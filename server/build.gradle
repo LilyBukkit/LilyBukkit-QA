@@ -9,7 +9,7 @@ plugins {
 abstract class DeletePatches extends DefaultTask {
 
 	@Input
-	String rmPath = "none";
+	String rmPath = "none"
 
     static def rm(Path path) {
         File file = new File(path.toString())
@@ -48,6 +48,16 @@ jar {
     manifest {
         attributes "Main-Class": "net.minecraft.server.MinecraftServer"
     }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.30'
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    implementation group: 'org.avaje', name: 'ebean', version: '2.8.1'
 }
 
 group 'net.buj'

@@ -1,22 +1,13 @@
-# Rosepad Server&Client
+# LilyBukkit
 
-Rosepad is a custom Lilypad QA server/client based on [Smaed's unofficial jars](https://github.com/AlphaVerUnofficialJars)
-focused on adding new features to the game.
+LilyBukkit is an attempt to create a Bukkit-compatible server core for Minecraft version Alpha v1.0.16.05_13 Lilypad from the AlphaVer ARG. This server core is based on [5GameMaker/Rosepad](https://github.com/5GameMaker/Rosepad).
+
+* Current Rosepad base: `7a59e2998816b25d16070b7347972a857dd4c22a`
+* Current Rosepad codebase: `2b4861cde419df321398fad8b85e0091c27b758c`
+* Current Bukkit version: `1.4-R1`
+
+*More info on the ARG can be found [here](https://alphaver.fandom.com/wiki).*
 
 ## Installation
 
-- Install both JDK 8 and JDK 17
-- Clone this repository
-- Run `TOOLKIT_JAVA17=/path/to/your/jdk17/home ./gradlew -Dorg.gradle.java.home=/path/to/your/java8/home prepare processPatches shadowJar pack` and wait for build to finish
-
-> /!\ Caution /!\
-> You may have to re-run build several times for it to succeed.
-> If you encounter `java.lang.IllegalStateException: An error occurred while decompiling this method.` in runtime, try rebuilding Rosepad.
-
-## Contributing
-
-Since Minecraft is not licensed under a free software license, we can't share its source code, any modifications
-must be stored in .patch files (at least until proper code injections will be implemented) Make sure to test your
-patches before making a pull request
-
-To generate .patch files use `TOOLKIT_JAVA17=/path/to/your/jdk17/home ./gradlew -Dorg.gradle.java.home=/path/to/your/java8/home createPatches`
+> The current version is not runnable, so no installation guide is provided.
