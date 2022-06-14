@@ -1,0 +1,73 @@
+import java.nio.file.*
+
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.brambolt.gradle.patching' version '2022.05.01-7057'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    shadow files('../libs/codecjorbis-20101023.jar')
+    shadow files('../libs/codecwav-20101023.jar')
+    shadow files('../libs/libraryjavasound-20101123.jar')
+    shadow files('../libs/librarylwjglopenal-20100824.jar')
+    implementation files('../libs/lwjgl-2.9.4-nightly-20150209.jar')
+    implementation files('../libs/lwjgl_util-2.9.4-nightly-20150209.jar')
+    shadow files('../libs/soundsystem-20120107.jar')
+    shadow group: 'org.json', name: 'json', version: '20220320'
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "net.minecraft.client.Minecraft"
+    }
+}
+
+abstract class DeletePatches extends DefaultTask {
+
+	@Input
+	String rmPath = "none";
+
+    static def rm(Path path) {
+        File file = new File(path.toString())
+        if (file.isDirectory()) {
+            for (File sf : file.listFiles()) {
+                rm(sf.toPath())
+            }
+        }
+        file.delete()
+    }
+	
+	@TaskAction
+	def delete() {
+		rm(Paths.get(rmPath))
+	}
+}
+
+tasks.register("deletePatches", DeletePatches) {
+	rmPath = "${projectDir}/patches"
+}
+
+processPatches {
+    content = "${projectDir}/src/orig/java"
+    patches = "${projectDir}/patches"
+    destination = "${projectDir}/src/main/java"
+}
+
+createPatches {
+    content = "${projectDir}/src/orig/java"
+    modified = "${projectDir}/src/main/java"
+    destination = "${projectDir}/patches"
+    dependsOn tasks.named("deletePatches").get()
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+}
+
+group 'net.buj'
+version '1.1-SNAPSHOT'
