@@ -6,6 +6,8 @@ LilyBukkit is an attempt to create a Bukkit-compatible server core for Minecraft
 * Current Rosepad codebase: `2b4861cde419df321398fad8b85e0091c27b758c`
 * Current Bukkit version: `1.7.10-R0.1-SNAPSHOT`
 
+ [//]: # (I'm a madlad by trying to implement 1.7.10 onto a1.0.16, but that's still very interesting)
+
 *More info on the ARG can be found [here](https://alphaver.fandom.com/wiki).*
 
 ## Installation
