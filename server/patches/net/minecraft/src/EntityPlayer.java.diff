@@ -1,0 +1,11 @@
+--- EntityPlayer.java
++++ EntityPlayer.java
+@@ -216,6 +216,6 @@
+     
+     @Override
+-    protected float getEyeHeight() {
+-        return 0.12f;
++    protected double getEyeHeight() {
++        return new Float(0.12f).doubleValue();
+     }
+     

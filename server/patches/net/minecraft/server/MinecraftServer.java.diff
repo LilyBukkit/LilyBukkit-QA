@@ -67,7 +67,7 @@
 -import net.minecraft.src.ICommandListener;
  
 -public class MinecraftServer implements ICommandListener, Runnable {
-+public class MinecraftServer implements ICommandListener, Runnable, Server {
++public class MinecraftServer implements ICommandListener, Runnable, Server, CommandExecutor {
      public static Logger logger;
 -    public static HashMap playerList;
 +    public static HashMap<String, Object> playerList;
@@ -242,7 +242,7 @@
 +        }
          this.worldMngr.updateEntities();
          this.networkServer.handleNetworkListenThread();
-@@ -248,21 +234,22 @@
+@@ -248,21 +234,39 @@
          this.entityTracker.updateTrackedEntities();
          for (int i5 = 0; i5 < this.playersOnline.size(); ++i5) {
 -            ((IUpdatePlayerListBox)this.playersOnline.get(i5)).addAllPlayers();
@@ -270,11 +270,28 @@
 -        while (this.commands.size() > 0) {
 -            final ServerCommand serverCommand1 = (ServerCommand)this.commands.remove(0);
 +        //TODO: rewrite the whole method to use custom command handling
++        /* Also:
++        ———————————No switches?———————————
++        ⠀⣞⢽⢪⢣⢣⢣⢫⡺⡵⣝⡮⣗⢷⢽⢽⢽⣮⡷⡽⣜⣜⢮⢺⣜⢷⢽⢝⡽⣝
++        ⠸⡸⠜⠕⠕⠁⢁⢇⢏⢽⢺⣪⡳⡝⣎⣏⢯⢞⡿⣟⣷⣳⢯⡷⣽⢽⢯⣳⣫⠇
++        ⠀⠀⢀⢀⢄⢬⢪⡪⡎⣆⡈⠚⠜⠕⠇⠗⠝⢕⢯⢫⣞⣯⣿⣻⡽⣏⢗⣗⠏⠀
++        ⠀⠪⡪⡪⣪⢪⢺⢸⢢⢓⢆⢤⢀⠀⠀⠀⠀⠈⢊⢞⡾⣿⡯⣏⢮⠷⠁⠀⠀
++        ⠀⠀⠀⠈⠊⠆⡃⠕⢕⢇⢇⢇⢇⢇⢏⢎⢎⢆⢄⠀⢑⣽⣿⢝⠲⠉⠀⠀⠀⠀
++        ⠀⠀⠀⠀⠀⡿⠂⠠⠀⡇⢇⠕⢈⣀⠀⠁⠡⠣⡣⡫⣂⣿⠯⢪⠰⠂⠀⠀⠀⠀
++        ⠀⠀⠀⠀⡦⡙⡂⢀⢤⢣⠣⡈⣾⡃⠠⠄⠀⡄⢱⣌⣶⢏⢊⠂⠀⠀⠀⠀⠀⠀
++        ⠀⠀⠀⠀⢝⡲⣜⡮⡏⢎⢌⢂⠙⠢⠐⢀⢘⢵⣽⣿⡿⠁⠁⠀⠀⠀⠀⠀⠀⠀
++        ⠀⠀⠀⠀⠨⣺⡺⡕⡕⡱⡑⡆⡕⡅⡕⡜⡼⢽⡻⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
++        ⠀⠀⠀⠀⣼⣳⣫⣾⣵⣗⡵⡱⡡⢣⢑⢕⢜⢕⡝⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
++        ⠀⠀⠀⣴⣿⣾⣿⣿⣿⡿⡽⡑⢌⠪⡢⡣⣣⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
++        ⠀⠀⠀⡟⡾⣿⢿⢿⢵⣽⣾⣼⣘⢸⢸⣞⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
++        ⠀⠀⠀⠀⠁⠇⠡⠩⡫⢿⣝⡻⡮⣒⢽⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
++        —————————————————————————————
++         */
 +        /*while (this.commands.size() > 0) {
 +            final ServerCommand serverCommand1 = (ServerCommand) this.commands.remove(0);
              String string2 = serverCommand1.command;
              final ICommandListener iCommandListener3 = serverCommand1.commandListener;
-@@ -271,45 +258,36 @@
+@@ -271,45 +275,36 @@
                  if (string2.toLowerCase().startsWith("list")) {
                      iCommandListener3.addHelpCommandMessage(new StringBuilder("Connected players: ").append(this.configManager.getPlayerList()).toString());
 -                }
@@ -329,7 +346,7 @@
 +                } else if (string2.toLowerCase().startsWith("ban ")) {
                      final String string4 = string2.substring(string2.indexOf(" ")).trim();
                      this.configManager.banPlayer(string4);
-@@ -320,15 +298,13 @@
+@@ -320,15 +315,13 @@
                      }
                      entityPlayerMP12.playerNetServerHandler.kickPlayer("Banned by admin");
 -                }
@@ -348,7 +365,7 @@
 +                        final EntityPlayerMP entityPlayerMP13 = (EntityPlayerMP) this.configManager.playerEntities.get(i13);
                          if (entityPlayerMP13.username.equalsIgnoreCase(string4)) {
                              entityPlayerMP12 = entityPlayerMP13;
-@@ -338,10 +314,8 @@
+@@ -338,10 +331,8 @@
                          entityPlayerMP12.playerNetServerHandler.kickPlayer("Kicked by admin");
                          this.print(string3, new StringBuilder("Kicking ").append(entityPlayerMP12.username).toString());
 -                    }
@@ -361,7 +378,7 @@
 +                } else if (string2.toLowerCase().startsWith("tp ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length == 3) {
-@@ -350,18 +324,14 @@
+@@ -350,18 +341,14 @@
                          if (entityPlayerMP12 == null) {
                              iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string5[1]).append(". No tp.").toString());
 -                        }
@@ -385,7 +402,7 @@
 +                } else if (string2.toLowerCase().startsWith("give ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length != 3 && string5.length != 4) {
-@@ -386,23 +356,18 @@
+@@ -386,23 +373,18 @@
                                  }
                                  entityPlayerMP14.dropPlayerItem(new ItemStack(i14, i15));
 -                            }
@@ -414,7 +431,7 @@
 +                } else if (string2.toLowerCase().startsWith("tell ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length < 3) {
-@@ -419,10 +384,73 @@
+@@ -419,10 +401,73 @@
                      }
                      iCommandListener3.addHelpCommandMessage("There's no player by that name online.");
 -                }
@@ -492,7 +509,7 @@
 +            } else {
                  iCommandListener3.addHelpCommandMessage("To run the server without a gui, start it like this:");
                  iCommandListener3.addHelpCommandMessage("   java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui");
-@@ -445,8 +473,9 @@
+@@ -445,8 +490,9 @@
                  iCommandListener3.addHelpCommandMessage("   list                      lists all currently connected players");
                  iCommandListener3.addHelpCommandMessage("   say <message>             broadcasts a message to all players");
 +                iCommandListener3.addHelpCommandMessage("   whitelist                 manage server whitelist");
@@ -504,7 +521,7 @@
 +
      private void print(final String string1, final String string2) {
          final String string3 = String.valueOf(string1) + ": " + string2;
-@@ -454,18 +483,17 @@
+@@ -454,18 +500,17 @@
          MinecraftServer.logger.info(string3);
      }
 -    
@@ -527,7 +544,7 @@
 +
      public static void main(final String[] args) {
          try {
-@@ -475,24 +503,554 @@
+@@ -475,24 +520,564 @@
              }
              new ThreadServerApplication("Server thread", minecraftServer1).start();
 +        } catch (Exception exception2) {
@@ -562,13 +579,12 @@
 +    // # L I L Y B U K K I T # \\
 +    // ####################### \\
 +
-+    private List<EntityPlayerMP> BUKKIT_onlinePlayerList;
-+    
-+    private void initLilyBukkit(){
++    private List<Player> BUKKIT_onlinePlayerList;
++
++    private void initLilyBukkit() {
 +        this.BUKKIT_onlinePlayerList = new ArrayList<>(this.playersOnline.size());
-+        for (:
-+             ) {
-+            
++        for (int i = 0; i < this.playersOnline.size(); i++) {
++            this.BUKKIT_onlinePlayerList.add(this.getPlayer(this.playersOnline.get(i).toString()));
 +        }
 +    }
 +
@@ -592,12 +608,12 @@
 +     */
 +    @Override
 +    public Player[] _INVALID_getOnlinePlayers() {
-+        return (Player[]) this.playersOnline.toArray();
++        return (Player[]) this.configManager.playerEntities.toArray();
 +    }
 +
 +    @Override
 +    public Collection<? extends Player> getOnlinePlayers() {
-+        return this.playersOnline;
++        return this.configManager.playerEntities;
 +    }
 +
 +    @Override
@@ -637,7 +653,7 @@
 +
 +    @Override
 +    public boolean getGenerateStructures() {
-+        return false;
++        return true;
 +    }
 +
 +    @Override
@@ -657,7 +673,9 @@
 +
 +    @Override
 +    public void setWhitelist(boolean b) {
-+        this.propertyManagerObj.getBooleanProperty(LilyBukkit.ServerProperties.WHITELIST_ENABLED, b);
++        if (this.propertyManagerObj.getBooleanProperty(LilyBukkit.ServerProperties.WHITELIST_ENABLED, b) != b) {
++            this.propertyManagerObj.generateAndSaveProperties();
++        }
 +    }
 +
 +    @Override
@@ -706,7 +724,7 @@
 +     */
 +    @Override
 +    public Player getPlayer(String s) {
-+        return null;
++        return this.configManager.getPlayerEntity(s);
 +    }
 +
 +    /**
@@ -1012,12 +1030,13 @@
 +
 +    @Override
 +    public boolean isPrimaryThread() {
++        //TODO: Understand wtf is this
 +        return false;
 +    }
 +
 +    @Override
 +    public String getMotd() {
-+        return null;
++        return this.propertyManagerObj.getStringProperty(LilyBukkit.ServerProperties.MOTD, "A LilyBukkit server");
 +    }
 +
 +    @Override
@@ -1083,9 +1102,17 @@
 +        return null;
 +    }
 +
-+    // CUSTOM \\
-+
-+    public static Command[] getCommands() {
-+        return LilyBukkit.commandList;
++    /**
++     * Executes the given command, returning its success
++     *
++     * @param sender  Source of the command
++     * @param command Command which was executed
++     * @param label   Alias of the command which was used
++     * @param args    Passed command arguments
++     * @return true if a valid command, otherwise false
++     */
++    @Override
++    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
++        return false;
 +    }
  }

@@ -1,0 +1,470 @@
+--- EntityLiving.java
++++ EntityLiving.java
+@@ -1,5 +1,16 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.EntityEffect;
++import org.bukkit.Location;
++import org.bukkit.Server;
++import org.bukkit.entity.EntityType;
++import org.bukkit.event.entity.EntityDamageEvent;
++import org.bukkit.event.player.PlayerTeleportEvent;
++import org.bukkit.metadata.MetadataValue;
++import org.bukkit.plugin.Plugin;
++import org.bukkit.util.Vector;
++
+ import java.util.List;
++import java.util.UUID;
+ 
+ public class EntityLiving extends Entity {
+@@ -109,6 +120,6 @@
+     
+     @Override
+-    protected float getEyeHeight() {
+-        return this.height * 0.85f;
++    protected double getEyeHeight() {
++        return new Float(this.height * 0.85f).doubleValue();
+     }
+     
+@@ -670,3 +681,441 @@
+         return this.worldObj.rayTraceBlocks(vec3D4, vec3D6);
+     }
++
++    /**
++     * Gets the entity's current position
++     *
++     * @return a new copy of Location containing the position of this entity
++     */
++    @Override
++    public Location getLocation() {
++        return null;
++    }
++
++    /**
++     * Stores the entity's current position in the provided Location object.
++     * <p>
++     * If the provided Location is null this method does nothing and returns
++     * null.
++     *
++     * @param loc
++     * @return The Location object provided or null
++     */
++    @Override
++    public Location getLocation(Location loc) {
++        return null;
++    }
++
++    /**
++     * Sets this entity's velocity
++     *
++     * @param velocity New velocity to travel with
++     */
++    @Override
++    public void setVelocity(Vector velocity) {
++
++    }
++
++    /**
++     * Gets this entity's current velocity
++     *
++     * @return Current travelling velocity of this entity
++     */
++    @Override
++    public Vector getVelocity() {
++        return null;
++    }
++
++    /**
++     * Returns true if the entity is supported by a block. This value is a
++     * state updated by the server and is not recalculated unless the entity
++     * moves.
++     *
++     * @return True if entity is on ground.
++     */
++    @Override
++    public boolean isOnGround() {
++        return false;
++    }
++
++    /**
++     * Gets the current world this entity resides in
++     *
++     * @return World
++     */
++    @Override
++    public org.bukkit.World getWorld() {
++        return null;
++    }
++
++    /**
++     * Teleports this entity to the given location. If this entity is riding a
++     * vehicle, it will be dismounted prior to teleportation.
++     *
++     * @param location New location to teleport this entity to
++     * @return <code>true</code> if the teleport was successful
++     */
++    @Override
++    public boolean teleport(Location location) {
++        return false;
++    }
++
++    /**
++     * Teleports this entity to the given location. If this entity is riding a
++     * vehicle, it will be dismounted prior to teleportation.
++     *
++     * @param location New location to teleport this entity to
++     * @param cause    The cause of this teleportation
++     * @return <code>true</code> if the teleport was successful
++     */
++    @Override
++    public boolean teleport(Location location, PlayerTeleportEvent.TeleportCause cause) {
++        return false;
++    }
++
++    /**
++     * Teleports this entity to the target Entity. If this entity is riding a
++     * vehicle, it will be dismounted prior to teleportation.
++     *
++     * @param destination Entity to teleport this entity to
++     * @return <code>true</code> if the teleport was successful
++     */
++    @Override
++    public boolean teleport(org.bukkit.entity.Entity destination) {
++        return false;
++    }
++
++    /**
++     * Teleports this entity to the target Entity. If this entity is riding a
++     * vehicle, it will be dismounted prior to teleportation.
++     *
++     * @param destination Entity to teleport this entity to
++     * @param cause       The cause of this teleportation
++     * @return <code>true</code> if the teleport was successful
++     */
++    @Override
++    public boolean teleport(org.bukkit.entity.Entity destination, PlayerTeleportEvent.TeleportCause cause) {
++        return false;
++    }
++
++    /**
++     * Returns a list of entities within a bounding box centered around this
++     * entity
++     *
++     * @param x 1/2 the size of the box along x axis
++     * @param y 1/2 the size of the box along y axis
++     * @param z 1/2 the size of the box along z axis
++     * @return List<Entity> List of entities nearby
++     */
++    @Override
++    public List<org.bukkit.entity.Entity> getNearbyEntities(double x, double y, double z) {
++        return null;
++    }
++
++    /**
++     * Returns a unique id for this entity
++     *
++     * @return Entity id
++     */
++    @Override
++    public int getEntityId() {
++        return 0;
++    }
++
++    /**
++     * Returns the entity's current fire ticks (ticks before the entity stops
++     * being on fire).
++     *
++     * @return int fireTicks
++     */
++    @Override
++    public int getFireTicks() {
++        return 0;
++    }
++
++    /**
++     * Returns the entity's maximum fire ticks.
++     *
++     * @return int maxFireTicks
++     */
++    @Override
++    public int getMaxFireTicks() {
++        return 0;
++    }
++
++    /**
++     * Sets the entity's current fire ticks (ticks before the entity stops
++     * being on fire).
++     *
++     * @param ticks Current ticks remaining
++     */
++    @Override
++    public void setFireTicks(int ticks) {
++
++    }
++
++    /**
++     * Mark the entity's removal.
++     */
++    @Override
++    public void remove() {
++
++    }
++
++    /**
++     * Returns true if this entity has been marked for removal.
++     *
++     * @return True if it is dead.
++     */
++    @Override
++    public boolean isDead() {
++        return false;
++    }
++
++    /**
++     * Returns false if the entity has died or been despawned for some other
++     * reason.
++     *
++     * @return True if valid.
++     */
++    @Override
++    public boolean isValid() {
++        return false;
++    }
++
++    /**
++     * Gets the {@link Server} that contains this Entity
++     *
++     * @return Server instance running this Entity
++     */
++    @Override
++    public Server getServer() {
++        return null;
++    }
++
++    /**
++     * Gets the primary passenger of a vehicle. For vehicles that could have
++     * multiple passengers, this will only return the primary passenger.
++     *
++     * @return an entity
++     */
++    @Override
++    public org.bukkit.entity.Entity getPassenger() {
++        return null;
++    }
++
++    /**
++     * Set the passenger of a vehicle.
++     *
++     * @param passenger The new passenger.
++     * @return false if it could not be done for whatever reason
++     */
++    @Override
++    public boolean setPassenger(org.bukkit.entity.Entity passenger) {
++        return false;
++    }
++
++    /**
++     * Check if a vehicle has passengers.
++     *
++     * @return True if the vehicle has no passengers.
++     */
++    @Override
++    public boolean isEmpty() {
++        return false;
++    }
++
++    /**
++     * Eject any passenger.
++     *
++     * @return True if there was a passenger.
++     */
++    @Override
++    public boolean eject() {
++        return false;
++    }
++
++    /**
++     * Returns the distance this entity has fallen
++     *
++     * @return The distance.
++     */
++    @Override
++    public float getFallDistance() {
++        return 0;
++    }
++
++    /**
++     * Sets the fall distance for this entity
++     *
++     * @param distance The new distance.
++     */
++    @Override
++    public void setFallDistance(float distance) {
++
++    }
++
++    /**
++     * Record the last {@link EntityDamageEvent} inflicted on this entity
++     *
++     * @param event a {@link EntityDamageEvent}
++     */
++    @Override
++    public void setLastDamageCause(EntityDamageEvent event) {
++
++    }
++
++    /**
++     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity.
++     * This event may have been cancelled.
++     *
++     * @return the last known {@link EntityDamageEvent} or null if hitherto
++     * unharmed
++     */
++    @Override
++    public EntityDamageEvent getLastDamageCause() {
++        return null;
++    }
++
++    /**
++     * Returns a unique and persistent id for this entity
++     *
++     * @return unique id
++     */
++    @Override
++    public UUID getUniqueId() {
++        return null;
++    }
++
++    /**
++     * Gets the amount of ticks this entity has lived for.
++     * <p>
++     * This is the equivalent to "age" in entities.
++     *
++     * @return Age of entity
++     */
++    @Override
++    public int getTicksLived() {
++        return 0;
++    }
++
++    /**
++     * Sets the amount of ticks this entity has lived for.
++     * <p>
++     * This is the equivalent to "age" in entities. May not be less than one
++     * tick.
++     *
++     * @param value Age of entity
++     */
++    @Override
++    public void setTicksLived(int value) {
++
++    }
++
++    /**
++     * Performs the specified {@link EntityEffect} for this entity.
++     * <p>
++     * This will be viewable to all players near the entity.
++     *
++     * @param type Effect to play.
++     */
++    @Override
++    public void playEffect(EntityEffect type) {
++
++    }
++
++    /**
++     * Get the type of the entity.
++     *
++     * @return The entity type.
++     */
++    @Override
++    public EntityType getType() {
++        return null;
++    }
++
++    /**
++     * Returns whether this entity is inside a vehicle.
++     *
++     * @return True if the entity is in a vehicle.
++     */
++    @Override
++    public boolean isInsideVehicle() {
++        return false;
++    }
++
++    /**
++     * Leave the current vehicle. If the entity is currently in a vehicle (and
++     * is removed from it), true will be returned, otherwise false will be
++     * returned.
++     *
++     * @return True if the entity was in a vehicle.
++     */
++    @Override
++    public boolean leaveVehicle() {
++        return false;
++    }
++
++    /**
++     * Get the vehicle that this player is inside. If there is no vehicle,
++     * null will be returned.
++     *
++     * @return The current vehicle.
++     */
++    @Override
++    public org.bukkit.entity.Entity getVehicle() {
++        return null;
++    }
++
++    /**
++     * Sets a metadata value in the implementing object's metadata store.
++     *
++     * @param metadataKey      A unique key to identify this metadata.
++     * @param newMetadataValue The metadata value to apply.
++     * @throws IllegalArgumentException If value is null, or the owning plugin
++     *                                  is null
++     */
++    @Override
++    public void setMetadata(String metadataKey, MetadataValue newMetadataValue) {
++
++    }
++
++    /**
++     * Returns a list of previously set metadata values from the implementing
++     * object's metadata store.
++     *
++     * @param metadataKey the unique metadata key being sought.
++     * @return A list of values, one for each plugin that has set the
++     * requested value.
++     */
++    @Override
++    public List<MetadataValue> getMetadata(String metadataKey) {
++        return null;
++    }
++
++    /**
++     * Tests to see whether the implementing object contains the given
++     * metadata value in its metadata store.
++     *
++     * @param metadataKey the unique metadata key being queried.
++     * @return the existence of the metadataKey within subject.
++     */
++    @Override
++    public boolean hasMetadata(String metadataKey) {
++        return false;
++    }
++
++    /**
++     * Removes the given metadata value from the implementing object's
++     * metadata store.
++     *
++     * @param metadataKey  the unique metadata key identifying the metadata to
++     *                     remove.
++     * @param owningPlugin This plugin's metadata value will be removed. All
++     *                     other values will be left untouched.
++     * @throws IllegalArgumentException If plugin is null
++     */
++    @Override
++    public void removeMetadata(String metadataKey, Plugin owningPlugin) {
++
++    }
+ }

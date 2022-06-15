@@ -267,9 +267,11 @@
          return false;
      }
 -    
+-    protected float getEyeHeight() {
+-        return 0.0f;
 +
-     protected float getEyeHeight() {
-         return 0.0f;
++    protected double getEyeHeight() {
++        return new Float(0.0f).doubleValue();
      }
 -    
 +
