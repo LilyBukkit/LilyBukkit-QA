@@ -544,7 +544,7 @@
 +
      public static void main(final String[] args) {
          try {
-@@ -475,24 +520,564 @@
+@@ -475,24 +520,566 @@
              }
              new ThreadServerApplication("Server thread", minecraftServer1).start();
 +        } catch (Exception exception2) {
@@ -580,12 +580,14 @@
 +    // ####################### \\
 +
 +    private List<Player> BUKKIT_onlinePlayerList;
++    private Set<OfflinePlayer> BUKKIT_whitelist;
 +
 +    private void initLilyBukkit() {
 +        this.BUKKIT_onlinePlayerList = new ArrayList<>(this.playersOnline.size());
 +        for (int i = 0; i < this.playersOnline.size(); i++) {
 +            this.BUKKIT_onlinePlayerList.add(this.getPlayer(this.playersOnline.get(i).toString()));
 +        }
++        this.BUKKIT_whitelist = new HashSet<>();
 +    }
 +
 +    @Override
@@ -680,7 +682,7 @@
 +
 +    @Override
 +    public Set<OfflinePlayer> getWhitelistedPlayers() {
-+        return null;
++        return this.BUKKIT_whitelist;
 +    }
 +
 +    @Override

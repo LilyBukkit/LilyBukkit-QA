@@ -1,6 +1,6 @@
 --- World.java
 +++ World.java
-@@ -1,7 +1,17 @@
+@@ -1,7 +1,20 @@
  package net.minecraft.src;
  
 +import org.bukkit.*;
@@ -12,6 +12,9 @@
 +import org.bukkit.inventory.ItemStack;
 +import org.bukkit.metadata.MetadataValue;
 +import org.bukkit.plugin.Plugin;
++import org.bukkit.plugin.messaging.ChannelNotRegisteredException;
++import org.bukkit.plugin.messaging.MessageTooLargeException;
++import org.bukkit.plugin.messaging.Messenger;
 +import org.bukkit.util.Vector;
 +
  import java.io.DataInputStream;
@@ -20,7 +23,7 @@
 +import java.util.*;
  import java.io.InputStream;
  import java.io.FileInputStream;
-@@ -10,13 +20,7 @@
+@@ -10,13 +23,7 @@
  import java.io.DataOutputStream;
  import java.io.FileOutputStream;
 -import java.util.HashSet;
@@ -35,14 +38,14 @@
 +public class World implements IBlockAccess, org.bukkit.World {
      private List lightingToUpdate;
      public List loadedEntityList;
-@@ -53,5 +57,5 @@
+@@ -53,5 +60,5 @@
      public boolean worldChunkLoadOverride;
      private ArrayList collidingBoundingBoxes;
 -    private Set positionsToUpdate;
 +private Set<ChunkCoordIntPair> positionsToUpdate;
      private int soundCounter;
      private List entitiesWithinAABBExcludingEntity;
-@@ -1579,3 +1583,1563 @@
+@@ -1579,3 +1586,1562 @@
          }
      }
 +
@@ -921,8 +924,7 @@
 +     * the specified {@link Material}. The material dictates what is falling.
 +     * When the FallingBlock hits the ground, it will place that block.
 +     * <p>
-+     * The Material must be a block type, check with {@link Material#isBlock()
-+     * material.isBlock()}. The Material may not be air.
++     * The Material must be a block type, which is uncheckable. The Material may not be air.
 +     *
 +     * @param location The {@link Location} to spawn the FallingBlock
 +     * @param material The block {@link Material} type

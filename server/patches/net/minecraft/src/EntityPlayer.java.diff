@@ -5,7 +5,7 @@
      @Override
 -    protected float getEyeHeight() {
 -        return 0.12f;
-+    protected double getEyeHeight() {
++    public double getEyeHeight() {
 +        return new Float(0.12f).doubleValue();
      }
      

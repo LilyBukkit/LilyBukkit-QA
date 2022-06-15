@@ -2,6 +2,9 @@ package ru.vtm.lilybukkit;
 
 public class LilyBukkit {
 
+    /**
+     * Just strings for the PropertyManager
+     */
     public static class ServerProperties {
         public static final String MAX_PLAYERS = "max-players";
         public static final String SERVER_PORT = "server-port";

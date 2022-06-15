@@ -121,10 +121,12 @@
 +
      @Override
      public void swingItem() {
-@@ -109,8 +133,2986 @@
+@@ -109,8 +133,2988 @@
          }
      }
 -    
++
++    private Player killer;
 +
      @Override
 -    protected float getEyeHeight() {
@@ -237,7 +239,7 @@
 +     */
 +    @Override
 +    public Arrow shootArrow() {
-+        return null;
++        return new EntityArrow(this.worldObj, this);
 +    }
 +
 +    /**
@@ -248,7 +250,7 @@
 +     */
 +    @Override
 +    public int getRemainingAir() {
-+        return 0;
++        return this.air;
 +    }
 +
 +    /**
@@ -258,7 +260,7 @@
 +     */
 +    @Override
 +    public void setRemainingAir(int ticks) {
-+
++        this.air = ticks;
 +    }
 +
 +    /**
@@ -268,7 +270,7 @@
 +     */
 +    @Override
 +    public int getMaximumAir() {
-+        return 0;
++        return this.maxAir;
 +    }
 +
 +    /**
@@ -278,7 +280,7 @@
 +     */
 +    @Override
 +    public void setMaximumAir(int ticks) {
-+
++        this.maxAir = ticks;
 +    }
 +
 +    /**
@@ -301,7 +303,7 @@
 +     */
 +    @Override
 +    public void setMaximumNoDamageTicks(int ticks) {
-+
++        System.err.println("Unsupported operation: setMaximumNoDamageTicks");
 +    }
 +
 +    /**
@@ -315,7 +317,7 @@
 +     */
 +    @Override
 +    public double getLastDamage() {
-+        return 0;
++        return this.attackedAtYaw;
 +    }
 +
 +    /**
@@ -325,7 +327,7 @@
 +     */
 +    @Override
 +    public int _INVALID_getLastDamage() {
-+        return 0;
++        return (int) getLastDamage();
 +    }
 +
 +    /**
@@ -335,7 +337,7 @@
 +     */
 +    @Override
 +    public void setLastDamage(double damage) {
-+
++        this.attackedAtYaw = new Float(damage);
 +    }
 +
 +    /**
@@ -347,7 +349,7 @@
 +     */
 +    @Override
 +    public void _INVALID_setLastDamage(int damage) {
-+
++        setLastDamage(damage);
 +    }
 +
 +    /**
@@ -367,7 +369,7 @@
 +     */
 +    @Override
 +    public void setNoDamageTicks(int ticks) {
-+
++        System.err.println("Unsupported operation: setNoDamageTicks");
 +    }
 +
 +    /**
@@ -379,7 +381,7 @@
 +     */
 +    @Override
 +    public Player getKiller() {
-+        return null;
++        return this.killer;
 +    }
 +
 +    /**
