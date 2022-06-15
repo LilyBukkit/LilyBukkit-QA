@@ -1,0 +1,44 @@
+--- ServerCommand.java
++++ ServerCommand.java
+@@ -1,11 +1,40 @@
+ package net.minecraft.src;
+ 
+-public class ServerCommand {
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++import ru.vtm.lilybukkit.command.CommandHandler;
++
++public class ServerCommand extends Command {
+     public final String command;
+     public final ICommandListener commandListener;
+     
+     public ServerCommand(final String command, final ICommandListener commandListener) {
++        super(command);
+         this.command = command;
+         this.commandListener = commandListener;
+     }
++
++    // LILYBUKKIT \\
++
++    /**
++     * Executes the command, returning its success
++     *
++     * @param sender       Source object which is executing this command
++     * @param commandLabel The alias of the command used
++     * @param args         All arguments passed to the command, split via ' '
++     * @return true if the command was successful, otherwise false
++     */
++    @Override
++    public boolean execute(CommandSender sender, String commandLabel, String[] args) {
++        switch (commandLabel) {
++            case "?":
++            case "help":
++                for (ServerCommand c : CommandHandler.getCommandsList()) {
++                    this.commandListener.addHelpCommandMessage(c.command + " - " + c.description);
++                }
++                return true;
++            default:
++                return false;
++        }
++    }
+ }
