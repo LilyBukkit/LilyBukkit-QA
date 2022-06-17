@@ -1,344 +1,23 @@
 --- Chunk.java
 +++ Chunk.java
-@@ -1,11 +1,9 @@
+@@ -1,4 +1,7 @@
  package net.minecraft.src;
  
--import java.util.Random;
--import java.util.ArrayList;
--import java.util.HashMap;
--import java.util.List;
--import java.util.Map;
++import org.bukkit.ChunkSnapshot;
 +import org.bukkit.block.BlockState;
++
+ import java.util.Random;
+ import java.util.ArrayList;
+@@ -7,5 +10,5 @@
+ import java.util.Map;
  
 -public class Chunk {
-+import java.util.*;
-+
 +public class Chunk implements org.bukkit.Chunk {
      public static boolean isLit;
      public byte[] blocks;
-@@ -19,6 +17,6 @@
-     public final int xPosition;
-     public final int zPosition;
--    public Map chunkTileEntityMap;
--    public List[] entities;
-+    public Map<ChunkPosition, TileEntity> chunkTileEntityMap;
-+    public List<Entity>[] entities;
-     public boolean isTerrainPopulated;
-     public boolean isModified;
-@@ -27,7 +25,7 @@
-     public boolean hasEntities;
-     public long lastSaveTime;
--    
-+
-     public Chunk(final World world, final int xPosition, final int zPosition) {
--        this.chunkTileEntityMap = (Map)new HashMap();
-+        this.chunkTileEntityMap = (Map) new HashMap();
-         this.entities = new List[8];
-         this.isTerrainPopulated = false;
-@@ -41,8 +39,8 @@
-         this.heightMap = new byte[256];
-         for (int i4 = 0; i4 < this.entities.length; ++i4) {
--            this.entities[i4] = (List)new ArrayList();
-+            this.entities[i4] = (List) new ArrayList();
-         }
-     }
--    
-+
-     public Chunk(final World world, final byte[] blocks, final int xPosition, final int zPositin) {
-         this(world, xPosition, zPositin);
-@@ -52,16 +50,16 @@
-         this.blocklightMap = new NibbleArray(blocks.length);
-     }
--    
-+
-     public boolean isAtLocation(final int xPosition, final int zPosition) {
-         return xPosition == this.xPosition && zPosition == this.zPosition;
-     }
--    
-+
-     public int getHeightValue(final int i1, final int i2) {
-         return this.heightMap[i2 << 4 | i1] & 0xFF;
-     }
--    
-+
-     public void doNothing() {
-     }
--    
-+
-     public void generateSkylightMap() {
-         int i1 = 127;
-@@ -83,5 +81,5 @@
-         this.isModified = true;
-     }
--    
-+
-     private void updateSkylight_do(final int i1, final int i2) {
-         final int i3 = this.getHeightValue(i1, i2);
-@@ -93,16 +91,15 @@
-         this.checkSkylightNeighborUpdate(i4, i5 + 1, i3);
-     }
--    
-+
-     private void checkSkylightNeighborUpdate(final int i1, final int i2, final int i3) {
-         final int i4 = this.worldObj.getHeightValue(i1, i2);
-         if (i4 > i3) {
-             this.worldObj.scheduleLightingUpdate(EnumSkyBlock.Sky, i1, i3, i2, i1, i4, i2);
--        }
--        else if (i4 < i3) {
-+        } else if (i4 < i3) {
-             this.worldObj.scheduleLightingUpdate(EnumSkyBlock.Sky, i1, i4, i2, i1, i3, i2);
-         }
-         this.isModified = true;
-     }
--    
-+
-     private void relightBlock(final int i1, final int i2, final int i3) {
-         int i5;
-@@ -111,12 +108,12 @@
-             i5 = i2;
-         }
--        for (int i6 = i1 << 11 | i3 << 7; i5 > 0 && Block.lightOpacity[this.blocks[i6 + i5 - 1]] == 0; --i5) {}
-+        for (int i6 = i1 << 11 | i3 << 7; i5 > 0 && Block.lightOpacity[this.blocks[i6 + i5 - 1]] == 0; --i5) {
-+        }
-         if (i5 != i4) {
-             this.worldObj.markBlocksDirtyVertical(i1, i3, i5, i4);
--            this.heightMap[i3 << 4 | i1] = (byte)i5;
-+            this.heightMap[i3 << 4 | i1] = (byte) i5;
-             if (i5 < this.height) {
-                 this.height = i5;
--            }
--            else {
-+            } else {
-                 int i7 = 127;
-                 for (int i8 = 0; i8 < 16; ++i8) {
-@@ -135,6 +132,5 @@
-                     this.skylightMap.set(i1, i9, i3, 15);
-                 }
--            }
--            else {
-+            } else {
-                 this.worldObj.scheduleLightingUpdate(EnumSkyBlock.Sky, i7, i4, i8, i7, i5, i8);
-                 for (int i9 = i4; i9 < i5; ++i9) {
-@@ -168,11 +164,11 @@
-         }
-     }
--    
-+
-     public int getBlockID(final int i1, final int i2, final int i3) {
-         return this.blocks[i1 << 11 | i3 << 7 | i2];
-     }
--    
-+
-     public boolean setBlockIDWithMetadata(final int i1, final int i2, final int i3, final int i4, final int i5) {
--        final byte b6 = (byte)i4;
-+        final byte b6 = (byte) i4;
-         final int i6 = this.heightMap[i3 << 4 | i1] & 0xFF;
-         final int i7 = this.blocks[i1 << 11 | i3 << 7 | i2] & 0xFF;
-@@ -191,6 +187,5 @@
-                 this.relightBlock(i1, i2 + 1, i3);
-             }
--        }
--        else if (i2 == i6 - 1) {
-+        } else if (i2 == i6 - 1) {
-             this.relightBlock(i1, i2, i3);
-         }
-@@ -203,7 +198,7 @@
-         return this.isModified = true;
-     }
--    
-+
-     public boolean setBlockID(final int x, final int y, final int z, final int id) {
--        final byte b5 = (byte)id;
-+        final byte b5 = (byte) id;
-         final int i6 = this.heightMap[z << 4 | x] & 0xFF;
-         final int i7 = this.blocks[x << 11 | z << 7 | y] & 0xFF;
-@@ -222,6 +217,5 @@
-                 this.relightBlock(x, y + 1, z);
-             }
--        }
--        else if (y == i6 - 1) {
-+        } else if (y == i6 - 1) {
-             this.relightBlock(x, y, z);
-         }
-@@ -234,24 +228,23 @@
-         return this.isModified = true;
-     }
--    
-+
-     public int getBlockMetadata(final int x, final int y, final int z) {
-         return this.data.get(x, y, z);
-     }
--    
-+
-     public void setBlockMetadata(final int x, final int y, final int z, final int metadata) {
-         this.isModified = true;
-         this.data.set(x, y, z, metadata);
-     }
--    
-+
-     public int getSavedLightValue(final EnumSkyBlock enumSkyBlock1, final int x, final int y, final int z) {
-         return (enumSkyBlock1 == EnumSkyBlock.Sky) ? this.skylightMap.get(x, y, z) : ((enumSkyBlock1 == EnumSkyBlock.Block) ? this.blocklightMap.get(x, y, z) : 0);
-     }
--    
-+
-     public void setLightValue(final EnumSkyBlock block, final int x, final int y, final int z, final int lightValue) {
-         this.isModified = true;
-         if (block == EnumSkyBlock.Sky) {
-             this.skylightMap.set(x, y, z, lightValue);
--        }
--        else {
-+        } else {
-             if (block != EnumSkyBlock.Block) {
-                 return;
-@@ -260,5 +253,5 @@
-         }
-     }
--    
-+
-     public int getBlockLightValue(final int x, final int y, final int z, final int i4) {
-         int i5 = this.skylightMap.get(x, y, z);
-@@ -273,5 +266,5 @@
-         return i5;
-     }
--    
-+
-     public void addEntity(final Entity entity) {
-         if (!this.isChunkRendered) {
-@@ -296,9 +289,9 @@
-         }
-     }
--    
-+
-     public void removeEntity(final Entity entity) {
-         this.removeEntityAtIndex(entity, entity.chunkCoordY);
-     }
--    
-+
-     public void removeEntityAtIndex(final Entity entity, int index) {
-         if (index < 0) {
-@@ -310,12 +303,12 @@
-         this.entities[index].remove(entity);
-     }
--    
-+
-     public boolean canBlockSeeTheSky(final int x, final int y, final int z) {
-         return y >= (this.heightMap[z << 4 | x] & 0xFF);
-     }
--    
-+
-     public TileEntity getChunkBlockTileEntity(final int x, final int y, final int z) {
-         final ChunkPosition chunkPosition4 = new ChunkPosition(x, y, z);
--        TileEntity tileEntity5 = (TileEntity)this.chunkTileEntityMap.get(chunkPosition4);
-+        TileEntity tileEntity5 = (TileEntity) this.chunkTileEntityMap.get(chunkPosition4);
-         if (tileEntity5 == null) {
-             final int i6 = this.getBlockID(x, y, z);
-@@ -323,11 +316,11 @@
-                 return null;
-             }
--            final BlockContainer blockContainer7 = (BlockContainer)Block.blocksList[i6];
-+            final BlockContainer blockContainer7 = (BlockContainer) Block.blocksList[i6];
-             blockContainer7.onBlockAdded(this.worldObj, this.xPosition * 16 + x, y, this.zPosition * 16 + z);
--            tileEntity5 = (TileEntity)this.chunkTileEntityMap.get(chunkPosition4);
-+            tileEntity5 = (TileEntity) this.chunkTileEntityMap.get(chunkPosition4);
-         }
-         return tileEntity5;
-     }
--    
-+
-     public void addTileEntity(final TileEntity tileEntity) {
-         final int i2 = tileEntity.xCoord - this.xPosition * 16;
-@@ -336,5 +329,5 @@
-         this.setChunkBlockTileEntity(i2, i3, i4, tileEntity);
-     }
--    
-+
-     public void setChunkBlockTileEntity(final int x, final int y, final int z, final TileEntity tileEntity) {
-         final ChunkPosition chunkPosition5 = new ChunkPosition(x, y, z);
-@@ -351,10 +344,9 @@
-             }
-             this.chunkTileEntityMap.put(chunkPosition5, tileEntity);
--        }
--        else {
-+        } else {
-             System.out.println("Attempted to place a tile entity where there was no entity tile!");
-         }
-     }
--    
-+
-     public void removeChunkBlockTileEntity(final int x, final int y, final int z) {
-         final ChunkPosition chunkPosition4 = new ChunkPosition(x, y, z);
-@@ -363,5 +355,5 @@
-         }
-     }
--    
-+
-     public void onChunkLoad() {
-         this.isChunkLoaded = true;
-@@ -371,5 +363,5 @@
-         }
-     }
--    
-+
-     public void onChunkUnload() {
-         this.isChunkLoaded = false;
-@@ -379,9 +371,9 @@
-         }
-     }
--    
-+
-     public void setChunkModified() {
-         this.isModified = true;
-     }
--    
-+
-     public void getEntitiesWithinAABBForEntity(final Entity entity, final AxisAlignedBB aabb, final List list) {
-         int i4 = MathHelper.floor_double((aabb.minY - 2.0) / 16.0);
-@@ -396,5 +388,5 @@
-             final List list2 = this.entities[i6];
-             for (int i7 = 0; i7 < list2.size(); ++i7) {
--                final Entity entity2 = (Entity)list2.get(i7);
-+                final Entity entity2 = (Entity) list2.get(i7);
-                 if (entity2 != entity && entity2.boundingBox.intersectsWith(aabb)) {
-                     list.add(entity2);
-@@ -403,5 +395,5 @@
-         }
-     }
--    
-+
-     public void getEntitiesOfTypeWithinAAAB(final Class clazz, final AxisAlignedBB aabb, final List list) {
-         int i4 = MathHelper.floor_double((aabb.minY - 2.0) / 16.0);
-@@ -416,5 +408,5 @@
-             final List list2 = this.entities[i6];
-             for (int i7 = 0; i7 < list2.size(); ++i7) {
--                final Entity entity9 = (Entity)list2.get(i7);
-+                final Entity entity9 = (Entity) list2.get(i7);
-                 if (clazz.isAssignableFrom(entity9.getClass()) && entity9.boundingBox.intersectsWith(aabb)) {
-                     list.add(entity9);
-@@ -423,9 +415,9 @@
-         }
-     }
--    
-+
-     public boolean needsSaving(final boolean unused) {
-         return !this.neverSave && ((this.hasEntities && this.worldObj.worldTime != this.lastSaveTime) || this.isModified);
-     }
--    
-+
-     public int getChunkData(final byte[] b1, final int i2, final int i3, final int i4, final int i5, final int i6, final int i7, int i8) {
-         for (int i9 = i2; i9 < i5; ++i9) {
-@@ -463,7 +455,65 @@
-         return i8;
-     }
--    
-+
-     public Random getRandomWithSeed(final long j1) {
+@@ -467,3 +470,143 @@
          return new Random(this.worldObj.randomSeed + this.xPosition * this.xPosition * 4987142 + this.xPosition * 5947611 + this.zPosition * this.zPosition * 4392871L + this.zPosition * 389711 ^ j1);
      }
-+
-+    // ####################### \\
-+    // # L I L Y B U K K I T # \\
-+    // ####################### \\
-+
 +
 +    /**
 +     * Gets the X-coordinate of this chunk
@@ -347,7 +26,7 @@
 +     */
 +    @Override
 +    public int getX() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -357,7 +36,7 @@
 +     */
 +    @Override
 +    public int getZ() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -367,7 +46,7 @@
 +     */
 +    @Override
 +    public org.bukkit.World getWorld() {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -380,16 +59,103 @@
 +     */
 +    @Override
 +    public org.bukkit.block.Block getBlock(int x, int y, int z) {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Capture thread-safe read-only snapshot of chunk data
++     *
++     * @return ChunkSnapshot
++     */
++    @Override
++    public ChunkSnapshot getChunkSnapshot() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Capture thread-safe read-only snapshot of chunk data
++     *
++     * @param includeMaxblocky     - if true, snapshot includes per-coordinate maximum Y values
++     * @param includeBiome         - if true, snapshot includes per-coordinate biome type
++     * @param includeBiomeTempRain - if true, snapshot includes per-coordinate raw biome temperature and rainfall
++     * @return ChunkSnapshot
++     */
++    @Override
++    public ChunkSnapshot getChunkSnapshot(boolean includeMaxblocky, boolean includeBiome, boolean includeBiomeTempRain) {
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    @Override
 +    public org.bukkit.entity.Entity[] getEntities() {
-+        return new org.bukkit.entity.Entity[0];
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    @Override
 +    public BlockState[] getTileEntities() {
-+        return new BlockState[0];
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Checks if the chunk is loaded.
++     *
++     * @return
++     */
++    @Override
++    public boolean isLoaded() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Loads the chunk.
++     *
++     * @param generate Whether or not to generate a chunk if it doesn't already exist
++     * @return true if the chunk has loaded successfully, otherwise false
++     */
++    @Override
++    public boolean load(boolean generate) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Loads the chunk.
++     *
++     * @return true if the chunk has loaded successfully, otherwise false
++     */
++    @Override
++    public boolean load() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Unloads and optionally saves the Chunk
++     *
++     * @param save Controls whether the chunk is saved
++     * @param safe Controls whether to unload the chunk when players are nearby
++     * @return true if the chunk has unloaded successfully, otherwise false
++     */
++    @Override
++    public boolean unload(boolean save, boolean safe) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Unloads and optionally saves the Chunk
++     *
++     * @param save Controls whether the chunk is saved
++     * @return true if the chunk has unloaded successfully, otherwise false
++     */
++    @Override
++    public boolean unload(boolean save) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Unloads and optionally saves the Chunk
++     *
++     * @return true if the chunk has unloaded successfully, otherwise false
++     */
++    @Override
++    public boolean unload() {
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
  }

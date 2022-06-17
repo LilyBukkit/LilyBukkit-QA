@@ -1,0 +1,11 @@
+--- EntityCow.java
++++ EntityCow.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.src;
+ 
+-public class EntityCow extends EntityAnimal {
++import org.bukkit.entity.Cow;
++
++public class EntityCow extends EntityAnimal implements Cow {
+     public boolean unusedBool2;
+     

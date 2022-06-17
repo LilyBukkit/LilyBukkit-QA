@@ -1,0 +1,11 @@
+--- EntitySkeleton.java
++++ EntitySkeleton.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.src;
+ 
+-public class EntitySkeleton extends EntityMob {
++import org.bukkit.entity.Skeleton;
++
++public class EntitySkeleton extends EntityMob implements Skeleton {
+     public EntitySkeleton(final World world) {
+         super(world);

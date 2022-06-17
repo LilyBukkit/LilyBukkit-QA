@@ -1,0 +1,11 @@
+--- EntitySpider.java
++++ EntitySpider.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.src;
+ 
+-public class EntitySpider extends EntityMob {
++import org.bukkit.entity.Spider;
++
++public class EntitySpider extends EntityMob implements Spider {
+     public EntitySpider(final World world) {
+         super(world);

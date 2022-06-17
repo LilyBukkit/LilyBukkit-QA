@@ -1,0 +1,130 @@
+--- BlockSign.java
++++ BlockSign.java
+@@ -1,7 +1,12 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.block.Block;
++import org.bukkit.block.Sign;
++import org.bukkit.inventory.Inventory;
++import org.bukkit.material.MaterialData;
++
+ import java.util.Random;
+ 
+-public class BlockSign extends BlockContainer {
++public class BlockSign extends BlockContainer implements Sign{
+     private Class signEntityClass;
+     private boolean isFreestanding;
+@@ -102,3 +107,113 @@
+         super.onNeighborBlockChange(world, x, y, z, flag);
+     }
++
++    /**
++     * Get the block's inventory.
++     *
++     * @return
++     */
++    @Override
++    public Inventory getInventory() {
++        return null;
++    }
++
++    /**
++     * Gets all the lines of text currently on this sign.
++     *
++     * @return Array of Strings containing each line of text
++     */
++    @Override
++    public String[] getLines() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the line of text at the specified index.
++     * <p>
++     * For example, getLine(0) will return the first line of text.
++     *
++     * @param index Line number to get the text from, starting at 0
++     * @return Text on the given line
++     * @throws IndexOutOfBoundsException Thrown when the line does not exist
++     */
++    @Override
++    public String getLine(int index) throws IndexOutOfBoundsException {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets the line of text at the specified index.
++     * <p>
++     * For example, setLine(0, "Line One") will set the first line of text to
++     * "Line One".
++     *
++     * @param index Line number to set the text at, starting from 0
++     * @param line  New text to set at the specified index
++     * @throws IndexOutOfBoundsException
++     */
++    @Override
++    public void setLine(int index, String line) throws IndexOutOfBoundsException {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the block represented by this BlockState
++     *
++     * @return Block that this BlockState represents
++     */
++    @Override
++    public Block getBlock() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets the metadata for this block
++     *
++     * @param data New block specific metadata
++     */
++    @Override
++    public void setData(MaterialData data) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Attempts to update the block represented by this state, setting it to the
++     * new values as defined by this state. <br />
++     * <br />
++     * This has the same effect as calling update(false). That is to say,
++     * this will not modify the state of a block if it is no longer the same
++     * type as it was when this state was taken. It will return false in this
++     * eventuality.
++     *
++     * @return true if the update was successful, otherwise false
++     * @see BlockState.update(boolean force)
++     */
++    @Override
++    public boolean update() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Attempts to update the block represented by this state, setting it to the
++     * new values as defined by this state. <br />
++     * <br />
++     * Unless force is true, this will not modify the state of a block if it is
++     * no longer the same type as it was when this state was taken. It will return
++     * false in this eventuality.<br />
++     * <br />
++     * If force is true, it will set the type of the block to match the new state,
++     * set the state data and then return true.
++     *
++     * @param force true to forcefully set the state
++     * @return true if the update was successful, otherwise false
++     */
++    @Override
++    public boolean update(boolean force) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    @Override
++    public byte getRawData() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
+ }

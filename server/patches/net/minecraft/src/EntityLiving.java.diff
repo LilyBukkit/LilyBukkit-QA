@@ -1,963 +1,308 @@
 --- EntityLiving.java
 +++ EntityLiving.java
-@@ -1,7 +1,23 @@
+@@ -1,7 +1,15 @@
  package net.minecraft.src;
  
-+import org.bukkit.EntityEffect;
 +import org.bukkit.Location;
 +import org.bukkit.Server;
 +import org.bukkit.entity.*;
 +import org.bukkit.event.entity.EntityDamageEvent;
-+import org.bukkit.event.player.PlayerTeleportEvent;
-+import org.bukkit.inventory.EntityEquipment;
-+import org.bukkit.metadata.MetadataValue;
-+import org.bukkit.plugin.Plugin;
-+import org.bukkit.potion.PotionEffect;
-+import org.bukkit.potion.PotionEffectType;
 +import org.bukkit.util.Vector;
 +
-+import java.util.Collection;
 +import java.util.HashSet;
  import java.util.List;
 +import java.util.UUID;
  
 -public class EntityLiving extends Entity {
-+public class EntityLiving extends Entity implements org.bukkit.entity.LivingEntity {
++public class EntityLiving extends Entity implements LivingEntity {
      public int heartsHalvesLife;
      public float unusedRotationPitch2;
-@@ -57,5 +73,5 @@
-     private Entity currentTarget;
-     private int numTicksToChaseTarget;
--    
-+
-     public EntityLiving(final World world) {
-         super(world);
-@@ -78,5 +94,5 @@
-         this.dead = false;
-         this.unusedInt = -1;
--        this.unusedFloat4 = (float)(Math.random() * 0.8999999761581421 + 0.10000000149011612);
-+        this.unusedFloat4 = (float) (Math.random() * 0.8999999761581421 + 0.10000000149011612);
-         this.unusedFloat3 = 0.0f;
-         this.entityAge = 0;
-@@ -86,35 +102,518 @@
-         this.numTicksToChaseTarget = 0;
-         this.preventEntitySpawning = true;
--        this.unusedRotationPitch = (float)(Math.random() + 1.0) * 0.01f;
-+        this.unusedRotationPitch = (float) (Math.random() + 1.0) * 0.01f;
-         this.setPosition(this.posX, this.posY, this.posZ);
--        this.unusedRotationPitch2 = (float)Math.random() * 12398.0f;
--        this.rotationYaw = (float)(Math.random() * 3.1415927410125732 * 2.0);
-+        this.unusedRotationPitch2 = (float) Math.random() * 12398.0f;
-+        this.rotationYaw = (float) (Math.random() * 3.1415927410125732 * 2.0);
-         this.unusedFloat = 1.0f;
-         this.stepHeight = 0.5f;
-     }
--    
-+
-     protected boolean canEntityBeSeen(final Entity entity) {
-         return this.worldObj.rayTraceBlocks(Vec3D.createVector(this.posX, this.posY + this.getEyeHeight(), this.posZ), Vec3D.createVector(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ)) == null;
-     }
--    
-+
-     @Override
-     public boolean canBeCollidedWith() {
+@@ -107,10 +115,271 @@
          return !this.isDead;
-     }
--    
-+
-     @Override
-     public boolean canBePushed() {
-         return !this.isDead;
-     }
--    
-+
-     @Override
--    protected float getEyeHeight() {
--        return this.height * 0.85f;
-+    public double getEyeHeight() {
-+        return new Float(this.height * 0.85f).doubleValue();
      }
 -    
 +
 +    /**
-+     * Gets the height of the living entity's eyes above its Location.
++     * Gets the entity's health from 0-20, where 0 is dead and 20 is full
 +     *
-+     * @param ignoreSneaking if set to true, the effects of sneaking will be
-+     *                       ignored
-+     * @return height of the living entity's eyes above its location
++     * @return Health represented from 0-20
++     */
+     @Override
++    public int getHealth() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets the entity's health from 0-20, where 0 is dead and 20 is full
++     *
++     * @param health New health represented from 0-20
++     */
++    @Override
++    public void setHealth(int health) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    @Override
+     protected float getEyeHeight() {
+         return this.height * 0.85f;
+     }
+-    
++
++    /**
++     * Gets the height of the entity's head above its Location
++     *
++     * @param ignoreSneaking@return Height of the entity's eyes above its Location
 +     */
 +    @Override
 +    public double getEyeHeight(boolean ignoreSneaking) {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Get a Location detailing the current eye position of the living entity.
++     * Get a Location detailing the current eye position of the LivingEntity.
 +     *
-+     * @return a location at the eyes of the living entity
++     * @return a Location at the eyes of the LivingEntity.
 +     */
 +    @Override
 +    public Location getEyeLocation() {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Gets all blocks along the living entity's line of sight.
-+     * <p>
-+     * This list contains all blocks from the living entity's eye position to
-+     * target inclusive.
++     * Gets all blocks along the player's line of sight
++     * List iterates from player's position to target inclusive
 +     *
-+     * @param transparent HashSet containing all transparent block IDs (set to
-+     *                    null for only air)
-+     * @param maxDistance this is the maximum distance to scan (may be limited
-+     *                    by server by at least 100 blocks, no less)
-+     * @return list containing all blocks along the living entity's line of
-+     * sight
-+     * @deprecated Magic value
++     * @param transparent
++     * @param maxDistance
++     * @return List containing all blocks along the player's line of sight
 +     */
 +    @Override
 +    public List<org.bukkit.block.Block> getLineOfSight(HashSet<Byte> transparent, int maxDistance) {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Gets the block that the living entity has targeted.
++     * Gets the block that the player has targeted
 +     *
-+     * @param transparent HashSet containing all transparent block IDs (set to
-+     *                    null for only air)
-+     * @param maxDistance this is the maximum distance to scan (may be limited
-+     *                    by server by at least 100 blocks, no less)
-+     * @return block that the living entity has targeted
-+     * @deprecated Magic value
++     * @param transparent
++     * @param maxDistance
++     * @return Block that the player has targeted
 +     */
 +    @Override
 +    public org.bukkit.block.Block getTargetBlock(HashSet<Byte> transparent, int maxDistance) {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Gets the last two blocks along the living entity's line of sight.
-+     * <p>
++     * Gets the last two blocks along the player's line of sight.
 +     * The target block will be the last block in the list.
 +     *
-+     * @param transparent HashSet containing all transparent block IDs (set to
-+     *                    null for only air)
-+     * @param maxDistance this is the maximum distance to scan. This may be
-+     *                    further limited by the server, but never to less than 100 blocks
-+     * @return list containing the last 2 blocks along the living entity's
-+     * line of sight
-+     * @deprecated Magic value
++     * @param transparent
++     * @param maxDistance
++     * @return List containing the last 2 blocks along the player's line of sight
 +     */
 +    @Override
 +    public List<org.bukkit.block.Block> getLastTwoTargetBlocks(HashSet<Byte> transparent, int maxDistance) {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Throws an egg from the living entity.
-+     *
-+     * @return the egg thrown
-+     * @deprecated use launchProjectile(Egg.class) instead
++     * Throws an egg from the entity.
 +     */
 +    @Override
 +    public Egg throwEgg() {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Throws a snowball from the living entity.
-+     *
-+     * @return the snowball thrown
-+     * @deprecated use launchProjectile(Snowball.class) instead
++     * Throws a snowball from the entity.
 +     */
 +    @Override
 +    public Snowball throwSnowball() {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Shoots an arrow from the living entity.
++     * Shoots an arrow from the entity.
 +     *
-+     * @return the arrow shot
-+     * @deprecated use launchProjectile(Arrow.class) instead
++     * @return
 +     */
 +    @Override
 +    public Arrow shootArrow() {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Returns the amount of air that the living entity has remaining, in
-+     * ticks.
++     * Returns whether this entity is inside a vehicle.
 +     *
-+     * @return amount of air remaining
++     * @return
++     */
++    @Override
++    public boolean isInsideVehicle() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Leave the current vehicle. If the entity is currently in a vehicle
++     * (and is removed from it), true will be returned, otherwise false will
++     * be returned.
++     *
++     * @return
++     */
++    @Override
++    public boolean leaveVehicle() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Get the vehicle that this player is inside. If there is no vehicle,
++     * null will be returned.
++     *
++     * @return
++     */
++    @Override
++    public Vehicle getVehicle() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Returns the amount of air that this entity has remaining, in ticks
++     *
++     * @return Amount of air remaining
 +     */
 +    @Override
 +    public int getRemainingAir() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Sets the amount of air that the living entity has remaining, in ticks.
++     * Sets the amount of air that this entity has remaining, in ticks
 +     *
-+     * @param ticks amount of air remaining
++     * @param ticks Amount of air remaining
 +     */
 +    @Override
 +    public void setRemainingAir(int ticks) {
-+
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Returns the maximum amount of air the living entity can have, in ticks.
++     * Returns the maximum amount of air this entity can have, in ticks
 +     *
-+     * @return maximum amount of air
++     * @return Maximum amount of air
 +     */
 +    @Override
 +    public int getMaximumAir() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Sets the maximum amount of air the living entity can have, in ticks.
++     * Sets the maximum amount of air this entity can have, in ticks
 +     *
-+     * @param ticks maximum amount of air
++     * @param ticks Maximum amount of air
 +     */
 +    @Override
 +    public void setMaximumAir(int ticks) {
-+
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Returns the living entity's current maximum no damage ticks.
-+     * <p>
-+     * This is the maximum duration in which the living entity will not take
-+     * damage.
++     * Deals the given amount of damage to this entity
 +     *
-+     * @return maximum no damage ticks
++     * @param amount Amount of damage to deal
++     */
++    @Override
++    public void damage(int amount) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Deals the given amount of damage to this entity, from a specified entity
++     *
++     * @param amount Amount of damage to deal
++     * @param source Entity which to attribute this damage from
++     */
++    @Override
++    public void damage(int amount, org.bukkit.entity.Entity source) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Returns the entities current maximum noDamageTicks
++     * This is the time in ticks the entity will become unable to take
++     * equal or less damage than the lastDamage
++     *
++     * @return noDamageTicks
 +     */
 +    @Override
 +    public int getMaximumNoDamageTicks() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Sets the living entity's current maximum no damage ticks.
++     * Sets the entities current maximum noDamageTicks
 +     *
-+     * @param ticks maximum amount of no damage ticks
++     * @param ticks maximumNoDamageTicks
 +     */
 +    @Override
 +    public void setMaximumNoDamageTicks(int ticks) {
-+
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Returns the living entity's last damage taken in the current no damage
-+     * ticks time.
-+     * <p>
-+     * Only damage higher than this amount will further damage the living
-+     * entity.
++     * Returns the entities lastDamage taken in the current noDamageTicks time.
++     * Only damage higher than this amount will further damage the entity.
 +     *
-+     * @return damage taken since the last no damage ticks time period
++     * @return lastDamage
 +     */
 +    @Override
-+    public double getLastDamage() {
-+        return 0;
++    public int getLastDamage() {
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * This method exists for legacy reasons to provide backwards
-+     * compatibility. It will not exist at runtime and should not be used
-+     * under any circumstances.
++     * Sets the entities current maximum noDamageTicks
++     *
++     * @param damage last damage
 +     */
 +    @Override
-+    public int _INVALID_getLastDamage() {
-+        return 0;
++    public void setLastDamage(int damage) {
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Sets the damage dealt within the current no damage ticks time period.
++     * Returns the entities current noDamageTicks
 +     *
-+     * @param damage amount of damage
-+     */
-+    @Override
-+    public void setLastDamage(double damage) {
-+
-+    }
-+
-+    /**
-+     * This method exists for legacy reasons to provide backwards
-+     * compatibility. It will not exist at runtime and should not be used
-+     * under any circumstances.
-+     *
-+     * @param damage
-+     */
-+    @Override
-+    public void _INVALID_setLastDamage(int damage) {
-+
-+    }
-+
-+    /**
-+     * Returns the living entity's current no damage ticks.
-+     *
-+     * @return amount of no damage ticks
++     * @return noDamageTicks
 +     */
 +    @Override
 +    public int getNoDamageTicks() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Sets the living entity's current no damage ticks.
++     * Sets the entities current noDamageTicks
 +     *
-+     * @param ticks amount of no damage ticks
++     * @param ticks NoDamageTicks
 +     */
 +    @Override
 +    public void setNoDamageTicks(int ticks) {
-+
-+    }
-+
-+    /**
-+     * Gets the player identified as the killer of the living entity.
-+     * <p>
-+     * May be null.
-+     *
-+     * @return killer player, or null if none found
-+     */
-+    @Override
-+    public Player getKiller() {
-+        return null;
-+    }
-+
-+    /**
-+     * Adds the given {@link PotionEffect} to the living entity.
-+     * <p>
-+     * Only one potion effect can be present for a given {@link
-+     * PotionEffectType}.
-+     *
-+     * @param effect PotionEffect to be added
-+     * @return whether the effect could be added
-+     */
-+    @Override
-+    public boolean addPotionEffect(PotionEffect effect) {
-+        return false;
-+    }
-+
-+    /**
-+     * Adds the given {@link PotionEffect} to the living entity.
-+     * <p>
-+     * Only one potion effect can be present for a given {@link
-+     * PotionEffectType}.
-+     *
-+     * @param effect PotionEffect to be added
-+     * @param force  whether conflicting effects should be removed
-+     * @return whether the effect could be added
-+     */
-+    @Override
-+    public boolean addPotionEffect(PotionEffect effect, boolean force) {
-+        return false;
-+    }
-+
-+    /**
-+     * Attempts to add all of the given {@link PotionEffect} to the living
-+     * entity.
-+     *
-+     * @param effects the effects to add
-+     * @return whether all of the effects could be added
-+     */
-+    @Override
-+    public boolean addPotionEffects(Collection<PotionEffect> effects) {
-+        return false;
-+    }
-+
-+    /**
-+     * Returns whether the living entity already has an existing effect of
-+     * the given {@link PotionEffectType} applied to it.
-+     *
-+     * @param type the potion type to check
-+     * @return whether the living entity has this potion effect active on them
-+     */
-+    @Override
-+    public boolean hasPotionEffect(PotionEffectType type) {
-+        return false;
-+    }
-+
-+    /**
-+     * Removes any effects present of the given {@link PotionEffectType}.
-+     *
-+     * @param type the potion type to remove
-+     */
-+    @Override
-+    public void removePotionEffect(PotionEffectType type) {
-+
-+    }
-+
-+    /**
-+     * Returns all currently active {@link PotionEffect}s on the living
-+     * entity.
-+     *
-+     * @return a collection of {@link PotionEffect}s
-+     */
-+    @Override
-+    public Collection<PotionEffect> getActivePotionEffects() {
-+        return null;
-+    }
-+
-+    /**
-+     * Checks whether the living entity has block line of sight to another.
-+     * <p>
-+     * This uses the same algorithm that hostile mobs use to find the closest
-+     * player.
-+     *
-+     * @param other the entity to determine line of sight to
-+     * @return true if there is a line of sight, false if not
-+     */
-+    @Override
-+    public boolean hasLineOfSight(org.bukkit.entity.Entity other) {
-+        return false;
-+    }
-+
-+    /**
-+     * Returns if the living entity despawns when away from players or not.
-+     * <p>
-+     * By default, animals are not removed while other mobs are.
-+     *
-+     * @return true if the living entity is removed when away from players
-+     */
-+    @Override
-+    public boolean getRemoveWhenFarAway() {
-+        return false;
-+    }
-+
-+    /**
-+     * Sets whether or not the living entity despawns when away from players
-+     * or not.
-+     *
-+     * @param remove the removal status
-+     */
-+    @Override
-+    public void setRemoveWhenFarAway(boolean remove) {
-+
-+    }
-+
-+    /**
-+     * Gets the inventory with the equipment worn by the living entity.
-+     *
-+     * @return the living entity's inventory
-+     */
-+    @Override
-+    public EntityEquipment getEquipment() {
-+        return null;
-+    }
-+
-+    /**
-+     * Sets whether or not the living entity can pick up items.
-+     *
-+     * @param pickup whether or not the living entity can pick up items
-+     */
-+    @Override
-+    public void setCanPickupItems(boolean pickup) {
-+
-+    }
-+
-+    /**
-+     * Gets if the living entity can pick up items.
-+     *
-+     * @return whether or not the living entity can pick up items
-+     */
-+    @Override
-+    public boolean getCanPickupItems() {
-+        return false;
-+    }
-+
-+    /**
-+     * Sets a custom name on a mob. This name will be used in death messages
-+     * and can be sent to the client as a nameplate over the mob.
-+     * <p>
-+     * Setting the name to null or an empty string will clear it.
-+     * <p>
-+     * This value has no effect on players, they will always use their real
-+     * name.
-+     *
-+     * @param name the name to set
-+     */
-+    @Override
-+    public void setCustomName(String name) {
-+
-+    }
-+
-+    /**
-+     * Gets the custom name on a mob. If there is no name this method will
-+     * return null.
-+     * <p>
-+     * This value has no effect on players, they will always use their real
-+     * name.
-+     *
-+     * @return name of the mob or null
-+     */
-+    @Override
-+    public String getCustomName() {
-+        return null;
-+    }
-+
-+    /**
-+     * Sets whether or not to display the mob's custom name client side. The
-+     * name will be displayed above the mob similarly to a player.
-+     * <p>
-+     * This value has no effect on players, they will always display their
-+     * name.
-+     *
-+     * @param flag custom name or not
-+     */
-+    @Override
-+    public void setCustomNameVisible(boolean flag) {
-+
-+    }
-+
-+    /**
-+     * Gets whether or not the mob's custom name is displayed client side.
-+     * <p>
-+     * This value has no effect on players, they will always display their
-+     * name.
-+     *
-+     * @return if the custom name is displayed
-+     */
-+    @Override
-+    public boolean isCustomNameVisible() {
-+        return false;
-+    }
-+
-+    /**
-+     * Returns whether the entity is currently leashed.
-+     *
-+     * @return whether the entity is leashed
-+     */
-+    @Override
-+    public boolean isLeashed() {
-+        return false;
-+    }
-+
-+    /**
-+     * Gets the entity that is currently leading this entity.
-+     *
-+     * @return the entity holding the leash
-+     * @throws IllegalStateException if not currently leashed
-+     */
-+    @Override
-+    public org.bukkit.entity.Entity getLeashHolder() throws IllegalStateException {
-+        return null;
-+    }
-+
-+    /**
-+     * Sets the leash on this entity to be held by the supplied entity.
-+     * <p>
-+     * This method has no effect on EnderDragons, Withers, Players, or Bats.
-+     * Non-living entities excluding leashes will not persist as leash
-+     * holders.
-+     *
-+     * @param holder the entity to leash this entity to
-+     * @return whether the operation was successful
-+     */
-+    @Override
-+    public boolean setLeashHolder(org.bukkit.entity.Entity holder) {
-+        return false;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
      public int getTalkInterval() {
          return 80;
-     }
--    
-+
-     @Override
-     public void onEntityUpdate() {
-@@ -144,6 +643,5 @@
-             }
-             this.fire = 0;
--        }
--        else {
-+        } else {
-             this.air = this.maxAir;
-         }
-@@ -176,5 +674,5 @@
-         this.prevRotationPitch = this.rotationPitch;
-     }
--    
-+
-     public void spawnExplosionParticle() {
-         for (int i1 = 0; i1 < 20; ++i1) {
-@@ -186,5 +684,5 @@
-         }
-     }
--    
-+
-     @Override
-     public void updateRidden() {
-@@ -193,5 +691,5 @@
-         this.prevRidingRotUnused = 0.0f;
-     }
--    
-+
-     @Override
-     public void onUpdate() {
-@@ -208,5 +706,5 @@
-             f8 = 1.0f;
-             f7 = f5 * 3.0f;
--            f6 = (float)Math.atan2(d2, d1) * 180.0f / 3.1415927f - 90.0f;
-+            f6 = (float) Math.atan2(d2, d1) * 180.0f / 3.1415927f - 90.0f;
-         }
-         if (this.swingProgress > 0.0f) {
-@@ -218,5 +716,6 @@
-         this.prevRidingRotUnused += (f8 - this.prevRidingRotUnused) * 0.3f;
-         float f9;
--        for (f9 = f6 - this.renderYawOffset; f9 < -180.0f; f9 += 360.0f) {}
-+        for (f9 = f6 - this.renderYawOffset; f9 < -180.0f; f9 += 360.0f) {
-+        }
-         while (f9 >= 180.0f) {
-             f9 -= 360.0f;
-@@ -224,5 +723,6 @@
-         this.renderYawOffset += f9 * 0.3f;
-         float f10;
--        for (f10 = this.rotationYaw - this.renderYawOffset; f10 < -180.0f; f10 += 360.0f) {}
-+        for (f10 = this.rotationYaw - this.renderYawOffset; f10 < -180.0f; f10 += 360.0f) {
-+        }
-         while (f10 >= 180.0f) {
-             f10 -= 360.0f;
-@@ -262,10 +762,10 @@
-         this.rotationUnused += f7;
-     }
--    
-+
-     @Override
-     protected void setSize(final float width, final float height) {
-         super.setSize(width, height);
-     }
--    
-+
-     public void heal(final int health) {
-         if (this.health > 0) {
-@@ -277,5 +777,5 @@
-         }
-     }
--    
-+
-     @Override
-     public boolean attackEntityFrom(final Entity entity, int damage) {
-@@ -293,6 +793,5 @@
-             }
-             this.health = this.prevHealth - damage;
--        }
--        else {
-+        } else {
-             this.prevHealth = this.health;
-             this.heartsLife = this.heartsHalvesLife;
-@@ -306,37 +805,36 @@
-             double d3;
-             double d4;
--            for (d3 = entity.posX - this.posX, d4 = entity.posZ - this.posZ; d3 * d3 + d4 * d4 < 1.0E-4; d3 = (Math.random() - Math.random()) * 0.01, d4 = (Math.random() - Math.random()) * 0.01) {}
--            this.attackedAtYaw = (float)(Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - this.rotationYaw;
-+            for (d3 = entity.posX - this.posX, d4 = entity.posZ - this.posZ; d3 * d3 + d4 * d4 < 1.0E-4; d3 = (Math.random() - Math.random()) * 0.01, d4 = (Math.random() - Math.random()) * 0.01) {
-+            }
-+            this.attackedAtYaw = (float) (Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - this.rotationYaw;
-             this.knockBack(entity, damage, d3, d4);
-+        } else {
-+            this.attackedAtYaw = (float) ((int) (Math.random() * 2.0) * 180);
-         }
--        else {
--            this.attackedAtYaw = (float)((int)(Math.random() * 2.0) * 180);
--        }
-         if (this.health <= 0) {
-             this.worldObj.playSoundAtEntity(this, this.getDeathSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
-             this.onDeath(entity);
--        }
--        else {
-+        } else {
-             this.worldObj.playSoundAtEntity(this, this.getHurtSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
-         }
-         return true;
-     }
--    
-+
-     protected float getSoundVolume() {
-         return 1.0f;
-     }
--    
-+
-     protected String getLivingSound() {
-         return null;
-     }
--    
-+
-     protected String getHurtSound() {
-         return "random.hurt";
-     }
--    
-+
-     protected String getDeathSound() {
-         return "random.hurt";
-     }
--    
-+
-     public void knockBack(final Entity entity, final int x, final double y, final double z) {
-         final float f7 = MathHelper.sqrt_double(y * y + z * z);
-@@ -352,5 +850,5 @@
-         }
-     }
--    
-+
-     public void onDeath(final Entity entity) {
-         if (this.scoreValue > 0 && entity != null) {
-@@ -365,12 +863,12 @@
-         }
-     }
--    
-+
-     protected int getDropItemId() {
-         return 0;
-     }
--    
-+
-     @Override
-     protected void fall(final float f1) {
--        final int i2 = (int)Math.ceil((double)(f1 - 3.0f));
-+        final int i2 = (int) Math.ceil((double) (f1 - 3.0f));
-         if (i2 > 0) {
-             this.attackEntityFrom(null, i2);
-@@ -382,5 +880,5 @@
-         }
-     }
--    
-+
-     public void moveEntityWithHeading(final float f1, final float f2) {
-         if (this.handleWaterMovement()) {
-@@ -395,6 +893,5 @@
-                 this.motionY = 0.30000001192092896;
-             }
--        }
--        else if (this.handleLavaMovement()) {
-+        } else if (this.handleLavaMovement()) {
-             final double d3 = this.posY;
-             this.moveFlying(f1, f2, 0.02f);
-@@ -407,6 +904,5 @@
-                 this.motionY = 0.30000001192092896;
-             }
--        }
--        else {
-+        } else {
-             float f3 = 0.91f;
-             if (this.onGround) {
-@@ -452,5 +948,5 @@
-         this.limbSwing += this.limbYaw;
-     }
--    
-+
-     public boolean isOnLadder() {
-         final int i1 = MathHelper.floor_double(this.posX);
-@@ -459,12 +955,12 @@
-         return this.worldObj.getBlockId(i1, i2, i3) == Block.ladder.blockID || this.worldObj.getBlockId(i1, i2 + 1, i3) == Block.ladder.blockID;
-     }
--    
-+
-     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
--        nbttagcompound.setShort("Health", (short)this.health);
--        nbttagcompound.setShort("HurtTime", (short)this.hurtTime);
--        nbttagcompound.setShort("DeathTime", (short)this.deathTime);
--        nbttagcompound.setShort("AttackTime", (short)this.attackTime);
-+        nbttagcompound.setShort("Health", (short) this.health);
-+        nbttagcompound.setShort("HurtTime", (short) this.hurtTime);
-+        nbttagcompound.setShort("DeathTime", (short) this.deathTime);
-+        nbttagcompound.setShort("AttackTime", (short) this.attackTime);
-     }
--    
-+
-     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
-         this.health = nbttagcompound.getShort("Health");
-@@ -476,10 +972,10 @@
-         this.attackTime = nbttagcompound.getShort("AttackTime");
-     }
--    
-+
-     @Override
-     public boolean isEntityAlive() {
-         return !this.isDead && this.health > 0;
-     }
--    
-+
-     public void onLivingUpdate() {
-         if (this.newPosRotationIncrements > 0) {
-@@ -488,10 +984,11 @@
-             final double d3 = this.posZ + (this.newPosZ - this.posZ) / this.newPosRotationIncrements;
-             double d4;
--            for (d4 = this.newRotationYaw - this.rotationYaw; d4 < -180.0; d4 += 360.0) {}
-+            for (d4 = this.newRotationYaw - this.rotationYaw; d4 < -180.0; d4 += 360.0) {
-+            }
-             while (d4 >= 180.0) {
-                 d4 -= 360.0;
-             }
--            this.rotationYaw += (float)(d4 / this.newPosRotationIncrements);
--            this.rotationPitch += (float)((this.newRotationPitch - this.rotationPitch) / this.newPosRotationIncrements);
-+            this.rotationYaw += (float) (d4 / this.newPosRotationIncrements);
-+            this.rotationPitch += (float) ((this.newRotationPitch - this.rotationPitch) / this.newPosRotationIncrements);
-             --this.newPosRotationIncrements;
-             this.setPosition(d1, d2, d3);
-@@ -503,6 +1000,5 @@
-             this.moveForward = 0.0f;
-             this.randomYawVelocity = 0.0f;
--        }
--        else if (!this.isAIEnabled) {
-+        } else if (!this.isAIEnabled) {
-             this.updateEntityActionState();
-         }
-@@ -512,9 +1008,7 @@
-             if (z9) {
-                 this.motionY += 0.03999999910593033;
--            }
--            else if (z10) {
-+            } else if (z10) {
-                 this.motionY += 0.03999999910593033;
--            }
--            else if (this.onGround) {
-+            } else if (this.onGround) {
-                 this.jump();
-             }
-@@ -527,5 +1021,5 @@
-         if (list10 != null && list10.size() > 0) {
-             for (int i4 = 0; i4 < list10.size(); ++i4) {
--                final Entity entity11 = (Entity)list10.get(i4);
-+                final Entity entity11 = (Entity) list10.get(i4);
-                 if (entity11.canBePushed()) {
-                     entity11.applyEntityCollision(this);
-@@ -534,9 +1028,9 @@
-         }
-     }
--    
-+
-     protected void jump() {
-         this.motionY = 0.41999998688697815;
-     }
--    
-+
-     protected void updateEntityActionState() {
-         ++this.entityAge;
-@@ -553,6 +1047,5 @@
-                 if (d5 < 1024.0) {
-                     this.entityAge = 0;
--                }
--                else {
-+                } else {
-                     this.setEntityDead();
-                 }
-@@ -567,6 +1060,5 @@
-                 this.currentTarget = entityPlayer1;
-                 this.numTicksToChaseTarget = 10 + this.rand.nextInt(20);
--            }
--            else {
-+            } else {
-                 this.randomYawVelocity = (this.rand.nextFloat() - 0.5f) * 20.0f;
-             }
-@@ -577,6 +1069,5 @@
-                 this.currentTarget = null;
-             }
--        }
--        else {
-+        } else {
-             if (this.rand.nextFloat() < 0.05f) {
-                 this.randomYawVelocity = (this.rand.nextFloat() - 0.5f) * 20.0f;
-@@ -591,5 +1082,5 @@
-         }
-     }
--    
-+
-     public void faceEntity(final Entity entity, final float f2) {
-         final double d3 = entity.posX - this.posX;
-@@ -597,20 +1088,20 @@
-         double d5;
-         if (entity instanceof EntityLiving) {
--            final EntityLiving entityLiving9 = (EntityLiving)entity;
-+            final EntityLiving entityLiving9 = (EntityLiving) entity;
-             d5 = entityLiving9.posY + entityLiving9.getEyeHeight() - (this.posY + this.getEyeHeight());
--        }
--        else {
-+        } else {
-             d5 = (entity.boundingBox.minY + entity.boundingBox.maxY) / 2.0 - (this.posY + this.getEyeHeight());
-         }
-         final double d6 = MathHelper.sqrt_double(d3 * d3 + d4 * d4);
--        final float f3 = (float)(Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - 90.0f;
--        final float f4 = (float)(Math.atan2(d5, d6) * 180.0 / 3.1415927410125732);
-+        final float f3 = (float) (Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - 90.0f;
-+        final float f4 = (float) (Math.atan2(d5, d6) * 180.0 / 3.1415927410125732);
-         this.rotationPitch = this.updateRotation(this.rotationPitch, f4, f2);
-         this.rotationYaw = this.updateRotation(this.rotationYaw, f3, f2);
-     }
--    
-+
-     private float updateRotation(final float f1, final float f2, final float f3) {
-         float f4;
--        for (f4 = f2 - f1; f4 < -180.0f; f4 += 360.0f) {}
-+        for (f4 = f2 - f1; f4 < -180.0f; f4 += 360.0f) {
-+        }
-         while (f4 >= 180.0f) {
-             f4 -= 360.0f;
-@@ -624,17 +1115,17 @@
-         return f1 + f4;
-     }
--    
-+
-     public void onEntityDeath() {
-     }
--    
-+
-     public boolean getCanSpawnHere() {
-         return this.worldObj.checkIfAABBIsClear(this.boundingBox) && this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox).size() == 0 && !this.worldObj.getIsAnyLiquid(this.boundingBox);
-     }
--    
-+
-     @Override
-     protected void kill() {
-         this.attackEntityFrom(null, 4);
-     }
--    
-+
-     public Vec3D getPosition(final float f1) {
-         if (f1 == 1.0f) {
-@@ -646,5 +1137,5 @@
-         return Vec3D.createVector(d2, d3, d4);
-     }
--    
-+
-     public Vec3D getLook(final float f1) {
-         if (f1 == 1.0f) {
-@@ -663,5 +1154,5 @@
-         return Vec3D.createVector(f5 * f6, f7, f4 * f6);
-     }
--    
-+
-     public MovingObjectPosition rayTrace(final double d1, final float f3) {
-         final Vec3D vec3D4 = this.getPosition(f3);
-@@ -670,3 +1161,613 @@
+@@ -670,3 +939,236 @@
          return this.worldObj.rayTraceBlocks(vec3D4, vec3D6);
      }
 +
 +    /**
 +     * Gets the entity's current position
 +     *
-+     * @return a new copy of Location containing the position of this entity
++     * @return Location containing the position of this entity
 +     */
 +    @Override
 +    public Location getLocation() {
-+        return null;
-+    }
-+
-+    /**
-+     * Stores the entity's current position in the provided Location object.
-+     * <p>
-+     * If the provided Location is null this method does nothing and returns
-+     * null.
-+     *
-+     * @param loc
-+     * @return The Location object provided or null
-+     */
-+    @Override
-+    public Location getLocation(Location loc) {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -967,7 +312,7 @@
 +     */
 +    @Override
 +    public void setVelocity(Vector velocity) {
-+
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -977,19 +322,7 @@
 +     */
 +    @Override
 +    public Vector getVelocity() {
-+        return null;
-+    }
-+
-+    /**
-+     * Returns true if the entity is supported by a block. This value is a
-+     * state updated by the server and is not recalculated unless the entity
-+     * moves.
-+     *
-+     * @return True if entity is on ground.
-+     */
-+    @Override
-+    public boolean isOnGround() {
-+        return false;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -999,71 +332,42 @@
 +     */
 +    @Override
 +    public org.bukkit.World getWorld() {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Teleports this entity to the given location. If this entity is riding a
-+     * vehicle, it will be dismounted prior to teleportation.
++     * Teleports this entity to the given location
 +     *
 +     * @param location New location to teleport this entity to
 +     * @return <code>true</code> if the teleport was successful
 +     */
 +    @Override
 +    public boolean teleport(Location location) {
-+        return false;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Teleports this entity to the given location. If this entity is riding a
-+     * vehicle, it will be dismounted prior to teleportation.
-+     *
-+     * @param location New location to teleport this entity to
-+     * @param cause    The cause of this teleportation
-+     * @return <code>true</code> if the teleport was successful
-+     */
-+    @Override
-+    public boolean teleport(Location location, PlayerTeleportEvent.TeleportCause cause) {
-+        return false;
-+    }
-+
-+    /**
-+     * Teleports this entity to the target Entity. If this entity is riding a
-+     * vehicle, it will be dismounted prior to teleportation.
++     * Teleports this entity to the target Entity
 +     *
 +     * @param destination Entity to teleport this entity to
 +     * @return <code>true</code> if the teleport was successful
 +     */
 +    @Override
 +    public boolean teleport(org.bukkit.entity.Entity destination) {
-+        return false;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Teleports this entity to the target Entity. If this entity is riding a
-+     * vehicle, it will be dismounted prior to teleportation.
++     * Returns a list of entities within a bounding box defined by x,y,z centered around player
 +     *
-+     * @param destination Entity to teleport this entity to
-+     * @param cause       The cause of this teleportation
-+     * @return <code>true</code> if the teleport was successful
-+     */
-+    @Override
-+    public boolean teleport(org.bukkit.entity.Entity destination, PlayerTeleportEvent.TeleportCause cause) {
-+        return false;
-+    }
-+
-+    /**
-+     * Returns a list of entities within a bounding box centered around this
-+     * entity
-+     *
-+     * @param x 1/2 the size of the box along x axis
-+     * @param y 1/2 the size of the box along y axis
-+     * @param z 1/2 the size of the box along z axis
++     * @param x Size of the box along x axis
++     * @param y Size of the box along y axis
++     * @param z Size of the box along z axis
 +     * @return List<Entity> List of entities nearby
 +     */
 +    @Override
 +    public List<org.bukkit.entity.Entity> getNearbyEntities(double x, double y, double z) {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -1073,18 +377,17 @@
 +     */
 +    @Override
 +    public int getEntityId() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Returns the entity's current fire ticks (ticks before the entity stops
-+     * being on fire).
++     * Returns the entity's current fire ticks (ticks before the entity stops being on fire).
 +     *
 +     * @return int fireTicks
 +     */
 +    @Override
 +    public int getFireTicks() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -1094,18 +397,17 @@
 +     */
 +    @Override
 +    public int getMaxFireTicks() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Sets the entity's current fire ticks (ticks before the entity stops
-+     * being on fire).
++     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
 +     *
-+     * @param ticks Current ticks remaining
++     * @param ticks
 +     */
 +    @Override
 +    public void setFireTicks(int ticks) {
-+
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -1113,28 +415,15 @@
 +     */
 +    @Override
 +    public void remove() {
-+
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
 +     * Returns true if this entity has been marked for removal.
-+     *
-+     * @return True if it is dead.
 +     */
 +    @Override
 +    public boolean isDead() {
-+        return false;
-+    }
-+
-+    /**
-+     * Returns false if the entity has died or been despawned for some other
-+     * reason.
-+     *
-+     * @return True if valid.
-+     */
-+    @Override
-+    public boolean isValid() {
-+        return false;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -1144,7 +433,7 @@
 +     */
 +    @Override
 +    public Server getServer() {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -1155,58 +444,58 @@
 +     */
 +    @Override
 +    public org.bukkit.entity.Entity getPassenger() {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
 +     * Set the passenger of a vehicle.
 +     *
-+     * @param passenger The new passenger.
++     * @param passenger
 +     * @return false if it could not be done for whatever reason
 +     */
 +    @Override
 +    public boolean setPassenger(org.bukkit.entity.Entity passenger) {
-+        return false;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Check if a vehicle has passengers.
++     * Returns true if the vehicle has no passengers.
 +     *
-+     * @return True if the vehicle has no passengers.
++     * @return
 +     */
 +    @Override
 +    public boolean isEmpty() {
-+        return false;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Eject any passenger.
++     * Eject any passenger. True if there was a passenger.
 +     *
-+     * @return True if there was a passenger.
++     * @return
 +     */
 +    @Override
 +    public boolean eject() {
-+        return false;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
 +     * Returns the distance this entity has fallen
 +     *
-+     * @return The distance.
++     * @return
 +     */
 +    @Override
 +    public float getFallDistance() {
-+        return 0;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
 +     * Sets the fall distance for this entity
 +     *
-+     * @param distance The new distance.
++     * @param distance
 +     */
 +    @Override
 +    public void setFallDistance(float distance) {
-+
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -1216,19 +505,17 @@
 +     */
 +    @Override
 +    public void setLastDamageCause(EntityDamageEvent event) {
-+
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
-+     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity.
-+     * This event may have been cancelled.
++     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
 +     *
-+     * @return the last known {@link EntityDamageEvent} or null if hitherto
-+     * unharmed
++     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
 +     */
 +    @Override
 +    public EntityDamageEvent getLastDamageCause() {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
 +    /**
@@ -1238,311 +525,6 @@
 +     */
 +    @Override
 +    public UUID getUniqueId() {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the amount of ticks this entity has lived for.
-+     * <p>
-+     * This is the equivalent to "age" in entities.
-+     *
-+     * @return Age of entity
-+     */
-+    @Override
-+    public int getTicksLived() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the amount of ticks this entity has lived for.
-+     * <p>
-+     * This is the equivalent to "age" in entities. May not be less than one
-+     * tick.
-+     *
-+     * @param value Age of entity
-+     */
-+    @Override
-+    public void setTicksLived(int value) {
-+
-+    }
-+
-+    /**
-+     * Performs the specified {@link EntityEffect} for this entity.
-+     * <p>
-+     * This will be viewable to all players near the entity.
-+     *
-+     * @param type Effect to play.
-+     */
-+    @Override
-+    public void playEffect(EntityEffect type) {
-+
-+    }
-+
-+    /**
-+     * Get the type of the entity.
-+     *
-+     * @return The entity type.
-+     */
-+    @Override
-+    public EntityType getType() {
-+        return null;
-+    }
-+
-+    /**
-+     * Returns whether this entity is inside a vehicle.
-+     *
-+     * @return True if the entity is in a vehicle.
-+     */
-+    @Override
-+    public boolean isInsideVehicle() {
-+        return false;
-+    }
-+
-+    /**
-+     * Leave the current vehicle. If the entity is currently in a vehicle (and
-+     * is removed from it), true will be returned, otherwise false will be
-+     * returned.
-+     *
-+     * @return True if the entity was in a vehicle.
-+     */
-+    @Override
-+    public boolean leaveVehicle() {
-+        return false;
-+    }
-+
-+    /**
-+     * Get the vehicle that this player is inside. If there is no vehicle,
-+     * null will be returned.
-+     *
-+     * @return The current vehicle.
-+     */
-+    @Override
-+    public org.bukkit.entity.Entity getVehicle() {
-+        return null;
-+    }
-+
-+    /**
-+     * Sets a metadata value in the implementing object's metadata store.
-+     *
-+     * @param metadataKey      A unique key to identify this metadata.
-+     * @param newMetadataValue The metadata value to apply.
-+     * @throws IllegalArgumentException If value is null, or the owning plugin
-+     *                                  is null
-+     */
-+    @Override
-+    public void setMetadata(String metadataKey, MetadataValue newMetadataValue) {
-+
-+    }
-+
-+    /**
-+     * Returns a list of previously set metadata values from the implementing
-+     * object's metadata store.
-+     *
-+     * @param metadataKey the unique metadata key being sought.
-+     * @return A list of values, one for each plugin that has set the
-+     * requested value.
-+     */
-+    @Override
-+    public List<MetadataValue> getMetadata(String metadataKey) {
-+        return null;
-+    }
-+
-+    /**
-+     * Tests to see whether the implementing object contains the given
-+     * metadata value in its metadata store.
-+     *
-+     * @param metadataKey the unique metadata key being queried.
-+     * @return the existence of the metadataKey within subject.
-+     */
-+    @Override
-+    public boolean hasMetadata(String metadataKey) {
-+        return false;
-+    }
-+
-+    /**
-+     * Removes the given metadata value from the implementing object's
-+     * metadata store.
-+     *
-+     * @param metadataKey  the unique metadata key identifying the metadata to
-+     *                     remove.
-+     * @param owningPlugin This plugin's metadata value will be removed. All
-+     *                     other values will be left untouched.
-+     * @throws IllegalArgumentException If plugin is null
-+     */
-+    @Override
-+    public void removeMetadata(String metadataKey, Plugin owningPlugin) {
-+
-+    }
-+
-+    /**
-+     * Deals the given amount of damage to this entity.
-+     *
-+     * @param amount Amount of damage to deal
-+     */
-+    @Override
-+    public void damage(double amount) {
-+
-+    }
-+
-+    /**
-+     * This method exists for legacy reasons to provide backwards
-+     * compatibility. It will not exist at runtime and should not be used
-+     * under any circumstances.
-+     *
-+     * @param amount
-+     */
-+    @Override
-+    public void _INVALID_damage(int amount) {
-+
-+    }
-+
-+    /**
-+     * Deals the given amount of damage to this entity, from a specified
-+     * entity.
-+     *
-+     * @param amount Amount of damage to deal
-+     * @param source Entity which to attribute this damage from
-+     */
-+    @Override
-+    public void damage(double amount, org.bukkit.entity.Entity source) {
-+
-+    }
-+
-+    /**
-+     * This method exists for legacy reasons to provide backwards
-+     * compatibility. It will not exist at runtime and should not be used
-+     * under any circumstances.
-+     *
-+     * @param amount
-+     * @param source
-+     */
-+    @Override
-+    public void _INVALID_damage(int amount, org.bukkit.entity.Entity source) {
-+
-+    }
-+
-+    /**
-+     * Gets the entity's health from 0 to {@link #getMaxHealth()}, where 0 is dead.
-+     *
-+     * @return Health represented from 0 to max
-+     */
-+    @Override
-+    public double getHealth() {
-+        return 0;
-+    }
-+
-+    /**
-+     * This method exists for legacy reasons to provide backwards
-+     * compatibility. It will not exist at runtime and should not be used
-+     * under any circumstances.
-+     */
-+    @Override
-+    public int _INVALID_getHealth() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the entity's health from 0 to {@link #getMaxHealth()}, where 0 is
-+     * dead.
-+     *
-+     * @param health New health represented from 0 to max
-+     * @throws IllegalArgumentException Thrown if the health is < 0 or >
-+     *                                  {@link #getMaxHealth()}
-+     */
-+    @Override
-+    public void setHealth(double health) {
-+
-+    }
-+
-+    /**
-+     * This method exists for legacy reasons to provide backwards
-+     * compatibility. It will not exist at runtime and should not be used
-+     * under any circumstances.
-+     *
-+     * @param health
-+     */
-+    @Override
-+    public void _INVALID_setHealth(int health) {
-+
-+    }
-+
-+    /**
-+     * Gets the maximum health this entity has.
-+     *
-+     * @return Maximum health
-+     */
-+    @Override
-+    public double getMaxHealth() {
-+        return 0;
-+    }
-+
-+    /**
-+     * This method exists for legacy reasons to provide backwards
-+     * compatibility. It will not exist at runtime and should not be used
-+     * under any circumstances.
-+     */
-+    @Override
-+    public int _INVALID_getMaxHealth() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the maximum health this entity can have.
-+     * <p>
-+     * If the health of the entity is above the value provided it will be set
-+     * to that value.
-+     * <p>
-+     * Note: An entity with a health bar ({@link Player}, {@link EnderDragon},
-+     * {@link Wither}, etc...} will have their bar scaled accordingly.
-+     *
-+     * @param health amount of health to set the maximum to
-+     */
-+    @Override
-+    public void setMaxHealth(double health) {
-+
-+    }
-+
-+    /**
-+     * This method exists for legacy reasons to provide backwards
-+     * compatibility. It will not exist at runtime and should not be used
-+     * under any circumstances.
-+     *
-+     * @param health
-+     */
-+    @Override
-+    public void _INVALID_setMaxHealth(int health) {
-+
-+    }
-+
-+    /**
-+     * Resets the max health to the original amount.
-+     */
-+    @Override
-+    public void resetMaxHealth() {
-+
-+    }
-+
-+    /**
-+     * Launches a {@link Projectile} from the ProjectileSource.
-+     *
-+     * @param projectile class of the projectile to launch
-+     * @return the launched projectile
-+     */
-+    @Override
-+    public <T extends Projectile> T launchProjectile(Class<? extends T> projectile) {
-+        return null;
-+    }
-+
-+    /**
-+     * Launches a {@link Projectile} from the ProjectileSource with an
-+     * initial velocity.
-+     *
-+     * @param projectile class of the projectile to launch
-+     * @param velocity   the velocity with which to launch
-+     * @return the launched projectile
-+     */
-+    @Override
-+    public <T extends Projectile> T launchProjectile(Class<? extends T> projectile, Vector velocity) {
-+        return null;
++        throw new UnsupportedOperationException("Not implemented yet");
 +    }
  }

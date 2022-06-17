@@ -1,0 +1,35 @@
+--- EntityCreeper.java
++++ EntityCreeper.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.src;
+ 
+-public class EntityCreeper extends EntityMob {
++import org.bukkit.entity.Creeper;
++
++public class EntityCreeper extends EntityMob implements Creeper {
+     int timeSinceIgnited;
+     int lastActiveTime;
+@@ -77,3 +79,23 @@
+         return Item.gunpowder.shiftedIndex;
+     }
++
++    /**
++     * Checks if this Creeper is powered (Electrocuted)
++     *
++     * @return true if this creeper is powered
++     */
++    @Override
++    public boolean isPowered() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets the Powered status of this Creeper
++     *
++     * @param value New Powered status
++     */
++    @Override
++    public void setPowered(boolean value) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
+ }

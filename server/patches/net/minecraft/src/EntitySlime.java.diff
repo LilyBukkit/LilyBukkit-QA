@@ -1,0 +1,66 @@
+--- EntitySlime.java
++++ EntitySlime.java
+@@ -1,5 +1,8 @@
+ package net.minecraft.src;
+ 
+-public class EntitySlime extends EntityLiving implements IMobs {
++import org.bukkit.entity.LivingEntity;
++import org.bukkit.entity.Slime;
++
++public class EntitySlime extends EntityLiving implements IMobs, Slime {
+     public float squishFactor;
+     public float prevSquishFactor;
+@@ -134,3 +137,53 @@
+         return 0.6f;
+     }
++
++    /**
++     * Gets the height of the entity's head above its Location
++     *
++     * @return Height of the entity's eyes above its Location
++     */
++    @Override
++    public double getEyeHeight() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Instructs this Creature to set the specified LivingEntity as its target.
++     * Hostile creatures may attack their target, and friendly creatures may
++     * follow their target.
++     *
++     * @param target New LivingEntity to target, or null to clear the target
++     */
++    @Override
++    public void setTarget(LivingEntity target) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the current target of this Creature
++     *
++     * @return Current target of this creature, or null if none exists
++     */
++    @Override
++    public LivingEntity getTarget() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * @return The size of the slime
++     * @author Celtic Minstrel
++     */
++    @Override
++    public int getSize() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * @param sz The new size of the slime.
++     * @author Celtic Minstrel
++     */
++    @Override
++    public void setSize(int sz) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
+ }

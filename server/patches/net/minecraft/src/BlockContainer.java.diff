@@ -1,0 +1,11 @@
+--- BlockContainer.java
++++ BlockContainer.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.src;
+ 
+-public abstract class BlockContainer extends Block {
++import org.bukkit.block.ContainerBlock;
++
++public abstract class BlockContainer extends Block implements ContainerBlock {
+     protected BlockContainer(final int id, final Material material) {
+         super(id, material);

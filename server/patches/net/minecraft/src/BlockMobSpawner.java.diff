@@ -1,0 +1,152 @@
+--- BlockMobSpawner.java
++++ BlockMobSpawner.java
+@@ -1,7 +1,13 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.block.Block;
++import org.bukkit.block.CreatureSpawner;
++import org.bukkit.entity.CreatureType;
++import org.bukkit.inventory.Inventory;
++import org.bukkit.material.MaterialData;
++
+ import java.util.Random;
+ 
+-public class BlockMobSpawner extends BlockContainer {
++public class BlockMobSpawner extends BlockContainer implements CreatureSpawner {
+     protected BlockMobSpawner(final int id, final int blockIndex) {
+         super(id, blockIndex, Material.rock);
+@@ -27,3 +33,134 @@
+         return false;
+     }
++
++    /**
++     * Get the block's inventory.
++     *
++     * @return
++     */
++    @Override
++    public Inventory getInventory() {
++        return null;
++    }
++
++    /**
++     * Get the spawner's creature type.
++     *
++     * @return
++     */
++    @Override
++    public CreatureType getCreatureType() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Set the spawner creature type.
++     *
++     * @param creatureType
++     */
++    @Override
++    public void setCreatureType(CreatureType creatureType) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Get the spawner's creature type.
++     *
++     * @return
++     */
++    @Override
++    public String getCreatureTypeId() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Set the spawner mob type.
++     *
++     * @param creatureType
++     */
++    @Override
++    public void setCreatureTypeId(String creatureType) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Get the spawner's delay.
++     *
++     * @return
++     */
++    @Override
++    public int getDelay() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Set the spawner's delay.
++     *
++     * @param delay
++     */
++    @Override
++    public void setDelay(int delay) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the block represented by this BlockState
++     *
++     * @return Block that this BlockState represents
++     */
++    @Override
++    public Block getBlock() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets the metadata for this block
++     *
++     * @param data New block specific metadata
++     */
++    @Override
++    public void setData(MaterialData data) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Attempts to update the block represented by this state, setting it to the
++     * new values as defined by this state. <br />
++     * <br />
++     * This has the same effect as calling update(false). That is to say,
++     * this will not modify the state of a block if it is no longer the same
++     * type as it was when this state was taken. It will return false in this
++     * eventuality.
++     *
++     * @return true if the update was successful, otherwise false
++     * @see BlockState.update(boolean force)
++     */
++    @Override
++    public boolean update() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Attempts to update the block represented by this state, setting it to the
++     * new values as defined by this state. <br />
++     * <br />
++     * Unless force is true, this will not modify the state of a block if it is
++     * no longer the same type as it was when this state was taken. It will return
++     * false in this eventuality.<br />
++     * <br />
++     * If force is true, it will set the type of the block to match the new state,
++     * set the state data and then return true.
++     *
++     * @param force true to forcefully set the state
++     * @return true if the update was successful, otherwise false
++     */
++    @Override
++    public boolean update(boolean force) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    @Override
++    public byte getRawData() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
+ }

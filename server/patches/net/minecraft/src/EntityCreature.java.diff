@@ -1,0 +1,48 @@
+--- EntityCreature.java
++++ EntityCreature.java
+@@ -1,5 +1,8 @@
+ package net.minecraft.src;
+ 
+-public class EntityCreature extends EntityLiving {
++import org.bukkit.entity.Creature;
++import org.bukkit.entity.LivingEntity;
++
++public class EntityCreature extends EntityLiving implements Creature {
+     private PathEntity pathToEntity;
+     protected Entity entityToAttack;
+@@ -141,3 +144,35 @@
+         return super.getCanSpawnHere() && this.getBlockPathWeight(i1, i2, i3) >= 0.0f;
+     }
++
++    /**
++     * Gets the height of the entity's head above its Location
++     *
++     * @return Height of the entity's eyes above its Location
++     */
++    @Override
++    public double getEyeHeight() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Instructs this Creature to set the specified LivingEntity as its target.
++     * Hostile creatures may attack their target, and friendly creatures may
++     * follow their target.
++     *
++     * @param target New LivingEntity to target, or null to clear the target
++     */
++    @Override
++    public void setTarget(LivingEntity target) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the current target of this Creature
++     *
++     * @return Current target of this creature, or null if none exists
++     */
++    @Override
++    public LivingEntity getTarget() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
+ }

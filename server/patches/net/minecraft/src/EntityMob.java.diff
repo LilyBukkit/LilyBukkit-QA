@@ -1,0 +1,9 @@
+--- EntityMob.java
++++ EntityMob.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.entity.Monster;
++
+ public class EntityMob extends EntityCreature implements IMobs {
+     protected int attackStrength;

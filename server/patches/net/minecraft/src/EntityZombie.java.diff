@@ -1,0 +1,11 @@
+--- EntityZombie.java
++++ EntityZombie.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.src;
+ 
+-public class EntityZombie extends EntityMob {
++import org.bukkit.entity.Zombie;
++
++public class EntityZombie extends EntityMob implements Zombie {
+     public EntityZombie(final World world) {
+         super(world);
