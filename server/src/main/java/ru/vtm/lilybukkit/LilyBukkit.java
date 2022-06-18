@@ -3,6 +3,7 @@ package ru.vtm.lilybukkit;
 import com.avaje.ebean.config.ServerConfig;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;

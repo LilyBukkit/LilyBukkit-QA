@@ -1,5 +1,6 @@
 package ru.vtm.lilybukkit.entity;
 
+import org.bukkit.block.Dispenser;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 

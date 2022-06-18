@@ -10,7 +10,6 @@ public interface Boat extends Vehicle {
     /**
      * Gets the maximum speed of a boat. The speed is unrelated to the velocity.
      *
-     * @param speed
      */
     public double getMaxSpeed();
 

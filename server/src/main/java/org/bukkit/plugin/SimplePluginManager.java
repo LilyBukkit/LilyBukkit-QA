@@ -326,7 +326,6 @@ public final class SimplePluginManager implements PluginManager {
     /**
      * Calls a player related event with the given details
      *
-     * @param type Type of player related event to call
      * @param event Event details
      */
     public synchronized void callEvent(Event event) {

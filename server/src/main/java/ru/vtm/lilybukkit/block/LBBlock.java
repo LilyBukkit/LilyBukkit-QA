@@ -56,7 +56,7 @@ public class LBBlock implements Block {
      *
      * @param face Face of this block to return
      * @return Block at the given face
-     * @see Block.getRelative(BlockFace face, int distance);
+     * @see Block#getRelative(BlockFace face, int distance);
      */
     @Override
     public Block getRelative(BlockFace face) {

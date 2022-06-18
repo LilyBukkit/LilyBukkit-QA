@@ -1,9 +1,6 @@
 package ru.vtm.lilybukkit.map;
 
-import org.bukkit.map.MapCanvas;
-import org.bukkit.map.MapCursorCollection;
-import org.bukkit.map.MapFont;
-import org.bukkit.map.MapView;
+import org.bukkit.map.*;
 
 import java.awt.*;
 

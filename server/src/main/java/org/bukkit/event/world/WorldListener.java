@@ -1,6 +1,7 @@
 package org.bukkit.event.world;
 
 import org.bukkit.event.Listener;
+import org.bukkit.generator.BlockPopulator;
 
 /**
  * Handles all World related events

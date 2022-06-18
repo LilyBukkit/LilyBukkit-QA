@@ -136,7 +136,7 @@ public interface Inventory {
     /**
      * Find all slots in the inventory containing any ItemStacks with the given material
      *
-     * @param materialId The material to look for
+     * @param material The material to look for
      * @return The Slots found.
      */
     public HashMap<Integer, ? extends ItemStack> all(Material material);
@@ -161,7 +161,7 @@ public interface Inventory {
     /**
      * Find the first slot in the inventory containing an ItemStack with the given material
      *
-     * @param materialId The material to look for
+     * @param material The material to look for
      * @return The Slot found.
      */
     public int first(Material material);

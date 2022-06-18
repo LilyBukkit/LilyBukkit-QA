@@ -148,7 +148,7 @@ public class LBBlockState implements BlockState {
      * eventuality.
      *
      * @return true if the update was successful, otherwise false
-     * @see BlockState.update(boolean force)
+     * @see BlockState#update(boolean force)
      */
     @Override
     public boolean update() {

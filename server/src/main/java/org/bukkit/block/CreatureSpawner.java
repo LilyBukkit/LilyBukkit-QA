@@ -20,7 +20,7 @@ public interface CreatureSpawner extends BlockState {
     /**
      * Set the spawner creature type.
      *
-     * @param mobType
+     * @param creatureType
      */
     public void setCreatureType(CreatureType creatureType);
 

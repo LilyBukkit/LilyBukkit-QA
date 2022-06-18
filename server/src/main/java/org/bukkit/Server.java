@@ -1,5 +1,6 @@
 package org.bukkit;
 
+import org.bukkit.command.CommandException;
 import org.bukkit.generator.ChunkGenerator;
 import com.avaje.ebean.config.ServerConfig;
 import org.bukkit.entity.Player;
@@ -292,7 +293,7 @@ public interface Server {
     /**
      * Dispatches a command on the server, and executes it if found.
      *
-     * @param cmdLine command + arguments. Example: "test abc 123"
+     * @param commandLine command + arguments. Example: "test abc 123"
      * @return targetFound returns false if no target is found.
      * @throws CommandException Thrown when the executor for the given command fails with an unhandled exception
      */
