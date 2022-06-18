@@ -1,0 +1,24 @@
+--- BlockSapling.java
++++ BlockSapling.java
+@@ -9,5 +9,5 @@
+         this.setBlockBounds(0.5f - f3, 0.0f, 0.5f - f3, 0.5f + f3, f3 * 2.0f, 0.5f + f3);
+     }
+-    
++
+     @Override
+     public void updateTick(final World world, final int x, final int y, final int z, final Random random) {
+@@ -17,6 +17,5 @@
+             if (i6 < 15) {
+                 world.setBlockMetadataWithNotify(x, y, z, i6 + 1);
+-            }
+-            else {
++            } else {
+                 world.setBlock(x, y, z, 0);
+                 Object object7 = new WorldGenTrees();
+@@ -24,5 +23,5 @@
+                     object7 = new WorldGenBigTree();
+                 }
+-                if (!((WorldGenerator)object7).generate(world, random, x, y, z)) {
++                if (!((WorldGenerator) object7).generate(world, random, x, y, z)) {
+                     world.setBlock(x, y, z, this.blockID);
+                 }

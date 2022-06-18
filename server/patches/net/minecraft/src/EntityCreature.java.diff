@@ -1,16 +1,98 @@
 --- EntityCreature.java
 +++ EntityCreature.java
-@@ -1,5 +1,8 @@
+@@ -1,14 +1,17 @@
  package net.minecraft.src;
  
 -public class EntityCreature extends EntityLiving {
+-    private PathEntity pathToEntity;
 +import org.bukkit.entity.Creature;
 +import org.bukkit.entity.LivingEntity;
 +
 +public class EntityCreature extends EntityLiving implements Creature {
-     private PathEntity pathToEntity;
      protected Entity entityToAttack;
-@@ -141,3 +144,35 @@
+     protected boolean hasAttacked;
+-    
++    private PathEntity pathToEntity;
++
+     public EntityCreature(final World world) {
+         super(world);
+         this.hasAttacked = false;
+     }
+-    
++
+     @Override
+     protected void updateEntityActionState() {
+@@ -20,9 +23,7 @@
+                 this.pathToEntity = this.worldObj.getPathToEntity(this, this.entityToAttack, f1);
+             }
+-        }
+-        else if (!this.entityToAttack.isEntityAlive()) {
++        } else if (!this.entityToAttack.isEntityAlive()) {
+             this.entityToAttack = null;
+-        }
+-        else {
++        } else {
+             final float f2 = this.entityToAttack.getDistanceToEntity(this);
+             if (this.canEntityBeSeen(this.entityToAttack)) {
+@@ -32,6 +33,5 @@
+         if (!this.hasAttacked && this.entityToAttack != null && (this.pathToEntity == null || this.rand.nextInt(20) == 0)) {
+             this.pathToEntity = this.worldObj.getPathToEntity(this, this.entityToAttack, f1);
+-        }
+-        else if ((this.pathToEntity == null && this.rand.nextInt(80) == 0) || this.rand.nextInt(80) == 0) {
++        } else if ((this.pathToEntity == null && this.rand.nextInt(80) == 0) || this.rand.nextInt(80) == 0) {
+             boolean z21 = false;
+             int i3 = -1;
+@@ -68,6 +68,5 @@
+                     vec3D25 = null;
+                     this.pathToEntity = null;
+-                }
+-                else {
++                } else {
+                     vec3D25 = this.pathToEntity.getPosition(this);
+                 }
+@@ -78,5 +77,5 @@
+                 final double d28 = vec3D25.zCoord - this.posZ;
+                 final double d29 = vec3D25.yCoord - i10;
+-                final float f5 = (float)(Math.atan2(d28, d27) * 180.0 / 3.1415927410125732) - 90.0f;
++                final float f5 = (float) (Math.atan2(d28, d27) * 180.0 / 3.1415927410125732) - 90.0f;
+                 float f6 = f5 - this.rotationYaw;
+                 this.moveForward = this.moveSpeed;
+@@ -98,5 +97,5 @@
+                     final double d31 = this.entityToAttack.posZ - this.posZ;
+                     final float f7 = this.rotationYaw;
+-                    this.rotationYaw = (float)(Math.atan2(d31, d30) * 180.0 / 3.1415927410125732) - 90.0f;
++                    this.rotationYaw = (float) (Math.atan2(d31, d30) * 180.0 / 3.1415927410125732) - 90.0f;
+                     f6 = (f7 - this.rotationYaw + 90.0f) * 3.1415927f / 180.0f;
+                     this.moveStrafing = -MathHelper.sin(f6) * this.moveForward * 1.0f;
+@@ -116,22 +115,21 @@
+                 this.isJumping = true;
+             }
+-        }
+-        else {
++        } else {
+             super.updateEntityActionState();
+             this.pathToEntity = null;
+         }
+     }
+-    
++
+     protected void attackEntity(final Entity entity, final float damage) {
+     }
+-    
++
+     protected float getBlockPathWeight(final int x, final int y, final int z) {
+         return 0.0f;
+     }
+-    
++
+     protected Entity findPlayerToAttack() {
+         return null;
+     }
+-    
++
+     @Override
+     public boolean getCanSpawnHere() {
+@@ -141,3 +139,35 @@
          return super.getCanSpawnHere() && this.getBlockPathWeight(i1, i2, i3) >= 0.0f;
      }
 +
@@ -25,6 +107,16 @@
 +    }
 +
 +    /**
++     * Gets the current target of this Creature
++     *
++     * @return Current target of this creature, or null if none exists
++     */
++    @Override
++    public LivingEntity getTarget() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
 +     * Instructs this Creature to set the specified LivingEntity as its target.
 +     * Hostile creatures may attack their target, and friendly creatures may
 +     * follow their target.
@@ -33,16 +125,6 @@
 +     */
 +    @Override
 +    public void setTarget(LivingEntity target) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
-+     * Gets the current target of this Creature
-+     *
-+     * @return Current target of this creature, or null if none exists
-+     */
-+    @Override
-+    public LivingEntity getTarget() {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
  }

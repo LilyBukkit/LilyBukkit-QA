@@ -1,0 +1,9 @@
+--- BlockOreBlock.java
++++ BlockOreBlock.java
+@@ -6,5 +6,5 @@
+         this.blockIndexInTexture = blockIndex;
+     }
+-    
++
+     @Override
+     public int getBlockTextureFromSide(final int side) {

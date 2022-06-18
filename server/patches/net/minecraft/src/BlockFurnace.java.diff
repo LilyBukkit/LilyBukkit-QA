@@ -1,6 +1,6 @@
 --- BlockFurnace.java
 +++ BlockFurnace.java
-@@ -1,7 +1,11 @@
+@@ -1,9 +1,13 @@
  package net.minecraft.src;
  
 +import org.bukkit.block.Furnace;
@@ -12,8 +12,77 @@
 -public class BlockFurnace extends BlockContainer {
 +public class BlockFurnace extends BlockContainer implements Furnace {
      private final boolean isActive;
-     
-@@ -73,3 +77,114 @@
+-    
++
+     protected BlockFurnace(final int id, final boolean isActive) {
+         super(id, Material.rock);
+@@ -11,10 +15,22 @@
+         this.blockIndexInTexture = 45;
+     }
+-    
++
++    public static void updateFurnaceBlockState(final boolean isActive, final World world, final int x, final int y, final int z) {
++        final int i5 = world.getBlockMetadata(x, y, z);
++        final TileEntity tileEntity6 = world.getBlockTileEntity(x, y, z);
++        if (isActive) {
++            world.setBlockWithNotify(x, y, z, Block.stoneOvenActive.blockID);
++        } else {
++            world.setBlockWithNotify(x, y, z, Block.stoneOvenIdle.blockID);
++        }
++        world.setBlockMetadataWithNotify(x, y, z, i5);
++        world.setBlockTileEntity(x, y, z, tileEntity6);
++    }
++
+     @Override
+     public int idDropped(final int count, final Random random) {
+         return Block.stoneOvenIdle.blockID;
+     }
+-    
++
+     @Override
+     public void onBlockAdded(final World world, final int x, final int y, final int z) {
+@@ -22,5 +38,5 @@
+         this.setDefaultDirection(world, x, y, z);
+     }
+-    
++
+     private void setDefaultDirection(final World world, final int x, final int y, final int z) {
+         final int i5 = world.getBlockId(x, y, z - 1);
+@@ -43,33 +59,131 @@
+         world.setBlockMetadataWithNotify(x, y, z, b9);
+     }
+-    
++
+     @Override
+     public int getBlockTextureFromSide(final int side) {
+         return (side == 1) ? Block.stone.blockID : ((side == 0) ? Block.stone.blockID : ((side == 3) ? (this.blockIndexInTexture - 1) : this.blockIndexInTexture));
+     }
+-    
++
+     @Override
+     public boolean blockActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer) {
+-        final TileEntityFurnace tileEntityFurnace6 = (TileEntityFurnace)world.getBlockTileEntity(x, y, z);
++        final TileEntityFurnace tileEntityFurnace6 = (TileEntityFurnace) world.getBlockTileEntity(x, y, z);
+         entityPlayer.displayGUIFurnace(tileEntityFurnace6);
+         return true;
+     }
+-    
+-    public static void updateFurnaceBlockState(final boolean isActive, final World world, final int x, final int y, final int z) {
+-        final int i5 = world.getBlockMetadata(x, y, z);
+-        final TileEntity tileEntity6 = world.getBlockTileEntity(x, y, z);
+-        if (isActive) {
+-            world.setBlockWithNotify(x, y, z, Block.stoneOvenActive.blockID);
+-        }
+-        else {
+-            world.setBlockWithNotify(x, y, z, Block.stoneOvenIdle.blockID);
+-        }
+-        world.setBlockMetadataWithNotify(x, y, z, i5);
+-        world.setBlockTileEntity(x, y, z, tileEntity6);
+-    }
+-    
++
+     @Override
+     protected TileEntity getBlockEntity() {
          return new TileEntityFurnace();
      }
 +
@@ -97,7 +166,7 @@
 +     * eventuality.
 +     *
 +     * @return true if the update was successful, otherwise false
-+     * @see BlockState.update(boolean force)
++     * @see org.bukkit.block.BlockState#update(boolean force)
 +     */
 +    @Override
 +    public boolean update() {

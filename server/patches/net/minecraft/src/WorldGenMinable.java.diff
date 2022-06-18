@@ -1,0 +1,26 @@
+--- WorldGenMinable.java
++++ WorldGenMinable.java
+@@ -6,10 +6,10 @@
+     private int minableBlockId;
+     private int numberOfBlocks;
+-    
++
+     public WorldGenMinable(final int minableBlockID, final int numberOfBlocks) {
+         this.minableBlockId = minableBlockID;
+         this.numberOfBlocks = numberOfBlocks;
+     }
+-    
++
+     @Override
+     public boolean generate(final World world, final Random rand, final int x, final int y, final int z) {
+@@ -28,7 +28,7 @@
+             final double d17 = (MathHelper.sin(i19 * 3.1415927f / this.numberOfBlocks) + 1.0f) * d16 + 1.0;
+             final double d18 = (MathHelper.sin(i19 * 3.1415927f / this.numberOfBlocks) + 1.0f) * d16 + 1.0;
+-            for (int i20 = (int)(d13 - d17 / 2.0); i20 <= (int)(d13 + d17 / 2.0); ++i20) {
+-                for (int i21 = (int)(d14 - d18 / 2.0); i21 <= (int)(d14 + d18 / 2.0); ++i21) {
+-                    for (int i22 = (int)(d15 - d17 / 2.0); i22 <= (int)(d15 + d17 / 2.0); ++i22) {
++            for (int i20 = (int) (d13 - d17 / 2.0); i20 <= (int) (d13 + d17 / 2.0); ++i20) {
++                for (int i21 = (int) (d14 - d18 / 2.0); i21 <= (int) (d14 + d18 / 2.0); ++i21) {
++                    for (int i22 = (int) (d15 - d17 / 2.0); i22 <= (int) (d15 + d17 / 2.0); ++i22) {
+                         final double d19 = (i20 + 0.5 - d13) / (d17 / 2.0);
+                         final double d20 = (i21 + 0.5 - d14) / (d18 / 2.0);

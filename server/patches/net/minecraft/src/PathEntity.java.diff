@@ -1,0 +1,35 @@
+--- PathEntity.java
++++ PathEntity.java
+@@ -2,25 +2,25 @@
+ 
+ public class PathEntity {
+-    private final PathPoint[] points;
+     public final int pathLength;
++    private final PathPoint[] points;
+     private int pathIndex;
+-    
++
+     public PathEntity(final PathPoint[] points) {
+         this.points = points;
+         this.pathLength = points.length;
+     }
+-    
++
+     public void incrementPathIndex() {
+         ++this.pathIndex;
+     }
+-    
++
+     public boolean isFinished() {
+         return this.pathIndex >= this.points.length;
+     }
+-    
++
+     public Vec3D getPosition(final Entity entity) {
+-        final double d2 = this.points[this.pathIndex].xCoord + (int)(entity.width + 1.0f) * 0.5;
++        final double d2 = this.points[this.pathIndex].xCoord + (int) (entity.width + 1.0f) * 0.5;
+         final double d3 = this.points[this.pathIndex].yCoord;
+-        final double d4 = this.points[this.pathIndex].zCoord + (int)(entity.width + 1.0f) * 0.5;
++        final double d4 = this.points[this.pathIndex].zCoord + (int) (entity.width + 1.0f) * 0.5;
+         return Vec3D.createVector(d2, d3, d4);
+     }

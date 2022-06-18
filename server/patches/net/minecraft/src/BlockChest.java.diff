@@ -1,8 +1,9 @@
 --- BlockChest.java
 +++ BlockChest.java
-@@ -1,7 +1,12 @@
+@@ -1,9 +1,15 @@
  package net.minecraft.src;
  
++import org.bukkit.Chunk;
 +import org.bukkit.block.Block;
 +import org.bukkit.block.Chest;
 +import org.bukkit.inventory.Inventory;
@@ -13,8 +14,83 @@
 -public class BlockChest extends BlockContainer {
 +public class BlockChest extends BlockContainer implements Chest {
      private Random random;
-     
-@@ -105,3 +110,74 @@
+-    
++
+     protected BlockChest(final int id) {
+         super(id, Material.wood);
+@@ -11,10 +17,10 @@
+         this.blockIndexInTexture = 26;
+     }
+-    
++
+     @Override
+     public int getBlockTextureFromSide(final int side) {
+         return (side == 1) ? (this.blockIndexInTexture - 1) : ((side == 0) ? (this.blockIndexInTexture - 1) : ((side == 3) ? (this.blockIndexInTexture + 1) : this.blockIndexInTexture));
+     }
+-    
++
+     @Override
+     public boolean canPlaceBlockAt(final World world, final int x, final int y, final int z) {
+@@ -34,12 +40,12 @@
+         return i5 <= 1 && !this.isThereANeighborChest(world, x - 1, y, z) && !this.isThereANeighborChest(world, x + 1, y, z) && !this.isThereANeighborChest(world, x, y, z - 1) && !this.isThereANeighborChest(world, x, y, z + 1);
+     }
+-    
++
+     private boolean isThereANeighborChest(final World world, final int x, final int y, final int z) {
+         return world.getBlockId(x, y, z) == this.blockID && (world.getBlockId(x - 1, y, z) == this.blockID || world.getBlockId(x + 1, y, z) == this.blockID || world.getBlockId(x, y, z - 1) == this.blockID || world.getBlockId(x, y, z + 1) == this.blockID);
+     }
+-    
++
+     @Override
+     public void onBlockRemoval(final World world, final int x, final int y, final int z) {
+-        final TileEntityChest tileEntityChest5 = (TileEntityChest)world.getBlockTileEntity(x, y, z);
++        final TileEntityChest tileEntityChest5 = (TileEntityChest) world.getBlockTileEntity(x, y, z);
+         for (int i6 = 0; i6 < tileEntityChest5.getSizeInventory(); ++i6) {
+             final ItemStack itemStack7 = tileEntityChest5.getStackInSlot(i6);
+@@ -57,7 +63,7 @@
+                     final EntityItem entityItem12 = new EntityItem(world, x + f8, y + f9, z + f10, new ItemStack(itemStack7.itemID, i7, itemStack7.itemDmg));
+                     final float f11 = 0.05f;
+-                    entityItem12.motionX = (float)this.random.nextGaussian() * f11;
+-                    entityItem12.motionY = (float)this.random.nextGaussian() * f11 + 0.2f;
+-                    entityItem12.motionZ = (float)this.random.nextGaussian() * f11;
++                    entityItem12.motionX = (float) this.random.nextGaussian() * f11;
++                    entityItem12.motionY = (float) this.random.nextGaussian() * f11 + 0.2f;
++                    entityItem12.motionZ = (float) this.random.nextGaussian() * f11;
+                     world.spawnEntityInWorld(entityItem12);
+                 }
+@@ -66,5 +72,5 @@
+         super.onBlockRemoval(world, x, y, z);
+     }
+-    
++
+     @Override
+     public boolean blockActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer) {
+@@ -86,22 +92,203 @@
+         }
+         if (world.getBlockId(x - 1, y, z) == this.blockID) {
+-            object6 = new InventoryLargeChest("Large chest", (IInventory)world.getBlockTileEntity(x - 1, y, z), (IInventory)object6);
++            object6 = new InventoryLargeChest("Large chest", (IInventory) world.getBlockTileEntity(x - 1, y, z), (IInventory) object6);
+         }
+         if (world.getBlockId(x + 1, y, z) == this.blockID) {
+-            object6 = new InventoryLargeChest("Large chest", (IInventory)object6, (IInventory)world.getBlockTileEntity(x + 1, y, z));
++            object6 = new InventoryLargeChest("Large chest", (IInventory) object6, (IInventory) world.getBlockTileEntity(x + 1, y, z));
+         }
+         if (world.getBlockId(x, y, z - 1) == this.blockID) {
+-            object6 = new InventoryLargeChest("Large chest", (IInventory)world.getBlockTileEntity(x, y, z - 1), (IInventory)object6);
++            object6 = new InventoryLargeChest("Large chest", (IInventory) world.getBlockTileEntity(x, y, z - 1), (IInventory) object6);
+         }
+         if (world.getBlockId(x, y, z + 1) == this.blockID) {
+-            object6 = new InventoryLargeChest("Large chest", (IInventory)object6, (IInventory)world.getBlockTileEntity(x, y, z + 1));
++            object6 = new InventoryLargeChest("Large chest", (IInventory) object6, (IInventory) world.getBlockTileEntity(x, y, z + 1));
+         }
+-        entityPlayer.displayGUIChest((IInventory)object6);
++        entityPlayer.displayGUIChest((IInventory) object6);
+         return true;
+     }
+-    
++
+     @Override
+     protected TileEntity getBlockEntity() {
          return new TileEntityChest();
      }
 +
@@ -29,12 +105,122 @@
 +    }
 +
 +    /**
++     * Gets the metadata for this block
++     *
++     * @return block specific metadata
++     */
++    @Override
++    public MaterialData getData() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the type of this block
++     *
++     * @return block type
++     */
++    @Override
++    public org.bukkit.Material getType() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the type-id of this block
++     *
++     * @return block type-id
++     */
++    @Override
++    public int getTypeId() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the light level between 0-15
++     *
++     * @return light level
++     */
++    @Override
++    public byte getLightLevel() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the world which contains this Block
++     *
++     * @return World containing this block
++     */
++    @Override
++    public org.bukkit.World getWorld() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the x-coordinate of this block
++     *
++     * @return x-coordinate
++     */
++    @Override
++    public int getX() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the y-coordinate of this block
++     *
++     * @return y-coordinate
++     */
++    @Override
++    public int getY() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the z-coordinate of this block
++     *
++     * @return z-coordinate
++     */
++    @Override
++    public int getZ() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the chunk which contains this block
++     *
++     * @return Containing Chunk
++     */
++    @Override
++    public Chunk getChunk() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
 +     * Sets the metadata for this block
 +     *
 +     * @param data New block specific metadata
 +     */
 +    @Override
 +    public void setData(MaterialData data) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets the type of this block
++     *
++     * @param type Material to change this block to
++     */
++    @Override
++    public void setType(org.bukkit.Material type) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets the type-id of this block
++     *
++     * @param type Type-Id to change this block to
++     */
++    @Override
++    public boolean setTypeId(int type) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -48,7 +234,7 @@
 +     * eventuality.
 +     *
 +     * @return true if the update was successful, otherwise false
-+     * @see BlockState.update(boolean force)
++     * @see org.bukkit.block.BlockState#update(boolean force)
 +     */
 +    @Override
 +    public boolean update() {

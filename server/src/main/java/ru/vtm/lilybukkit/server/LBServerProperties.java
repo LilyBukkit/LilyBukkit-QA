@@ -27,7 +27,10 @@ public class LBServerProperties {
      */
     public static final String SERVER_PORT = "server-port";
     /**
-     *
+     * If Rosepad's whitelist feature is enabled
      */
     public static final String WHITELIST = "whitelist";
+
+    // LILYBUKKIT \\
+    public static final String ALLOW_FLIGHT = "allow-flight";
 }

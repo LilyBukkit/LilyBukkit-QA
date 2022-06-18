@@ -1,0 +1,14 @@
+--- WorldGenLiquids.java
++++ WorldGenLiquids.java
+@@ -5,9 +5,9 @@
+ public class WorldGenLiquids extends WorldGenerator {
+     private int liquidBlockId;
+-    
++
+     public WorldGenLiquids(final int liquidBlockID) {
+         this.liquidBlockId = liquidBlockID;
+     }
+-    
++
+     @Override
+     public boolean generate(final World world, final Random rand, final int x, final int y, final int z) {

@@ -1,0 +1,61 @@
+--- MathHelper.java
++++ MathHelper.java
+@@ -3,42 +3,42 @@
+ public class MathHelper {
+     private static float[] SIN_TABLE;
+-    
++
+     static {
+         MathHelper.SIN_TABLE = new float[65536];
+         for (int i0 = 0; i0 < 65536; ++i0) {
+-            MathHelper.SIN_TABLE[i0] = (float)Math.sin(i0 * 3.141592653589793 * 2.0 / 65536.0);
++            MathHelper.SIN_TABLE[i0] = (float) Math.sin(i0 * 3.141592653589793 * 2.0 / 65536.0);
+         }
+     }
+-    
++
+     public static final float sin(final float floatValue) {
+-        return MathHelper.SIN_TABLE[(int)(floatValue * 10430.378f) & 0xFFFF];
++        return MathHelper.SIN_TABLE[(int) (floatValue * 10430.378f) & 0xFFFF];
+     }
+-    
++
+     public static final float cos(final float floatValue) {
+-        return MathHelper.SIN_TABLE[(int)(floatValue * 10430.378f + 16384.0f) & 0xFFFF];
++        return MathHelper.SIN_TABLE[(int) (floatValue * 10430.378f + 16384.0f) & 0xFFFF];
+     }
+-    
++
+     public static final float sqrt_float(final float floatValue) {
+-        return (float)Math.sqrt((double)floatValue);
++        return (float) Math.sqrt((double) floatValue);
+     }
+-    
++
+     public static final float sqrt_double(final double doubleValue) {
+-        return (float)Math.sqrt(doubleValue);
++        return (float) Math.sqrt(doubleValue);
+     }
+-    
++
+     public static int floor_float(final float floatValue) {
+-        final int i1 = (int)floatValue;
++        final int i1 = (int) floatValue;
+         return (floatValue < i1) ? (i1 - 1) : i1;
+     }
+-    
++
+     public static int floor_double(final double doubleValue) {
+-        final int i2 = (int)doubleValue;
++        final int i2 = (int) doubleValue;
+         return (doubleValue < i2) ? (i2 - 1) : i2;
+     }
+-    
++
+     public static float abs(final float floatValue) {
+         return (floatValue >= 0.0f) ? floatValue : (-floatValue);
+     }
+-    
++
+     public static double abs_max(double doubleValue1, double doubleValue2) {
+         if (doubleValue1 < 0.0) {

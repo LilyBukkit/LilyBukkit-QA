@@ -1,6 +1,7 @@
 package ru.vtm.lilybukkit.stubs.block;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.BlockContainer;
 import net.minecraft.src.Material;
 import org.bukkit.Instrument;
 import org.bukkit.Note;
@@ -30,22 +31,22 @@ public class BlockNoteblock extends Block implements NoteBlock {
     }
 
     /**
-     * Gets the note.
-     *
-     * @return
-     */
-    @Override
-    public byte getRawNote() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Set the note.
      *
      * @param note
      */
     @Override
     public void setNote(Note note) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the note.
+     *
+     * @return
+     */
+    @Override
+    public byte getRawNote() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -125,7 +126,7 @@ public class BlockNoteblock extends Block implements NoteBlock {
      * eventuality.
      *
      * @return true if the update was successful, otherwise false
-     * @see BlockState.update(boolean force)
+     * @see org.bukkit.block.BlockState#update(boolean force)
      */
     @Override
     public boolean update() {

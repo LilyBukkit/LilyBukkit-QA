@@ -1,0 +1,29 @@
+--- BlockJukeBox.java
++++ BlockJukeBox.java
+@@ -5,10 +5,10 @@
+         super(id, blockIndex, Material.wood);
+     }
+-    
++
+     @Override
+     public int getBlockTextureFromSide(final int side) {
+         return this.blockIndexInTexture + ((side == 1) ? 1 : 0);
+     }
+-    
++
+     @Override
+     public boolean blockActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer) {
+@@ -20,5 +20,5 @@
+         return false;
+     }
+-    
++
+     public void ejectRecord(final World world, final int x, final int y, final int z, final int i5) {
+         world.playRecord(null, x, y, z);
+@@ -33,5 +33,5 @@
+         world.spawnEntityInWorld(entityItem14);
+     }
+-    
++
+     @Override
+     public void dropBlockAsItemWithChance(final World world, final int x, final int y, final int z, final int i5, final float f6) {

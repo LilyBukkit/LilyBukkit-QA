@@ -31,22 +31,22 @@ public class EntityExplosive extends Entity implements Explosive {
     }
 
     /**
-     * Set the radius affected by this explosive's explosion
-     *
-     * @param yield
-     */
-    @Override
-    public void setYield(float yield) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Return the radius or yield of this explosive's explosion
      *
      * @return the radius of blocks affected
      */
     @Override
     public float getYield() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Set the radius affected by this explosive's explosion
+     *
+     * @param yield
+     */
+    @Override
+    public void setYield(float yield) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -81,22 +81,22 @@ public class EntityExplosive extends Entity implements Explosive {
     }
 
     /**
-     * Sets this entity's velocity
-     *
-     * @param velocity New velocity to travel with
-     */
-    @Override
-    public void setVelocity(Vector velocity) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Gets this entity's current velocity
      *
      * @return Current travelling velocity of this entity
      */
     @Override
     public Vector getVelocity() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Sets this entity's velocity
+     *
+     * @param velocity New velocity to travel with
+     */
+    @Override
+    public void setVelocity(Vector velocity) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -166,22 +166,22 @@ public class EntityExplosive extends Entity implements Explosive {
     }
 
     /**
-     * Returns the entity's maximum fire ticks.
-     *
-     * @return int maxFireTicks
-     */
-    @Override
-    public int getMaxFireTicks() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
      *
      * @param ticks
      */
     @Override
     public void setFireTicks(int ticks) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Returns the entity's maximum fire ticks.
+     *
+     * @return int maxFireTicks
+     */
+    @Override
+    public int getMaxFireTicks() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -274,22 +274,22 @@ public class EntityExplosive extends Entity implements Explosive {
     }
 
     /**
-     * Record the last {@link EntityDamageEvent} inflicted on this entity
-     *
-     * @param event a {@link EntityDamageEvent}
-     */
-    @Override
-    public void setLastDamageCause(EntityDamageEvent event) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
      *
      * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
      */
     @Override
     public EntityDamageEvent getLastDamageCause() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Record the last {@link EntityDamageEvent} inflicted on this entity
+     *
+     * @param event a {@link EntityDamageEvent}
+     */
+    @Override
+    public void setLastDamageCause(EntityDamageEvent event) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

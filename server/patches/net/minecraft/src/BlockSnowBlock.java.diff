@@ -1,0 +1,21 @@
+--- BlockSnowBlock.java
++++ BlockSnowBlock.java
+@@ -8,15 +8,15 @@
+         this.setTickOnLoad(true);
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {
+         return Item.snowball.shiftedIndex;
+     }
+-    
++
+     @Override
+     public int quantityDropped(final Random random) {
+         return 4;
+     }
+-    
++
+     @Override
+     public void updateTick(final World world, final int x, final int y, final int z, final Random random) {

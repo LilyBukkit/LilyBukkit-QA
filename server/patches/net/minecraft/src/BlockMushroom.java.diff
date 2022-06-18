@@ -1,0 +1,15 @@
+--- BlockMushroom.java
++++ BlockMushroom.java
+@@ -7,10 +7,10 @@
+         this.setBlockBounds(0.5f - f3, 0.0f, 0.5f - f3, 0.5f + f3, f3 * 2.0f, 0.5f + f3);
+     }
+-    
++
+     @Override
+     protected boolean canThisPlantGrowOnThisBlockID(final int id) {
+         return Block.opaqueCubeLookup[id];
+     }
+-    
++
+     @Override
+     public boolean canBlockStay(final World world, final int x, final int y, final int z) {

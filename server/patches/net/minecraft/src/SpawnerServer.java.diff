@@ -1,0 +1,15 @@
+--- SpawnerServer.java
++++ SpawnerServer.java
+@@ -3,10 +3,10 @@
+ class SpawnerServer extends SpawnerAnimals {
+     final WorldServer worldServer;
+-    
++
+     SpawnerServer(final WorldServer worldServer1, final int i2, final Class class3, final Class[] class4) {
+         super(i2, class3, class4);
+         this.worldServer = worldServer1;
+     }
+-    
++
+     @Override
+     protected ChunkPosition getRandomSpawningPointInChunk(final World world1, final int i2, final int i3) {

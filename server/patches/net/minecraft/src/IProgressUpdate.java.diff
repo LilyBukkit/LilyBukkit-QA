@@ -1,0 +1,12 @@
+--- IProgressUpdate.java
++++ IProgressUpdate.java
+@@ -3,7 +3,7 @@
+ public interface IProgressUpdate {
+     void displayProgressMessage(final String message);
+-    
++
+     void displayLoadingString(final String message);
+-    
++
+     void setLoadingProgress(final int progress);
+ }

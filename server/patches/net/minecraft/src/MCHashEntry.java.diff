@@ -1,0 +1,48 @@
+--- MCHashEntry.java
++++ MCHashEntry.java
+@@ -3,8 +3,8 @@
+ class MCHashEntry {
+     final int hashEntry;
++    final int slotHash;
+     Object valueEntry;
+     MCHashEntry nextEntry;
+-    final int slotHash;
+-    
++
+     MCHashEntry(final int slotHash, final int hashEntry, final Object valueEntry, final MCHashEntry nextEntry) {
+         this.valueEntry = valueEntry;
+@@ -13,18 +13,18 @@
+         this.slotHash = slotHash;
+     }
+-    
++
+     public final int getHash() {
+         return this.hashEntry;
+     }
+-    
++
+     public final Object getValue() {
+         return this.valueEntry;
+     }
+-    
++
+     public final boolean equals(final Object object) {
+         if (!(object instanceof MCHashEntry)) {
+             return false;
+         }
+-        final MCHashEntry mCHashEntry2 = (MCHashEntry)object;
++        final MCHashEntry mCHashEntry2 = (MCHashEntry) object;
+         final Integer integer3 = this.getHash();
+         final Integer integer4 = mCHashEntry2.getHash();
+@@ -38,9 +38,9 @@
+         return false;
+     }
+-    
++
+     public final int hashCode() {
+         return MCHashTable.getHash(this.hashEntry);
+     }
+-    
++
+     public final String toString() {
+         return String.valueOf(this.getHash()) + "=" + this.getValue();

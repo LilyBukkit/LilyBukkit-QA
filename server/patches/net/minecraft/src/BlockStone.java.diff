@@ -1,0 +1,9 @@
+--- BlockStone.java
++++ BlockStone.java
+@@ -7,5 +7,5 @@
+         super(id, blockIndex, Material.rock);
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {

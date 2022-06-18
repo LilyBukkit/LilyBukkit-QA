@@ -9,3 +9,79 @@
 +public class EntityChicken extends EntityAnimal implements Chicken {
      public boolean unusedBool2;
      public float wingRotation;
+@@ -9,5 +11,5 @@
+     public float moveWings;
+     public int timeUntilNextEgg;
+-    
++
+     public EntityChicken(final World world) {
+         super(world);
+@@ -21,5 +23,5 @@
+         this.timeUntilNextEgg = this.rand.nextInt(6000) + 6000;
+     }
+-    
++
+     @Override
+     public void onLivingUpdate() {
+@@ -27,5 +29,5 @@
+         this.prevWingRotation = this.wingRotation;
+         this.prevDestPos = this.destPos;
+-        this.destPos += (float)((this.onGround ? -1 : 4) * 0.3);
++        this.destPos += (float) ((this.onGround ? -1 : 4) * 0.3);
+         if (this.destPos < 0.0f) {
+             this.destPos = 0.0f;
+@@ -37,5 +39,5 @@
+             this.moveWings = 1.0f;
+         }
+-        this.moveWings *= (float)0.9;
++        this.moveWings *= (float) 0.9;
+         if (!this.onGround && this.motionY < 0.0) {
+             this.motionY *= 0.6;
+@@ -43,39 +45,39 @@
+         this.wingRotation += this.moveWings * 2.0f;
+         if (!this.worldObj.multiplayerWorld && --this.timeUntilNextEgg <= 0) {
+-            this.worldObj.playSoundAtEntity((Entity)this, "mob.chickenplop", 1.0f, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
++            this.worldObj.playSoundAtEntity((Entity) this, "mob.chickenplop", 1.0f, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
+             this.dropItem(Item.egg.shiftedIndex, 1);
+             this.timeUntilNextEgg = this.rand.nextInt(6000) + 6000;
+         }
+     }
+-    
++
+     @Override
+     protected void fall(final float f1) {
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     protected String getLivingSound() {
+         return "mob.chicken";
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.chickenhurt";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "mob.chickenhurt";
+     }
+-    
++
+     @Override
+     protected int getDropItemId() {

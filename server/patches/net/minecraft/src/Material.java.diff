@@ -1,0 +1,45 @@
+--- Material.java
++++ Material.java
+@@ -24,6 +24,5 @@
+     public static final Material cactus;
+     public static final Material clay;
+-    private boolean canBurn;
+-    
++
+     static {
+         air = new MaterialTransparent();
+@@ -50,26 +49,28 @@
+         clay = new Material();
+     }
+-    
++
++    private boolean canBurn;
++
+     public boolean getIsLiquid() {
+         return false;
+     }
+-    
++
+     public boolean isSolid() {
+         return true;
+     }
+-    
++
+     public boolean getCanBlockGrass() {
+         return true;
+     }
+-    
++
+     public boolean getIsSolid() {
+         return true;
+     }
+-    
++
+     private Material setBurning() {
+         this.canBurn = true;
+         return this;
+     }
+-    
++
+     public boolean getCanBurn() {
+         return this.canBurn;

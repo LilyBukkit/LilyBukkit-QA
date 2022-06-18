@@ -1,0 +1,125 @@
+--- Vec3D.java
++++ Vec3D.java
+@@ -7,28 +7,14 @@
+     private static List vectorList;
+     private static int nextVector;
+-    public double xCoord;
+-    public double yCoord;
+-    public double zCoord;
+-    
++
+     static {
+-        Vec3D.vectorList = (List)new ArrayList();
++        Vec3D.vectorList = (List) new ArrayList();
+         Vec3D.nextVector = 0;
+     }
+-    
+-    public static Vec3D createVectorHelper(final double x, final double y, final double z) {
+-        return new Vec3D(x, y, z);
+-    }
+-    
+-    public static void initialize() {
+-        Vec3D.nextVector = 0;
+-    }
+-    
+-    public static Vec3D createVector(final double x, final double y, final double z) {
+-        if (Vec3D.nextVector >= Vec3D.vectorList.size()) {
+-            Vec3D.vectorList.add(createVectorHelper(0.0, 0.0, 0.0));
+-        }
+-        return ((Vec3D)Vec3D.vectorList.get(Vec3D.nextVector++)).setComponents(x, y, z);
+-    }
+-    
++
++    public double xCoord;
++    public double yCoord;
++    public double zCoord;
++
+     private Vec3D(double x, double y, double z) {
+         if (x == -0.0) {
+@@ -45,5 +31,20 @@
+         this.zCoord = z;
+     }
+-    
++
++    public static Vec3D createVectorHelper(final double x, final double y, final double z) {
++        return new Vec3D(x, y, z);
++    }
++
++    public static void initialize() {
++        Vec3D.nextVector = 0;
++    }
++
++    public static Vec3D createVector(final double x, final double y, final double z) {
++        if (Vec3D.nextVector >= Vec3D.vectorList.size()) {
++            Vec3D.vectorList.add(createVectorHelper(0.0, 0.0, 0.0));
++        }
++        return ((Vec3D) Vec3D.vectorList.get(Vec3D.nextVector++)).setComponents(x, y, z);
++    }
++
+     private Vec3D setComponents(final double x, final double y, final double z) {
+         this.xCoord = x;
+@@ -52,14 +53,14 @@
+         return this;
+     }
+-    
++
+     public Vec3D normalize() {
+         final double d1 = MathHelper.sqrt_double(this.xCoord * this.xCoord + this.yCoord * this.yCoord + this.zCoord * this.zCoord);
+         return (d1 < 1.0E-4) ? createVector(0.0, 0.0, 0.0) : createVector(this.xCoord / d1, this.yCoord / d1, this.zCoord / d1);
+     }
+-    
++
+     public Vec3D addVector(final double x, final double y, final double z) {
+         return createVector(this.xCoord + x, this.yCoord + y, this.zCoord + z);
+     }
+-    
++
+     public double distanceTo(final Vec3D vector) {
+         final double d2 = vector.xCoord - this.xCoord;
+@@ -68,5 +69,5 @@
+         return MathHelper.sqrt_double(d2 * d2 + d3 * d3 + d4 * d4);
+     }
+-    
++
+     public double squareDistanceTo(final Vec3D vector) {
+         final double d2 = vector.xCoord - this.xCoord;
+@@ -75,5 +76,5 @@
+         return d2 * d2 + d3 * d3 + d4 * d4;
+     }
+-    
++
+     public double squareDistanceTo(final double x, final double y, final double z) {
+         final double d7 = x - this.xCoord;
+@@ -82,9 +83,9 @@
+         return d7 * d7 + d8 * d8 + d9 * d9;
+     }
+-    
++
+     public double lengthVector() {
+         return MathHelper.sqrt_double(this.xCoord * this.xCoord + this.yCoord * this.yCoord + this.zCoord * this.zCoord);
+     }
+-    
++
+     public Vec3D getIntermediateWithXValue(final Vec3D vector, final double d2) {
+         final double d3 = vector.xCoord - this.xCoord;
+@@ -97,5 +98,5 @@
+         return (d6 >= 0.0 && d6 <= 1.0) ? createVector(this.xCoord + d3 * d6, this.yCoord + d4 * d6, this.zCoord + d5 * d6) : null;
+     }
+-    
++
+     public Vec3D getIntermediateWithYValue(final Vec3D vector, final double d2) {
+         final double d3 = vector.xCoord - this.xCoord;
+@@ -108,5 +109,5 @@
+         return (d6 >= 0.0 && d6 <= 1.0) ? createVector(this.xCoord + d3 * d6, this.yCoord + d4 * d6, this.zCoord + d5 * d6) : null;
+     }
+-    
++
+     public Vec3D getIntermediateWithZValue(final Vec3D vector, final double d2) {
+         final double d3 = vector.xCoord - this.xCoord;
+@@ -119,5 +120,5 @@
+         return (d6 >= 0.0 && d6 <= 1.0) ? createVector(this.xCoord + d3 * d6, this.yCoord + d4 * d6, this.zCoord + d5 * d6) : null;
+     }
+-    
++
+     public String toString() {
+         return new StringBuilder("(").append(this.xCoord).append(", ").append(this.yCoord).append(", ").append(this.zCoord).append(")").toString();

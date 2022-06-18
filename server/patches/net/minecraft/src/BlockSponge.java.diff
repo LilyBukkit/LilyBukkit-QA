@@ -1,0 +1,23 @@
+--- BlockSponge.java
++++ BlockSponge.java
+@@ -6,5 +6,5 @@
+         this.blockIndexInTexture = 48;
+     }
+-    
++
+     @Override
+     public void onBlockAdded(final World world, final int x, final int y, final int z) {
+@@ -13,10 +13,11 @@
+             for (int i7 = y - b5; i7 <= y + b5; ++i7) {
+                 for (int i8 = z - b5; i8 <= z + b5; ++i8) {
+-                    if (world.getBlockMaterial(i6, i7, i8) == Material.water) {}
++                    if (world.getBlockMaterial(i6, i7, i8) == Material.water) {
++                    }
+                 }
+             }
+         }
+     }
+-    
++
+     @Override
+     public void onBlockRemoval(final World world, final int x, final int y, final int z) {

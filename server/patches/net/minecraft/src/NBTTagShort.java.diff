@@ -1,0 +1,46 @@
+--- NBTTagShort.java
++++ NBTTagShort.java
+@@ -2,34 +2,34 @@
+ 
+ import java.io.DataInput;
+-import java.io.IOException;
+ import java.io.DataOutput;
++import java.io.IOException;
+ 
+ public class NBTTagShort extends NBTBase {
+     public short shortValue;
+-    
++
+     public NBTTagShort() {
+     }
+-    
++
+     public NBTTagShort(final short shortValue) {
+         this.shortValue = shortValue;
+     }
+-    
++
+     @Override
+     void writeTagContents(final DataOutput dataOutput) throws IOException {
+-        dataOutput.writeShort((int)this.shortValue);
++        dataOutput.writeShort((int) this.shortValue);
+     }
+-    
++
+     @Override
+     void readTagContents(final DataInput dataInput) throws IOException {
+         this.shortValue = dataInput.readShort();
+     }
+-    
++
+     @Override
+     public byte getType() {
+         return 2;
+     }
+-    
++
+     public String toString() {
+-        return new StringBuilder().append((int)this.shortValue).toString();
++        return new StringBuilder().append((int) this.shortValue).toString();
+     }
+ }

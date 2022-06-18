@@ -1,0 +1,78 @@
+--- NBTBase.java
++++ NBTBase.java
+@@ -2,29 +2,14 @@
+ 
+ import java.io.DataInput;
+-import java.io.IOException;
+ import java.io.DataOutput;
++import java.io.IOException;
+ 
+ public abstract class NBTBase {
+     private String key;
+-    
++
+     public NBTBase() {
+         this.key = null;
+     }
+-    
+-    abstract void writeTagContents(final DataOutput dataOutput) throws IOException;
+-    
+-    abstract void readTagContents(final DataInput dataInput) throws IOException;
+-    
+-    public abstract byte getType();
+-    
+-    public String getKey() {
+-        return (this.key == null) ? "" : this.key;
+-    }
+-    
+-    public NBTBase setKey(final String key) {
+-        this.key = key;
+-        return this;
+-    }
+-    
++
+     public static NBTBase readNamedTag(final DataInput dataInput) throws IOException {
+         final byte b1 = dataInput.readByte();
+@@ -37,7 +22,7 @@
+         return nBTBase2;
+     }
+-    
++
+     public static void writeNamedTag(final NBTBase nbtbase, final DataOutput dataOutput) throws IOException {
+-        dataOutput.writeByte((int)nbtbase.getType());
++        dataOutput.writeByte((int) nbtbase.getType());
+         if (nbtbase.getType() != 0) {
+             dataOutput.writeUTF(nbtbase.getKey());
+@@ -45,5 +30,5 @@
+         }
+     }
+-    
++
+     public static NBTBase createTagOfType(final byte type) {
+         switch (type) {
+@@ -86,5 +71,5 @@
+         }
+     }
+-    
++
+     public static String getTagName(final byte type) {
+         switch (type) {
+@@ -127,3 +112,18 @@
+         }
+     }
++
++    abstract void writeTagContents(final DataOutput dataOutput) throws IOException;
++
++    abstract void readTagContents(final DataInput dataInput) throws IOException;
++
++    public abstract byte getType();
++
++    public String getKey() {
++        return (this.key == null) ? "" : this.key;
++    }
++
++    public NBTBase setKey(final String key) {
++        this.key = key;
++        return this;
++    }
+ }

@@ -1,0 +1,38 @@
+--- BlockStationary.java
++++ BlockStationary.java
+@@ -11,5 +11,5 @@
+         }
+     }
+-    
++
+     @Override
+     public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final int flag) {
+@@ -19,5 +19,5 @@
+         }
+     }
+-    
++
+     private void setNotStationary(final World world, final int x, final int y, final int z) {
+         final int i5 = world.getBlockMetadata(x, y, z);
+@@ -28,5 +28,5 @@
+         world.editingBlocks = false;
+     }
+-    
++
+     @Override
+     public void updateTick(final World world, int x, int y, int z, final Random random) {
+@@ -42,6 +42,5 @@
+                         return;
+                     }
+-                }
+-                else if (Block.blocksList[i8].material.getIsSolid()) {
++                } else if (Block.blocksList[i8].material.getIsSolid()) {
+                     return;
+                 }
+@@ -49,5 +48,5 @@
+         }
+     }
+-    
++
+     private boolean isFlammable(final World world, final int x, final int y, final int z) {
+         return world.getBlockMaterial(x, y, z).getCanBurn();

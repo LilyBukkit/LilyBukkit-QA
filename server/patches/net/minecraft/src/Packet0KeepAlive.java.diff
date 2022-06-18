@@ -1,0 +1,27 @@
+--- Packet0KeepAlive.java
++++ Packet0KeepAlive.java
+@@ -1,6 +1,6 @@
+ package net.minecraft.src;
+ 
+-import java.io.DataOutputStream;
+ import java.io.DataInputStream;
++import java.io.DataOutputStream;
+ 
+ public class Packet0KeepAlive extends Packet {
+@@ -8,13 +8,13 @@
+     public void processPacket(final NetHandler netHandler) {
+     }
+-    
++
+     @Override
+     public void readPacketData(final DataInputStream dataInputStream) {
+     }
+-    
++
+     @Override
+     public void writePacket(final DataOutputStream dataOutputStream) {
+     }
+-    
++
+     @Override
+     public int getPacketSize() {

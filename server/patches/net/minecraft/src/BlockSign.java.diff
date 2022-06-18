@@ -1,8 +1,9 @@
 --- BlockSign.java
 +++ BlockSign.java
-@@ -1,7 +1,12 @@
+@@ -1,10 +1,16 @@
  package net.minecraft.src;
  
++import org.bukkit.Chunk;
 +import org.bukkit.block.Block;
 +import org.bukkit.block.Sign;
 +import org.bukkit.inventory.Inventory;
@@ -11,10 +12,74 @@
  import java.util.Random;
  
 -public class BlockSign extends BlockContainer {
-+public class BlockSign extends BlockContainer implements Sign{
++public class BlockSign extends BlockContainer implements Sign {
      private Class signEntityClass;
      private boolean isFreestanding;
-@@ -102,3 +107,113 @@
+-    
++
+     protected BlockSign(final int id, final Class signEntityClass, final boolean isFreestanding) {
+         super(id, Material.wood);
+@@ -16,10 +22,10 @@
+         this.setBlockBounds(0.5f - f4, 0.0f, 0.5f - f4, 0.5f + f4, f5, 0.5f + f4);
+     }
+-    
++
+     @Override
+     public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+         return null;
+     }
+-    
++
+     @Override
+     public void setBlockBoundsBasedOnState(final IBlockAccess blockAccess, final int x, final int y, final int z) {
+@@ -46,30 +52,29 @@
+         }
+     }
+-    
++
+     @Override
+     public int getRenderType() {
+         return -1;
+     }
+-    
++
+     @Override
+     public boolean isOpaqueCube() {
+         return false;
+     }
+-    
++
+     @Override
+     protected TileEntity getBlockEntity() {
+         try {
+-            return (TileEntity)this.signEntityClass.newInstance();
++            return (TileEntity) this.signEntityClass.newInstance();
++        } catch (Exception exception2) {
++            throw new RuntimeException((Throwable) exception2);
+         }
+-        catch (Exception exception2) {
+-            throw new RuntimeException((Throwable)exception2);
+-        }
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {
+         return Item.sign.shiftedIndex;
+     }
+-    
++
+     @Override
+     public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final int flag) {
+@@ -79,6 +84,5 @@
+                 z2 = true;
+             }
+-        }
+-        else {
++        } else {
+             final int i7 = world.getBlockMetadata(x, y, z);
+             z2 = true;
+@@ -102,3 +106,223 @@
          super.onNeighborBlockChange(world, x, y, z, flag);
      }
 +
@@ -78,12 +143,122 @@
 +    }
 +
 +    /**
++     * Gets the metadata for this block
++     *
++     * @return block specific metadata
++     */
++    @Override
++    public MaterialData getData() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the type of this block
++     *
++     * @return block type
++     */
++    @Override
++    public org.bukkit.Material getType() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the type-id of this block
++     *
++     * @return block type-id
++     */
++    @Override
++    public int getTypeId() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the light level between 0-15
++     *
++     * @return light level
++     */
++    @Override
++    public byte getLightLevel() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the world which contains this Block
++     *
++     * @return World containing this block
++     */
++    @Override
++    public org.bukkit.World getWorld() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the x-coordinate of this block
++     *
++     * @return x-coordinate
++     */
++    @Override
++    public int getX() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the y-coordinate of this block
++     *
++     * @return y-coordinate
++     */
++    @Override
++    public int getY() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the z-coordinate of this block
++     *
++     * @return z-coordinate
++     */
++    @Override
++    public int getZ() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Gets the chunk which contains this block
++     *
++     * @return Containing Chunk
++     */
++    @Override
++    public Chunk getChunk() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
 +     * Sets the metadata for this block
 +     *
 +     * @param data New block specific metadata
 +     */
 +    @Override
 +    public void setData(MaterialData data) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets the type of this block
++     *
++     * @param type Material to change this block to
++     */
++    @Override
++    public void setType(org.bukkit.Material type) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets the type-id of this block
++     *
++     * @param type Type-Id to change this block to
++     */
++    @Override
++    public boolean setTypeId(int type) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -97,7 +272,7 @@
 +     * eventuality.
 +     *
 +     * @return true if the update was successful, otherwise false
-+     * @see BlockState.update(boolean force)
++     * @see org.bukkit.block.BlockState#update(boolean force)
 +     */
 +    @Override
 +    public boolean update() {

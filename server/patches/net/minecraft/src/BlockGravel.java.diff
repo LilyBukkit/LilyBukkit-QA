@@ -1,0 +1,9 @@
+--- BlockGravel.java
++++ BlockGravel.java
+@@ -7,5 +7,5 @@
+         super(id, blockIndex);
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {

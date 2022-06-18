@@ -1,9 +1,69 @@
 --- EntityMob.java
 +++ EntityMob.java
-@@ -1,4 +1,6 @@
- package net.minecraft.src;
- 
-+import org.bukkit.entity.Monster;
-+
+@@ -3,5 +3,5 @@
  public class EntityMob extends EntityCreature implements IMobs {
      protected int attackStrength;
+-    
++
+     public EntityMob(final World world) {
+         super(world);
+@@ -9,5 +9,5 @@
+         this.health = 20;
+     }
+-    
++
+     @Override
+     public void onLivingUpdate() {
+@@ -18,5 +18,5 @@
+         super.onLivingUpdate();
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -26,5 +26,5 @@
+         }
+     }
+-    
++
+     @Override
+     protected Entity findPlayerToAttack() {
+@@ -32,5 +32,5 @@
+         return (entityPlayer1 != null && this.canEntityBeSeen(entityPlayer1)) ? entityPlayer1 : null;
+     }
+-    
++
+     @Override
+     public boolean attackEntityFrom(final Entity entity, final int damage) {
+@@ -46,5 +46,5 @@
+         return true;
+     }
+-    
++
+     @Override
+     protected void attackEntity(final Entity entity, final float damage) {
+@@ -54,20 +54,20 @@
+         }
+     }
+-    
++
+     @Override
+     protected float getBlockPathWeight(final int x, final int y, final int z) {
+         return 0.5f - this.worldObj.getBrightness(x, y, z);
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public boolean getCanSpawnHere() {

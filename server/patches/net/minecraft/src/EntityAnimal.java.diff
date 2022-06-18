@@ -1,12 +1,12 @@
 --- EntityAnimal.java
 +++ EntityAnimal.java
-@@ -1,4 +1,15 @@
+@@ -1,24 +1,35 @@
  package net.minecraft.src;
  
 +import org.bukkit.Location;
 +import org.bukkit.Server;
-+import org.bukkit.entity.*;
 +import org.bukkit.entity.Entity;
++import org.bukkit.entity.*;
 +import org.bukkit.event.entity.EntityDamageEvent;
 +import org.bukkit.util.Vector;
 +
@@ -16,7 +16,37 @@
 +
  public abstract class EntityAnimal extends EntityCreature implements IAnimals {
      public EntityAnimal(final World world) {
-@@ -33,3 +44,529 @@
+         super(world);
+     }
+-    
++
+     @Override
+     protected float getBlockPathWeight(final int x, final int y, final int z) {
+         return (this.worldObj.getBlockId(x, y - 1, z) == Block.grass.blockID) ? 10.0f : (this.worldObj.getBrightness(x, y, z) - 0.5f);
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public boolean getCanSpawnHere() {
+@@ -28,8 +39,534 @@
+         return this.worldObj.getBlockId(i1, i2 - 1, i3) == Block.grass.blockID && this.worldObj.getBlockLightValue(i1, i2, i3) > 8 && super.getCanSpawnHere();
+     }
+-    
++
+     @Override
+     public int getTalkInterval() {
          return 120;
      }
 +
@@ -292,6 +322,16 @@
 +    }
 +
 +    /**
++     * Gets the current target of this Creature
++     *
++     * @return Current target of this creature, or null if none exists
++     */
++    @Override
++    public LivingEntity getTarget() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
 +     * Instructs this Creature to set the specified LivingEntity as its target.
 +     * Hostile creatures may attack their target, and friendly creatures may
 +     * follow their target.
@@ -300,16 +340,6 @@
 +     */
 +    @Override
 +    public void setTarget(LivingEntity target) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
-+     * Gets the current target of this Creature
-+     *
-+     * @return Current target of this creature, or null if none exists
-+     */
-+    @Override
-+    public LivingEntity getTarget() {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -324,22 +354,22 @@
 +    }
 +
 +    /**
-+     * Sets this entity's velocity
-+     *
-+     * @param velocity New velocity to travel with
-+     */
-+    @Override
-+    public void setVelocity(Vector velocity) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Gets this entity's current velocity
 +     *
 +     * @return Current travelling velocity of this entity
 +     */
 +    @Override
 +    public Vector getVelocity() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets this entity's velocity
++     *
++     * @param velocity New velocity to travel with
++     */
++    @Override
++    public void setVelocity(Vector velocity) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -409,22 +439,22 @@
 +    }
 +
 +    /**
-+     * Returns the entity's maximum fire ticks.
-+     *
-+     * @return int maxFireTicks
-+     */
-+    @Override
-+    public int getMaxFireTicks() {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
 +     *
 +     * @param ticks
 +     */
 +    @Override
 +    public void setFireTicks(int ticks) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Returns the entity's maximum fire ticks.
++     *
++     * @return int maxFireTicks
++     */
++    @Override
++    public int getMaxFireTicks() {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -517,22 +547,22 @@
 +    }
 +
 +    /**
-+     * Record the last {@link EntityDamageEvent} inflicted on this entity
-+     *
-+     * @param event a {@link EntityDamageEvent}
-+     */
-+    @Override
-+    public void setLastDamageCause(EntityDamageEvent event) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
 +     *
 +     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
 +     */
 +    @Override
 +    public EntityDamageEvent getLastDamageCause() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Record the last {@link EntityDamageEvent} inflicted on this entity
++     *
++     * @param event a {@link EntityDamageEvent}
++     */
++    @Override
++    public void setLastDamageCause(EntityDamageEvent event) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +

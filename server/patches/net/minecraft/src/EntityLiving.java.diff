@@ -17,7 +17,112 @@
 +public class EntityLiving extends Entity implements LivingEntity {
      public int heartsHalvesLife;
      public float unusedRotationPitch2;
-@@ -107,10 +115,271 @@
+@@ -10,16 +18,4 @@
+     public float renderYawOffset;
+     public float prevRenderYawOffset;
+-    protected float ridingRotUnused;
+-    protected float prevRidingRotUnused;
+-    protected float rotationUnused;
+-    protected float prevRotationUnused;
+-    protected boolean unusedBool1;
+-    protected String texture;
+-    protected boolean unusedBool2;
+-    protected float unusedRotation;
+-    protected String entityType;
+-    protected float unusedFloat1;
+-    protected int scoreValue;
+-    protected float unusedFloat2;
+     public boolean isAIEnabled;
+     public float prevSwingProgress;
+@@ -27,5 +23,4 @@
+     public int health;
+     public int prevHealth;
+-    private int livingSoundTime;
+     public int hurtTime;
+     public int maxHurtTime;
+@@ -35,5 +30,4 @@
+     public float prevCameraPitch;
+     public float cameraPitch;
+-    protected boolean dead;
+     public int unusedInt;
+     public float unusedFloat4;
+@@ -41,11 +35,17 @@
+     public float limbYaw;
+     public float limbSwing;
+-    private int newPosRotationIncrements;
+-    private double newPosX;
+-    private double newPosY;
+-    private double newPosZ;
+-    private double newRotationYaw;
+-    private double newRotationPitch;
+-    float unusedFloat3;
++    protected float ridingRotUnused;
++    protected float prevRidingRotUnused;
++    protected float rotationUnused;
++    protected float prevRotationUnused;
++    protected boolean unusedBool1;
++    protected String texture;
++    protected boolean unusedBool2;
++    protected float unusedRotation;
++    protected String entityType;
++    protected float unusedFloat1;
++    protected int scoreValue;
++    protected float unusedFloat2;
++    protected boolean dead;
+     protected int entityAge;
+     protected float moveStrafing;
+@@ -55,7 +55,15 @@
+     protected float defaultPitch;
+     protected float moveSpeed;
++    float unusedFloat3;
++    private int livingSoundTime;
++    private int newPosRotationIncrements;
++    private double newPosX;
++    private double newPosY;
++    private double newPosZ;
++    private double newRotationYaw;
++    private double newRotationPitch;
+     private Entity currentTarget;
+     private int numTicksToChaseTarget;
+-    
++
+     public EntityLiving(final World world) {
+         super(world);
+@@ -78,5 +86,5 @@
+         this.dead = false;
+         this.unusedInt = -1;
+-        this.unusedFloat4 = (float)(Math.random() * 0.8999999761581421 + 0.10000000149011612);
++        this.unusedFloat4 = (float) (Math.random() * 0.8999999761581421 + 0.10000000149011612);
+         this.unusedFloat3 = 0.0f;
+         this.entityAge = 0;
+@@ -86,35 +94,296 @@
+         this.numTicksToChaseTarget = 0;
+         this.preventEntitySpawning = true;
+-        this.unusedRotationPitch = (float)(Math.random() + 1.0) * 0.01f;
++        this.unusedRotationPitch = (float) (Math.random() + 1.0) * 0.01f;
+         this.setPosition(this.posX, this.posY, this.posZ);
+-        this.unusedRotationPitch2 = (float)Math.random() * 12398.0f;
+-        this.rotationYaw = (float)(Math.random() * 3.1415927410125732 * 2.0);
++        this.unusedRotationPitch2 = (float) Math.random() * 12398.0f;
++        this.rotationYaw = (float) (Math.random() * 3.1415927410125732 * 2.0);
+         this.unusedFloat = 1.0f;
+         this.stepHeight = 0.5f;
+     }
+-    
++
+     protected boolean canEntityBeSeen(final Entity entity) {
+         return this.worldObj.rayTraceBlocks(Vec3D.createVector(this.posX, this.posY + this.getEyeHeight(), this.posZ), Vec3D.createVector(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ)) == null;
+     }
+-    
++
+     @Override
+     public boolean canBeCollidedWith() {
+         return !this.isDead;
+     }
+-    
++
+     @Override
+     public boolean canBePushed() {
          return !this.isDead;
      }
 -    
@@ -291,7 +396,375 @@
 +
      public int getTalkInterval() {
          return 80;
-@@ -670,3 +939,236 @@
+     }
+-    
++
+     @Override
+     public void onEntityUpdate() {
+@@ -144,6 +413,5 @@
+             }
+             this.fire = 0;
+-        }
+-        else {
++        } else {
+             this.air = this.maxAir;
+         }
+@@ -176,5 +444,5 @@
+         this.prevRotationPitch = this.rotationPitch;
+     }
+-    
++
+     public void spawnExplosionParticle() {
+         for (int i1 = 0; i1 < 20; ++i1) {
+@@ -186,5 +454,5 @@
+         }
+     }
+-    
++
+     @Override
+     public void updateRidden() {
+@@ -193,5 +461,5 @@
+         this.prevRidingRotUnused = 0.0f;
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -208,5 +476,5 @@
+             f8 = 1.0f;
+             f7 = f5 * 3.0f;
+-            f6 = (float)Math.atan2(d2, d1) * 180.0f / 3.1415927f - 90.0f;
++            f6 = (float) Math.atan2(d2, d1) * 180.0f / 3.1415927f - 90.0f;
+         }
+         if (this.swingProgress > 0.0f) {
+@@ -218,5 +486,6 @@
+         this.prevRidingRotUnused += (f8 - this.prevRidingRotUnused) * 0.3f;
+         float f9;
+-        for (f9 = f6 - this.renderYawOffset; f9 < -180.0f; f9 += 360.0f) {}
++        for (f9 = f6 - this.renderYawOffset; f9 < -180.0f; f9 += 360.0f) {
++        }
+         while (f9 >= 180.0f) {
+             f9 -= 360.0f;
+@@ -224,5 +493,6 @@
+         this.renderYawOffset += f9 * 0.3f;
+         float f10;
+-        for (f10 = this.rotationYaw - this.renderYawOffset; f10 < -180.0f; f10 += 360.0f) {}
++        for (f10 = this.rotationYaw - this.renderYawOffset; f10 < -180.0f; f10 += 360.0f) {
++        }
+         while (f10 >= 180.0f) {
+             f10 -= 360.0f;
+@@ -262,10 +532,10 @@
+         this.rotationUnused += f7;
+     }
+-    
++
+     @Override
+     protected void setSize(final float width, final float height) {
+         super.setSize(width, height);
+     }
+-    
++
+     public void heal(final int health) {
+         if (this.health > 0) {
+@@ -277,5 +547,5 @@
+         }
+     }
+-    
++
+     @Override
+     public boolean attackEntityFrom(final Entity entity, int damage) {
+@@ -293,6 +563,5 @@
+             }
+             this.health = this.prevHealth - damage;
+-        }
+-        else {
++        } else {
+             this.prevHealth = this.health;
+             this.heartsLife = this.heartsHalvesLife;
+@@ -306,37 +575,36 @@
+             double d3;
+             double d4;
+-            for (d3 = entity.posX - this.posX, d4 = entity.posZ - this.posZ; d3 * d3 + d4 * d4 < 1.0E-4; d3 = (Math.random() - Math.random()) * 0.01, d4 = (Math.random() - Math.random()) * 0.01) {}
+-            this.attackedAtYaw = (float)(Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - this.rotationYaw;
++            for (d3 = entity.posX - this.posX, d4 = entity.posZ - this.posZ; d3 * d3 + d4 * d4 < 1.0E-4; d3 = (Math.random() - Math.random()) * 0.01, d4 = (Math.random() - Math.random()) * 0.01) {
++            }
++            this.attackedAtYaw = (float) (Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - this.rotationYaw;
+             this.knockBack(entity, damage, d3, d4);
++        } else {
++            this.attackedAtYaw = (float) ((int) (Math.random() * 2.0) * 180);
+         }
+-        else {
+-            this.attackedAtYaw = (float)((int)(Math.random() * 2.0) * 180);
+-        }
+         if (this.health <= 0) {
+             this.worldObj.playSoundAtEntity(this, this.getDeathSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
+             this.onDeath(entity);
+-        }
+-        else {
++        } else {
+             this.worldObj.playSoundAtEntity(this, this.getHurtSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
+         }
+         return true;
+     }
+-    
++
+     protected float getSoundVolume() {
+         return 1.0f;
+     }
+-    
++
+     protected String getLivingSound() {
+         return null;
+     }
+-    
++
+     protected String getHurtSound() {
+         return "random.hurt";
+     }
+-    
++
+     protected String getDeathSound() {
+         return "random.hurt";
+     }
+-    
++
+     public void knockBack(final Entity entity, final int x, final double y, final double z) {
+         final float f7 = MathHelper.sqrt_double(y * y + z * z);
+@@ -352,5 +620,5 @@
+         }
+     }
+-    
++
+     public void onDeath(final Entity entity) {
+         if (this.scoreValue > 0 && entity != null) {
+@@ -365,12 +633,12 @@
+         }
+     }
+-    
++
+     protected int getDropItemId() {
+         return 0;
+     }
+-    
++
+     @Override
+     protected void fall(final float f1) {
+-        final int i2 = (int)Math.ceil((double)(f1 - 3.0f));
++        final int i2 = (int) Math.ceil((double) (f1 - 3.0f));
+         if (i2 > 0) {
+             this.attackEntityFrom(null, i2);
+@@ -382,5 +650,5 @@
+         }
+     }
+-    
++
+     public void moveEntityWithHeading(final float f1, final float f2) {
+         if (this.handleWaterMovement()) {
+@@ -395,6 +663,5 @@
+                 this.motionY = 0.30000001192092896;
+             }
+-        }
+-        else if (this.handleLavaMovement()) {
++        } else if (this.handleLavaMovement()) {
+             final double d3 = this.posY;
+             this.moveFlying(f1, f2, 0.02f);
+@@ -407,6 +674,5 @@
+                 this.motionY = 0.30000001192092896;
+             }
+-        }
+-        else {
++        } else {
+             float f3 = 0.91f;
+             if (this.onGround) {
+@@ -452,5 +718,5 @@
+         this.limbSwing += this.limbYaw;
+     }
+-    
++
+     public boolean isOnLadder() {
+         final int i1 = MathHelper.floor_double(this.posX);
+@@ -459,12 +725,12 @@
+         return this.worldObj.getBlockId(i1, i2, i3) == Block.ladder.blockID || this.worldObj.getBlockId(i1, i2 + 1, i3) == Block.ladder.blockID;
+     }
+-    
++
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+-        nbttagcompound.setShort("Health", (short)this.health);
+-        nbttagcompound.setShort("HurtTime", (short)this.hurtTime);
+-        nbttagcompound.setShort("DeathTime", (short)this.deathTime);
+-        nbttagcompound.setShort("AttackTime", (short)this.attackTime);
++        nbttagcompound.setShort("Health", (short) this.health);
++        nbttagcompound.setShort("HurtTime", (short) this.hurtTime);
++        nbttagcompound.setShort("DeathTime", (short) this.deathTime);
++        nbttagcompound.setShort("AttackTime", (short) this.attackTime);
+     }
+-    
++
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         this.health = nbttagcompound.getShort("Health");
+@@ -476,10 +742,10 @@
+         this.attackTime = nbttagcompound.getShort("AttackTime");
+     }
+-    
++
+     @Override
+     public boolean isEntityAlive() {
+         return !this.isDead && this.health > 0;
+     }
+-    
++
+     public void onLivingUpdate() {
+         if (this.newPosRotationIncrements > 0) {
+@@ -488,10 +754,11 @@
+             final double d3 = this.posZ + (this.newPosZ - this.posZ) / this.newPosRotationIncrements;
+             double d4;
+-            for (d4 = this.newRotationYaw - this.rotationYaw; d4 < -180.0; d4 += 360.0) {}
++            for (d4 = this.newRotationYaw - this.rotationYaw; d4 < -180.0; d4 += 360.0) {
++            }
+             while (d4 >= 180.0) {
+                 d4 -= 360.0;
+             }
+-            this.rotationYaw += (float)(d4 / this.newPosRotationIncrements);
+-            this.rotationPitch += (float)((this.newRotationPitch - this.rotationPitch) / this.newPosRotationIncrements);
++            this.rotationYaw += (float) (d4 / this.newPosRotationIncrements);
++            this.rotationPitch += (float) ((this.newRotationPitch - this.rotationPitch) / this.newPosRotationIncrements);
+             --this.newPosRotationIncrements;
+             this.setPosition(d1, d2, d3);
+@@ -503,6 +770,5 @@
+             this.moveForward = 0.0f;
+             this.randomYawVelocity = 0.0f;
+-        }
+-        else if (!this.isAIEnabled) {
++        } else if (!this.isAIEnabled) {
+             this.updateEntityActionState();
+         }
+@@ -512,9 +778,7 @@
+             if (z9) {
+                 this.motionY += 0.03999999910593033;
+-            }
+-            else if (z10) {
++            } else if (z10) {
+                 this.motionY += 0.03999999910593033;
+-            }
+-            else if (this.onGround) {
++            } else if (this.onGround) {
+                 this.jump();
+             }
+@@ -527,5 +791,5 @@
+         if (list10 != null && list10.size() > 0) {
+             for (int i4 = 0; i4 < list10.size(); ++i4) {
+-                final Entity entity11 = (Entity)list10.get(i4);
++                final Entity entity11 = (Entity) list10.get(i4);
+                 if (entity11.canBePushed()) {
+                     entity11.applyEntityCollision(this);
+@@ -534,9 +798,9 @@
+         }
+     }
+-    
++
+     protected void jump() {
+         this.motionY = 0.41999998688697815;
+     }
+-    
++
+     protected void updateEntityActionState() {
+         ++this.entityAge;
+@@ -553,6 +817,5 @@
+                 if (d5 < 1024.0) {
+                     this.entityAge = 0;
+-                }
+-                else {
++                } else {
+                     this.setEntityDead();
+                 }
+@@ -567,6 +830,5 @@
+                 this.currentTarget = entityPlayer1;
+                 this.numTicksToChaseTarget = 10 + this.rand.nextInt(20);
+-            }
+-            else {
++            } else {
+                 this.randomYawVelocity = (this.rand.nextFloat() - 0.5f) * 20.0f;
+             }
+@@ -577,6 +839,5 @@
+                 this.currentTarget = null;
+             }
+-        }
+-        else {
++        } else {
+             if (this.rand.nextFloat() < 0.05f) {
+                 this.randomYawVelocity = (this.rand.nextFloat() - 0.5f) * 20.0f;
+@@ -591,5 +852,5 @@
+         }
+     }
+-    
++
+     public void faceEntity(final Entity entity, final float f2) {
+         final double d3 = entity.posX - this.posX;
+@@ -597,20 +858,20 @@
+         double d5;
+         if (entity instanceof EntityLiving) {
+-            final EntityLiving entityLiving9 = (EntityLiving)entity;
++            final EntityLiving entityLiving9 = (EntityLiving) entity;
+             d5 = entityLiving9.posY + entityLiving9.getEyeHeight() - (this.posY + this.getEyeHeight());
+-        }
+-        else {
++        } else {
+             d5 = (entity.boundingBox.minY + entity.boundingBox.maxY) / 2.0 - (this.posY + this.getEyeHeight());
+         }
+         final double d6 = MathHelper.sqrt_double(d3 * d3 + d4 * d4);
+-        final float f3 = (float)(Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - 90.0f;
+-        final float f4 = (float)(Math.atan2(d5, d6) * 180.0 / 3.1415927410125732);
++        final float f3 = (float) (Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - 90.0f;
++        final float f4 = (float) (Math.atan2(d5, d6) * 180.0 / 3.1415927410125732);
+         this.rotationPitch = this.updateRotation(this.rotationPitch, f4, f2);
+         this.rotationYaw = this.updateRotation(this.rotationYaw, f3, f2);
+     }
+-    
++
+     private float updateRotation(final float f1, final float f2, final float f3) {
+         float f4;
+-        for (f4 = f2 - f1; f4 < -180.0f; f4 += 360.0f) {}
++        for (f4 = f2 - f1; f4 < -180.0f; f4 += 360.0f) {
++        }
+         while (f4 >= 180.0f) {
+             f4 -= 360.0f;
+@@ -624,17 +885,17 @@
+         return f1 + f4;
+     }
+-    
++
+     public void onEntityDeath() {
+     }
+-    
++
+     public boolean getCanSpawnHere() {
+         return this.worldObj.checkIfAABBIsClear(this.boundingBox) && this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox).size() == 0 && !this.worldObj.getIsAnyLiquid(this.boundingBox);
+     }
+-    
++
+     @Override
+     protected void kill() {
+         this.attackEntityFrom(null, 4);
+     }
+-    
++
+     public Vec3D getPosition(final float f1) {
+         if (f1 == 1.0f) {
+@@ -646,5 +907,5 @@
+         return Vec3D.createVector(d2, d3, d4);
+     }
+-    
++
+     public Vec3D getLook(final float f1) {
+         if (f1 == 1.0f) {
+@@ -663,5 +924,5 @@
+         return Vec3D.createVector(f5 * f6, f7, f4 * f6);
+     }
+-    
++
+     public MovingObjectPosition rayTrace(final double d1, final float f3) {
+         final Vec3D vec3D4 = this.getPosition(f3);
+@@ -670,3 +931,236 @@
          return this.worldObj.rayTraceBlocks(vec3D4, vec3D6);
      }
 +
@@ -306,22 +779,22 @@
 +    }
 +
 +    /**
-+     * Sets this entity's velocity
-+     *
-+     * @param velocity New velocity to travel with
-+     */
-+    @Override
-+    public void setVelocity(Vector velocity) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Gets this entity's current velocity
 +     *
 +     * @return Current travelling velocity of this entity
 +     */
 +    @Override
 +    public Vector getVelocity() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets this entity's velocity
++     *
++     * @param velocity New velocity to travel with
++     */
++    @Override
++    public void setVelocity(Vector velocity) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -391,22 +864,22 @@
 +    }
 +
 +    /**
-+     * Returns the entity's maximum fire ticks.
-+     *
-+     * @return int maxFireTicks
-+     */
-+    @Override
-+    public int getMaxFireTicks() {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
 +     *
 +     * @param ticks
 +     */
 +    @Override
 +    public void setFireTicks(int ticks) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Returns the entity's maximum fire ticks.
++     *
++     * @return int maxFireTicks
++     */
++    @Override
++    public int getMaxFireTicks() {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -499,22 +972,22 @@
 +    }
 +
 +    /**
-+     * Record the last {@link EntityDamageEvent} inflicted on this entity
-+     *
-+     * @param event a {@link EntityDamageEvent}
-+     */
-+    @Override
-+    public void setLastDamageCause(EntityDamageEvent event) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
 +     *
 +     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
 +     */
 +    @Override
 +    public EntityDamageEvent getLastDamageCause() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Record the last {@link EntityDamageEvent} inflicted on this entity
++     *
++     * @param event a {@link EntityDamageEvent}
++     */
++    @Override
++    public void setLastDamageCause(EntityDamageEvent event) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +

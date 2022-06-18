@@ -1,6 +1,6 @@
 --- TileEntityChest.java
 +++ TileEntityChest.java
-@@ -1,4 +1,8 @@
+@@ -1,21 +1,25 @@
  package net.minecraft.src;
  
 +import org.bukkit.Material;
@@ -9,7 +9,63 @@
 +
  public class TileEntityChest extends TileEntity implements IInventory {
      private ItemStack[] chestContents;
-@@ -58,3 +62,290 @@
+-    
++
+     public TileEntityChest() {
+         this.chestContents = new ItemStack[36];
+     }
+-    
++
+     @Override
+     public int getSizeInventory() {
+         return 27;
+     }
+-    
++
+     @Override
+     public ItemStack getStackInSlot(final int slot) {
+         return this.chestContents[slot];
+     }
+-    
++
+     public void setInventorySlotContents(final int slot, final ItemStack stack) {
+         this.chestContents[slot] = stack;
+@@ -25,5 +29,5 @@
+         this.onInventoryChanged();
+     }
+-    
++
+     @Override
+     public void readFromNBT(final NBTTagCompound nbttagcompound) {
+@@ -32,5 +36,5 @@
+         this.chestContents = new ItemStack[this.getSizeInventory()];
+         for (int i3 = 0; i3 < nBTTagList2.tagCount(); ++i3) {
+-            final NBTTagCompound nBTTagCompound4 = (NBTTagCompound)nBTTagList2.tagAt(i3);
++            final NBTTagCompound nBTTagCompound4 = (NBTTagCompound) nBTTagList2.tagAt(i3);
+             final int i4 = nBTTagCompound4.getByte("Slot") & 0xFF;
+             if (i4 >= 0 && i4 < this.chestContents.length) {
+@@ -39,5 +43,5 @@
+         }
+     }
+-    
++
+     @Override
+     public void writeToNBT(final NBTTagCompound nbttagcompound) {
+@@ -47,14 +51,301 @@
+             if (this.chestContents[i3] != null) {
+                 final NBTTagCompound nBTTagCompound4 = new NBTTagCompound();
+-                nBTTagCompound4.setByte("Slot", (byte)i3);
++                nBTTagCompound4.setByte("Slot", (byte) i3);
+                 this.chestContents[i3].writeToNBT(nBTTagCompound4);
+                 nBTTagList2.setTag(nBTTagCompound4);
+             }
+         }
+-        nbttagcompound.setTag("Items", (NBTBase)nBTTagList2);
++        nbttagcompound.setTag("Items", (NBTBase) nBTTagList2);
+     }
+-    
++
+     public int getInventoryStackLimit() {
          return 64;
      }
 +

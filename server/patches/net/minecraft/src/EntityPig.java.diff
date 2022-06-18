@@ -1,6 +1,6 @@
 --- EntityPig.java
 +++ EntityPig.java
-@@ -1,5 +1,7 @@
+@@ -1,7 +1,9 @@
  package net.minecraft.src;
  
 -public class EntityPig extends EntityAnimal {
@@ -8,8 +8,49 @@
 +
 +public class EntityPig extends EntityAnimal implements Pig {
      public boolean saddled;
-     
-@@ -43,3 +45,23 @@
+-    
++
+     public EntityPig(final World world) {
+         super(world);
+@@ -11,5 +13,5 @@
+         this.saddled = false;
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+@@ -17,5 +19,5 @@
+         nbttagcompound.setBoolean("Saddle", this.saddled);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+@@ -23,23 +25,43 @@
+         this.saddled = nbttagcompound.getBoolean("Saddle");
+     }
+-    
++
+     @Override
+     protected String getLivingSound() {
+         return "mob.pig";
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.pig";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "mob.pigdeath";
+     }
+-    
++
+     @Override
+     protected int getDropItemId() {
          return Item.porkRaw.shiftedIndex;
      }
 +

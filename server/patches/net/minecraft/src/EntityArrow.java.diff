@@ -1,6 +1,6 @@
 --- EntityArrow.java
 +++ EntityArrow.java
-@@ -1,7 +1,15 @@
+@@ -1,7 +1,16 @@
  package net.minecraft.src;
  
 +import org.bukkit.Location;
@@ -15,15 +15,151 @@
  
 -public class EntityArrow extends Entity {
 +public class EntityArrow extends Entity implements Arrow {
++    public int arrowShake;
      private int xTile;
      private int yTile;
-@@ -221,3 +229,277 @@
+@@ -9,9 +18,8 @@
+     private int inTile;
+     private boolean inData;
+-    public int arrowShake;
+     private EntityLiving shootingEntity;
+     private int ticksInGround;
+     private int ticksInAir;
+-    
++
+     public EntityArrow(final World world) {
+         super(world);
+@@ -25,5 +33,5 @@
+         this.setSize(0.5f, 0.5f);
+     }
+-    
++
+     public EntityArrow(final World world, final EntityLiving entityLiving) {
+         super(world);
+@@ -48,5 +56,5 @@
+         this.setArrowHeading(this.motionX, this.motionY, this.motionZ, 1.5f, 1.0f);
+     }
+-    
++
+     public void setArrowHeading(double motionX, double motionY, double motionZ, final float offsetY, final float offsetX) {
+         final float f9 = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
+@@ -64,13 +72,13 @@
+         this.motionZ = motionZ;
+         final float f10 = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
+-        final float n = (float)(Math.atan2(motionX, motionZ) * 180.0 / 3.1415927410125732);
++        final float n = (float) (Math.atan2(motionX, motionZ) * 180.0 / 3.1415927410125732);
+         this.rotationYaw = n;
+         this.prevRotationYaw = n;
+-        final float n2 = (float)(Math.atan2(motionY, (double)f10) * 180.0 / 3.1415927410125732);
++        final float n2 = (float) (Math.atan2(motionY, (double) f10) * 180.0 / 3.1415927410125732);
+         this.rotationPitch = n2;
+         this.prevRotationPitch = n2;
+         this.ticksInGround = 0;
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -94,6 +102,5 @@
+             this.ticksInGround = 0;
+             this.ticksInAir = 0;
+-        }
+-        else {
++        } else {
+             ++this.ticksInAir;
+         }
+@@ -110,5 +117,5 @@
+         double d6 = 0.0;
+         for (int i2 = 0; i2 < list5.size(); ++i2) {
+-            final Entity entity5 = (Entity)list5.get(i2);
++            final Entity entity5 = (Entity) list5.get(i2);
+             if (entity5.canBeCollidedWith() && (entity5 != this.shootingEntity || this.ticksInAir >= 5)) {
+                 final float f10 = 0.3f;
+@@ -130,8 +137,7 @@
+             if (movingObjectPosition3.entityHit != null) {
+                 if (movingObjectPosition3.entityHit.attackEntityFrom(this.shootingEntity, 4)) {
+-                    this.worldObj.playSoundAtEntity((Entity)this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
++                    this.worldObj.playSoundAtEntity((Entity) this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
+                     this.setEntityDead();
+-                }
+-                else {
++                } else {
+                     this.motionX *= -0.10000000149011612;
+                     this.motionY *= -0.10000000149011612;
+@@ -141,18 +147,17 @@
+                     this.ticksInAir = 0;
+                 }
+-            }
+-            else {
++            } else {
+                 this.xTile = movingObjectPosition3.blockX;
+                 this.yTile = movingObjectPosition3.blockY;
+                 this.zTile = movingObjectPosition3.blockZ;
+                 this.inTile = this.worldObj.getBlockId(this.xTile, this.yTile, this.zTile);
+-                this.motionX = (float)(movingObjectPosition3.hitVec.xCoord - this.posX);
+-                this.motionY = (float)(movingObjectPosition3.hitVec.yCoord - this.posY);
+-                this.motionZ = (float)(movingObjectPosition3.hitVec.zCoord - this.posZ);
++                this.motionX = (float) (movingObjectPosition3.hitVec.xCoord - this.posX);
++                this.motionY = (float) (movingObjectPosition3.hitVec.yCoord - this.posY);
++                this.motionZ = (float) (movingObjectPosition3.hitVec.zCoord - this.posZ);
+                 final float f11 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+                 this.posX -= this.motionX / f11 * 0.05000000074505806;
+                 this.posY -= this.motionY / f11 * 0.05000000074505806;
+                 this.posZ -= this.motionZ / f11 * 0.05000000074505806;
+-                this.worldObj.playSoundAtEntity((Entity)this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
++                this.worldObj.playSoundAtEntity((Entity) this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
+                 this.inData = true;
+                 this.arrowShake = 7;
+@@ -163,6 +168,6 @@
+         this.posZ += this.motionZ;
+         final float f11 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+-        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0 / 3.1415927410125732);
+-        this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f11) * 180.0 / 3.1415927410125732);
++        this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0 / 3.1415927410125732);
++        this.rotationPitch = (float) (Math.atan2(this.motionY, (double) f11) * 180.0 / 3.1415927410125732);
+         while (this.rotationPitch - this.prevRotationPitch < -180.0f) {
+             this.prevRotationPitch -= 360.0f;
+@@ -194,14 +199,14 @@
+         this.setPosition(this.posX, this.posY, this.posZ);
+     }
+-    
++
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+-        nbttagcompound.setShort("xTile", (short)this.xTile);
+-        nbttagcompound.setShort("yTile", (short)this.yTile);
+-        nbttagcompound.setShort("zTile", (short)this.zTile);
+-        nbttagcompound.setByte("inTile", (byte)this.inTile);
+-        nbttagcompound.setByte("shake", (byte)this.arrowShake);
+-        nbttagcompound.setByte("inGround", (byte)(byte)(this.inData ? 1 : 0));
++        nbttagcompound.setShort("xTile", (short) this.xTile);
++        nbttagcompound.setShort("yTile", (short) this.yTile);
++        nbttagcompound.setShort("zTile", (short) this.zTile);
++        nbttagcompound.setByte("inTile", (byte) this.inTile);
++        nbttagcompound.setByte("shake", (byte) this.arrowShake);
++        nbttagcompound.setByte("inGround", (byte) (byte) (this.inData ? 1 : 0));
+     }
+-    
++
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         this.xTile = nbttagcompound.getShort("xTile");
+@@ -212,12 +217,286 @@
+         this.inData = (nbttagcompound.getByte("inGround") == 1);
+     }
+-    
++
+     @Override
+     public void onCollideWithPlayer(final EntityPlayer entityPlayer) {
+         if (this.inData && this.shootingEntity == entityPlayer && this.arrowShake <= 0 && entityPlayer.inventory.addItemStackToInventory(new ItemStack(Item.arrow.shiftedIndex, 1))) {
+-            this.worldObj.playSoundAtEntity((Entity)this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
++            this.worldObj.playSoundAtEntity((Entity) this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
+             entityPlayer.onItemPickup(this, 1);
+             this.setEntityDead();
          }
      }
 +
 +    /**
 +     * Retrieve the shooter of this projectile. The returned value can be null
-+     * for projectiles shot from a {@link Dispenser} for example.
++     * for projectiles shot from a {@link org.bukkit.block.Dispenser} for example.
 +     *
 +     * @return the {@link LivingEntity} that shot this projectile
 +     */
@@ -73,22 +209,22 @@
 +    }
 +
 +    /**
-+     * Sets this entity's velocity
-+     *
-+     * @param velocity New velocity to travel with
-+     */
-+    @Override
-+    public void setVelocity(Vector velocity) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Gets this entity's current velocity
 +     *
 +     * @return Current travelling velocity of this entity
 +     */
 +    @Override
 +    public Vector getVelocity() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets this entity's velocity
++     *
++     * @param velocity New velocity to travel with
++     */
++    @Override
++    public void setVelocity(Vector velocity) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -158,22 +294,22 @@
 +    }
 +
 +    /**
-+     * Returns the entity's maximum fire ticks.
-+     *
-+     * @return int maxFireTicks
-+     */
-+    @Override
-+    public int getMaxFireTicks() {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
 +     *
 +     * @param ticks
 +     */
 +    @Override
 +    public void setFireTicks(int ticks) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Returns the entity's maximum fire ticks.
++     *
++     * @return int maxFireTicks
++     */
++    @Override
++    public int getMaxFireTicks() {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -266,22 +402,22 @@
 +    }
 +
 +    /**
-+     * Record the last {@link EntityDamageEvent} inflicted on this entity
-+     *
-+     * @param event a {@link EntityDamageEvent}
-+     */
-+    @Override
-+    public void setLastDamageCause(EntityDamageEvent event) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
 +     *
 +     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
 +     */
 +    @Override
 +    public EntityDamageEvent getLastDamageCause() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Record the last {@link EntityDamageEvent} inflicted on this entity
++     *
++     * @param event a {@link EntityDamageEvent}
++     */
++    @Override
++    public void setLastDamageCause(EntityDamageEvent event) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +

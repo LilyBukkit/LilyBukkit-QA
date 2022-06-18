@@ -1,0 +1,11 @@
+--- EnumMobType.java
++++ EnumMobType.java
+@@ -2,6 +2,6 @@
+ 
+ public enum EnumMobType {
+-    everything, 
+-    mobs, 
++    everything,
++    mobs,
+     players;
+ }

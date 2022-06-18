@@ -1,0 +1,9 @@
+--- ItemHoe.java
++++ ItemHoe.java
+@@ -7,5 +7,5 @@
+         this.maxDamage = 32 << maxDamage;
+     }
+-    
++
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, final int y, final int z, final int i7) {

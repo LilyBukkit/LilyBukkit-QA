@@ -1,0 +1,104 @@
+--- Namegen.java
++++ Namegen.java
+@@ -2,30 +2,32 @@
+ 
+ import net.minecraft.server.MinecraftServer;
++
+ import java.util.Random;
+ 
+ public class Namegen {
++    private static final String[] syllab;
++    public static String uqKey;
++
++    static {
++        Namegen.uqKey = "";
++        syllab = new String[]{"SIE", "LOH", "KII", "HUR", "MIS", "RUU", "VY", "KA", "TAV", "OLE", "PAH", "MUI", "MAT", "JA", "SAU", "NIN", "UD", "MU", "NGI", "BAR", "LUG", "MAH", "GIR", "AK", "USU", "ESE", "IRU", "UUN", "AMTU", "AGAS", "HI", "TOOI", "YORU", "NEN", "PON", "ONNA", "TSU", "YA", "AO", "ONI", "AN", "KO", "SHI", "YUME", "YARI", "TEST"};
++    }
++
++    public String testMessage;
++    public float damageGuiPartialTime;
++    public boolean renderQAName;
++    public String currentArea;
++    public long areaTimer;
++    float prevVignetteBrightness;
+     private Random rand;
+     private MinecraftServer mc;
+-    public String testMessage;
+     private int updateCounter;
+     private String recordPlaying;
+     private int recordPlayingUpFor;
+-    public float damageGuiPartialTime;
+-    float prevVignetteBrightness;
+-    public boolean renderQAName;
+-    public static String uqKey;
+     private boolean initedArea;
+     private long lastSeed;
+     private int lgroupX;
+     private int lgroupY;
+-    public String currentArea;
+-    public long areaTimer;
+-    private static final String[] syllab;
+-    
+-    static {
+-        Namegen.uqKey = "";
+-        syllab = new String[] { "SIE", "LOH", "KII", "HUR", "MIS", "RUU", "VY", "KA", "TAV", "OLE", "PAH", "MUI", "MAT", "JA", "SAU", "NIN", "UD", "MU", "NGI", "BAR", "LUG", "MAH", "GIR", "AK", "USU", "ESE", "IRU", "UUN", "AMTU", "AGAS", "HI", "TOOI", "YORU", "NEN", "PON", "ONNA", "TSU", "YA", "AO", "ONI", "AN", "KO", "SHI", "YUME", "YARI", "TEST" };
+-    }
+-    
++
+     public Namegen() {
+         this.rand = new Random();
+@@ -40,5 +42,5 @@
+         this.areaTimer = 0L;
+     }
+-    
++
+     public static String Namegen2(final long l, final int n, final int n2) {
+         final long l2 = n + 392214;
+@@ -46,5 +48,5 @@
+         final long l4 = l3 * 784428L + l2;
+         final long l5 = l + l4;
+-        final int n3 = (int)Math.sqrt((double)(n * n + n2 * n2));
++        final int n3 = (int) Math.sqrt((double) (n * n + n2 * n2));
+         int n4 = 0;
+         int n5 = 3;
+@@ -55,19 +57,19 @@
+         if (n4 > 0) {
+             for (int i = 0; i != n4; ++i) {
+-                string = String.valueOf(string) + Namegen.syllab[(int)((n3 + n4 + n5 + l4 * (2 + i)) % 45L)];
++                string = String.valueOf(string) + Namegen.syllab[(int) ((n3 + n4 + n5 + l4 * (2 + i)) % 45L)];
+             }
+             string = String.valueOf(string) + "-";
+         }
+-        string = String.valueOf(string) + Namegen.syllab[(int)((l4 * 2L + n3) % 45L)];
+-        string = String.valueOf(string) + Namegen.syllab[(int)((l4 * 3L + n3) % 45L)];
+-        string = String.valueOf(string) + Namegen.syllab[(int)((l4 * 4L + n3) % 45L)];
++        string = String.valueOf(string) + Namegen.syllab[(int) ((l4 * 2L + n3) % 45L)];
++        string = String.valueOf(string) + Namegen.syllab[(int) ((l4 * 3L + n3) % 45L)];
++        string = String.valueOf(string) + Namegen.syllab[(int) ((l4 * 4L + n3) % 45L)];
+         return string;
+     }
+-    
++
+     public void ResetNamegen() {
+         final float playerPosX = 0.0f;
+         final float playerPosZ = 0.0f;
+-        this.lgroupX = (int)(playerPosX / 32.0);
+-        this.lgroupY = (int)(playerPosZ / 32.0);
++        this.lgroupX = (int) (playerPosX / 32.0);
++        this.lgroupY = (int) (playerPosZ / 32.0);
+         this.lastSeed = this.mc.worldMngr.randomSeed;
+         this.initedArea = true;
+@@ -76,10 +78,10 @@
+         this.areaTimer = System.currentTimeMillis();
+     }
+-    
++
+     public boolean NamegenNeedsReset() {
+         final float playerPosX = 0.0f;
+         final float playerPosZ = 0.0f;
+-        final int n = (int)(playerPosX / 32.0);
+-        final int n2 = (int)(playerPosZ / 32.0);
++        final int n = (int) (playerPosX / 32.0);
++        final int n2 = (int) (playerPosZ / 32.0);
+         return !this.initedArea || this.lastSeed != this.mc.worldMngr.randomSeed || n != this.lgroupX || n2 != this.lgroupY;
+     }

@@ -1,0 +1,9 @@
+--- WorldGenerator.java
++++ WorldGenerator.java
+@@ -5,5 +5,5 @@
+ public abstract class WorldGenerator {
+     public abstract boolean generate(final World world, final Random rand, final int x, final int y, final int z);
+-    
++
+     public void setScale(final double scaleX, final double scaleY, final double scaleZ) {
+     }

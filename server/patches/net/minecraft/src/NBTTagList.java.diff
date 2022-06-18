@@ -1,0 +1,79 @@
+--- NBTTagList.java
++++ NBTTagList.java
+@@ -2,6 +2,6 @@
+ 
+ import java.io.DataInput;
+-import java.io.IOException;
+ import java.io.DataOutput;
++import java.io.IOException;
+ import java.util.ArrayList;
+ import java.util.List;
+@@ -10,29 +10,28 @@
+     private List tagList;
+     private byte tagType;
+-    
++
+     public NBTTagList() {
+-        this.tagList = (List)new ArrayList();
++        this.tagList = (List) new ArrayList();
+     }
+-    
++
+     @Override
+     void writeTagContents(final DataOutput dataOutput) throws IOException {
+         if (this.tagList.size() > 0) {
+-            this.tagType = ((NBTBase)this.tagList.get(0)).getType();
+-        }
+-        else {
++            this.tagType = ((NBTBase) this.tagList.get(0)).getType();
++        } else {
+             this.tagType = 1;
+         }
+-        dataOutput.writeByte((int)this.tagType);
++        dataOutput.writeByte((int) this.tagType);
+         dataOutput.writeInt(this.tagList.size());
+         for (int i2 = 0; i2 < this.tagList.size(); ++i2) {
+-            ((NBTBase)this.tagList.get(i2)).writeTagContents(dataOutput);
++            ((NBTBase) this.tagList.get(i2)).writeTagContents(dataOutput);
+         }
+     }
+-    
++
+     @Override
+     void readTagContents(final DataInput dataInput) throws IOException {
+         this.tagType = dataInput.readByte();
+         final int i2 = dataInput.readInt();
+-        this.tagList = (List)new ArrayList();
++        this.tagList = (List) new ArrayList();
+         for (int i3 = 0; i3 < i2; ++i3) {
+             final NBTBase nBTBase4 = NBTBase.createTagOfType(this.tagType);
+@@ -41,23 +40,23 @@
+         }
+     }
+-    
++
+     @Override
+     public byte getType() {
+         return 9;
+     }
+-    
++
+     public String toString() {
+         return new StringBuilder().append(this.tagList.size()).append(" entries of type ").append(NBTBase.getTagName(this.tagType)).toString();
+     }
+-    
++
+     public void setTag(final NBTBase nbtbase) {
+         this.tagType = nbtbase.getType();
+         this.tagList.add(nbtbase);
+     }
+-    
++
+     public NBTBase tagAt(final int index) {
+-        return (NBTBase)this.tagList.get(index);
++        return (NBTBase) this.tagList.get(index);
+     }
+-    
++
+     public int tagCount() {
+         return this.tagList.size();

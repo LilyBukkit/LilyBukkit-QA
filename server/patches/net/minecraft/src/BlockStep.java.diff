@@ -1,0 +1,49 @@
+--- BlockStep.java
++++ BlockStep.java
+@@ -5,5 +5,5 @@
+ public class BlockStep extends Block {
+     private boolean blockType;
+-    
++
+     public BlockStep(final int id, final boolean blockType) {
+         super(id, 6, Material.rock);
+@@ -13,20 +13,21 @@
+         this.setLightOpacity(255);
+     }
+-    
++
+     @Override
+     public int getBlockTextureFromSide(final int side) {
+         return (side <= 1) ? 6 : 5;
+     }
+-    
++
+     @Override
+     public boolean isOpaqueCube() {
+         return this.blockType;
+     }
+-    
++
+     @Override
+     public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final int flag) {
+-        if (this == Block.stairSingle) {}
++        if (this == Block.stairSingle) {
++        }
+     }
+-    
++
+     @Override
+     public void onBlockAdded(final World world, final int x, final int y, final int z) {
+@@ -40,10 +41,10 @@
+         }
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {
+         return Block.stairSingle.blockID;
+     }
+-    
++
+     @Override
+     public boolean shouldSideBeRendered(final IBlockAccess blockAccess, final int x, final int y, final int z, final int side) {

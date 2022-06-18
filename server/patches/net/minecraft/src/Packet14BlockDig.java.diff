@@ -1,0 +1,38 @@
+--- Packet14BlockDig.java
++++ Packet14BlockDig.java
+@@ -1,7 +1,7 @@
+ package net.minecraft.src;
+ 
++import java.io.DataInputStream;
+ import java.io.DataOutputStream;
+ import java.io.IOException;
+-import java.io.DataInputStream;
+ 
+ public class Packet14BlockDig extends Packet {
+@@ -11,5 +11,5 @@
+     public int face;
+     public int status;
+-    
++
+     @Override
+     public void readPacketData(final DataInputStream dataInputStream) throws IOException {
+@@ -20,5 +20,5 @@
+         this.face = dataInputStream.read();
+     }
+-    
++
+     @Override
+     public void writePacket(final DataOutputStream dataOutputStream) throws IOException {
+@@ -29,10 +29,10 @@
+         dataOutputStream.write(this.face);
+     }
+-    
++
+     @Override
+     public void processPacket(final NetHandler netHandler) {
+         netHandler.handleBlockDig(this);
+     }
+-    
++
+     @Override
+     public int getPacketSize() {

@@ -900,6 +900,6 @@
 +     */
 +    @Override
 +    public boolean getAllowFlight() {
-+        throw new UnsupportedOperationException("Not implemented yet");
++        return this.propertyManagerObj.getBooleanProperty(LBServerProperties.ALLOW_FLIGHT, false);
 +    }
  }

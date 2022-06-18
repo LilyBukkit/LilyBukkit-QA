@@ -1,0 +1,85 @@
+--- BlockLeaves.java
++++ BlockLeaves.java
+@@ -6,5 +6,5 @@
+     private int leafTexIndex;
+     private int decayCounter;
+-    
++
+     protected BlockLeaves(final int id, final int blockIndex) {
+         super(id, blockIndex, Material.leaves, false);
+@@ -13,5 +13,5 @@
+         this.setTickOnLoad(true);
+     }
+-    
++
+     @Override
+     public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final int flag) {
+@@ -20,5 +20,5 @@
+         super.onNeighborBlockChange(world, x, y, z, flag);
+     }
+-    
++
+     public void updateConnectedLeaves(final World world, final int x, final int y, final int z, final int i5) {
+         if (world.getBlockId(x, y, z) == this.blockID) {
+@@ -29,5 +29,5 @@
+         }
+     }
+-    
++
+     public void updateCurrentLeaves(final World world, final int x, final int y, final int z) {
+         if (this.decayCounter++ < 100) {
+@@ -58,5 +58,5 @@
+         }
+     }
+-    
++
+     private int getConnectionStrength(final World world, final int x, final int y, final int z, final int i5) {
+         final int i6 = world.getBlockId(x, y, z);
+@@ -72,5 +72,5 @@
+         return i5;
+     }
+-    
++
+     @Override
+     public void updateTick(final World world, final int x, final int y, final int z, final Random random) {
+@@ -79,33 +79,31 @@
+             this.decayCounter = 0;
+             this.updateCurrentLeaves(world, x, y, z);
+-        }
+-        else if (i6 == 1) {
++        } else if (i6 == 1) {
+             this.removeLeaves(world, x, y, z);
+-        }
+-        else if (random.nextInt(10) == 0) {
++        } else if (random.nextInt(10) == 0) {
+             this.updateCurrentLeaves(world, x, y, z);
+         }
+     }
+-    
++
+     private void removeLeaves(final World world, final int x, final int y, final int z) {
+         this.dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z));
+         world.setBlockWithNotify(x, y, z, 0);
+     }
+-    
++
+     @Override
+     public int quantityDropped(final Random random) {
+         return (random.nextInt(20) == 0) ? 1 : 0;
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {
+         return Block.sapling.blockID;
+     }
+-    
++
+     @Override
+     public boolean isOpaqueCube() {
+         return !this.graphicsLevel;
+     }
+-    
++
+     @Override
+     public void onEntityWalking(final World world, final int x, final int y, final int z, final Entity entity) {

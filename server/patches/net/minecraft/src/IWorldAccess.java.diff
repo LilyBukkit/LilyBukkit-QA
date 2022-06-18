@@ -1,0 +1,30 @@
+--- IWorldAccess.java
++++ IWorldAccess.java
+@@ -3,19 +3,19 @@
+ public interface IWorldAccess {
+     void markBlockAndNeighborsNeedsUpdate(final int x, final int y, final int z);
+-    
++
+     void markBlockRangeNeedsUpdate(final int integer1, final int integer2, final int integer3, final int integer4, final int integer5, final int integer6);
+-    
++
+     void playSound(final String name, final double x, final double y, final double z, final float volume, final float pitch);
+-    
++
+     void spawnParticle(final String name, final double x, final double y, final double z, final double double5, final double double6, final double double7);
+-    
++
+     void obtainEntitySkin(final Entity entity);
+-    
++
+     void releaseEntitySkin(final Entity entity);
+-    
++
+     void updateAllRenderers();
+-    
++
+     void playRecord(final String name, final int x, final int y, final int z);
+-    
++
+     void doNothingWithTileEntity(final int x, final int y, final int z, final TileEntity tileEntity);
+ }

@@ -1,0 +1,60 @@
+--- GuiLogFormatter.java
++++ GuiLogFormatter.java
+@@ -1,18 +1,18 @@
+ package net.minecraft.src;
+ 
+-import java.io.Writer;
+ import java.io.PrintWriter;
+ import java.io.StringWriter;
++import java.io.Writer;
++import java.util.logging.Formatter;
+ import java.util.logging.Level;
+ import java.util.logging.LogRecord;
+-import java.util.logging.Formatter;
+ 
+ class GuiLogFormatter extends Formatter {
+     final GuiLogOutputHandler handler;
+-    
++
+     GuiLogFormatter(final GuiLogOutputHandler handler) {
+         this.handler = handler;
+     }
+-    
++
+     public String format(final LogRecord logRecord) {
+         final StringBuilder stringBuilder2 = new StringBuilder();
+@@ -20,21 +20,15 @@
+         if (level3 == Level.FINEST) {
+             stringBuilder2.append("[FINEST] ");
+-        }
+-        else if (level3 == Level.FINER) {
++        } else if (level3 == Level.FINER) {
+             stringBuilder2.append("[FINER] ");
+-        }
+-        else if (level3 == Level.FINE) {
++        } else if (level3 == Level.FINE) {
+             stringBuilder2.append("[FINE] ");
+-        }
+-        else if (level3 == Level.INFO) {
++        } else if (level3 == Level.INFO) {
+             stringBuilder2.append("[INFO] ");
+-        }
+-        else if (level3 == Level.WARNING) {
++        } else if (level3 == Level.WARNING) {
+             stringBuilder2.append("[WARNING] ");
+-        }
+-        else if (level3 == Level.SEVERE) {
++        } else if (level3 == Level.SEVERE) {
+             stringBuilder2.append("[SEVERE] ");
+-        }
+-        else if (level3 == Level.SEVERE) {
++        } else if (level3 == Level.SEVERE) {
+             stringBuilder2.append(new StringBuilder("[").append(level3.getLocalizedName()).append("] ").toString());
+         }
+@@ -44,5 +38,5 @@
+         if (throwable4 != null) {
+             final StringWriter stringWriter5 = new StringWriter();
+-            throwable4.printStackTrace(new PrintWriter((Writer)stringWriter5));
++            throwable4.printStackTrace(new PrintWriter((Writer) stringWriter5));
+             stringBuilder2.append(stringWriter5.toString());
+         }

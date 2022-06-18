@@ -1,0 +1,22 @@
+--- ItemSword.java
++++ ItemSword.java
+@@ -3,5 +3,5 @@
+ public class ItemSword extends Item {
+     private int weaponDamage;
+-    
++
+     public ItemSword(final int itemID, final int maxDamage) {
+         super(itemID);
+@@ -13,10 +13,10 @@
+         this.weaponDamage = 4 + maxDamage * 2;
+     }
+-    
++
+     @Override
+     public float getStrVsBlock(final ItemStack stack, final Block block) {
+         return 1.5f;
+     }
+-    
++
+     @Override
+     public void onBlockDestroyed(final ItemStack stack, final int x, final int y, final int z, final int i5) {

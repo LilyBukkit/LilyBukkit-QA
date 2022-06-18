@@ -1,0 +1,43 @@
+--- Packet3Chat.java
++++ Packet3Chat.java
+@@ -1,33 +1,33 @@
+ package net.minecraft.src;
+ 
++import java.io.DataInputStream;
+ import java.io.DataOutputStream;
+ import java.io.IOException;
+-import java.io.DataInputStream;
+ 
+ public class Packet3Chat extends Packet {
+     public String message;
+-    
++
+     public Packet3Chat() {
+     }
+-    
++
+     public Packet3Chat(final String message) {
+         this.message = message;
+     }
+-    
++
+     @Override
+     public void readPacketData(final DataInputStream dataInputStream) throws IOException {
+         this.message = dataInputStream.readUTF();
+     }
+-    
++
+     @Override
+     public void writePacket(final DataOutputStream dataOutputStream) throws IOException {
+         dataOutputStream.writeUTF(this.message);
+     }
+-    
++
+     @Override
+     public void processPacket(final NetHandler netHandler) {
+         netHandler.handleChat(this);
+     }
+-    
++
+     @Override
+     public int getPacketSize() {

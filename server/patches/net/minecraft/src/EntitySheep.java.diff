@@ -1,6 +1,6 @@
 --- EntitySheep.java
 +++ EntitySheep.java
-@@ -1,5 +1,8 @@
+@@ -1,7 +1,10 @@
  package net.minecraft.src;
  
 -public class EntitySheep extends EntityAnimal {
@@ -9,8 +9,50 @@
 +
 +public class EntitySheep extends EntityAnimal implements Sheep {
      public boolean sheared;
-     
-@@ -54,3 +57,41 @@
+-    
++
+     public EntitySheep(final World world) {
+         super(world);
+@@ -10,5 +13,5 @@
+         this.setSize(0.9f, 1.3f);
+     }
+-    
++
+     @Override
+     public boolean attackEntityFrom(final Entity entity, final int damage) {
+@@ -27,5 +30,5 @@
+         return super.attackEntityFrom(entity, damage);
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+@@ -33,5 +36,5 @@
+         nbttagcompound.setBoolean("Sheared", this.sheared);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+@@ -39,18 +42,56 @@
+         this.sheared = nbttagcompound.getBoolean("Sheared");
+     }
+-    
++
+     @Override
+     protected String getLivingSound() {
+         return "mob.sheep";
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.sheep";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
          return "mob.sheep";
      }
 +

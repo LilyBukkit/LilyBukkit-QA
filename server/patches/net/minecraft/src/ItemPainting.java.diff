@@ -1,0 +1,9 @@
+--- ItemPainting.java
++++ ItemPainting.java
+@@ -6,5 +6,5 @@
+         this.maxDamage = 64;
+     }
+-    
++
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, final int y, final int z, final int i7) {

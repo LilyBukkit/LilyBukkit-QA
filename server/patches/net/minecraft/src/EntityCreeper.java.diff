@@ -1,6 +1,6 @@
 --- EntityCreeper.java
 +++ EntityCreeper.java
-@@ -1,5 +1,7 @@
+@@ -1,10 +1,12 @@
  package net.minecraft.src;
  
 -public class EntityCreeper extends EntityMob {
@@ -9,7 +9,70 @@
 +public class EntityCreeper extends EntityMob implements Creeper {
      int timeSinceIgnited;
      int lastActiveTime;
-@@ -77,3 +79,23 @@
+     int fuseDuration;
+     int creeperState;
+-    
++
+     public EntityCreeper(final World world) {
+         super(world);
+@@ -13,15 +15,15 @@
+         this.texture = "/mob/creeper.png";
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     protected void updateEntityActionState() {
+@@ -38,15 +40,15 @@
+         }
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.creeper";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "mob.creeperdeath";
+     }
+-    
++
+     @Override
+     public void onDeath(final Entity entity) {
+@@ -56,10 +58,10 @@
+         }
+     }
+-    
++
+     @Override
+     protected void attackEntity(final Entity entity, final float damage) {
+         if ((this.creeperState <= 0 && damage < 3.0f) || (this.creeperState > 0 && damage < 7.0f)) {
+             if (this.timeSinceIgnited == 0) {
+-                this.worldObj.playSoundAtEntity((Entity)this, "random.fuse", 1.0f, 0.5f);
++                this.worldObj.playSoundAtEntity((Entity) this, "random.fuse", 1.0f, 0.5f);
+             }
+             this.creeperState = 1;
+@@ -72,8 +74,28 @@
+         }
+     }
+-    
++
+     @Override
+     protected int getDropItemId() {
          return Item.gunpowder.shiftedIndex;
      }
 +

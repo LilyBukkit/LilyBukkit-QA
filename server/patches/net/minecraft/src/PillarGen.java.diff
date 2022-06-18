@@ -1,0 +1,19 @@
+--- PillarGen.java
++++ PillarGen.java
+@@ -2,14 +2,12 @@
+ 
+ import java.util.Random;
+-import net.minecraft.src.World;
+-import net.minecraft.src.WorldGenerator;
+ 
+ public class PillarGen extends WorldGenerator {
+     private int blockID;
+-    
++
+     public PillarGen(final int n) {
+         this.blockID = n;
+     }
+-    
++
+     @Override
+     public boolean generate(final World world, final Random rand, final int x, final int y, final int z) {

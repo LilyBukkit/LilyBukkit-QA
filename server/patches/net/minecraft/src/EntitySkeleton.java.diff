@@ -1,6 +1,6 @@
 --- EntitySkeleton.java
 +++ EntitySkeleton.java
-@@ -1,5 +1,7 @@
+@@ -1,25 +1,27 @@
  package net.minecraft.src;
  
 -public class EntitySkeleton extends EntityMob {
@@ -9,3 +9,64 @@
 +public class EntitySkeleton extends EntityMob implements Skeleton {
      public EntitySkeleton(final World world) {
          super(world);
+         this.texture = "/mob/skeleton.png";
+     }
+-    
++
+     @Override
+     protected String getLivingSound() {
+         return "mob.skeleton";
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.skeletonhurt";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "mob.skeletonhurt";
+     }
+-    
++
+     @Override
+     public void onLivingUpdate() {
+@@ -32,5 +34,5 @@
+         super.onLivingUpdate();
+     }
+-    
++
+     @Override
+     protected void attackEntity(final Entity entity, final float damage) {
+@@ -44,24 +46,24 @@
+                 final double d5 = entity.posY - 0.20000000298023224 - entityArrow7.posY;
+                 final float f10 = MathHelper.sqrt_double(d3 * d3 + d4 * d4) * 0.2f;
+-                this.worldObj.playSoundAtEntity((Entity)this, "random.bow", 1.0f, 1.0f / (this.rand.nextFloat() * 0.4f + 0.8f));
++                this.worldObj.playSoundAtEntity((Entity) this, "random.bow", 1.0f, 1.0f / (this.rand.nextFloat() * 0.4f + 0.8f));
+                 this.worldObj.spawnEntityInWorld(entityArrow7);
+                 entityArrow7.setArrowHeading(d3, d5 + f10, d4, 0.6f, 12.0f);
+                 this.attackTime = 30;
+             }
+-            this.rotationYaw = (float)(Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - 90.0f;
++            this.rotationYaw = (float) (Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - 90.0f;
+             this.hasAttacked = true;
+         }
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     protected int getDropItemId() {

@@ -1,0 +1,192 @@
+--- BlockRedstoneWire.java
++++ BlockRedstoneWire.java
+@@ -5,5 +5,5 @@
+ public class BlockRedstoneWire extends Block {
+     private boolean wiresProvidePower;
+-    
++
+     public BlockRedstoneWire(final int id, final int blockIndex) {
+         super(id, blockIndex, Material.circuits);
+@@ -11,25 +11,25 @@
+         this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 0.0625f, 1.0f);
+     }
+-    
++
+     @Override
+     public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+         return null;
+     }
+-    
++
+     @Override
+     public boolean isOpaqueCube() {
+         return false;
+     }
+-    
++
+     @Override
+     public int getRenderType() {
+         return 5;
+     }
+-    
++
+     @Override
+     public boolean canPlaceBlockAt(final World world, final int x, final int y, final int z) {
+         return world.isBlockNormalCube(x, y - 1, z);
+     }
+-    
++
+     private void updateAndPropagateCurrentStrength(final World world, final int x, final int y, final int z) {
+         final int i5 = world.getBlockMetadata(x, y, z);
+@@ -40,6 +40,5 @@
+         if (z2) {
+             i6 = 15;
+-        }
+-        else {
++        } else {
+             for (int i7 = 0; i7 < 4; ++i7) {
+                 int i8 = x;
+@@ -60,6 +59,5 @@
+                 if (world.isBlockNormalCube(i8, y, i9) && !world.isBlockNormalCube(x, y + 1, z)) {
+                     i6 = this.getMaxCurrentStrength(world, i8, y + 1, i9, i6);
+-                }
+-                else if (!world.isBlockNormalCube(i8, y, i9)) {
++                } else if (!world.isBlockNormalCube(i8, y, i9)) {
+                     i6 = this.getMaxCurrentStrength(world, i8, y - 1, i9, i6);
+                 }
+@@ -67,6 +65,5 @@
+             if (i6 > 0) {
+                 --i6;
+-            }
+-            else {
++            } else {
+                 i6 = 0;
+             }
+@@ -117,5 +114,5 @@
+         }
+     }
+-    
++
+     private void notifyWireNeighborsOfNeighborChange(final World world, final int x, final int y, final int z) {
+         if (world.getBlockId(x, y, z) == this.blockID) {
+@@ -129,5 +126,5 @@
+         }
+     }
+-    
++
+     @Override
+     public void onBlockAdded(final World world, final int x, final int y, final int z) {
+@@ -142,28 +139,24 @@
+         if (world.isBlockNormalCube(x - 1, y, z)) {
+             this.notifyWireNeighborsOfNeighborChange(world, x - 1, y + 1, z);
+-        }
+-        else {
++        } else {
+             this.notifyWireNeighborsOfNeighborChange(world, x - 1, y - 1, z);
+         }
+         if (world.isBlockNormalCube(x + 1, y, z)) {
+             this.notifyWireNeighborsOfNeighborChange(world, x + 1, y + 1, z);
+-        }
+-        else {
++        } else {
+             this.notifyWireNeighborsOfNeighborChange(world, x + 1, y - 1, z);
+         }
+         if (world.isBlockNormalCube(x, y, z - 1)) {
+             this.notifyWireNeighborsOfNeighborChange(world, x, y + 1, z - 1);
+-        }
+-        else {
++        } else {
+             this.notifyWireNeighborsOfNeighborChange(world, x, y - 1, z - 1);
+         }
+         if (world.isBlockNormalCube(x, y, z + 1)) {
+             this.notifyWireNeighborsOfNeighborChange(world, x, y + 1, z + 1);
+-        }
+-        else {
++        } else {
+             this.notifyWireNeighborsOfNeighborChange(world, x, y - 1, z + 1);
+         }
+     }
+-    
++
+     @Override
+     public void onBlockRemoval(final World world, final int x, final int y, final int z) {
+@@ -178,28 +171,24 @@
+         if (world.isBlockNormalCube(x - 1, y, z)) {
+             this.notifyWireNeighborsOfNeighborChange(world, x - 1, y + 1, z);
+-        }
+-        else {
++        } else {
+             this.notifyWireNeighborsOfNeighborChange(world, x - 1, y - 1, z);
+         }
+         if (world.isBlockNormalCube(x + 1, y, z)) {
+             this.notifyWireNeighborsOfNeighborChange(world, x + 1, y + 1, z);
+-        }
+-        else {
++        } else {
+             this.notifyWireNeighborsOfNeighborChange(world, x + 1, y - 1, z);
+         }
+         if (world.isBlockNormalCube(x, y, z - 1)) {
+             this.notifyWireNeighborsOfNeighborChange(world, x, y + 1, z - 1);
+-        }
+-        else {
++        } else {
+             this.notifyWireNeighborsOfNeighborChange(world, x, y - 1, z - 1);
+         }
+         if (world.isBlockNormalCube(x, y, z + 1)) {
+             this.notifyWireNeighborsOfNeighborChange(world, x, y + 1, z + 1);
+-        }
+-        else {
++        } else {
+             this.notifyWireNeighborsOfNeighborChange(world, x, y - 1, z + 1);
+         }
+     }
+-    
++
+     private int getMaxCurrentStrength(final World world, final int x, final int y, final int z, final int i5) {
+         if (world.getBlockId(x, y, z) != this.blockID) {
+@@ -209,5 +198,5 @@
+         return (i6 > i5) ? i6 : i5;
+     }
+-    
++
+     @Override
+     public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final int flag) {
+@@ -217,21 +206,20 @@
+             this.dropBlockAsItem(world, x, y, z, i6);
+             world.setBlockWithNotify(x, y, z, 0);
+-        }
+-        else {
++        } else {
+             this.updateAndPropagateCurrentStrength(world, x, y, z);
+         }
+         super.onNeighborBlockChange(world, x, y, z, flag);
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {
+         return Item.redstone.shiftedIndex;
+     }
+-    
++
+     @Override
+     public boolean isIndirectlyPoweringTo(final World world, final int x, final int y, final int z, final int flag) {
+         return this.wiresProvidePower && this.isPoweringTo(world, x, y, z, flag);
+     }
+-    
++
+     @Override
+     public boolean isPoweringTo(final IBlockAccess blockAccess, final int x, final int y, final int z, final int unused) {
+@@ -265,10 +253,10 @@
+         return (!z4 && !z3 && !z2 && !z5 && unused >= 2 && unused <= 5) || (unused == 2 && z4 && !z2 && !z3) || (unused == 3 && z5 && !z2 && !z3) || (unused == 4 && z2 && !z4 && !z5) || (unused == 5 && z3 && !z4 && !z5);
+     }
+-    
++
+     @Override
+     public boolean canProvidePower() {
+         return this.wiresProvidePower;
+     }
+-    
++
+     public static boolean isPowerProviderOrWire(final IBlockAccess blockAccess, final int x, final int y, final int z) {
+         final int i4 = blockAccess.getBlockId(x, y, z);

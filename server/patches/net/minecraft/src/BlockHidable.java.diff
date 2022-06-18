@@ -1,0 +1,33 @@
+--- BlockHidable.java
++++ BlockHidable.java
+@@ -1,16 +1,9 @@
+ package net.minecraft.src;
+ 
+-import net.minecraft.src.ItemStack;
+-import net.minecraft.src.EntityPlayer;
+-import net.minecraft.src.World;
+-import net.minecraft.src.IBlockAccess;
+-import net.minecraft.src.Material;
+-import net.minecraft.src.BlockGlass;
+-
+ public class BlockHidable extends BlockGlass {
+     public boolean render;
+     public int id;
+     public int tRes;
+-    
++
+     public BlockHidable(final int id, final int blockIndex, final Material material, final boolean localFlag) {
+         super(id, blockIndex, material, localFlag);
+@@ -19,10 +12,10 @@
+         this.tRes = blockIndex;
+     }
+-    
++
+     @Override
+     public int getBlockTexture(final IBlockAccess iBlockAccess, final int n, final int n2, final int n3, final int n4) {
+         return this.render ? this.tRes : 160;
+     }
+-    
++
+     @Override
+     public boolean blockActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer) {

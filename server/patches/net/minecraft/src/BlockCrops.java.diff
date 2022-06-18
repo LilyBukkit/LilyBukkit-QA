@@ -1,0 +1,56 @@
+--- BlockCrops.java
++++ BlockCrops.java
+@@ -11,10 +11,10 @@
+         this.setBlockBounds(0.5f - f3, 0.0f, 0.5f - f3, 0.5f + f3, 0.25f, 0.5f + f3);
+     }
+-    
++
+     @Override
+     protected boolean canThisPlantGrowOnThisBlockID(final int id) {
+         return id == Block.tilledField.blockID;
+     }
+-    
++
+     @Override
+     public void updateTick(final World world, final int x, final int y, final int z, final Random random) {
+@@ -24,5 +24,5 @@
+             if (i6 < 7) {
+                 final float f7 = this.getGrowthRate(world, x, y, z);
+-                if (random.nextInt((int)(100.0f / f7)) == 0) {
++                if (random.nextInt((int) (100.0f / f7)) == 0) {
+                     ++i6;
+                     world.setBlockMetadataWithNotify(x, y, z, i6);
+@@ -31,5 +31,5 @@
+         }
+     }
+-    
++
+     private float getGrowthRate(final World world, final int x, final int y, final int z) {
+         float f5 = 1.0f;
+@@ -66,10 +66,10 @@
+         return f5;
+     }
+-    
++
+     @Override
+     public int getRenderType() {
+         return 6;
+     }
+-    
++
+     @Override
+     public void onBlockDestroyedByPlayer(final World world, final int x, final int y, final int z, final int flag) {
+@@ -87,5 +87,5 @@
+         }
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {
+@@ -93,5 +93,5 @@
+         return (count == 7) ? Item.wheat.shiftedIndex : -1;
+     }
+-    
++
+     @Override
+     public int quantityDropped(final Random random) {

@@ -1,0 +1,136 @@
+--- BlockFlowing.java
++++ BlockFlowing.java
+@@ -7,5 +7,5 @@
+     boolean[] isOptimalFlowDirection;
+     int[] flowCost;
+-    
++
+     protected BlockFlowing(final int id, final Material material) {
+         super(id, material);
+@@ -14,5 +14,5 @@
+         this.flowCost = new int[4];
+     }
+-    
++
+     private void updateFlow(final World world, final int x, final int y, final int z) {
+         final int i5 = world.getBlockMetadata(x, y, z);
+@@ -21,5 +21,5 @@
+         world.markBlockNeedsUpdate(x, y, z);
+     }
+-    
++
+     @Override
+     public void updateTick(final World world, final int x, final int y, final int z, final Random random) {
+@@ -41,6 +41,5 @@
+                 if (i9 >= 8) {
+                     i8 = i9;
+-                }
+-                else {
++                } else {
+                     i8 = i9 + 8;
+                 }
+@@ -49,6 +48,5 @@
+                 if (world.isBlockNormalCube(x, y - 1, z)) {
+                     i8 = 0;
+-                }
+-                else if (world.getBlockMaterial(x, y - 1, z) == this.material && world.getBlockMetadata(x, y, z) == 0) {
++                } else if (world.getBlockMaterial(x, y - 1, z) == this.material && world.getBlockMetadata(x, y, z) == 0) {
+                     i8 = 0;
+                 }
+@@ -61,16 +59,13 @@
+                 if ((i6 = i8) < 0) {
+                     world.setBlockWithNotify(x, y, z, 0);
+-                }
+-                else {
++                } else {
+                     world.setBlockMetadataWithNotify(x, y, z, i8);
+                     world.scheduleBlockUpdate(x, y, z, this.blockID);
+                     world.notifyBlocksOfNeighborChange(x, y, z, this.blockID);
+                 }
+-            }
+-            else if (z2) {
++            } else if (z2) {
+                 this.updateFlow(world, x, y, z);
+             }
+-        }
+-        else {
++        } else {
+             this.updateFlow(world, x, y, z);
+         }
+@@ -78,10 +73,8 @@
+             if (i6 >= 8) {
+                 world.setBlockAndMetadataWithNotify(x, y - 1, z, this.blockID, i6);
+-            }
+-            else {
++            } else {
+                 world.setBlockAndMetadataWithNotify(x, y - 1, z, this.blockID, i6 + 8);
+             }
+-        }
+-        else if (i6 >= 0 && (i6 == 0 || this.blockBlocksFlow(world, x, y - 1, z))) {
++        } else if (i6 >= 0 && (i6 == 0 || this.blockBlocksFlow(world, x, y - 1, z))) {
+             final boolean[] z3 = this.getOptimalFlowDirections(world, x, y, z);
+             int i8 = i6 + this.fluidType;
+@@ -106,5 +99,5 @@
+         }
+     }
+-    
++
+     private void flowIntoBlock(final World world, final int x, final int y, final int z, final int metadata) {
+         if (this.liquidCanDisplaceBlock(world, x, y, z)) {
+@@ -113,6 +106,5 @@
+                 if (this.material == Material.lava) {
+                     this.triggerLavaMixEffects(world, x, y, z);
+-                }
+-                else {
++                } else {
+                     Block.blocksList[i6].dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z));
+                 }
+@@ -121,5 +113,5 @@
+         }
+     }
+-    
++
+     private int calculateFlowCost(final World world, final int x, final int y, final int z, final int i5, final int i6) {
+         int i7 = 1000;
+@@ -155,5 +147,5 @@
+         return i7;
+     }
+-    
++
+     private boolean[] getOptimalFlowDirections(final World world, final int x, final int y, final int z) {
+         for (int i5 = 0; i5 < 4; ++i5) {
+@@ -176,6 +168,5 @@
+                 if (!this.blockBlocksFlow(world, i6, y - 1, i7)) {
+                     this.flowCost[i5] = 0;
+-                }
+-                else {
++                } else {
+                     this.flowCost[i5] = this.calculateFlowCost(world, i6, y, i7, 1, i5);
+                 }
+@@ -193,5 +184,5 @@
+         return this.isOptimalFlowDirection;
+     }
+-    
++
+     private boolean blockBlocksFlow(final World world, final int x, final int y, final int z) {
+         final int i5 = world.getBlockId(x, y, z);
+@@ -205,5 +196,5 @@
+         return material6.isSolid();
+     }
+-    
++
+     protected int getSmallestFlowDecay(final World world, final int x, final int y, final int z, final int i5) {
+         int i6 = this.getFlowDecay(world, x, y, z);
+@@ -219,10 +210,10 @@
+         return (i5 >= 0 && i6 >= i5) ? i5 : i6;
+     }
+-    
++
+     private boolean liquidCanDisplaceBlock(final World world, final int x, final int y, final int z) {
+         final Material material5 = world.getBlockMaterial(x, y, z);
+         return material5 != this.material && material5 != Material.lava && !this.blockBlocksFlow(world, x, y, z);
+     }
+-    
++
+     @Override
+     public void onBlockAdded(final World world, final int x, final int y, final int z) {

@@ -1,0 +1,14 @@
+--- GuiStatsListener.java
++++ GuiStatsListener.java
+@@ -6,9 +6,9 @@
+ class GuiStatsListener implements ActionListener {
+     final GuiStatsComponent component;
+-    
++
+     GuiStatsListener(final GuiStatsComponent component) {
+         this.component = component;
+     }
+-    
++
+     public void actionPerformed(final ActionEvent actionEvent) {
+         GuiStatsComponent.update(this.component);

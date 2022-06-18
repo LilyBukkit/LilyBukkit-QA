@@ -1,0 +1,53 @@
+--- WorldServer.java
++++ WorldServer.java
+@@ -1,7 +1,7 @@
+ package net.minecraft.src;
+ 
++import java.io.File;
+ import java.util.ArrayList;
+ import java.util.List;
+-import java.io.File;
+ 
+ public class WorldServer extends World {
+@@ -12,13 +12,13 @@
+     private SpawnerAnimals monsterSpawner;
+     private SpawnerAnimals animalSpawner;
+-    
++
+     public WorldServer(final File file1, final String string2, final boolean z3) {
+         super(file1, string2);
+         this.disableSpawnProtection = false;
+-        this.monsterSpawner = new SpawnerServer(this, 200, IMobs.class, new Class[] { EntityZombie.class, EntitySkeleton.class, EntityCreeper.class, EntitySpider.class, EntitySlime.class });
+-        this.animalSpawner = new SpawnerAnimals(15, EntityAnimal.class, new Class[] { EntitySheep.class, EntityPig.class, EntityCow.class, EntityChicken.class });
++        this.monsterSpawner = new SpawnerServer(this, 200, IMobs.class, new Class[]{EntityZombie.class, EntitySkeleton.class, EntityCreeper.class, EntitySpider.class, EntitySlime.class});
++        this.animalSpawner = new SpawnerAnimals(15, EntityAnimal.class, new Class[]{EntitySheep.class, EntityPig.class, EntityCow.class, EntityChicken.class});
+         this.monsters = z3;
+     }
+-    
++
+     @Override
+     public void tick() {
+@@ -29,19 +29,19 @@
+         this.animalSpawner.onUpdate(this);
+     }
+-    
++
+     @Override
+     protected IChunkProvider getChunkProvider(final File saveDir) {
+         return this.chunkProviderServer = new ChunkProviderServer(this, new ChunkLoader(saveDir, true), new ChunkProviderGenerate(this, this.randomSeed));
+     }
+-    
++
+     public List getTileEntityList(final int i1, final int i2, final int i3, final int i4, final int i5, final int i6) {
+         final ArrayList arrayList7 = new ArrayList();
+         for (int i7 = 0; i7 < this.loadedTileEntityList.size(); ++i7) {
+-            final TileEntity tileEntity9 = (TileEntity)this.loadedTileEntityList.get(i7);
++            final TileEntity tileEntity9 = (TileEntity) this.loadedTileEntityList.get(i7);
+             if (tileEntity9.xCoord >= i1 && tileEntity9.yCoord >= i2 && tileEntity9.zCoord >= i3 && tileEntity9.xCoord < i4 && tileEntity9.yCoord < i5 && tileEntity9.zCoord < i6) {
+                 arrayList7.add(tileEntity9);
+             }
+         }
+-        return (List)arrayList7;
++        return (List) arrayList7;
+     }
+ }

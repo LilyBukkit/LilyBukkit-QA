@@ -1,0 +1,130 @@
+--- NetLoginHandler.java
++++ NetLoginHandler.java
+@@ -1,7 +1,8 @@
+ package net.minecraft.src;
+ 
++import net.minecraft.server.MinecraftServer;
++
+ import java.io.IOException;
+ import java.net.Socket;
+-import net.minecraft.server.MinecraftServer;
+ import java.util.Random;
+ import java.util.logging.Logger;
+@@ -10,4 +11,10 @@
+     public static Logger logger;
+     private static Random rand;
++
++    static {
++        NetLoginHandler.logger = Logger.getLogger("Minecraft");
++        NetLoginHandler.rand = new Random();
++    }
++
+     public NetworkManager netManager;
+     public boolean finishedProcessing;
+@@ -17,10 +24,5 @@
+     private Packet1Login packet1login;
+     private String serverId;
+-    
+-    static {
+-        NetLoginHandler.logger = Logger.getLogger("Minecraft");
+-        NetLoginHandler.rand = new Random();
+-    }
+-    
++
+     public NetLoginHandler(final MinecraftServer minecraftServer, final Socket socket, final String threadName) throws IOException {
+         this.finishedProcessing = false;
+@@ -32,5 +34,13 @@
+         this.netManager = new NetworkManager(socket, threadName, this);
+     }
+-    
++
++    static String getServerId(final NetLoginHandler loginHandler) {
++        return loginHandler.serverId;
++    }
++
++    static Packet1Login setLoginPacket(final NetLoginHandler loginHandler, final Packet1Login loginPacket) {
++        return loginHandler.packet1login = loginPacket;
++    }
++
+     public void tryLogin() throws IOException {
+         if (this.packet1login != null) {
+@@ -40,10 +50,9 @@
+         if (this.loginTimer++ == 100) {
+             this.kickUser("Took too long to log in");
+-        }
+-        else {
++        } else {
+             this.netManager.processReadPackets();
+         }
+     }
+-    
++
+     public void kickUser(final String playerName) {
+         NetLoginHandler.logger.info(new StringBuilder("Disconnecting ").append(this.getUserAndIPString()).append(": ").append(playerName).toString());
+@@ -52,5 +61,5 @@
+         this.finishedProcessing = true;
+     }
+-    
++
+     @Override
+     public void handleHandshake(final Packet2Handshake packet) {
+@@ -58,10 +67,9 @@
+             this.serverId = Long.toHexString(NetLoginHandler.rand.nextLong());
+             this.netManager.addToSendQueue(new Packet2Handshake(this.serverId));
+-        }
+-        else {
++        } else {
+             this.netManager.addToSendQueue(new Packet2Handshake("-"));
+         }
+     }
+-    
++
+     @Override
+     public void handleLogin(final Packet1Login packet) {
+@@ -69,13 +77,11 @@
+         if (packet.protocolVersion != 2) {
+             this.kickUser("Outdated client!");
+-        }
+-        else if (!this.mcServer.onlineMode) {
++        } else if (!this.mcServer.onlineMode) {
+             this.doLogin(packet);
+-        }
+-        else {
++        } else {
+             new ThreadLoginVerifier(this, packet).start();
+         }
+     }
+-    
++
+     public void doLogin(final Packet1Login loginPacket) {
+         final EntityPlayerMP entityPlayerMP2 = this.mcServer.configManager.login(this, loginPacket.username, loginPacket.password);
+@@ -93,5 +99,5 @@
+         this.finishedProcessing = true;
+     }
+-    
++
+     @Override
+     public void handleErrorMessage(final String message) {
+@@ -99,20 +105,12 @@
+         this.finishedProcessing = true;
+     }
+-    
++
+     @Override
+     public void registerPacket(final Packet packet) {
+         this.kickUser("Protocol error");
+     }
+-    
++
+     public String getUserAndIPString() {
+         return (this.username != null) ? (String.valueOf(this.username) + " [" + this.netManager.getRemoteAddress().toString() + "]") : this.netManager.getRemoteAddress().toString();
+     }
+-    
+-    static String getServerId(final NetLoginHandler loginHandler) {
+-        return loginHandler.serverId;
+-    }
+-    
+-    static Packet1Login setLoginPacket(final NetLoginHandler loginHandler, final Packet1Login loginPacket) {
+-        return loginHandler.packet1login = loginPacket;
+-    }
+ }

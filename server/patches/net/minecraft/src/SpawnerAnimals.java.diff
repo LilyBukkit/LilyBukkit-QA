@@ -1,0 +1,67 @@
+--- SpawnerAnimals.java
++++ SpawnerAnimals.java
+@@ -1,5 +1,4 @@
+ package net.minecraft.src;
+ 
+-import java.util.Iterator;
+ import java.util.HashSet;
+ import java.util.Set;
+@@ -10,12 +9,12 @@
+     private Class[] entities;
+     private Set eligibleChunksForSpawning;
+-    
++
+     public SpawnerAnimals(final int i1, final Class class2, final Class[] class3) {
+-        this.eligibleChunksForSpawning = (Set)new HashSet();
++        this.eligibleChunksForSpawning = (Set) new HashSet();
+         this.maxSpawns = i1;
+         this.entityType = class2;
+         this.entities = class3;
+     }
+-    
++
+     public void onUpdate(final World world1) {
+         final int i2 = world1.countEntities(this.entityType);
+@@ -26,5 +25,5 @@
+         }
+     }
+-    
++
+     protected ChunkPosition getRandomSpawningPointInChunk(final World world1, final int i2, final int i3) {
+         final int i4 = i2 + world1.rand.nextInt(16);
+@@ -33,9 +32,9 @@
+         return new ChunkPosition(i4, i5, i6);
+     }
+-    
++
+     private int performSpawning(final World world1, final int i2, final IProgressUpdate iProgressUpdate3) {
+         this.eligibleChunksForSpawning.clear();
+         for (int i3 = 0; i3 < world1.playerEntities.size(); ++i3) {
+-            final EntityPlayer entityPlayer5 = (EntityPlayer)world1.playerEntities.get(i3);
++            final EntityPlayer entityPlayer5 = (EntityPlayer) world1.playerEntities.get(i3);
+             final int i4 = MathHelper.floor_double(entityPlayer5.posX / 16.0);
+             final int i5 = MathHelper.floor_double(entityPlayer5.posZ / 16.0);
+@@ -67,10 +66,10 @@
+                     final byte b9 = 6;
+                     for (int i13 = 0; i13 < 2; ++i13) {
+-                        i10 += world1.rand.nextInt((int)b9) - world1.rand.nextInt((int)b9);
++                        i10 += world1.rand.nextInt((int) b9) - world1.rand.nextInt((int) b9);
+                         i11 += world1.rand.nextInt(1) - world1.rand.nextInt(1);
+-                        i12 += world1.rand.nextInt((int)b9) - world1.rand.nextInt((int)b9);
++                        i12 += world1.rand.nextInt((int) b9) - world1.rand.nextInt((int) b9);
+                         if (world1.isBlockNormalCube(i10, i11 - 1, i12) && !world1.isBlockNormalCube(i10, i11, i12) && !world1.getBlockMaterial(i10, i11, i12).getIsLiquid() && !world1.isBlockNormalCube(i10, i11 + 1, i12)) {
+                             final float f18 = i10 + 0.5f;
+-                            final float f19 = (float)i11;
++                            final float f19 = (float) i11;
+                             final float f20 = i12 + 0.5f;
+                             if (world1.getClosestPlayer(f18, f19, f20, 24.0) == null) {
+@@ -82,7 +81,6 @@
+                                     EntityLiving entityLiving29;
+                                     try {
+-                                        entityLiving29 = (EntityLiving)this.entities[i5].getConstructor(new Class[] { World.class }).newInstance(new Object[] { world1 });
+-                                    }
+-                                    catch (Exception exception25) {
++                                        entityLiving29 = (EntityLiving) this.entities[i5].getConstructor(new Class[]{World.class}).newInstance(new Object[]{world1});
++                                    } catch (Exception exception25) {
+                                         exception25.printStackTrace();
+                                         return i3;

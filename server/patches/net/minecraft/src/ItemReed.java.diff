@@ -1,0 +1,22 @@
+--- ItemReed.java
++++ ItemReed.java
+@@ -3,16 +3,15 @@
+ public class ItemReed extends Item {
+     private int spawnID;
+-    
++
+     public ItemReed(final int itemID, final Block reed) {
+         super(itemID);
+         this.spawnID = reed.blockID;
+     }
+-    
++
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, int x, int y, int z, int i7) {
+         if (world.getBlockId(x, y, z) == Block.snow.blockID) {
+             i7 = 0;
+-        }
+-        else {
++        } else {
+             if (i7 == 0) {
+                 --y;

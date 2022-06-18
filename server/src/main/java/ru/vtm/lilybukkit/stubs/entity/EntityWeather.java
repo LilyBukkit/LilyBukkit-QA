@@ -41,22 +41,22 @@ public class EntityWeather extends Entity implements Weather {
     }
 
     /**
-     * Sets this entity's velocity
-     *
-     * @param velocity New velocity to travel with
-     */
-    @Override
-    public void setVelocity(Vector velocity) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Gets this entity's current velocity
      *
      * @return Current travelling velocity of this entity
      */
     @Override
     public Vector getVelocity() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Sets this entity's velocity
+     *
+     * @param velocity New velocity to travel with
+     */
+    @Override
+    public void setVelocity(Vector velocity) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -126,22 +126,22 @@ public class EntityWeather extends Entity implements Weather {
     }
 
     /**
-     * Returns the entity's maximum fire ticks.
-     *
-     * @return int maxFireTicks
-     */
-    @Override
-    public int getMaxFireTicks() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
      *
      * @param ticks
      */
     @Override
     public void setFireTicks(int ticks) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Returns the entity's maximum fire ticks.
+     *
+     * @return int maxFireTicks
+     */
+    @Override
+    public int getMaxFireTicks() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -234,22 +234,22 @@ public class EntityWeather extends Entity implements Weather {
     }
 
     /**
-     * Record the last {@link EntityDamageEvent} inflicted on this entity
-     *
-     * @param event a {@link EntityDamageEvent}
-     */
-    @Override
-    public void setLastDamageCause(EntityDamageEvent event) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
      *
      * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
      */
     @Override
     public EntityDamageEvent getLastDamageCause() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Record the last {@link EntityDamageEvent} inflicted on this entity
+     *
+     * @param event a {@link EntityDamageEvent}
+     */
+    @Override
+    public void setLastDamageCause(EntityDamageEvent event) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

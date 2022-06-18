@@ -1,0 +1,25 @@
+--- ChunkCoordinates.java
++++ ChunkCoordinates.java
+@@ -4,18 +4,18 @@
+     public final int posX;
+     public final int posZ;
+-    
++
+     public ChunkCoordinates(final int posX, final int posZ) {
+         this.posX = posX;
+         this.posZ = posZ;
+     }
+-    
++
+     public boolean equals(final Object object) {
+         if (!(object instanceof ChunkCoordinates)) {
+             return false;
+         }
+-        final ChunkCoordinates chunkCoordinates2 = (ChunkCoordinates)object;
++        final ChunkCoordinates chunkCoordinates2 = (ChunkCoordinates) object;
+         return this.posX == chunkCoordinates2.posX && this.posZ == chunkCoordinates2.posZ;
+     }
+-    
++
+     public int hashCode() {
+         return this.posX << 16 ^ this.posZ;

@@ -1,6 +1,6 @@
 --- EntityTNTPrimed.java
 +++ EntityTNTPrimed.java
-@@ -1,5 +1,14 @@
+@@ -1,7 +1,16 @@
  package net.minecraft.src;
  
 -public class EntityTNTPrimed extends Entity {
@@ -15,20 +15,63 @@
 +
 +public class EntityTNTPrimed extends Entity implements TNTPrimed {
      public int fuse;
-     
-@@ -69,3 +78,296 @@
+-    
++
+     public EntityTNTPrimed(final World world) {
+         super(world);
+@@ -11,9 +20,9 @@
+         this.yOffset = this.height / 2.0f;
+     }
+-    
++
+     public EntityTNTPrimed(final World world, final float x, final float y, final float z) {
+         this(world);
+         this.setPosition(x, y, z);
+-        final float f5 = (float)(Math.random() * 3.1415927410125732 * 2.0);
++        final float f5 = (float) (Math.random() * 3.1415927410125732 * 2.0);
+         this.motionX = -MathHelper.sin(f5 * 3.1415927f / 180.0f) * 0.02f;
+         this.motionY = 0.20000000298023224;
+@@ -25,10 +34,10 @@
+         this.prevPosZ = z;
+     }
+-    
++
+     @Override
+     public boolean canBeCollidedWith() {
+         return !this.isDead;
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -49,23 +58,315 @@
+             this.setEntityDead();
+             this.explode();
+-        }
+-        else {
++        } else {
+             this.worldObj.spawnParticle("smoke", this.posX, this.posY + 0.5, this.posZ, 0.0, 0.0, 0.0);
+         }
+     }
+-    
++
+     private void explode() {
+         final float f1 = 4.0f;
+         this.worldObj.createExplosion(null, this.posX, this.posY, this.posZ, f1);
+     }
+-    
++
+     @Override
+     protected void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+-        nbttagcompound.setByte("Fuse", (byte)this.fuse);
++        nbttagcompound.setByte("Fuse", (byte) this.fuse);
+     }
+-    
++
+     @Override
+     protected void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
          this.fuse = nbttagcompound.getByte("Fuse");
      }
-+
-+    /**
-+     * Set the number of ticks until the TNT blows up after being primed.
-+     *
-+     * @param fuseTicks
-+     */
-+    @Override
-+    public void setFuseTicks(int fuseTicks) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
 +
 +    /**
 +     * Retrieve the number of ticks until the explosion of this TNTPrimed entity
@@ -41,12 +84,12 @@
 +    }
 +
 +    /**
-+     * Set the radius affected by this explosive's explosion
++     * Set the number of ticks until the TNT blows up after being primed.
 +     *
-+     * @param yield
++     * @param fuseTicks
 +     */
 +    @Override
-+    public void setYield(float yield) {
++    public void setFuseTicks(int fuseTicks) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -57,6 +100,16 @@
 +     */
 +    @Override
 +    public float getYield() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Set the radius affected by this explosive's explosion
++     *
++     * @param yield
++     */
++    @Override
++    public void setYield(float yield) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -91,22 +144,22 @@
 +    }
 +
 +    /**
-+     * Sets this entity's velocity
-+     *
-+     * @param velocity New velocity to travel with
-+     */
-+    @Override
-+    public void setVelocity(Vector velocity) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Gets this entity's current velocity
 +     *
 +     * @return Current travelling velocity of this entity
 +     */
 +    @Override
 +    public Vector getVelocity() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets this entity's velocity
++     *
++     * @param velocity New velocity to travel with
++     */
++    @Override
++    public void setVelocity(Vector velocity) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -176,22 +229,22 @@
 +    }
 +
 +    /**
-+     * Returns the entity's maximum fire ticks.
-+     *
-+     * @return int maxFireTicks
-+     */
-+    @Override
-+    public int getMaxFireTicks() {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
 +     *
 +     * @param ticks
 +     */
 +    @Override
 +    public void setFireTicks(int ticks) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Returns the entity's maximum fire ticks.
++     *
++     * @return int maxFireTicks
++     */
++    @Override
++    public int getMaxFireTicks() {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -284,22 +337,22 @@
 +    }
 +
 +    /**
-+     * Record the last {@link EntityDamageEvent} inflicted on this entity
-+     *
-+     * @param event a {@link EntityDamageEvent}
-+     */
-+    @Override
-+    public void setLastDamageCause(EntityDamageEvent event) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
 +     *
 +     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
 +     */
 +    @Override
 +    public EntityDamageEvent getLastDamageCause() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Record the last {@link EntityDamageEvent} inflicted on this entity
++     *
++     * @param event a {@link EntityDamageEvent}
++     */
++    @Override
++    public void setLastDamageCause(EntityDamageEvent event) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +

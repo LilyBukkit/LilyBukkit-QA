@@ -1,6 +1,6 @@
 --- BlockMobSpawner.java
 +++ BlockMobSpawner.java
-@@ -1,7 +1,13 @@
+@@ -1,29 +1,166 @@
  package net.minecraft.src;
  
 +import org.bukkit.block.Block;
@@ -15,7 +15,29 @@
 +public class BlockMobSpawner extends BlockContainer implements CreatureSpawner {
      protected BlockMobSpawner(final int id, final int blockIndex) {
          super(id, blockIndex, Material.rock);
-@@ -27,3 +33,134 @@
+     }
+-    
++
+     @Override
+     protected TileEntity getBlockEntity() {
+         return new TileEntityMobSpawner();
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {
+         return 0;
+     }
+-    
++
+     @Override
+     public int quantityDropped(final Random random) {
+         return 0;
+     }
+-    
++
+     @Override
+     public boolean isOpaqueCube() {
          return false;
      }
 +
@@ -119,7 +141,7 @@
 +     * eventuality.
 +     *
 +     * @return true if the update was successful, otherwise false
-+     * @see BlockState.update(boolean force)
++     * @see org.bukkit.block.BlockState#update(boolean force)
 +     */
 +    @Override
 +    public boolean update() {

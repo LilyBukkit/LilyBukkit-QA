@@ -1,0 +1,52 @@
+--- MobGiant.java
++++ MobGiant.java
+@@ -1,12 +1,7 @@
+ package net.minecraft.src;
+ 
+-import net.minecraft.src.Item;
+-import net.minecraft.src.Entity;
+-import net.minecraft.src.World;
+-import net.minecraft.src.EntityMob;
+-
+ public class MobGiant extends EntityMob {
+     public int maxHP;
+-    
++
+     public MobGiant(final World world, int n) {
+         super(world);
+@@ -23,29 +18,29 @@
+         this.setSize(this.width * 6.0f, this.height * 6.0f);
+     }
+-    
++
+     @Override
+     protected float getBlockPathWeight(final int x, final int y, final int z) {
+         return this.worldObj.getBrightness(x, y, z) - 0.5f;
+     }
+-    
++
+     @Override
+     protected void fall(final float f) {
+     }
+-    
++
+     @Override
+     protected String getLivingSound() {
+         return "ext.giantambient";
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "ext.gianthurt";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "ext.giantdead";
+     }
+-    
++
+     @Override
+     public void onDeath(final Entity entity) {

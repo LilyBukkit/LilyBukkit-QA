@@ -1,0 +1,15 @@
+--- IBlockAccess.java
++++ IBlockAccess.java
+@@ -3,9 +3,9 @@
+ public interface IBlockAccess {
+     int getBlockId(final int blockX, final int blockY, final int blockZ);
+-    
++
+     int getBlockMetadata(final int x, final int y, final int z);
+-    
++
+     Material getBlockMaterial(final int x, final int y, final int z);
+-    
++
+     boolean isBlockNormalCube(final int x, final int y, final int z);
+ }

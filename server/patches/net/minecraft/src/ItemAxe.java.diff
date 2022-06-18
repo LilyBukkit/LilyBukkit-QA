@@ -1,0 +1,15 @@
+--- ItemAxe.java
++++ ItemAxe.java
+@@ -3,9 +3,9 @@
+ public class ItemAxe extends ItemTool {
+     private static Block[] blocksEffectiveAgainst;
+-    
++
+     static {
+-        ItemAxe.blocksEffectiveAgainst = new Block[] { Block.planks, Block.bookshelf, Block.wood, Block.chest };
++        ItemAxe.blocksEffectiveAgainst = new Block[]{Block.planks, Block.bookshelf, Block.wood, Block.chest};
+     }
+-    
++
+     public ItemAxe(final int itemID, final int material) {
+         super(itemID, 3, material, ItemAxe.blocksEffectiveAgainst);

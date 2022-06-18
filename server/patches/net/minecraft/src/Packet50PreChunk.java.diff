@@ -1,0 +1,51 @@
+--- Packet50PreChunk.java
++++ Packet50PreChunk.java
+@@ -1,7 +1,7 @@
+ package net.minecraft.src;
+ 
++import java.io.DataInputStream;
+ import java.io.DataOutputStream;
+ import java.io.IOException;
+-import java.io.DataInputStream;
+ 
+ public class Packet50PreChunk extends Packet {
+@@ -9,8 +9,8 @@
+     public int yPosition;
+     public boolean mode;
+-    
++
+     public Packet50PreChunk() {
+     }
+-    
++
+     public Packet50PreChunk(final int xPosition, final int yPosition, final boolean mode) {
+         this.isChunkDataPacket = true;
+@@ -19,5 +19,5 @@
+         this.mode = mode;
+     }
+-    
++
+     @Override
+     public void readPacketData(final DataInputStream dataInputStream) throws IOException {
+@@ -26,17 +26,17 @@
+         this.mode = (dataInputStream.read() != 0);
+     }
+-    
++
+     @Override
+     public void writePacket(final DataOutputStream dataOutputStream) throws IOException {
+         dataOutputStream.writeInt(this.xPosition);
+         dataOutputStream.writeInt(this.yPosition);
+-        dataOutputStream.write((int)(this.mode ? 1 : 0));
++        dataOutputStream.write((int) (this.mode ? 1 : 0));
+     }
+-    
++
+     @Override
+     public void processPacket(final NetHandler netHandler) {
+         netHandler.handlePreChunk(this);
+     }
+-    
++
+     @Override
+     public int getPacketSize() {

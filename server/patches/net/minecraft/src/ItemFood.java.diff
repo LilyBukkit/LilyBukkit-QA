@@ -1,0 +1,9 @@
+--- ItemFood.java
++++ ItemFood.java
+@@ -3,5 +3,5 @@
+ public class ItemFood extends Item {
+     private int healAmount;
+-    
++
+     public ItemFood(final int itemID, final int healAmount) {
+         super(itemID);

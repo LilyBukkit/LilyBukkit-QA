@@ -1,0 +1,76 @@
+--- BlockCactus.java
++++ BlockCactus.java
+@@ -8,10 +8,11 @@
+         this.setTickOnLoad(true);
+     }
+-    
++
+     @Override
+     public void updateTick(final World world, final int x, final int y, final int z, final Random random) {
+         if (world.getBlockId(x, y + 1, z) == 0) {
+             int i6;
+-            for (i6 = 1; world.getBlockId(x, y - i6, z) == this.blockID; ++i6) {}
++            for (i6 = 1; world.getBlockId(x, y - i6, z) == this.blockID; ++i6) {
++            }
+             if (i6 < 3) {
+                 final int i7 = world.getBlockMetadata(x, y, z);
+@@ -19,6 +20,5 @@
+                     world.setBlockWithNotify(x, y + 1, z, this.blockID);
+                     world.setBlockMetadataWithNotify(x, y, z, 0);
+-                }
+-                else {
++                } else {
+                     world.setBlockMetadataWithNotify(x, y, z, i7 + 1);
+                 }
+@@ -26,5 +26,5 @@
+         }
+     }
+-    
++
+     @Override
+     public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+@@ -32,25 +32,25 @@
+         return AxisAlignedBB.getBoundingBoxFromPool(x + f5, y, z + f5, x + 1 - f5, y + 1 - f5, z + 1 - f5);
+     }
+-    
++
+     @Override
+     public int getBlockTextureFromSide(final int side) {
+         return (side == 1) ? (this.blockIndexInTexture - 1) : ((side == 0) ? (this.blockIndexInTexture + 1) : this.blockIndexInTexture);
+     }
+-    
++
+     @Override
+     public boolean isOpaqueCube() {
+         return false;
+     }
+-    
++
+     @Override
+     public int getRenderType() {
+         return 13;
+     }
+-    
++
+     @Override
+     public boolean canPlaceBlockAt(final World world, final int x, final int y, final int z) {
+         return super.canPlaceBlockAt(world, x, y, z) && this.canBlockStay(world, x, y, z);
+     }
+-    
++
+     @Override
+     public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final int flag) {
+@@ -60,5 +60,5 @@
+         }
+     }
+-    
++
+     @Override
+     public boolean canBlockStay(final World world, final int x, final int y, final int z) {
+@@ -78,5 +78,5 @@
+         return i5 == Block.cactus.blockID || i5 == Block.sand.blockID;
+     }
+-    
++
+     @Override
+     public void onEntityCollidedWithBlock(final World world, final int x, final int y, final int z, final Entity entity) {

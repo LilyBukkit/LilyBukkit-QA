@@ -1,0 +1,238 @@
+--- NetworkManager.java
++++ NetworkManager.java
+@@ -1,12 +1,12 @@
+ package net.minecraft.src;
+ 
+-import java.net.SocketAddress;
++import java.io.DataInputStream;
++import java.io.DataOutputStream;
+ import java.io.IOException;
++import java.net.Socket;
++import java.net.SocketAddress;
+ import java.util.Collections;
+ import java.util.LinkedList;
+ import java.util.List;
+-import java.io.DataOutputStream;
+-import java.io.DataInputStream;
+-import java.net.Socket;
+ 
+ public class NetworkManager {
+@@ -14,4 +14,9 @@
+     public static int numReadThreads;
+     public static int numWriteThreads;
++
++    static {
++        threadSyncObject = new Object();
++    }
++
+     private Object sendQueueLock;
+     private Socket networkSocket;
+@@ -31,15 +36,11 @@
+     private int sendQueueByteLength;
+     private int chunkDataSendCounter;
+-    
+-    static {
+-        threadSyncObject = new Object();
+-    }
+-    
++
+     public NetworkManager(final Socket socket, final String threadName, final NetHandler netHandler) throws IOException {
+         this.sendQueueLock = new Object();
+         this.isRunning = true;
+-        this.readPackets = Collections.synchronizedList((List)new LinkedList());
+-        this.dataPackets = Collections.synchronizedList((List)new LinkedList());
+-        this.chunkDataPackets = Collections.synchronizedList((List)new LinkedList());
++        this.readPackets = Collections.synchronizedList((List) new LinkedList());
++        this.dataPackets = Collections.synchronizedList((List) new LinkedList());
++        this.chunkDataPackets = Collections.synchronizedList((List) new LinkedList());
+         this.isServerTerminating = false;
+         this.isTerminating = false;
+@@ -58,9 +59,33 @@
+         this.writeThread.start();
+     }
+-    
++
++    static boolean isRunning(final NetworkManager networkManager) {
++        return networkManager.isRunning;
++    }
++
++    static boolean isServerTerminating(final NetworkManager networkManager) {
++        return networkManager.isServerTerminating;
++    }
++
++    static void readNetworkPacket(final NetworkManager networkManager) {
++        networkManager.readPacket();
++    }
++
++    static void sendNetworkPacket(final NetworkManager networkManager) {
++        networkManager.sendPacket();
++    }
++
++    static Thread getReadThread(final NetworkManager networkManager) {
++        return networkManager.readThread;
++    }
++
++    static Thread getWriteThread(final NetworkManager networkManager) {
++        return networkManager.writeThread;
++    }
++
+     public void setNetHandler(final NetHandler netHandler) {
+         this.netHandler = netHandler;
+     }
+-    
++
+     public void addToSendQueue(final Packet packet) {
+         if (!this.isServerTerminating) {
+@@ -70,6 +95,5 @@
+                 if (packet.isChunkDataPacket) {
+                     this.chunkDataPackets.add(packet);
+-                }
+-                else {
++                } else {
+                     this.dataPackets.add(packet);
+                 }
+@@ -78,5 +102,5 @@
+         }
+     }
+-    
++
+     private void sendPacket() {
+         try {
+@@ -87,5 +111,5 @@
+                 final Packet packet2;
+                 synchronized (this.sendQueueLock) {
+-                    packet2 = (Packet)this.dataPackets.remove(0);
++                    packet2 = (Packet) this.dataPackets.remove(0);
+                     this.sendQueueByteLength -= packet2.getPacketSize() + 1;
+                 }
+@@ -98,5 +122,5 @@
+                 final Packet packet2;
+                 synchronized (this.sendQueueLock) {
+-                    packet2 = (Packet)this.chunkDataPackets.remove(0);
++                    packet2 = (Packet) this.chunkDataPackets.remove(0);
+                     this.sendQueueByteLength -= packet2.getPacketSize() + 1;
+                 }
+@@ -108,7 +132,6 @@
+                 Thread.sleep(10L);
+             }
+-        }
+-        catch (InterruptedException ex) {}
+-        catch (Exception exception9) {
++        } catch (InterruptedException ex) {
++        } catch (Exception exception9) {
+             if (!this.isTerminating) {
+                 this.onNetworkError(exception9);
+@@ -116,5 +139,5 @@
+         }
+     }
+-    
++
+     private void readPacket() {
+         try {
+@@ -122,10 +145,8 @@
+             if (packet1 != null) {
+                 this.readPackets.add(packet1);
+-            }
+-            else {
++            } else {
+                 this.networkShutdown("End of stream");
+             }
+-        }
+-        catch (Exception exception2) {
++        } catch (Exception exception2) {
+             if (!this.isTerminating) {
+                 this.onNetworkError(exception2);
+@@ -133,10 +154,10 @@
+         }
+     }
+-    
++
+     private void onNetworkError(final Exception exception) {
+         exception.printStackTrace();
+         this.networkShutdown(new StringBuilder("Internal exception: ").append(exception.toString()).toString());
+     }
+-    
++
+     public void networkShutdown(final String terminationReason) {
+         if (this.isRunning) {
+@@ -147,17 +168,17 @@
+             try {
+                 this.socketInputStream.close();
++            } catch (Throwable t) {
+             }
+-            catch (Throwable t) {}
+             try {
+                 this.socketOutputStream.close();
++            } catch (Throwable t2) {
+             }
+-            catch (Throwable t2) {}
+             try {
+                 this.networkSocket.close();
++            } catch (Throwable t3) {
+             }
+-            catch (Throwable t3) {}
+         }
+     }
+-    
++
+     public void processReadPackets() {
+         if (this.sendQueueByteLength > 1048576) {
+@@ -168,11 +189,10 @@
+                 this.networkShutdown("Timed out");
+             }
+-        }
+-        else {
++        } else {
+             this.timeSinceLastRead = 0;
+         }
+         int i1 = 100;
+         while (!this.readPackets.isEmpty() && i1-- >= 0) {
+-            final Packet packet2 = (Packet)this.readPackets.remove(0);
++            final Packet packet2 = (Packet) this.readPackets.remove(0);
+             packet2.processPacket(this.netHandler);
+         }
+@@ -181,9 +201,9 @@
+         }
+     }
+-    
++
+     public SocketAddress getRemoteAddress() {
+         return this.networkSocket.getRemoteSocketAddress();
+     }
+-    
++
+     public void serverShutdown() {
+         this.isServerTerminating = true;
+@@ -191,31 +211,7 @@
+         new ThreadMonitorConnection(this).start();
+     }
+-    
++
+     public int getNumChunkDataPackets() {
+         return this.chunkDataPackets.size();
+     }
+-    
+-    static boolean isRunning(final NetworkManager networkManager) {
+-        return networkManager.isRunning;
+-    }
+-    
+-    static boolean isServerTerminating(final NetworkManager networkManager) {
+-        return networkManager.isServerTerminating;
+-    }
+-    
+-    static void readNetworkPacket(final NetworkManager networkManager) {
+-        networkManager.readPacket();
+-    }
+-    
+-    static void sendNetworkPacket(final NetworkManager networkManager) {
+-        networkManager.sendPacket();
+-    }
+-    
+-    static Thread getReadThread(final NetworkManager networkManager) {
+-        return networkManager.readThread;
+-    }
+-    
+-    static Thread getWriteThread(final NetworkManager networkManager) {
+-        return networkManager.writeThread;
+-    }
+ }

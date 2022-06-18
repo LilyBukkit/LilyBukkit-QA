@@ -1,0 +1,46 @@
+--- NBTTagByte.java
++++ NBTTagByte.java
+@@ -2,34 +2,34 @@
+ 
+ import java.io.DataInput;
+-import java.io.IOException;
+ import java.io.DataOutput;
++import java.io.IOException;
+ 
+ public class NBTTagByte extends NBTBase {
+     public byte byteValue;
+-    
++
+     public NBTTagByte() {
+     }
+-    
++
+     public NBTTagByte(final byte byteValue) {
+         this.byteValue = byteValue;
+     }
+-    
++
+     @Override
+     void writeTagContents(final DataOutput dataOutput) throws IOException {
+-        dataOutput.writeByte((int)this.byteValue);
++        dataOutput.writeByte((int) this.byteValue);
+     }
+-    
++
+     @Override
+     void readTagContents(final DataInput dataInput) throws IOException {
+         this.byteValue = dataInput.readByte();
+     }
+-    
++
+     @Override
+     public byte getType() {
+         return 1;
+     }
+-    
++
+     public String toString() {
+-        return new StringBuilder().append((int)this.byteValue).toString();
++        return new StringBuilder().append((int) this.byteValue).toString();
+     }
+ }

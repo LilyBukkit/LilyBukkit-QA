@@ -1,0 +1,20 @@
+--- ItemSpade.java
++++ ItemSpade.java
+@@ -3,13 +3,13 @@
+ public class ItemSpade extends ItemTool {
+     private static Block[] blocksEffectiveAgainst;
+-    
++
+     static {
+-        ItemSpade.blocksEffectiveAgainst = new Block[] { Block.grass, Block.dirt, Block.sand, Block.gravel, Block.snow, Block.blockSnow, Block.blockClay };
++        ItemSpade.blocksEffectiveAgainst = new Block[]{Block.grass, Block.dirt, Block.sand, Block.gravel, Block.snow, Block.blockSnow, Block.blockClay};
+     }
+-    
++
+     public ItemSpade(final int itemID, final int material) {
+         super(itemID, 1, material, ItemSpade.blocksEffectiveAgainst);
+     }
+-    
++
+     @Override
+     public boolean canHarvestBlock(final Block block) {

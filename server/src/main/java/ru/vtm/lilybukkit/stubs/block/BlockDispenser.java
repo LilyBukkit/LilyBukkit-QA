@@ -67,7 +67,7 @@ public class BlockDispenser extends BlockContainer implements Dispenser {
      * eventuality.
      *
      * @return true if the update was successful, otherwise false
-     * @see BlockState.update(boolean force)
+     * @see org.bukkit.block.BlockState#update(boolean force)
      */
     @Override
     public boolean update() {

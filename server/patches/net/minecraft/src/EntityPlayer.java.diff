@@ -21,7 +21,216 @@
 +public class EntityPlayer extends EntityLiving implements Player {
      public InventoryPlayer inventory;
      public byte unusedMiningCooldown;
-@@ -271,3 +282,601 @@
+@@ -13,7 +24,7 @@
+     public int swingProgressInt;
+     public String username;
+-    private int damageRemainder;
+     public Random playerRand;
+-    
++    private int damageRemainder;
++
+     public EntityPlayer(final World world) {
+         super(world);
+@@ -33,5 +44,5 @@
+         this.playerRand = new Random();
+     }
+-    
++
+     @Override
+     public void updateRidden() {
+@@ -40,5 +51,5 @@
+         this.cameraYaw = 0.0f;
+     }
+-    
++
+     @Override
+     protected void updateEntityActionState() {
+@@ -49,11 +60,10 @@
+                 this.isSwinging = false;
+             }
+-        }
+-        else {
++        } else {
+             this.swingProgressInt = 0;
+         }
+         this.swingProgress = this.swingProgressInt / 8.0f;
+     }
+-    
++
+     @Override
+     public void onLivingUpdate() {
+@@ -65,5 +75,5 @@
+         super.onLivingUpdate();
+         float f1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+-        float f2 = (float)Math.atan(-this.motionY * 0.20000000298023224) * 15.0f;
++        float f2 = (float) Math.atan(-this.motionY * 0.20000000298023224) * 15.0f;
+         if (f1 > 0.1f) {
+             f1 = 0.1f;
+@@ -81,5 +91,5 @@
+             if (list3 != null) {
+                 for (int i4 = 0; i4 < list3.size(); ++i4) {
+-                    this.collideWithPlayer((Entity)list3.get(i4));
++                    this.collideWithPlayer((Entity) list3.get(i4));
+                 }
+             }
+@@ -90,10 +100,9 @@
+             int n3 = 0;
+             while (n2 != 0) {
+-                final int n4 = this.worldObj.getBlockId((int)this.posX, n2, (int)this.posZ);
++                final int n4 = this.worldObj.getBlockId((int) this.posX, n2, (int) this.posZ);
+                 if (n4 == 0 || n4 == 116) {
+                     --n2;
+                     n3 = 1;
+-                }
+-                else {
++                } else {
+                     if (n3 != 0) {
+                         ++n2;
+@@ -108,9 +117,9 @@
+         }
+     }
+-    
++
+     private void collideWithPlayer(final Entity entity) {
+         entity.onCollideWithPlayer(this);
+     }
+-    
++
+     @Override
+     public void onDeath(final Entity entity) {
+@@ -125,6 +134,5 @@
+             this.motionX = -MathHelper.cos((this.attackedAtYaw + this.rotationYaw) * 3.1415927f / 180.0f) * 0.1f;
+             this.motionZ = -MathHelper.sin((this.attackedAtYaw + this.rotationYaw) * 3.1415927f / 180.0f) * 0.1f;
+-        }
+-        else {
++        } else {
+             final double n = 0.0;
+             this.motionZ = n;
+@@ -133,14 +141,14 @@
+         this.yOffset = 0.1f;
+     }
+-    
++
+     @Override
+     public void addToPlayerScore(final Entity entity, final int score) {
+         this.score += score;
+     }
+-    
++
+     public void dropPlayerItem(final ItemStack stack) {
+         this.dropPlayerItemWithRandomChoice(stack, false);
+     }
+-    
++
+     public void dropPlayerItemWithRandomChoice(final ItemStack stack, final boolean z2) {
+         if (stack != null) {
+@@ -154,6 +162,5 @@
+                 entityItem3.motionZ = MathHelper.cos(f6) * f5;
+                 entityItem3.motionY = 0.20000000298023224;
+-            }
+-            else {
++            } else {
+                 f4 = 0.3f;
+                 entityItem3.motionX = -MathHelper.sin(this.rotationYaw / 180.0f * 3.1415927f) * MathHelper.cos(this.rotationPitch / 180.0f * 3.1415927f) * f4;
+@@ -164,18 +171,18 @@
+                 f4 *= this.rand.nextFloat();
+                 final EntityItem entityItem4 = entityItem3;
+-                entityItem4.motionX += Math.cos((double)f5) * f4;
++                entityItem4.motionX += Math.cos((double) f5) * f4;
+                 final EntityItem entityItem5 = entityItem3;
+                 entityItem5.motionY += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;
+                 final EntityItem entityItem6 = entityItem3;
+-                entityItem6.motionZ += Math.sin((double)f5) * f4;
++                entityItem6.motionZ += Math.sin((double) f5) * f4;
+             }
+             this.joinEntityItemWithWorld(entityItem3);
+         }
+     }
+-    
++
+     protected void joinEntityItemWithWorld(final EntityItem entityItem) {
+         this.worldObj.spawnEntityInWorld(entityItem);
+     }
+-    
++
+     public float getCurrentPlayerStrVsBlock(final Block block) {
+         float f2 = this.inventory.getStrVsBlock(block);
+@@ -188,9 +195,9 @@
+         return f2;
+     }
+-    
++
+     public boolean canHarvestBlock(final Block block) {
+         return this.inventory.canHarvestBlock(block);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+@@ -199,25 +206,25 @@
+         this.inventory.readFromNBT(nBTTagList2);
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+-        nbttagcompound.setTag("Inventory", (NBTBase)this.inventory.writeToNBT(new NBTTagList()));
++        nbttagcompound.setTag("Inventory", (NBTBase) this.inventory.writeToNBT(new NBTTagList()));
+     }
+-    
++
+     public void displayGUIChest(final IInventory inventory) {
+     }
+-    
++
+     public void displayWorkbenchGUI() {
+     }
+-    
++
+     public void onItemPickup(final Entity entity, final int i2) {
+     }
+-    
++
+     @Override
+     protected float getEyeHeight() {
+         return 0.12f;
+     }
+-    
++
+     @Override
+     public boolean attackEntityFrom(final Entity entity, int damage) {
+@@ -247,27 +254,625 @@
+         return damage != 0 && super.attackEntityFrom(entity, damage);
+     }
+-    
++
+     public void displayGUIFurnace(final TileEntityFurnace tileEntityFurnace) {
+     }
+-    
++
+     public void displayGUIEditSign(final TileEntitySign tileEntitySign) {
+     }
+-    
++
+     public ItemStack getCurrentEquippedItem() {
+         return this.inventory.getCurrentItem();
+     }
+-    
++
+     public void destroyCurrentEquippedItem() {
+         this.inventory.setInventorySlotContents(this.inventory.currentItem, null);
+     }
+-    
++
+     @Override
+     public double getYOffset() {
+         return this.yOffset - 0.5f;
+     }
+-    
++
+     public void swingItem() {
+         this.swingProgressInt = -1;
          this.isSwinging = true;
      }
 +
@@ -62,22 +271,22 @@
 +    }
 +
 +    /**
-+     * Set the target of the player's compass.
-+     *
-+     * @param loc
-+     */
-+    @Override
-+    public void setCompassTarget(Location loc) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Get the previously set compass target.
 +     *
 +     * @return location of the target
 +     */
 +    @Override
 +    public Location getCompassTarget() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Set the target of the player's compass.
++     *
++     * @param loc
++     */
++    @Override
++    public void setCompassTarget(Location loc) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -161,6 +370,16 @@
 +    }
 +
 +    /**
++     * Returns whether the player is sleeping ignored.
++     *
++     * @return
++     */
++    @Override
++    public boolean isSleepingIgnored() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
 +     * Sets whether the player is ignored as not sleeping. If everyone is
 +     * either sleeping or has this flag set, then time will advance to the
 +     * next day. If everyone has this flag set but no one is actually in bed,
@@ -170,16 +389,6 @@
 +     */
 +    @Override
 +    public void setSleepingIgnored(boolean isSleeping) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
-+     * Returns whether the player is sleeping ignored.
-+     *
-+     * @return
-+     */
-+    @Override
-+    public boolean isSleepingIgnored() {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +

@@ -1,0 +1,15 @@
+--- MaterialLogic.java
++++ MaterialLogic.java
+@@ -6,10 +6,10 @@
+         return false;
+     }
+-    
++
+     @Override
+     public boolean getCanBlockGrass() {
+         return false;
+     }
+-    
++
+     @Override
+     public boolean getIsSolid() {

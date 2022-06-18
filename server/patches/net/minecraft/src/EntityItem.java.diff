@@ -1,6 +1,6 @@
 --- EntityItem.java
 +++ EntityItem.java
-@@ -1,5 +1,14 @@
+@@ -1,37 +1,46 @@
  package net.minecraft.src;
  
 -public class EntityItem extends Entity {
@@ -15,7 +15,112 @@
 +
 +public class EntityItem extends Entity implements Item {
      public ItemStack item;
-     private int age2;
+-    private int age2;
+     public int age;
+     public int delayBeforeCanPickup;
+-    private int health;
+     public float hoverStart;
+-    
++    private int age2;
++    private int health;
++
+     public EntityItem(final World world, final double x, final double y, final double z, final ItemStack item) {
+         super(world);
+         this.age = 0;
+         this.health = 5;
+-        this.hoverStart = (float)(Math.random() * 3.141592653589793 * 2.0);
++        this.hoverStart = (float) (Math.random() * 3.141592653589793 * 2.0);
+         this.setSize(0.25f, 0.25f);
+         this.yOffset = this.height / 2.0f;
+         this.setPosition(x, y, z);
+         this.item = item;
+-        this.rotationYaw = (float)(Math.random() * 360.0);
+-        this.motionX = (float)(Math.random() * 0.20000000298023224 - 0.10000000149011612);
++        this.rotationYaw = (float) (Math.random() * 360.0);
++        this.motionX = (float) (Math.random() * 0.20000000298023224 - 0.10000000149011612);
+         this.motionY = 0.20000000298023224;
+-        this.motionZ = (float)(Math.random() * 0.20000000298023224 - 0.10000000149011612);
++        this.motionZ = (float) (Math.random() * 0.20000000298023224 - 0.10000000149011612);
+         this.canTriggerWalking = false;
+     }
+-    
++
+     public EntityItem(final World world) {
+         super(world);
+         this.age = 0;
+         this.health = 5;
+-        this.hoverStart = (float)(Math.random() * 3.141592653589793 * 2.0);
++        this.hoverStart = (float) (Math.random() * 3.141592653589793 * 2.0);
+         this.setSize(0.25f, 0.25f);
+         this.yOffset = this.height / 2.0f;
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -48,5 +57,5 @@
+             this.motionX = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f;
+             this.motionZ = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f;
+-            this.worldObj.playSoundAtEntity((Entity)this, "random.fizz", 0.4f, 2.0f + this.rand.nextFloat() * 0.4f);
++            this.worldObj.playSoundAtEntity((Entity) this, "random.fizz", 0.4f, 2.0f + this.rand.nextFloat() * 0.4f);
+         }
+         this.pushOutOfBlocks(this.posX, this.posY, this.posZ);
+@@ -73,10 +82,10 @@
+         }
+     }
+-    
++
+     @Override
+     public boolean handleWaterMovement() {
+         return this.worldObj.handleMaterialAcceleration(this.boundingBox, Material.water, this);
+     }
+-    
++
+     private boolean pushOutOfBlocks(final double x, final double y, final double z) {
+         final int i7 = MathHelper.floor_double(x);
+@@ -141,10 +150,10 @@
+         return false;
+     }
+-    
++
+     @Override
+     protected void dealFireDamage(final int fireDamage) {
+         this.attackEntityFrom(null, fireDamage);
+     }
+-    
++
+     @Override
+     public boolean attackEntityFrom(final Entity entity, final int damage) {
+@@ -155,11 +164,11 @@
+         return false;
+     }
+-    
++
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+-        nbttagcompound.setShort("Health", (short)(byte)this.health);
+-        nbttagcompound.setShort("Age", (short)this.age);
++        nbttagcompound.setShort("Health", (short) (byte) this.health);
++        nbttagcompound.setShort("Age", (short) this.age);
+         nbttagcompound.setCompoundTag("Item", this.item.writeToNBT(new NBTTagCompound()));
+     }
+-    
++
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         this.health = (nbttagcompound.getShort("Health") & 0xFF);
+@@ -168,5 +177,5 @@
+         this.item = new ItemStack(nBTTagCompound2);
+     }
+-    
++
+     @Override
+     public void onCollideWithPlayer(final EntityPlayer entityPlayer) {
+@@ -174,5 +183,5 @@
+             final int i2 = this.item.stackSize;
+             if (this.delayBeforeCanPickup == 0 && entityPlayer.inventory.addItemStackToInventory(this.item)) {
+-                this.worldObj.playSoundAtEntity((Entity)this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
++                this.worldObj.playSoundAtEntity((Entity) this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
+                 entityPlayer.onItemPickup(this, i2);
+                 this.setEntityDead();
 @@ -180,3 +189,256 @@
          }
      }
@@ -51,22 +156,22 @@
 +    }
 +
 +    /**
-+     * Sets this entity's velocity
-+     *
-+     * @param velocity New velocity to travel with
-+     */
-+    @Override
-+    public void setVelocity(Vector velocity) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Gets this entity's current velocity
 +     *
 +     * @return Current travelling velocity of this entity
 +     */
 +    @Override
 +    public Vector getVelocity() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Sets this entity's velocity
++     *
++     * @param velocity New velocity to travel with
++     */
++    @Override
++    public void setVelocity(Vector velocity) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -136,22 +241,22 @@
 +    }
 +
 +    /**
-+     * Returns the entity's maximum fire ticks.
-+     *
-+     * @return int maxFireTicks
-+     */
-+    @Override
-+    public int getMaxFireTicks() {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
 +     *
 +     * @param ticks
 +     */
 +    @Override
 +    public void setFireTicks(int ticks) {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Returns the entity's maximum fire ticks.
++     *
++     * @return int maxFireTicks
++     */
++    @Override
++    public int getMaxFireTicks() {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
@@ -244,22 +349,22 @@
 +    }
 +
 +    /**
-+     * Record the last {@link EntityDamageEvent} inflicted on this entity
-+     *
-+     * @param event a {@link EntityDamageEvent}
-+     */
-+    @Override
-+    public void setLastDamageCause(EntityDamageEvent event) {
-+        throw new UnsupportedOperationException("Not implemented yet");
-+    }
-+
-+    /**
 +     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
 +     *
 +     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
 +     */
 +    @Override
 +    public EntityDamageEvent getLastDamageCause() {
++        throw new UnsupportedOperationException("Not implemented yet");
++    }
++
++    /**
++     * Record the last {@link EntityDamageEvent} inflicted on this entity
++     *
++     * @param event a {@link EntityDamageEvent}
++     */
++    @Override
++    public void setLastDamageCause(EntityDamageEvent event) {
 +        throw new UnsupportedOperationException("Not implemented yet");
 +    }
 +
