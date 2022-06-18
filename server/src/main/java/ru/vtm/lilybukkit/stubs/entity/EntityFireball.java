@@ -1,10 +1,10 @@
-package ru.vtm.lilybukkit.entity;
+package ru.vtm.lilybukkit.stubs.entity;
 
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fish;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
@@ -15,9 +15,65 @@ import java.util.UUID;
 /**
  * A stub class for a non-existent entity
  */
-public class EntityFish extends EntityProjectile implements Fish {
-    public EntityFish(net.minecraft.src.World world) {
-        super(world);
+public class EntityFireball implements Fireball {
+    /**
+     * Fireballs fly straight and do not take setVelocity(...) well.
+     *
+     * @param direction the direction this fireball is flying toward
+     */
+    @Override
+    public void setDirection(Vector direction) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Retrieve the direction this fireball is heading toward
+     *
+     * @return the direction
+     */
+    @Override
+    public Vector getDirection() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Set the radius affected by this explosive's explosion
+     *
+     * @param yield
+     */
+    @Override
+    public void setYield(float yield) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Return the radius or yield of this explosive's explosion
+     *
+     * @return the radius of blocks affected
+     */
+    @Override
+    public float getYield() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Set whether or not this explosive's explosion causes fire
+     *
+     * @param isIncendiary
+     */
+    @Override
+    public void setIsIncendiary(boolean isIncendiary) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Return whether or not this explosive creates a fire when exploding
+     *
+     * @return true if the explosive creates fire, false otherwise
+     */
+    @Override
+    public boolean isIncendiary() {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**

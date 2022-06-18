@@ -1,4 +1,4 @@
-package ru.vtm.lilybukkit.entity;
+package ru.vtm.lilybukkit.stubs.entity;
 
 import net.minecraft.src.World;
 import org.bukkit.entity.LightningStrike;

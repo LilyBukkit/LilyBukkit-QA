@@ -1,11 +1,11 @@
-package ru.vtm.lilybukkit.entity;
+package ru.vtm.lilybukkit.stubs.entity;
 
-import net.minecraft.src.Entity;
-import net.minecraft.src.NBTTagCompound;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.entity.Explosive;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fish;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
@@ -15,58 +15,49 @@ import java.util.UUID;
 /**
  * A stub class for a non-existent entity
  */
-public class EntityExplosive extends Entity implements Explosive {
-    public EntityExplosive(net.minecraft.src.World world) {
+public class EntityFish extends EntityProjectile implements Fish {
+    public EntityFish(net.minecraft.src.World world) {
         super(world);
     }
 
+    /**
+     * Retrieve the shooter of this projectile. The returned value can be null
+     * for projectiles shot from a {@link Dispenser} for example.
+     *
+     * @return the {@link LivingEntity} that shot this projectile
+     */
     @Override
-    protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+    public LivingEntity getShooter() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Set the radius affected by this explosive's explosion
+     * Set the shooter of this projectile
      *
-     * @param yield
+     * @param shooter the {@link LivingEntity} that shot this projectile
      */
     @Override
-    public void setYield(float yield) {
+    public void setShooter(LivingEntity shooter) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Return the radius or yield of this explosive's explosion
+     * Determine if this projectile should bounce or not when it hits.
      *
-     * @return the radius of blocks affected
+     * @return true if it should bounce.
      */
     @Override
-    public float getYield() {
+    public boolean doesBounce() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Set whether or not this explosive's explosion causes fire
+     * Set whether or not this projectile should bounce or not when it hits something.
      *
-     * @param isIncendiary
+     * @param doesBounce whether or not it should bounce.
      */
     @Override
-    public void setIsIncendiary(boolean isIncendiary) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Return whether or not this explosive creates a fire when exploding
-     *
-     * @return true if the explosive creates fire, false otherwise
-     */
-    @Override
-    public boolean isIncendiary() {
+    public void setBounce(boolean doesBounce) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -128,7 +119,7 @@ public class EntityExplosive extends Entity implements Explosive {
      * @return <code>true</code> if the teleport was successful
      */
     @Override
-    public boolean teleport(org.bukkit.entity.Entity destination) {
+    public boolean teleport(Entity destination) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -141,7 +132,7 @@ public class EntityExplosive extends Entity implements Explosive {
      * @return List<Entity> List of entities nearby
      */
     @Override
-    public List<org.bukkit.entity.Entity> getNearbyEntities(double x, double y, double z) {
+    public List<Entity> getNearbyEntities(double x, double y, double z) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -218,7 +209,7 @@ public class EntityExplosive extends Entity implements Explosive {
      * @return an entity
      */
     @Override
-    public org.bukkit.entity.Entity getPassenger() {
+    public Entity getPassenger() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -229,7 +220,7 @@ public class EntityExplosive extends Entity implements Explosive {
      * @return false if it could not be done for whatever reason
      */
     @Override
-    public boolean setPassenger(org.bukkit.entity.Entity passenger) {
+    public boolean setPassenger(Entity passenger) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

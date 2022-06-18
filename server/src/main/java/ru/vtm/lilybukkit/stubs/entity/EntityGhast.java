@@ -1,4 +1,4 @@
-package ru.vtm.lilybukkit.entity;
+package ru.vtm.lilybukkit.stubs.entity;
 
 import org.bukkit.Location;
 import org.bukkit.Server;

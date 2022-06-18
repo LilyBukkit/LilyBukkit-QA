@@ -1,39 +1,97 @@
-package ru.vtm.lilybukkit.block;
+package ru.vtm.lilybukkit.stubs.block;
 
-import net.minecraft.src.BlockContainer;
+import net.minecraft.src.Block;
 import net.minecraft.src.Material;
-import net.minecraft.src.TileEntity;
-import org.bukkit.block.Block;
-import org.bukkit.block.Dispenser;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.Instrument;
+import org.bukkit.Note;
+import org.bukkit.block.NoteBlock;
 import org.bukkit.material.MaterialData;
 
 /**
  * A stub class for a non-existent block
  */
-public class BlockDispenser extends BlockContainer implements Dispenser {
-    protected BlockDispenser(int id, Material material) {
+public class BlockNoteblock extends Block implements NoteBlock {
+    protected BlockNoteblock(int id, Material material) {
         super(id, material);
     }
 
-    protected BlockDispenser(int id, int blockIndex, Material material) {
+    protected BlockNoteblock(int id, int blockIndex, Material material) {
         super(id, blockIndex, material);
     }
 
+    /**
+     * Gets the note.
+     *
+     * @return
+     */
     @Override
-    protected TileEntity getBlockEntity() {
+    public Note getNote() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Attempts to dispense the contents of this block<br />
+     * Gets the note.
+     *
+     * @return
+     */
+    @Override
+    public byte getRawNote() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Set the note.
+     *
+     * @param note
+     */
+    @Override
+    public void setNote(Note note) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Set the note.
+     *
+     * @param note
+     */
+    @Override
+    public void setRawNote(byte note) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Attempts to play the note at block<br />
      * <br />
-     * If the block is no longer a dispenser, this will return false
+     * If the block is no longer a note block, this will return false
      *
      * @return true if successful, otherwise false
      */
     @Override
-    public boolean dispense() {
+    public boolean play() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Plays an arbitrary note with an arbitrary instrument
+     *
+     * @param instrument
+     * @param note
+     * @return true if successful, otherwise false
+     */
+    @Override
+    public boolean play(byte instrument, byte note) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Plays an arbitrary note with an arbitrary instrument
+     *
+     * @param instrument
+     * @param note
+     * @return true if successful, otherwise false
+     */
+    @Override
+    public boolean play(Instrument instrument, Note note) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -43,7 +101,7 @@ public class BlockDispenser extends BlockContainer implements Dispenser {
      * @return Block that this BlockState represents
      */
     @Override
-    public Block getBlock() {
+    public org.bukkit.block.Block getBlock() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -95,16 +153,6 @@ public class BlockDispenser extends BlockContainer implements Dispenser {
 
     @Override
     public byte getRawData() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Get the block's inventory.
-     *
-     * @return
-     */
-    @Override
-    public Inventory getInventory() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }
