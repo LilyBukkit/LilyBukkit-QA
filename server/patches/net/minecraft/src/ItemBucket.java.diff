@@ -1,9 +1,0 @@
---- ItemBucket.java
-+++ ItemBucket.java
-@@ -3,5 +3,5 @@
- public class ItemBucket extends Item {
-     private int isFull;
--    
-+
-     public ItemBucket(final int itemID, final int isFull) {
-         super(itemID);

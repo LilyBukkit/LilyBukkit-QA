@@ -1,64 +1,35 @@
-package ru.vtm.lilybukkit.stubs.entity;
+package ru.vtm.lilybukkit.entity;
 
-import net.minecraft.src.NBTTagCompound;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Item;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.UUID;
 
-/**
- * A stub class for a non-existent entity
- */
-public class EntityProjectile extends net.minecraft.src.Entity implements Projectile {
-    public EntityProjectile(net.minecraft.src.World world) {
-        super(world);
-    }
-
+public class LBItem implements Item {
     /**
-     * Retrieve the shooter of this projectile. The returned value can be null
-     * for projectiles shot from a {@link org.bukkit.block.Dispenser} for example.
+     * Gets the item stack associated with this item drop.
      *
-     * @return the {@link LivingEntity} that shot this projectile
+     * @return
      */
     @Override
-    public LivingEntity getShooter() {
+    public ItemStack getItemStack() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Set the shooter of this projectile
+     * Sets the item stack associated with this item drop.
      *
-     * @param shooter the {@link LivingEntity} that shot this projectile
+     * @param stack
      */
     @Override
-    public void setShooter(LivingEntity shooter) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Determine if this projectile should bounce or not when it hits.
-     *
-     * @return true if it should bounce.
-     */
-    @Override
-    public boolean doesBounce() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Set whether or not this projectile should bounce or not when it hits something.
-     *
-     * @param doesBounce whether or not it should bounce.
-     */
-    @Override
-    public void setBounce(boolean doesBounce) {
+    public void setItemStack(ItemStack stack) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -73,22 +44,22 @@ public class EntityProjectile extends net.minecraft.src.Entity implements Projec
     }
 
     /**
-     * Gets this entity's current velocity
-     *
-     * @return Current travelling velocity of this entity
-     */
-    @Override
-    public Vector getVelocity() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Sets this entity's velocity
      *
      * @param velocity New velocity to travel with
      */
     @Override
     public void setVelocity(Vector velocity) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets this entity's current velocity
+     *
+     * @return Current travelling velocity of this entity
+     */
+    @Override
+    public Vector getVelocity() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -158,22 +129,22 @@ public class EntityProjectile extends net.minecraft.src.Entity implements Projec
     }
 
     /**
-     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
-     *
-     * @param ticks
-     */
-    @Override
-    public void setFireTicks(int ticks) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Returns the entity's maximum fire ticks.
      *
      * @return int maxFireTicks
      */
     @Override
     public int getMaxFireTicks() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
+     *
+     * @param ticks
+     */
+    @Override
+    public void setFireTicks(int ticks) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -266,16 +237,6 @@ public class EntityProjectile extends net.minecraft.src.Entity implements Projec
     }
 
     /**
-     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
-     *
-     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
-     */
-    @Override
-    public EntityDamageEvent getLastDamageCause() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Record the last {@link EntityDamageEvent} inflicted on this entity
      *
      * @param event a {@link EntityDamageEvent}
@@ -286,22 +247,22 @@ public class EntityProjectile extends net.minecraft.src.Entity implements Projec
     }
 
     /**
+     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
+     *
+     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
+     */
+    @Override
+    public EntityDamageEvent getLastDamageCause() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * Returns a unique and persistent id for this entity
      *
      * @return unique id
      */
     @Override
     public UUID getUniqueId() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

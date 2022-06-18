@@ -1,93 +1,119 @@
-package ru.vtm.lilybukkit.stubs.entity;
+package ru.vtm.lilybukkit.entity;
 
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fish;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.UUID;
 
-/**
- * A stub class for a non-existent entity
- */
-public class EntityFish extends EntityProjectile implements Fish {
-    public EntityFish(net.minecraft.src.World world) {
-        super(world);
-    }
-
+public class LBMinecart implements Minecart {
     /**
-     * Retrieve the shooter of this projectile. The returned value can be null
-     * for projectiles shot from a {@link org.bukkit.block.Dispenser} for example.
+     * Sets a minecart's damage.
      *
-     * @return the {@link LivingEntity} that shot this projectile
+     * @param damage over 40 to "kill" a minecart
      */
     @Override
-    public LivingEntity getShooter() {
+    public void setDamage(int damage) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Set the shooter of this projectile
-     *
-     * @param shooter the {@link LivingEntity} that shot this projectile
+     * Gets a minecart's damage.
      */
     @Override
-    public void setShooter(LivingEntity shooter) {
+    public int getDamage() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Determine if this projectile should bounce or not when it hits.
-     *
-     * @return true if it should bounce.
+     * Gets the maximum speed of a minecart. The speed is unrelated to the velocity.
      */
     @Override
-    public boolean doesBounce() {
+    public double getMaxSpeed() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Set whether or not this projectile should bounce or not when it hits something.
+     * Sets the maximum speed of a minecart. Must be nonnegative. Default is 0.4D.
      *
-     * @param doesBounce whether or not it should bounce.
+     * @param speed
      */
     @Override
-    public void setBounce(boolean doesBounce) {
+    public void setMaxSpeed(double speed) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Gets the entity's current position
-     *
-     * @return Location containing the position of this entity
+     * Returns whether this minecart will slow down faster without a passenger occupying it
      */
     @Override
-    public Location getLocation() {
+    public boolean isSlowWhenEmpty() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
-     * Gets this entity's current velocity
+     * Sets whether this minecart will slow down faster without a passenger occupying it
      *
-     * @return Current travelling velocity of this entity
+     * @param slow
+     */
+    @Override
+    public void setSlowWhenEmpty(boolean slow) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the flying velocity modifier. Used for minecarts that are in mid-air.
+     * A flying minecart's velocity is multiplied by this factor each tick.
+     */
+    @Override
+    public Vector getFlyingVelocityMod() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Sets the flying velocity modifier. Used for minecarts that are in mid-air.
+     * A flying minecart's velocity is multiplied by this factor each tick.
+     *
+     * @param flying velocity modifier
+     */
+    @Override
+    public void setFlyingVelocityMod(Vector flying) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the derailed velocity modifier. Used for minecarts that are on the ground, but not on rails.
+     * <p>
+     * A derailed minecart's velocity is multiplied by this factor each tick.
+     */
+    @Override
+    public Vector getDerailedVelocityMod() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Sets the derailed velocity modifier. Used for minecarts that are on the ground, but not on rails.
+     * A derailed minecart's velocity is multiplied by this factor each tick.
+     *
+     * @param derailed
+     */
+    @Override
+    public void setDerailedVelocityMod(Vector derailed) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the vehicle's velocity.
+     *
+     * @return velocity vector
      */
     @Override
     public Vector getVelocity() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Sets this entity's velocity
-     *
-     * @param velocity New velocity to travel with
-     */
-    @Override
-    public void setVelocity(Vector velocity) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -157,22 +183,22 @@ public class EntityFish extends EntityProjectile implements Fish {
     }
 
     /**
-     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
-     *
-     * @param ticks
-     */
-    @Override
-    public void setFireTicks(int ticks) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Returns the entity's maximum fire ticks.
      *
      * @return int maxFireTicks
      */
     @Override
     public int getMaxFireTicks() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
+     *
+     * @param ticks
+     */
+    @Override
+    public void setFireTicks(int ticks) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -265,16 +291,6 @@ public class EntityFish extends EntityProjectile implements Fish {
     }
 
     /**
-     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
-     *
-     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
-     */
-    @Override
-    public EntityDamageEvent getLastDamageCause() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Record the last {@link EntityDamageEvent} inflicted on this entity
      *
      * @param event a {@link EntityDamageEvent}
@@ -285,12 +301,42 @@ public class EntityFish extends EntityProjectile implements Fish {
     }
 
     /**
+     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
+     *
+     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
+     */
+    @Override
+    public EntityDamageEvent getLastDamageCause() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * Returns a unique and persistent id for this entity
      *
      * @return unique id
      */
     @Override
     public UUID getUniqueId() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the entity's current position
+     *
+     * @return Location containing the position of this entity
+     */
+    @Override
+    public Location getLocation() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Sets the vehicle's velocity.
+     *
+     * @param vel velocity vector
+     */
+    @Override
+    public void setVelocity(Vector vel) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

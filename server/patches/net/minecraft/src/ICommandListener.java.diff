@@ -1,9 +1,0 @@
---- ICommandListener.java
-+++ ICommandListener.java
-@@ -3,5 +3,5 @@
- public interface ICommandListener {
-     void addHelpCommandMessage(final String helpCommandMessage);
--    
-+
-     String getUsername();
- }

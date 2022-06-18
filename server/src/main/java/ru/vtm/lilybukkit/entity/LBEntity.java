@@ -1,35 +1,16 @@
-package ru.vtm.lilybukkit.stubs.entity;
+package ru.vtm.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
-import net.minecraft.src.NBTTagCompound;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.entity.Weather;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.UUID;
 
-/**
- * A stub class for a non-existent entity
- */
-public class EntityWeather extends Entity implements Weather {
-    public EntityWeather(net.minecraft.src.World world) {
-        super(world);
-    }
-
-    @Override
-    protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
+public class LBEntity implements Entity {
     /**
      * Gets the entity's current position
      *
@@ -41,22 +22,22 @@ public class EntityWeather extends Entity implements Weather {
     }
 
     /**
-     * Gets this entity's current velocity
-     *
-     * @return Current travelling velocity of this entity
-     */
-    @Override
-    public Vector getVelocity() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Sets this entity's velocity
      *
      * @param velocity New velocity to travel with
      */
     @Override
     public void setVelocity(Vector velocity) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets this entity's current velocity
+     *
+     * @return Current travelling velocity of this entity
+     */
+    @Override
+    public Vector getVelocity() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -88,7 +69,7 @@ public class EntityWeather extends Entity implements Weather {
      * @return <code>true</code> if the teleport was successful
      */
     @Override
-    public boolean teleport(org.bukkit.entity.Entity destination) {
+    public boolean teleport(Entity destination) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -101,7 +82,7 @@ public class EntityWeather extends Entity implements Weather {
      * @return List<Entity> List of entities nearby
      */
     @Override
-    public List<org.bukkit.entity.Entity> getNearbyEntities(double x, double y, double z) {
+    public List<Entity> getNearbyEntities(double x, double y, double z) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -126,22 +107,22 @@ public class EntityWeather extends Entity implements Weather {
     }
 
     /**
-     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
-     *
-     * @param ticks
-     */
-    @Override
-    public void setFireTicks(int ticks) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Returns the entity's maximum fire ticks.
      *
      * @return int maxFireTicks
      */
     @Override
     public int getMaxFireTicks() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Sets the entity's current fire ticks (ticks before the entity stops being on fire).
+     *
+     * @param ticks
+     */
+    @Override
+    public void setFireTicks(int ticks) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -178,7 +159,7 @@ public class EntityWeather extends Entity implements Weather {
      * @return an entity
      */
     @Override
-    public org.bukkit.entity.Entity getPassenger() {
+    public Entity getPassenger() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -189,7 +170,7 @@ public class EntityWeather extends Entity implements Weather {
      * @return false if it could not be done for whatever reason
      */
     @Override
-    public boolean setPassenger(org.bukkit.entity.Entity passenger) {
+    public boolean setPassenger(Entity passenger) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -234,22 +215,22 @@ public class EntityWeather extends Entity implements Weather {
     }
 
     /**
-     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
-     *
-     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
-     */
-    @Override
-    public EntityDamageEvent getLastDamageCause() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Record the last {@link EntityDamageEvent} inflicted on this entity
      *
      * @param event a {@link EntityDamageEvent}
      */
     @Override
     public void setLastDamageCause(EntityDamageEvent event) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Retrieve the last {@link EntityDamageEvent} inflicted on this entity. This event may have been cancelled.
+     *
+     * @return the last known {@link EntityDamageEvent} or null if hitherto unharmed
+     */
+    @Override
+    public EntityDamageEvent getLastDamageCause() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

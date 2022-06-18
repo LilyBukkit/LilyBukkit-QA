@@ -1,108 +1,110 @@
-package ru.vtm.lilybukkit.stubs.block;
+package ru.vtm.lilybukkit.block;
 
-import net.minecraft.src.Block;
-import net.minecraft.src.BlockContainer;
-import net.minecraft.src.Material;
-import org.bukkit.Instrument;
-import org.bukkit.Note;
-import org.bukkit.block.NoteBlock;
+import org.bukkit.Chunk;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.material.MaterialData;
 
-/**
- * A stub class for a non-existent block
- */
-public class BlockNoteblock extends Block implements NoteBlock {
-    protected BlockNoteblock(int id, Material material) {
-        super(id, material);
-    }
-
-    protected BlockNoteblock(int id, int blockIndex, Material material) {
-        super(id, blockIndex, material);
-    }
-
-    /**
-     * Gets the note.
-     *
-     * @return
-     */
-    @Override
-    public Note getNote() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Set the note.
-     *
-     * @param note
-     */
-    @Override
-    public void setNote(Note note) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Gets the note.
-     *
-     * @return
-     */
-    @Override
-    public byte getRawNote() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Set the note.
-     *
-     * @param note
-     */
-    @Override
-    public void setRawNote(byte note) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Attempts to play the note at block<br />
-     * <br />
-     * If the block is no longer a note block, this will return false
-     *
-     * @return true if successful, otherwise false
-     */
-    @Override
-    public boolean play() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Plays an arbitrary note with an arbitrary instrument
-     *
-     * @param instrument
-     * @param note
-     * @return true if successful, otherwise false
-     */
-    @Override
-    public boolean play(byte instrument, byte note) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Plays an arbitrary note with an arbitrary instrument
-     *
-     * @param instrument
-     * @param note
-     * @return true if successful, otherwise false
-     */
-    @Override
-    public boolean play(Instrument instrument, Note note) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
+public class LBBlockState implements BlockState {
     /**
      * Gets the block represented by this BlockState
      *
      * @return Block that this BlockState represents
      */
     @Override
-    public org.bukkit.block.Block getBlock() {
+    public Block getBlock() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the metadata for this block
+     *
+     * @return block specific metadata
+     */
+    @Override
+    public MaterialData getData() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the type of this block
+     *
+     * @return block type
+     */
+    @Override
+    public Material getType() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the type-id of this block
+     *
+     * @return block type-id
+     */
+    @Override
+    public int getTypeId() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the light level between 0-15
+     *
+     * @return light level
+     */
+    @Override
+    public byte getLightLevel() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the world which contains this Block
+     *
+     * @return World containing this block
+     */
+    @Override
+    public World getWorld() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the x-coordinate of this block
+     *
+     * @return x-coordinate
+     */
+    @Override
+    public int getX() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the y-coordinate of this block
+     *
+     * @return y-coordinate
+     */
+    @Override
+    public int getY() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the z-coordinate of this block
+     *
+     * @return z-coordinate
+     */
+    @Override
+    public int getZ() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Gets the chunk which contains this block
+     *
+     * @return Containing Chunk
+     */
+    @Override
+    public Chunk getChunk() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -117,6 +119,26 @@ public class BlockNoteblock extends Block implements NoteBlock {
     }
 
     /**
+     * Sets the type of this block
+     *
+     * @param type Material to change this block to
+     */
+    @Override
+    public void setType(Material type) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Sets the type-id of this block
+     *
+     * @param type Type-Id to change this block to
+     */
+    @Override
+    public boolean setTypeId(int type) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * Attempts to update the block represented by this state, setting it to the
      * new values as defined by this state. <br />
      * <br />
@@ -126,7 +148,7 @@ public class BlockNoteblock extends Block implements NoteBlock {
      * eventuality.
      *
      * @return true if the update was successful, otherwise false
-     * @see org.bukkit.block.BlockState#update(boolean force)
+     * @see BlockState.update(boolean force)
      */
     @Override
     public boolean update() {

@@ -1,9 +1,0 @@
---- ItemRedstone.java
-+++ ItemRedstone.java
-@@ -5,5 +5,5 @@
-         super(itemID);
-     }
--    
-+
-     @Override
-     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, int x, int y, int z, final int i7) {

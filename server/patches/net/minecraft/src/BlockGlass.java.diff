@@ -1,9 +1,0 @@
---- BlockGlass.java
-+++ BlockGlass.java
-@@ -7,5 +7,5 @@
-         super(id, blockIndex, material, localFlag);
-     }
--    
-+
-     @Override
-     public int quantityDropped(final Random random) {

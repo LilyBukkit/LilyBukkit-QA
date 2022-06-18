@@ -1,9 +1,0 @@
---- ServerCommand.java
-+++ ServerCommand.java
-@@ -4,5 +4,5 @@
-     public final String command;
-     public final ICommandListener commandListener;
--    
-+
-     public ServerCommand(final String command, final ICommandListener commandListener) {
-         this.command = command;
