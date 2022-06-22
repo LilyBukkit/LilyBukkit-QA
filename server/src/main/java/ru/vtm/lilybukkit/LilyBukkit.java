@@ -1,8 +1,11 @@
 package ru.vtm.lilybukkit;
 
 import com.avaje.ebean.config.ServerConfig;
+import net.minecraft.server.MinecraftServer;
+import org.bukkit.Chunk;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -12,14 +15,43 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicesManager;
+import org.bukkit.plugin.SimplePluginManager;
+import org.bukkit.plugin.SimpleServicesManager;
 import org.bukkit.scheduler.BukkitScheduler;
+import ru.vtm.lilybukkit.entity.LBPlayer;
+import ru.vtm.lilybukkit.scheduler.LBScheduler;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
+/**
+ * {@link org.bukkit.Server} implementation
+ *
+ * @author VladTheMountain
+ */
 public class LilyBukkit implements Server {
+
+    final String MAX_PLAYERS = "max-players";
+    final String SERVER_PORT = "server-port";
+    final String VIEW_DISTANCE = "view-distance";
+    final String SERVER_IP = "server-ip";
+    final String WHITELIST_ENABLED = "whitelist";
+    final String SPAWN_PROTECTION = "spawn-protection";
+    final String ONLINE_MODE = "online-mode";
+    final String ALLOW_FLIGHT = "allow-flight";
+    final String SERVER_NAME = "server-name";
+
+    private LBPlayer[] playerList;
+    private MinecraftServer mc;
+    private final PluginManager pluginMngr = new SimplePluginManager(this, null);
+    private LBScheduler scheduler;
+    private final ServicesManager servicesMngr = new SimpleServicesManager();
+    private List<LBWorld> worldList;
+    private List<Command> commandList;
+    //TODO: Redo to make both lists combinable
+    private List<PluginCommand> pluginCommandList;
+    private List<Recipe> recipeManager;
+
     /**
      * Gets the name of this server implementation
      *
@@ -47,7 +79,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public Player[] getOnlinePlayers() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return playerList;
     }
 
     /**
@@ -57,7 +89,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public int getMaxPlayers() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return mc.propertyManagerObj.getIntProperty(MAX_PLAYERS, 20);
     }
 
     /**
@@ -67,7 +99,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public int getPort() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return mc.propertyManagerObj.getIntProperty(SERVER_PORT, 25565);
     }
 
     /**
@@ -77,7 +109,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public int getViewDistance() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return mc.propertyManagerObj.getIntProperty(VIEW_DISTANCE, 8);
     }
 
     /**
@@ -87,7 +119,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getIp() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return mc.propertyManagerObj.getStringProperty(SERVER_IP, "");
     }
 
     /**
@@ -97,7 +129,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getServerName() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.mc.propertyManagerObj.getStringProperty(SERVER_NAME, "Minecraft Server");
     }
 
     /**
@@ -118,7 +150,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean getAllowNether() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return false;
     }
 
     /**
@@ -128,7 +160,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean hasWhitelist() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return mc.propertyManagerObj.getBooleanProperty(WHITELIST_ENABLED, false);
     }
 
     /**
@@ -139,7 +171,12 @@ public class LilyBukkit implements Server {
      */
     @Override
     public int broadcastMessage(String message) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int c = 0;
+        for (LBPlayer p : this.playerList) {
+            p.sendMessage(message);
+            c++;
+        }
+        return c;
     }
 
     /**
@@ -150,7 +187,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getUpdateFolder() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return "pluginUpdate";
     }
 
     /**
@@ -163,7 +200,10 @@ public class LilyBukkit implements Server {
      */
     @Override
     public Player getPlayer(String name) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (LBPlayer p : this.playerList) {
+            if (p.getName().equals(name)) return p;
+        }
+        return null;
     }
 
     /**
@@ -178,7 +218,13 @@ public class LilyBukkit implements Server {
      */
     @Override
     public List<Player> matchPlayer(String name) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        List<Player> pl = new ArrayList<>();
+        for (LBPlayer p : this.playerList) {
+            if (p.getName().equals(name)) {
+                pl.add(p);
+            }
+        }
+        return pl;
     }
 
     /**
@@ -188,7 +234,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public PluginManager getPluginManager() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.pluginMngr;
     }
 
     /**
@@ -198,7 +244,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public BukkitScheduler getScheduler() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.scheduler;
     }
 
     /**
@@ -208,7 +254,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public ServicesManager getServicesManager() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.servicesMngr;
     }
 
     /**
@@ -218,7 +264,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public List<World> getWorlds() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new ArrayList<>(this.worldList);
     }
 
     /**
@@ -232,7 +278,9 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        LBWorld newWorld = new LBWorld(name);
+        this.worldList.add(newWorld);
+        return newWorld;
     }
 
     /**
@@ -247,7 +295,9 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, long seed) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        LBWorld newWorld = new LBWorld(name, seed);
+        this.worldList.add(newWorld);
+        return newWorld;
     }
 
     /**
@@ -262,7 +312,9 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, ChunkGenerator generator) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        LBWorld newWorld = new LBWorld(name, generator);
+        this.worldList.add(newWorld);
+        return newWorld;
     }
 
     /**
@@ -278,7 +330,9 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, long seed, ChunkGenerator generator) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        LBWorld newWorld = new LBWorld(name, seed, generator);
+        this.worldList.add(newWorld);
+        return newWorld;
     }
 
     /**
@@ -290,7 +344,19 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean unloadWorld(String name, boolean save) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (LBWorld world : this.worldList) {
+            if (world.getName().equals(name)) {
+                boolean unloaded = true;
+                for (Chunk chunk : world.getLoadedChunks()) {
+                    unloaded = unloaded && chunk.unload(save);
+                    if (!unloaded) {
+                        break;
+                    }
+                }
+                return unloaded;
+            }
+        }
+        return false;
     }
 
     /**
@@ -302,7 +368,14 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean unloadWorld(World world, boolean save) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        boolean unloaded = true;
+        for (Chunk chunk : world.getLoadedChunks()) {
+            unloaded = unloaded && chunk.unload(save);
+            if (!unloaded) {
+                break;
+            }
+        }
+        return unloaded;
     }
 
     /**
@@ -313,7 +386,10 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World getWorld(String name) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (LBWorld world : this.worldList) {
+            if (world.getName().equals(name)) return world;
+        }
+        return null;
     }
 
     /**
@@ -324,7 +400,10 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World getWorld(UUID uid) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (LBWorld world : this.worldList) {
+            if (world.getUID().equals(uid)) return world;
+        }
+        return null;
     }
 
     /**
@@ -335,7 +414,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public MapView getMap(short id) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     /**
@@ -346,7 +425,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public MapView createMap(World world) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     /**
@@ -364,7 +443,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public Logger getLogger() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return Logger.getLogger("Minecraft");
     }
 
     /**
@@ -375,7 +454,11 @@ public class LilyBukkit implements Server {
      */
     @Override
     public PluginCommand getPluginCommand(String name) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (PluginCommand pluginCmd :
+                this.pluginCommandList) {
+            if (pluginCmd.getName().equals(name)) return pluginCmd;
+        }
+        return null;
     }
 
     /**
@@ -383,14 +466,14 @@ public class LilyBukkit implements Server {
      */
     @Override
     public void savePlayers() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (LBPlayer player : this.playerList) player.saveData();
     }
 
     /**
      * Dispatches a command on the server, and executes it if found.
      *
-     * @param sender
-     * @param commandLine
+     * @param sender {@link CommandSender} that executed the command
+     * @param commandLine the command itself (with arguments)
      * @return targetFound returns false if no target is found.
      * @throws CommandException Thrown when the executor for the given command fails with an unhandled exception
      */
@@ -406,7 +489,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public void configureDbConfig(ServerConfig config) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not supported yet");
     }
 
     /**
@@ -417,7 +500,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean addRecipe(Recipe recipe) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.recipeManager.add(recipe);
     }
 
     /**
@@ -427,7 +510,12 @@ public class LilyBukkit implements Server {
      */
     @Override
     public Map<String, String[]> getCommandAliases() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Map<String, String[]> commandAliases = new HashMap<>();
+        for (Command command : this.commandList) {
+            String[] aliases = {};
+            commandAliases.put(command.getName(), command.getAliases().toArray(aliases));
+        }
+        return commandAliases;
     }
 
     /**
@@ -437,7 +525,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public int getSpawnRadius() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.mc.propertyManagerObj.getIntProperty(SPAWN_PROTECTION, 0);
     }
 
     /**
@@ -447,7 +535,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public void setSpawnRadius(int value) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.mc.propertyManagerObj.getIntProperty(SPAWN_PROTECTION, value);
     }
 
     /**
@@ -457,7 +545,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean getOnlineMode() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.mc.propertyManagerObj.getBooleanProperty(ONLINE_MODE, true);
     }
 
     /**
@@ -467,6 +555,6 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean getAllowFlight() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.mc.propertyManagerObj.getBooleanProperty(ALLOW_FLIGHT, false);
     }
 }
