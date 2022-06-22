@@ -8,6 +8,15 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 
 public class LBChunk implements Chunk {
+
+    public LBChunk(net.minecraft.src.Chunk chunk){
+        //TODO
+    }
+
+    public LBChunk(Chunk chunk) {
+        //TODO
+    }
+
     /**
      * Gets the X-coordinate of this chunk
      *

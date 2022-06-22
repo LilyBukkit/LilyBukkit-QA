@@ -7,6 +7,18 @@ import org.bukkit.World;
 import org.bukkit.block.*;
 
 public class LBBlock implements Block {
+
+    net.minecraft.src.Block block;
+
+    public LBBlock(int id){
+        switch (id){
+            case 1:
+            case 0:
+            default:
+                //TODO: Create an air block stub
+        }
+    }
+
     /**
      * Gets the metadata for this block
      *

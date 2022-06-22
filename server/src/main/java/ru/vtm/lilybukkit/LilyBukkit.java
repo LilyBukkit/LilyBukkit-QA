@@ -512,8 +512,7 @@ public class LilyBukkit implements Server {
     public Map<String, String[]> getCommandAliases() {
         Map<String, String[]> commandAliases = new HashMap<>();
         for (Command command : this.commandList) {
-            String[] aliases = {};
-            commandAliases.put(command.getName(), command.getAliases().toArray(aliases));
+            commandAliases.put(command.getName(), command.getAliases().toArray(new String[]{}));
         }
         return commandAliases;
     }

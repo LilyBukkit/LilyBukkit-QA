@@ -8,6 +8,7 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import ru.vtm.lilybukkit.block.LBBlock;
 
 import java.io.File;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.UUID;
 
 public class LBWorld implements World {
 
-    private net.minecraft.src.World world;
+    private List<Chunk> loadedChunks;
+    private final net.minecraft.src.World world;
 
     public LBWorld(String name) {
         world = new net.minecraft.src.World(name);
@@ -25,12 +27,12 @@ public class LBWorld implements World {
         world = new net.minecraft.src.World(new File(name), name, seed);
     }
 
-    public LBWorld(String name, ChunkGenerator chunkGen){
+    public LBWorld(String name, ChunkGenerator chunkGen) {
         this(name);
         //TODO
     }
 
-    public LBWorld(String name, long seed, ChunkGenerator chunkGen){
+    public LBWorld(String name, long seed, ChunkGenerator chunkGen) {
         this(name, seed);
         //TODO
     }
@@ -46,7 +48,7 @@ public class LBWorld implements World {
      */
     @Override
     public Block getBlockAt(int x, int y, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.blockExists(x, y, z) ? new LBBlock(this.world.getBlockId(x, y, z)) : new LBBlock(0);
     }
 
     /**
@@ -58,7 +60,7 @@ public class LBWorld implements World {
      */
     @Override
     public Block getBlockAt(Location location) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     /**
@@ -72,7 +74,7 @@ public class LBWorld implements World {
      */
     @Override
     public int getBlockTypeIdAt(int x, int y, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.getBlockId(x, y, z);
     }
 
     /**
@@ -84,7 +86,7 @@ public class LBWorld implements World {
      */
     @Override
     public int getBlockTypeIdAt(Location location) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getBlockTypeIdAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     /**
@@ -96,7 +98,12 @@ public class LBWorld implements World {
      */
     @Override
     public int getHighestBlockYAt(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (int y = 0; y < 256; y++) {
+            if (this.getBlockTypeIdAt(x, y, z) == 0) {
+                return y - 1;
+            }
+        }
+        return 255;
     }
 
     /**
@@ -107,7 +114,7 @@ public class LBWorld implements World {
      */
     @Override
     public int getHighestBlockYAt(Location location) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getHighestBlockYAt(location.getBlockX(), location.getBlockZ());
     }
 
     /**
@@ -119,7 +126,7 @@ public class LBWorld implements World {
      */
     @Override
     public Block getHighestBlockAt(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getBlockAt(x, this.getHighestBlockYAt(x, z), z);
     }
 
     /**
@@ -130,7 +137,7 @@ public class LBWorld implements World {
      */
     @Override
     public Block getHighestBlockAt(Location location) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getHighestBlockAt(location.getBlockX(), location.getBlockY());
     }
 
     /**
@@ -142,7 +149,7 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk getChunkAt(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBChunk(this.world.getChunkFromChunkCoords(x, z));
     }
 
     /**
@@ -153,7 +160,7 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk getChunkAt(Location location) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getChunkAt(location.getBlockX(), location.getBlockZ());
     }
 
     /**
@@ -164,7 +171,7 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk getChunkAt(Block block) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBChunk(this.world.getChunkFromBlockCoords(block.getX(), block.getY()));
     }
 
     /**
@@ -175,7 +182,10 @@ public class LBWorld implements World {
      */
     @Override
     public boolean isChunkLoaded(Chunk chunk) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (Chunk lbchunk : this.loadedChunks) {
+            if (lbchunk.equals(chunk)) return lbchunk.isLoaded();
+        }
+        return false;
     }
 
     /**
@@ -185,7 +195,7 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk[] getLoadedChunks() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.loadedChunks.toArray(new Chunk[]{});
     }
 
     /**
@@ -195,7 +205,9 @@ public class LBWorld implements World {
      */
     @Override
     public void loadChunk(Chunk chunk) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (chunk.load()) {
+            this.loadedChunks.add(chunk);
+        }
     }
 
     /**
@@ -207,7 +219,10 @@ public class LBWorld implements World {
      */
     @Override
     public boolean isChunkLoaded(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (Chunk loadedChunk : this.loadedChunks) {
+            if (loadedChunk.getX() == x && loadedChunk.getZ() == z) return loadedChunk.isLoaded();
+        }
+        return false;
     }
 
     /**
@@ -221,7 +236,7 @@ public class LBWorld implements World {
      */
     @Override
     public void loadChunk(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.loadChunk(this.getChunkAt(x, z));
     }
 
     /**
@@ -234,7 +249,9 @@ public class LBWorld implements World {
      */
     @Override
     public boolean loadChunk(int x, int z, boolean generate) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        boolean flag = this.getChunkAt(x, z).load(generate);
+        if (flag) this.loadedChunks.add(this.getChunkAt(x, z));
+        return flag;
     }
 
     /**
@@ -247,7 +264,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean unloadChunk(Chunk chunk) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.unloadChunk(chunk.getX(), chunk.getZ());
     }
 
     /**
@@ -261,7 +278,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean unloadChunk(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.unloadChunk(x, z, true, true);
     }
 
     /**
@@ -276,7 +293,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean unloadChunk(int x, int z, boolean save) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.unloadChunk(x, z, save, true);
     }
 
     /**
@@ -290,7 +307,9 @@ public class LBWorld implements World {
      */
     @Override
     public boolean unloadChunk(int x, int z, boolean save, boolean safe) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        boolean flag = this.getChunkAt(x, z).unload(save, safe);
+        if (flag) this.loadedChunks.remove(this.getChunkAt(x, z));
+        return flag;
     }
 
     /**
@@ -304,7 +323,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean unloadChunkRequest(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.unloadChunkRequest(x, z, true);
     }
 
     /**
@@ -317,7 +336,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean unloadChunkRequest(int x, int z, boolean safe) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Bukkit.getServer().getPluginManager().getPlugin("Minecraft"), () -> unloadChunk(x, z, true, safe)) != -1;
     }
 
     /**
@@ -727,7 +746,7 @@ public class LBWorld implements World {
      */
     @Override
     public Environment getEnvironment() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return Environment.NORMAL;
     }
 
     /**
@@ -737,7 +756,7 @@ public class LBWorld implements World {
      */
     @Override
     public long getSeed() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.randomSeed;
     }
 
     /**
@@ -794,7 +813,7 @@ public class LBWorld implements World {
      * @param location the {@link Location} to spawn the entity at
      * @param clazz    the class of the {@link Entity} to spawn
      * @return an instance of the spawned {@link Entity}
-     * @throws {@link IllegalArgumentException} if either parameter is null or the {@link Entity} requested cannot be spawned
+     * @throws IllegalArgumentException if either parameter is null or the {@link org.bukkit.entity.Entity} requested cannot be spawned
      */
     @Override
     public <T extends Entity> T spawn(Location location, Class<T> clazz) throws IllegalArgumentException {
