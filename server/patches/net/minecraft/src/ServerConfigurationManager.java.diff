@@ -1,0 +1,13 @@
+--- ServerConfigurationManager.java
++++ ServerConfigurationManager.java
+@@ -23,7 +23,7 @@
+     private PlayerManager playerManagerObj;
+     private int maxPlayers;
+-    private Set bannedPlayers;
+-    private Set bannedIPs;
+-    private Set ops;
++    private Set<String> bannedPlayers;
++    private Set<String> bannedIPs;
++    private Set<String> ops;
+     private File bannedPlayersFile;
+     private File ipBanFile;

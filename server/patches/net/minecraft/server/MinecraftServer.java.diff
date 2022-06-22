@@ -1,0 +1,9 @@
+--- MinecraftServer.java
++++ MinecraftServer.java
+@@ -39,5 +39,5 @@
+ public class MinecraftServer implements ICommandListener, Runnable {
+     public static Logger logger;
+-    public static HashMap playerList;
++    public static HashMap<String, Integer> playerList;
+     public NetworkListenThread networkServer;
+     public PropertyManager propertyManagerObj;

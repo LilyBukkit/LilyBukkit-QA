@@ -1,0 +1,16 @@
+--- NetworkWriterThread.java
++++ NetworkWriterThread.java
+@@ -40,10 +40,10 @@
+                     continue;
+                 }
+-                object1 = NetworkManager.threadSyncObject;
++                /*object1 = NetworkManager.threadSyncObject;
+                 synchronized (NetworkManager.threadSyncObject) {
+                     --NetworkManager.numWriteThreads;
+-                }
++                }*/
+                 // monitorexit(NetworkManager.threadSyncObject)
+-                break;
++                //break;
+             }
+         }
