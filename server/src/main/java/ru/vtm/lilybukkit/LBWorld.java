@@ -9,10 +9,32 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
 public class LBWorld implements World {
+
+    private net.minecraft.src.World world;
+
+    public LBWorld(String name) {
+        world = new net.minecraft.src.World(name);
+    }
+
+    public LBWorld(String name, long seed) {
+        world = new net.minecraft.src.World(new File(name), name, seed);
+    }
+
+    public LBWorld(String name, ChunkGenerator chunkGen){
+        this(name);
+        //TODO
+    }
+
+    public LBWorld(String name, long seed, ChunkGenerator chunkGen){
+        this(name, seed);
+        //TODO
+    }
+
     /**
      * Gets the {@link Block} at the given coordinates
      *
