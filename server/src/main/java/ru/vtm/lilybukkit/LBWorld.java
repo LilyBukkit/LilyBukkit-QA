@@ -192,8 +192,20 @@ public class LBWorld implements World {
     @Override
     public Chunk[] getLoadedChunks() {
         List<Chunk> loadedChunks = new ArrayList<>();
-        int x = 0, z = 0;
-        while (this.getChunkAt(x, z).isLoaded()) {
+        /*
+            TODO:
+            Implement a solution that will go over all chunks beginning with the [1,1], [1,-1], [-1,1] and [-1,-1] in groups of 3x3 and check if they are loaded.
+            Since ChunkProviderServer and WorldServer do not provide useful functionality due to the Alpha level format,
+            a possible solution would be iteration until we stumble upon at least N unloaded chunks and exit the loop,
+            but this will cause the server to mark the far chunks as unloaded.
+            E.g. a player that has reached the Farlands would be considered by LilyBukkit to be in an unloaded chunk,
+            when in reality, it is loaded and is consuming resources (and MinecraftServer is probably aware of that, but I might be wrong).
+
+            Damn, I think I'll have to modify the sources...
+         */
+        /*
+        int px = 1, pz = 1, nx = -1, nz = -1;
+        while (px <= n && pz <= n && nx >= n && nz >= ) {
             loadedChunks.add(this.getChunkAt(x, z));
             if (this.getChunkAt(x + 1, z).isLoaded()) {
                 loadedChunks.add(this.getChunkAt(x + 1, z));
@@ -202,6 +214,7 @@ public class LBWorld implements World {
                 loadedChunks.add(this.getChunkAt(x, z + 1));
             }
         }
+         */
         return loadedChunks.toArray(new Chunk[]{});
     }
 
