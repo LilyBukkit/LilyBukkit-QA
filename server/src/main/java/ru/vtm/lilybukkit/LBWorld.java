@@ -11,20 +11,21 @@ import org.bukkit.util.Vector;
 import ru.vtm.lilybukkit.block.LBBlock;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class LBWorld implements World {
 
-    private List<Chunk> loadedChunks;
-    private final net.minecraft.src.World world;
+    private List<Chunk> chunks;
+    private final net.minecraft.src.WorldServer world;
 
     public LBWorld(String name) {
-        world = new net.minecraft.src.World(name);
+        world = new net.minecraft.src.WorldServer(new File(name), name, true);
     }
 
     public LBWorld(String name, long seed) {
-        world = new net.minecraft.src.World(new File(name), name, seed);
+        world = new net.minecraft.src.WorldServer(new File(name), name, true);
     }
 
     public LBWorld(String name, ChunkGenerator chunkGen) {
@@ -98,12 +99,7 @@ public class LBWorld implements World {
      */
     @Override
     public int getHighestBlockYAt(int x, int z) {
-        for (int y = 0; y < 256; y++) {
-            if (this.getBlockTypeIdAt(x, y, z) == 0) {
-                return y - 1;
-            }
-        }
-        return 255;
+        return this.world.getChunkFromBlockCoords(x, z).getHeightValue(x, z);
     }
 
     /**
@@ -182,7 +178,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean isChunkLoaded(Chunk chunk) {
-        for (Chunk lbchunk : this.loadedChunks) {
+        for (Chunk lbchunk : this.getLoadedChunks()) {
             if (lbchunk.equals(chunk)) return lbchunk.isLoaded();
         }
         return false;
@@ -195,7 +191,18 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk[] getLoadedChunks() {
-        return this.loadedChunks.toArray(new Chunk[]{});
+        List<Chunk> loadedChunks = new ArrayList<>();
+        int x = 0, z = 0;
+        while (this.getChunkAt(x, z).isLoaded()) {
+            loadedChunks.add(this.getChunkAt(x, z));
+            if (this.getChunkAt(x + 1, z).isLoaded()) {
+                loadedChunks.add(this.getChunkAt(x + 1, z));
+            }
+            if (this.getChunkAt(x, z + 1).isLoaded()) {
+                loadedChunks.add(this.getChunkAt(x, z + 1));
+            }
+        }
+        return loadedChunks.toArray(new Chunk[]{});
     }
 
     /**
@@ -205,9 +212,7 @@ public class LBWorld implements World {
      */
     @Override
     public void loadChunk(Chunk chunk) {
-        if (chunk.load()) {
-            this.loadedChunks.add(chunk);
-        }
+        chunk.load();
     }
 
     /**
@@ -219,10 +224,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean isChunkLoaded(int x, int z) {
-        for (Chunk loadedChunk : this.loadedChunks) {
-            if (loadedChunk.getX() == x && loadedChunk.getZ() == z) return loadedChunk.isLoaded();
-        }
-        return false;
+        return this.isChunkLoaded(this.getChunkAt(x, z));
     }
 
     /**
@@ -250,7 +252,7 @@ public class LBWorld implements World {
     @Override
     public boolean loadChunk(int x, int z, boolean generate) {
         boolean flag = this.getChunkAt(x, z).load(generate);
-        if (flag) this.loadedChunks.add(this.getChunkAt(x, z));
+        if (flag) this.chunks.add(this.getChunkAt(x, z));
         return flag;
     }
 
@@ -308,7 +310,7 @@ public class LBWorld implements World {
     @Override
     public boolean unloadChunk(int x, int z, boolean save, boolean safe) {
         boolean flag = this.getChunkAt(x, z).unload(save, safe);
-        if (flag) this.loadedChunks.remove(this.getChunkAt(x, z));
+        if (flag) this.chunks.remove(this.getChunkAt(x, z));
         return flag;
     }
 
