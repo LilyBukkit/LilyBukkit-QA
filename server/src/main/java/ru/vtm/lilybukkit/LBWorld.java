@@ -11,14 +11,16 @@ import org.bukkit.util.Vector;
 import ru.vtm.lilybukkit.block.LBBlock;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class LBWorld implements World {
 
-    private List<Chunk> chunks;
     private final net.minecraft.src.WorldServer world;
+
+    //Part of that bad solution
+    //TODO: Initialize this List in constructors by performing a scan of world and adding every single loaded chunk
+    private List<Chunk> loadedChunks;
 
     public LBWorld(String name) {
         world = new net.minecraft.src.WorldServer(new File(name), name, true);
@@ -191,7 +193,6 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk[] getLoadedChunks() {
-        List<Chunk> loadedChunks = new ArrayList<>();
         /*
             TODO:
             Implement a solution that will go over all chunks beginning with the [1,1], [1,-1], [-1,1] and [-1,-1] in groups of 3x3 and check if they are loaded.
@@ -204,17 +205,8 @@ public class LBWorld implements World {
             Damn, I think I'll have to modify the sources...
          */
         /*
-        int px = 1, pz = 1, nx = -1, nz = -1;
-        while (px <= n && pz <= n && nx >= n && nz >= ) {
-            loadedChunks.add(this.getChunkAt(x, z));
-            if (this.getChunkAt(x + 1, z).isLoaded()) {
-                loadedChunks.add(this.getChunkAt(x + 1, z));
-            }
-            if (this.getChunkAt(x, z + 1).isLoaded()) {
-                loadedChunks.add(this.getChunkAt(x, z + 1));
-            }
-        }
-         */
+        A bad solution, but whatever
+        */
         return loadedChunks.toArray(new Chunk[]{});
     }
 
@@ -225,7 +217,7 @@ public class LBWorld implements World {
      */
     @Override
     public void loadChunk(Chunk chunk) {
-        chunk.load();
+        if (chunk.load()) this.loadedChunks.add(chunk);
     }
 
     /**
@@ -265,7 +257,7 @@ public class LBWorld implements World {
     @Override
     public boolean loadChunk(int x, int z, boolean generate) {
         boolean flag = this.getChunkAt(x, z).load(generate);
-        if (flag) this.chunks.add(this.getChunkAt(x, z));
+        if (flag) this.loadedChunks.add(this.getChunkAt(x, z));
         return flag;
     }
 
@@ -323,7 +315,7 @@ public class LBWorld implements World {
     @Override
     public boolean unloadChunk(int x, int z, boolean save, boolean safe) {
         boolean flag = this.getChunkAt(x, z).unload(save, safe);
-        if (flag) this.chunks.remove(this.getChunkAt(x, z));
+        if (flag) this.loadedChunks.remove(this.getChunkAt(x, z));
         return flag;
     }
 
@@ -457,7 +449,7 @@ public class LBWorld implements World {
      * Strikes lightning at the given {@link Location}
      *
      * @param loc The location to strike lightning
-     * @return
+     * @return {@link LightningStrike}
      */
     @Override
     public LightningStrike strikeLightning(Location loc) {
@@ -468,7 +460,7 @@ public class LBWorld implements World {
      * Strikes lightning at the given {@link Location} without doing damage
      *
      * @param loc The location to strike lightning
-     * @return
+     * @return {@link LightningStrike}
      */
     @Override
     public LightningStrike strikeLightningEffect(Location loc) {
@@ -552,9 +544,6 @@ public class LBWorld implements World {
     /**
      * Sets the spawn location of the world
      *
-     * @param x
-     * @param y
-     * @param z
      * @return True if it was successfully set.
      */
     @Override
@@ -701,9 +690,6 @@ public class LBWorld implements World {
     /**
      * Creates explosion at given coordinates with given power
      *
-     * @param x
-     * @param y
-     * @param z
      * @param power The power of explosion, where 4F is TNT
      * @return false if explosion was canceled, otherwise true
      */
@@ -716,9 +702,6 @@ public class LBWorld implements World {
      * Creates explosion at given coordinates with given power and optionally setting
      * blocks on fire.
      *
-     * @param x
-     * @param y
-     * @param z
      * @param power   The power of explosion, where 4F is TNT
      * @param setFire Whether or not to set blocks on fire
      * @return false if explosion was canceled, otherwise true
@@ -731,7 +714,6 @@ public class LBWorld implements World {
     /**
      * Creates explosion at given coordinates with given power
      *
-     * @param loc
      * @param power The power of explosion, where 4F is TNT
      * @return false if explosion was canceled, otherwise true
      */
@@ -744,7 +726,6 @@ public class LBWorld implements World {
      * Creates explosion at given coordinates with given power and optionally setting
      * blocks on fire.
      *
-     * @param loc
      * @param power   The power of explosion, where 4F is TNT
      * @param setFire Whether or not to set blocks on fire
      * @return false if explosion was canceled, otherwise true
@@ -776,8 +757,6 @@ public class LBWorld implements World {
 
     /**
      * Gets the current PVP setting for this world.
-     *
-     * @return
      */
     @Override
     public boolean getPVP() {
