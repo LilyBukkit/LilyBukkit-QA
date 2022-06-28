@@ -1,8 +1,13 @@
 package ru.vtm.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.entity.Slime;
 
 public class LBSlime extends LBLivingEntity implements Slime {
+
+    public LBSlime(Entity e) {
+        super(e);
+    }
 
     /**
      * @return The size of the slime

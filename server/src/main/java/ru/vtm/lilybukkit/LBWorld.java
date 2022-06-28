@@ -1,16 +1,25 @@
 package ru.vtm.lilybukkit;
 
+import net.minecraft.src.*;
+import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.*;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import ru.vtm.lilybukkit.block.LBBlock;
+import ru.vtm.lilybukkit.entity.LBArrow;
+import ru.vtm.lilybukkit.entity.LBItem;
+import ru.vtm.lilybukkit.entity.LBLivingEntity;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -355,7 +364,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean regenerateChunk(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getChunkAt(x, z).unload(true, true) && this.getChunkAt(x, z).load(true);
     }
 
     /**
@@ -367,7 +376,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean refreshChunk(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getChunkAt(x, z).unload(true, true) && this.getChunkAt(x, z).load(false);
     }
 
     /**
@@ -379,7 +388,7 @@ public class LBWorld implements World {
      */
     @Override
     public Item dropItem(Location location, ItemStack item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBItem(this.world.getClosestPlayer(location.getBlockX(), location.getBlockY(), location.getBlockZ(), 16.0).dropItem(item.getTypeId(), item.getAmount()));
     }
 
     /**
@@ -391,7 +400,9 @@ public class LBWorld implements World {
      */
     @Override
     public Item dropItemNaturally(Location location, ItemStack item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        EntityItem i = new EntityItem(this.world, new Integer(location.getBlockX()).doubleValue(), new Integer(location.getBlockY()).doubleValue(), new Integer(location.getBlockZ()).doubleValue(), new net.minecraft.src.ItemStack(item.getTypeId(), item.getAmount(), item.getData().getData()));
+        if (this.world.spawnEntityInWorld(i)) return new LBItem(i);
+        return null;
     }
 
     /**
@@ -405,7 +416,11 @@ public class LBWorld implements World {
      */
     @Override
     public Arrow spawnArrow(Location location, Vector velocity, float speed, float spread) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        EntityArrow e = new EntityArrow(this.world);
+        e.setPosition(new Integer(location.getBlockX()).doubleValue(), new Integer(location.getBlockY()).doubleValue(), new Integer(location.getBlockZ()).doubleValue());
+        e.setArrowHeading(velocity.getX(), velocity.getY(), velocity.getZ(), velocity.angle(new Vector(0, velocity.getY(), 0)), velocity.angle(new Vector(velocity.getX(), 0, 0)));
+        if (this.world.spawnEntityInWorld(e)) return new LBArrow(e);
+        return null;
     }
 
     /**
@@ -442,7 +457,40 @@ public class LBWorld implements World {
      */
     @Override
     public LivingEntity spawnCreature(Location loc, CreatureType type) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.EntityLiving e;
+        switch (type) {
+            case CHICKEN:
+                e = new EntityChicken(this.world);
+            case COW:
+                e = new EntityCow(this.world);
+            case PIG:
+                e = new EntityPig(this.world);
+            case GIANT:
+                e = new EntityGiantZombie(this.world);
+            case SHEEP:
+                e = new EntitySheep(this.world);
+            case SLIME:
+                e = new EntitySlime(this.world);
+            case SPIDER:
+                e = new EntitySpider(this.world);
+            case ZOMBIE:
+                e = new EntityZombie(this.world);
+            case CREEPER:
+                e = new EntityCreeper(this.world);
+            case MONSTER:
+                // What the fuck is CreatureType.MONSTER ???
+                e = new EntityMob(this.world);
+            case SKELETON:
+                e = new EntitySkeleton(this.world);
+            case WOLF:
+            case GHAST:
+            case SQUID:
+            case PIG_ZOMBIE:
+            default:
+                e = null;
+        }
+        if (this.world.spawnEntityInWorld(e)) return new LBLivingEntity(e);
+        return null;
     }
 
     /**
@@ -474,7 +522,8 @@ public class LBWorld implements World {
      */
     @Override
     public List<Entity> getEntities() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        // How the fuck does this thing compile ???
+        return this.world.loadedEntityList;
     }
 
     /**
@@ -484,7 +533,14 @@ public class LBWorld implements World {
      */
     @Override
     public List<LivingEntity> getLivingEntities() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        List<net.minecraft.src.Entity> allEntities = this.world.loadedEntityList;
+        List livingEntities = new ArrayList();
+        for (net.minecraft.src.Entity e : allEntities) {
+            if (e instanceof net.minecraft.src.EntityLiving) {
+                livingEntities.add(e);
+            }
+        }
+        return livingEntities;
     }
 
     /**
@@ -494,7 +550,7 @@ public class LBWorld implements World {
      */
     @Override
     public List<Player> getPlayers() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.playerEntities;
     }
 
     /**
@@ -504,7 +560,7 @@ public class LBWorld implements World {
      */
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.levelName;
     }
 
     /**
@@ -514,7 +570,7 @@ public class LBWorld implements World {
      */
     @Override
     public UUID getUID() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return UUID.fromString(this.getName());
     }
 
     /**
@@ -528,7 +584,7 @@ public class LBWorld implements World {
      */
     @Override
     public long getId() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new Long(this.getUID().toString());
     }
 
     /**
@@ -538,7 +594,7 @@ public class LBWorld implements World {
      */
     @Override
     public Location getSpawnLocation() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new Location(this, this.world.spawnX, this.world.spawnY, this.world.spawnZ);
     }
 
     /**
@@ -548,7 +604,11 @@ public class LBWorld implements World {
      */
     @Override
     public boolean setSpawnLocation(int x, int y, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.world.spawnX = x;
+        this.world.spawnY = y;
+        this.world.spawnZ = z;
+        //TODO: Add additional check
+        return true;
     }
 
     /**
@@ -589,7 +649,7 @@ public class LBWorld implements World {
      */
     @Override
     public long getFullTime() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.worldTime;
     }
 
     /**
@@ -603,7 +663,7 @@ public class LBWorld implements World {
      */
     @Override
     public void setFullTime(long time) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.world.worldTime = time;
     }
 
     /**
@@ -760,7 +820,8 @@ public class LBWorld implements World {
      */
     @Override
     public boolean getPVP() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        //Because it's broken
+        return false;
     }
 
     /**
@@ -770,7 +831,7 @@ public class LBWorld implements World {
      */
     @Override
     public void setPVP(boolean pvp) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("PvP is broken, chill out");
     }
 
     /**
@@ -788,7 +849,8 @@ public class LBWorld implements World {
      */
     @Override
     public void save() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        //TODO: Make the thing output to chat
+        this.world.saveWorld(false, null);
     }
 
     /**
@@ -923,6 +985,7 @@ public class LBWorld implements World {
      */
     @Override
     public double getHumidity(int x, int z) {
+        //The f*ck is this
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -935,7 +998,10 @@ public class LBWorld implements World {
      */
     @Override
     public int getMaxHeight() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        //i don't give a sh*t rn
+        //also
+        //TODO
+        return 256;
     }
 
     /**

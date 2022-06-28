@@ -1,8 +1,13 @@
 package ru.vtm.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.entity.TNTPrimed;
 
 public class LBTNTPrimed extends LBExplosive implements TNTPrimed {
+
+    public LBTNTPrimed(Entity e) {
+        super(e);
+    }
 
     /**
      * Set the number of ticks until the TNT blows up after being primed.

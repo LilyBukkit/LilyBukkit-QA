@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class LBEntity implements Entity {
+
+    public LBEntity(net.minecraft.src.Entity e){
+
+    }
+
     /**
      * Gets the entity's current position
      *

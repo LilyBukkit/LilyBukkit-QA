@@ -1,10 +1,15 @@
 package ru.vtm.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 
 public class LBProjectile extends LBEntity implements Projectile {
+
+    public LBProjectile(Entity e) {
+        super(e);
+    }
 
     /**
      * Retrieve the shooter of this projectile. The returned value can be null

@@ -1,9 +1,14 @@
 package ru.vtm.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 
 public class LBCreature extends LBLivingEntity implements Creature {
+
+    public LBCreature(Entity e) {
+        super(e);
+    }
 
     /**
      * Instructs this Creature to set the specified LivingEntity as its target.

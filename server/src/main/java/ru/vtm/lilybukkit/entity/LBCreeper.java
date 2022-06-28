@@ -1,8 +1,13 @@
 package ru.vtm.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.entity.Creeper;
 
 public class LBCreeper extends LBMonster implements Creeper {
+
+    public LBCreeper(Entity e) {
+        super(e);
+    }
 
     /**
      * Checks if this Creeper is powered (Electrocuted)

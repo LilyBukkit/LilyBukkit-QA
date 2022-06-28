@@ -1,5 +1,6 @@
 package ru.vtm.lilybukkit.entity;
 
+import net.minecraft.src.EntityItem;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -13,6 +14,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class LBItem implements Item {
+    public LBItem(EntityItem item) {
+        //TODO
+    }
+
     /**
      * Gets the item stack associated with this item drop.
      *

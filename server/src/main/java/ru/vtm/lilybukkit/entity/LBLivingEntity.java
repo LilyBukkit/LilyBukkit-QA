@@ -8,6 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 
 public class LBLivingEntity extends LBEntity implements LivingEntity {
+    public LBLivingEntity(net.minecraft.src.Entity e) {
+        super(e);
+    }
+
     /**
      * Gets the entity's health from 0-20, where 0 is dead and 20 is full
      *

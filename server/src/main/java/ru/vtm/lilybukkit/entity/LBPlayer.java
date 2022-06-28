@@ -1,5 +1,6 @@
 package ru.vtm.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,6 +15,10 @@ import java.net.InetSocketAddress;
 import java.util.Set;
 
 public class LBPlayer extends LBLivingEntity implements Player {
+
+    public LBPlayer(Entity e) {
+        super(e);
+    }
 
     /**
      * Checks if this player is currently online

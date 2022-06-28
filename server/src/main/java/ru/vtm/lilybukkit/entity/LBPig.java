@@ -1,8 +1,13 @@
 package ru.vtm.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.entity.Pig;
 
 public class LBPig extends LBAnimals implements Pig {
+
+    public LBPig(Entity e) {
+        super(e);
+    }
 
     /**
      * Check if the pig has a saddle.

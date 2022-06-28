@@ -1,8 +1,13 @@
 package ru.vtm.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.entity.Explosive;
 
 public class LBExplosive extends LBEntity implements Explosive {
+    public LBExplosive(Entity e) {
+        super(e);
+    }
+
     /**
      * Set the radius affected by this explosive's explosion
      *
