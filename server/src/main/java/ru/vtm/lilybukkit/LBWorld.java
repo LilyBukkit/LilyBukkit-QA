@@ -1,22 +1,18 @@
 package ru.vtm.lilybukkit;
 
-import net.minecraft.src.*;
-import org.bukkit.Chunk;
-import org.bukkit.World;
+import net.minecraft.src.EntityArrow;
+import net.minecraft.src.EntityItem;
+import net.minecraft.src.EntityPlayer;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.*;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import ru.vtm.lilybukkit.block.LBBlock;
-import ru.vtm.lilybukkit.entity.LBArrow;
-import ru.vtm.lilybukkit.entity.LBItem;
-import ru.vtm.lilybukkit.entity.LBLivingEntity;
+import ru.vtm.lilybukkit.entity.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,10 +31,12 @@ public class LBWorld implements World {
 
     public LBWorld(String name) {
         world = new net.minecraft.src.WorldServer(new File(name), name, true);
+        this.loadedChunks = new ArrayList<>();
     }
 
     public LBWorld(String name, long seed) {
         world = new net.minecraft.src.WorldServer(new File(name), name, true);
+        this.loadedChunks = new ArrayList<>();
     }
 
     public LBWorld(String name, ChunkGenerator chunkGen) {
@@ -459,40 +457,36 @@ public class LBWorld implements World {
      */
     @Override
     public LivingEntity spawnCreature(Location loc, CreatureType type) {
-        net.minecraft.src.EntityLiving e;
         switch (type) {
             case CHICKEN:
-                e = new EntityChicken(this.world);
+                return this.spawn(loc, LBChicken.class);
             case COW:
-                e = new EntityCow(this.world);
+                return this.spawn(loc, LBCow.class);
             case PIG:
-                e = new EntityPig(this.world);
+                return this.spawn(loc, LBPig.class);
             case GIANT:
-                e = new EntityGiantZombie(this.world);
+                return this.spawn(loc, LBGiant.class);
             case SHEEP:
-                e = new EntitySheep(this.world);
+                return this.spawn(loc, LBSheep.class);
             case SLIME:
-                e = new EntitySlime(this.world);
+                return this.spawn(loc, LBSlime.class);
             case SPIDER:
-                e = new EntitySpider(this.world);
+                return this.spawn(loc, LBSpider.class);
             case ZOMBIE:
-                e = new EntityZombie(this.world);
+                return this.spawn(loc, LBZombie.class);
             case CREEPER:
-                e = new EntityCreeper(this.world);
+                return this.spawn(loc, LBCreeper.class);
             case MONSTER:
-                // What the fuck is CreatureType.MONSTER ???
-                e = new EntityMob(this.world);
+                return this.spawn(loc, LBMonster.class);
             case SKELETON:
-                e = new EntitySkeleton(this.world);
+                return this.spawn(loc, LBSkeleton.class);
             case WOLF:
             case GHAST:
             case SQUID:
             case PIG_ZOMBIE:
             default:
-                e = null;
+                return null;
         }
-        if (this.world.spawnEntityInWorld(e)) return new LBLivingEntity(e);
-        return null;
     }
 
     /**
@@ -524,8 +518,12 @@ public class LBWorld implements World {
      */
     @Override
     public List<Entity> getEntities() {
-        // How the fuck does this thing compile ???
-        return this.world.loadedEntityList;
+        List<net.minecraft.src.Entity> loadedEntities = this.world.loadedEntityList;
+        List<Entity> entities = new ArrayList<>();
+        for (net.minecraft.src.Entity e : loadedEntities) {
+            entities.add(new LBEntity(e));
+        }
+        return entities;
     }
 
     /**
@@ -535,11 +533,11 @@ public class LBWorld implements World {
      */
     @Override
     public List<LivingEntity> getLivingEntities() {
-        List<net.minecraft.src.Entity> allEntities = this.world.loadedEntityList;
-        List livingEntities = new ArrayList();
-        for (net.minecraft.src.Entity e : allEntities) {
+        List<net.minecraft.src.Entity> loadedEntities = this.world.loadedEntityList;
+        List<LivingEntity> livingEntities = new ArrayList<>();
+        for (net.minecraft.src.Entity e : loadedEntities) {
             if (e instanceof net.minecraft.src.EntityLiving) {
-                livingEntities.add(e);
+                livingEntities.add(new LBLivingEntity(e));
             }
         }
         return livingEntities;
@@ -552,7 +550,14 @@ public class LBWorld implements World {
      */
     @Override
     public List<Player> getPlayers() {
-        return this.world.playerEntities;
+        List<net.minecraft.src.Entity> loadedEntities = this.world.loadedEntityList;
+        List<Player> playerEntities = new ArrayList<>();
+        for (net.minecraft.src.Entity e : loadedEntities) {
+            if (e instanceof net.minecraft.src.EntityLiving) {
+                playerEntities.add(new LBPlayer(e));
+            }
+        }
+        return playerEntities;
     }
 
     /**
@@ -757,9 +762,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean createExplosion(double x, double y, double z, float power) {
-        EntityPlayer p = this.world.getClosestPlayer(x, y, z, 0.0);
-        this.world.createExplosion(p, x, y, z, power);
-        return p != null;
+        return this.createExplosion(x, y, z, power, false);
     }
 
     /**
@@ -772,7 +775,9 @@ public class LBWorld implements World {
      */
     @Override
     public boolean createExplosion(double x, double y, double z, float power, boolean setFire) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        EntityPlayer p = this.world.getClosestPlayer(x, y, z, 0.0);
+        this.world.createExplosion(p, x, y, z, power);
+        return p != null;
     }
 
     /**
@@ -783,7 +788,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean createExplosion(Location loc, float power) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.createExplosion(loc, power, false);
     }
 
     /**
@@ -796,7 +801,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean createExplosion(Location loc, float power, boolean setFire) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.createExplosion(loc.getX(), loc.getY(), loc.getZ(), power, setFire);
     }
 
     /**
@@ -835,7 +840,7 @@ public class LBWorld implements World {
      */
     @Override
     public void setPVP(boolean pvp) {
-        throw new UnsupportedOperationException("PvP is broken, chill out");
+        throw new UnsupportedOperationException("PvP is broken, sorry");
     }
 
     /**

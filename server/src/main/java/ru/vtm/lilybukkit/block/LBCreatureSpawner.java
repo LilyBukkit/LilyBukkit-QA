@@ -1,9 +1,14 @@
 package ru.vtm.lilybukkit.block;
 
+import net.minecraft.src.Entity;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.CreatureType;
 
 public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
+
+    public LBCreatureSpawner(Entity e) {
+        super(e);
+    }
 
     /**
      * Get the spawner's creature type.

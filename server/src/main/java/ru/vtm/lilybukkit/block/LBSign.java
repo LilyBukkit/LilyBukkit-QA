@@ -1,8 +1,13 @@
 package ru.vtm.lilybukkit.block;
 
+import net.minecraft.src.Entity;
 import org.bukkit.block.Sign;
 
 public class LBSign extends LBBlockState implements Sign {
+    public LBSign(Entity e) {
+        super(e);
+    }
+
     /**
      * Gets all the lines of text currently on this sign.
      *
