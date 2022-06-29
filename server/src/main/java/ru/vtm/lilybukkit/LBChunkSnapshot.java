@@ -123,7 +123,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public Biome getBiome(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getBlock(x, this.getHighestBlockYAt(x, z), z).getBiome();
     }
 
     /**
@@ -135,7 +135,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public double getRawBiomeTemperature(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getBlock(x, this.getHighestBlockYAt(x, z), z).getTemperature();
     }
 
     /**
@@ -147,7 +147,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public double getRawBiomeRainfall(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getBlock(x, this.getHighestBlockYAt(x, z), z).getHumidity();
     }
 
     /**

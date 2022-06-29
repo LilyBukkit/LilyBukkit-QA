@@ -1,8 +1,16 @@
 package ru.vtm.lilybukkit;
 
 import org.bukkit.BlockChangeDelegate;
+import org.bukkit.World;
 
 public class LBBlockChangeDelegate implements BlockChangeDelegate {
+
+    private World world;
+
+    public LBBlockChangeDelegate(World w) {
+        this.world = w;
+    }
+
     /**
      * Set a block type at the specified coordinates.
      *
@@ -14,7 +22,7 @@ public class LBBlockChangeDelegate implements BlockChangeDelegate {
      */
     @Override
     public boolean setRawTypeId(int x, int y, int z, int typeId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.getBlockAt(x, y, z).setTypeId(typeId);
     }
 
     /**
@@ -29,7 +37,7 @@ public class LBBlockChangeDelegate implements BlockChangeDelegate {
      */
     @Override
     public boolean setRawTypeIdAndData(int x, int y, int z, int typeId, int data) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.getBlockAt(x, y, z).setTypeIdAndData(typeId, new Integer(data).byteValue(), true);
     }
 
     /**
@@ -42,6 +50,6 @@ public class LBBlockChangeDelegate implements BlockChangeDelegate {
      */
     @Override
     public int getTypeId(int x, int y, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.getBlockAt(x, y, z).getTypeId();
     }
 }

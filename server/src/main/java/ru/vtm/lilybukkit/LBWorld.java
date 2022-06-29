@@ -757,7 +757,9 @@ public class LBWorld implements World {
      */
     @Override
     public boolean createExplosion(double x, double y, double z, float power) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        EntityPlayer p = this.world.getClosestPlayer(x, y, z, 0.0);
+        this.world.createExplosion(p, x, y, z, power);
+        return p != null;
     }
 
     /**
@@ -887,7 +889,7 @@ public class LBWorld implements World {
      */
     @Override
     public void playEffect(Location location, Effect effect, int data) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.playEffect(location, effect, data, Bukkit.getServer().getSpawnRadius()); // Yeah...
     }
 
     /**
@@ -900,7 +902,11 @@ public class LBWorld implements World {
      */
     @Override
     public void playEffect(Location location, Effect effect, int data, int radius) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (Player p : this.getPlayers()) {
+            if (p.getLocation().distance(location) <= radius) {
+                p.playEffect(location, effect, data);
+            }
+        }
     }
 
     /**
@@ -914,7 +920,7 @@ public class LBWorld implements World {
      */
     @Override
     public ChunkSnapshot getEmptyChunkSnapshot(int x, int z, boolean includeBiome, boolean includeBiomeTempRain) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBChunkSnapshot(new LBChunk(new net.minecraft.src.Chunk(this.world, x, z)), this.getFullTime(), false, includeBiome, includeBiomeTempRain);
     }
 
     /**
@@ -925,7 +931,8 @@ public class LBWorld implements World {
      */
     @Override
     public void setSpawnFlags(boolean allowMonsters, boolean allowAnimals) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.allowAnimals = allowAnimals;
+        this.allowMonsters = allowMonsters;
     }
 
     /**
@@ -935,7 +942,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean getAllowAnimals() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.allowAnimals;
     }
 
     /**
@@ -945,7 +952,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean getAllowMonsters() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.allowMonsters;
     }
 
     /**
@@ -959,7 +966,7 @@ public class LBWorld implements World {
      */
     @Override
     public Biome getBiome(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getBlockAt(x, this.getHighestBlockYAt(x, z), z).getBiome();
     }
 
     /**
@@ -973,7 +980,7 @@ public class LBWorld implements World {
      */
     @Override
     public double getTemperature(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getBlockAt(x, this.getHighestBlockYAt(x, z), z).getTemperature();
     }
 
     /**

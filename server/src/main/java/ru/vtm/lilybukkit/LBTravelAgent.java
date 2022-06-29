@@ -4,6 +4,16 @@ import org.bukkit.Location;
 import org.bukkit.TravelAgent;
 
 public class LBTravelAgent implements TravelAgent {
+
+    private int searchRadius;
+    private int crationRadius;
+    private boolean mayGenerate;
+
+    public LBTravelAgent(int sRadius, int cRadius) {
+        this.searchRadius = sRadius;
+        this.crationRadius = cRadius;
+    }
+
     /**
      * Set the Block radius to search in for available portals.
      *
@@ -12,7 +22,7 @@ public class LBTravelAgent implements TravelAgent {
      */
     @Override
     public TravelAgent setSearchRadius(int radius) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBTravelAgent(radius, this.crationRadius);
     }
 
     /**
@@ -22,7 +32,7 @@ public class LBTravelAgent implements TravelAgent {
      */
     @Override
     public int getSearchRadius() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.searchRadius;
     }
 
     /**
@@ -33,7 +43,7 @@ public class LBTravelAgent implements TravelAgent {
      */
     @Override
     public TravelAgent setCreationRadius(int radius) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBTravelAgent(this.searchRadius, radius);
     }
 
     /**
@@ -43,7 +53,7 @@ public class LBTravelAgent implements TravelAgent {
      */
     @Override
     public int getCreationRadius() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.crationRadius;
     }
 
     /**
@@ -53,7 +63,7 @@ public class LBTravelAgent implements TravelAgent {
      */
     @Override
     public boolean getCanCreatePortal() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.mayGenerate;
     }
 
     /**
@@ -63,7 +73,7 @@ public class LBTravelAgent implements TravelAgent {
      */
     @Override
     public void setCanCreatePortal(boolean create) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.mayGenerate = create;
     }
 
     /**
@@ -74,6 +84,11 @@ public class LBTravelAgent implements TravelAgent {
      */
     @Override
     public Location findOrCreate(Location location) {
+        /*if(this.mayGenerate){
+            return null;
+        } else {
+            return null;
+        }*/
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
