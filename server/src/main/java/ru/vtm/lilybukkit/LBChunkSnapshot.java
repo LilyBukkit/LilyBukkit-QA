@@ -1,9 +1,20 @@
 package ru.vtm.lilybukkit;
 
+import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.block.Biome;
 
 public class LBChunkSnapshot implements ChunkSnapshot {
+
+    private Chunk chunk;
+    private long timestamp;
+
+    public LBChunkSnapshot(Chunk chunk, long fullTime, boolean maxBlockY, boolean biomeType, boolean biomeWeather) {
+        this.chunk = chunk;
+        this.timestamp = fullTime;
+        //TODO: Make use of booleans
+    }
+
     /**
      * Gets the X-coordinate of this chunk
      *
@@ -11,7 +22,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public int getX() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getX();
     }
 
     /**
@@ -21,7 +32,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public int getZ() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getZ();
     }
 
     /**
@@ -31,7 +42,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public String getWorldName() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getWorld().getName();
     }
 
     /**
@@ -44,7 +55,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public int getBlockTypeId(int x, int y, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getBlock(x, y, z).getTypeId();
     }
 
     /**
@@ -57,7 +68,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public int getBlockData(int x, int y, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getBlock(x, y, z).getData();
     }
 
     /**
@@ -70,7 +81,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public int getBlockSkyLight(int x, int y, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getBlock(x, y, z).getLightLevel();
     }
 
     /**
@@ -83,7 +94,7 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public int getBlockEmittedLight(int x, int y, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.getBlock(x, y, z).getLightLevel(); //I don't think there's any other way
     }
 
     /**
@@ -95,7 +106,12 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public int getHighestBlockYAt(int x, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (int y = 127; y >= 0; y--) {
+            if (!(this.chunk.getBlock(x, y, z).isEmpty() || this.chunk.getBlock(x, y, z).getTypeId() == 0)) {
+                return y;
+            }
+        }
+        return 127;
     }
 
     /**
@@ -141,6 +157,6 @@ public class LBChunkSnapshot implements ChunkSnapshot {
      */
     @Override
     public long getCaptureFullTime() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.timestamp;
     }
 }

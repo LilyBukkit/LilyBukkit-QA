@@ -2,6 +2,7 @@ package ru.vtm.lilybukkit;
 
 import com.avaje.ebean.config.ServerConfig;
 import net.minecraft.server.MinecraftServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -43,14 +44,25 @@ public class LilyBukkit implements Server {
 
     private LBPlayer[] playerList;
     private MinecraftServer mc;
-    private final PluginManager pluginMngr = new SimplePluginManager(this, null);
-    private LBScheduler scheduler;
+    private final PluginManager pluginMngr = new SimplePluginManager(this, null /*TODO*/);
+    private BukkitScheduler scheduler;
     private final ServicesManager servicesMngr = new SimpleServicesManager();
     private List<LBWorld> worldList;
     private List<Command> commandList;
     //TODO: Redo to make both lists combinable
     private List<PluginCommand> pluginCommandList;
     private List<Recipe> recipeManager;
+
+    public LilyBukkit(MinecraftServer parent) {
+        this.playerList = new LBPlayer[]{};
+        this.mc = parent;
+        this.scheduler = new LBScheduler();
+        this.worldList = new ArrayList<>();
+        this.commandList = new ArrayList<>();
+        this.pluginCommandList = new ArrayList<>();
+        this.recipeManager = new ArrayList<>();
+        Bukkit.setServer(this);
+    }
 
     /**
      * Gets the name of this server implementation
@@ -472,7 +484,7 @@ public class LilyBukkit implements Server {
     /**
      * Dispatches a command on the server, and executes it if found.
      *
-     * @param sender {@link CommandSender} that executed the command
+     * @param sender      {@link CommandSender} that executed the command
      * @param commandLine the command itself (with arguments)
      * @return targetFound returns false if no target is found.
      * @throws CommandException Thrown when the executor for the given command fails with an unhandled exception

@@ -1,20 +1,28 @@
 package ru.vtm.lilybukkit;
 
+import net.minecraft.src.AxisAlignedBB;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import ru.vtm.lilybukkit.block.LBBlock;
+import ru.vtm.lilybukkit.block.LBBlockState;
+import ru.vtm.lilybukkit.entity.LBEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LBChunk implements Chunk {
 
-    public LBChunk(net.minecraft.src.Chunk chunk){
-        //TODO
-    }
+    private net.minecraft.src.Chunk chunk;
+    private World world;
 
-    public LBChunk(Chunk chunk) {
-        //TODO
+    public LBChunk(net.minecraft.src.Chunk chunk) {
+        this.chunk = chunk;
+        this.world = Bukkit.getServer().getWorld(this.chunk.worldObj.levelName);
     }
 
     /**
@@ -24,7 +32,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public int getX() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.xPosition;
     }
 
     /**
@@ -34,7 +42,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public int getZ() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.zPosition;
     }
 
     /**
@@ -44,7 +52,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public World getWorld() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world;
     }
 
     /**
@@ -57,7 +65,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public Block getBlock(int x, int y, int z) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBBlock(this.chunk.getBlockID(x, y, z));
     }
 
     /**
@@ -67,7 +75,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public ChunkSnapshot getChunkSnapshot() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getChunkSnapshot(false, false, false);
     }
 
     /**
@@ -80,17 +88,29 @@ public class LBChunk implements Chunk {
      */
     @Override
     public ChunkSnapshot getChunkSnapshot(boolean includeMaxblocky, boolean includeBiome, boolean includeBiomeTempRain) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBChunkSnapshot(this, this.world.getFullTime(), includeMaxblocky, includeBiome, includeBiomeTempRain);
     }
 
     @Override
     public Entity[] getEntities() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        List<net.minecraft.src.Entity> vEntityList = new ArrayList<>();
+        this.chunk.getEntitiesOfTypeWithinAAAB(net.minecraft.src.Entity.class, AxisAlignedBB.getBoundingBoxFromPool(new Integer(this.chunk.xPosition).doubleValue(), 0.0, new Integer(this.chunk.zPosition).doubleValue(), new Integer(this.chunk.xPosition + 16).doubleValue(), 127.0, new Integer(this.chunk.zPosition).doubleValue()), vEntityList);
+        List<Entity> bEntityList = new ArrayList<>();
+        for (net.minecraft.src.Entity e : vEntityList) {
+            bEntityList.add(new LBEntity(e));
+        }
+        return bEntityList.toArray(new Entity[]{});
     }
 
     @Override
     public BlockState[] getTileEntities() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        List<net.minecraft.src.Entity> vEntityList = new ArrayList<>();
+        this.chunk.getEntitiesOfTypeWithinAAAB(net.minecraft.src.TileEntity.class, AxisAlignedBB.getBoundingBoxFromPool(new Integer(this.chunk.xPosition).doubleValue(), 0.0, new Integer(this.chunk.zPosition).doubleValue(), new Integer(this.chunk.xPosition + 16).doubleValue(), 127.0, new Integer(this.chunk.zPosition).doubleValue()), vEntityList);
+        List<BlockState> bEntityList = new ArrayList<>();
+        for (net.minecraft.src.Entity e : vEntityList) {
+            bEntityList.add(new LBBlockState(e));
+        }
+        return bEntityList.toArray(new BlockState[]{});
     }
 
     /**
@@ -100,7 +120,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean isLoaded() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunk.isChunkLoaded;
     }
 
     /**
@@ -111,7 +131,8 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean load(boolean generate) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.chunk.onChunkLoad();
+        return this.chunk.isChunkLoaded;
     }
 
     /**
@@ -121,7 +142,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean load() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.load(false);
     }
 
     /**
@@ -133,7 +154,8 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean unload(boolean save, boolean safe) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.chunk.onChunkUnload();
+        return this.chunk.isChunkLoaded;
     }
 
     /**
@@ -144,7 +166,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean unload(boolean save) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.unload(save, true);
     }
 
     /**
@@ -154,6 +176,6 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean unload() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.unload(true, true);
     }
 }

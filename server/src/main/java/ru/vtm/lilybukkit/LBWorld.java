@@ -26,6 +26,8 @@ import java.util.UUID;
 public class LBWorld implements World {
 
     private final net.minecraft.src.WorldServer world;
+    private boolean allowMonsters;
+    private boolean allowAnimals;
 
     //Part of that bad solution
     //TODO: Initialize this List in constructors by performing a scan of world and adding every single loaded chunk
@@ -985,8 +987,7 @@ public class LBWorld implements World {
      */
     @Override
     public double getHumidity(int x, int z) {
-        //The f*ck is this
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getBlockAt(x, this.getHighestBlockYAt(x, z), z).getHumidity();
     }
 
     /**

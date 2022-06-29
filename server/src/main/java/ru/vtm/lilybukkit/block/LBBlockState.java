@@ -1,5 +1,6 @@
 package ru.vtm.lilybukkit.block;
 
+import net.minecraft.src.Entity;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -8,6 +9,10 @@ import org.bukkit.block.BlockState;
 import org.bukkit.material.MaterialData;
 
 public class LBBlockState implements BlockState {
+    public LBBlockState(Entity e) {
+        
+    }
+
     /**
      * Gets the block represented by this BlockState
      *
