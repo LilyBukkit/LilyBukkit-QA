@@ -1,6 +1,7 @@
 package ru.vtm.lilybukkit.entity;
 
 import net.minecraft.src.Entity;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -278,8 +279,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      * Render a map and send it to the player in its entirety. This may be used
      * when streaming the map in the normal manner is not desirbale.
      *
-     * @param map
-     * @pram map The map to be sent
+     * @param map The map to be sent
      */
     @Override
     public void sendMap(MapView map) {
@@ -451,7 +451,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
      * user was holding.
      *
      * @param item The ItemStack which will end up in the hand
-     * @return
      */
     @Override
     public void setItemInHand(ItemStack item) {

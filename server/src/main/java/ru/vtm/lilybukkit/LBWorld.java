@@ -3,6 +3,7 @@ package ru.vtm.lilybukkit;
 import net.minecraft.src.EntityArrow;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
+import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
