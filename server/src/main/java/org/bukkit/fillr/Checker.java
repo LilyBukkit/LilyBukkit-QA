@@ -2,7 +2,8 @@ package org.bukkit.fillr;
 
 import java.io.*;
 import java.util.jar.*;
-import org.bukkit.*;
+
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.*;
 

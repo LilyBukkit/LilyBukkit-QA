@@ -3,7 +3,7 @@ package org.bukkit.fillr;
 import java.io.File;
 import java.util.logging.Level;
 
-import org.bukkit.*;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;

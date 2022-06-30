@@ -4,6 +4,6 @@
  
  public class EntityTracker {
 -    private Set trackedEntitySet;
-+    private Set<EntityTrackerEntry> trackedEntitySet;
++private Set<EntityTrackerEntry> trackedEntitySet;
      private MCHashTable trackedEntityHashTable;
      private MinecraftServer mcServer;

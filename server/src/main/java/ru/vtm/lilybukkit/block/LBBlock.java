@@ -5,13 +5,14 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.*;
+import org.bukkit.material.*;
 
 public class LBBlock implements Block {
 
-    net.minecraft.src.Block block;
+    private net.minecraft.src.Block block;
 
-    public LBBlock(int id){
-        switch (id){
+    public LBBlock(int id) {
+        switch (id) {
             case 1:
             case 0:
             default:
@@ -26,7 +27,7 @@ public class LBBlock implements Block {
      */
     @Override
     public byte getData() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Data values don't exist in Lilypad");
     }
 
     /**
@@ -58,7 +59,7 @@ public class LBBlock implements Block {
      */
     @Override
     public Block getRelative(int modX, int modY, int modZ) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getWorld().getBlockAt(this.getX() + modX, this.getY() + modY, this.getZ() + modZ);
     }
 
     /**
@@ -112,7 +113,7 @@ public class LBBlock implements Block {
      */
     @Override
     public int getTypeId() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.blockID;
     }
 
     /**
@@ -142,7 +143,7 @@ public class LBBlock implements Block {
      */
     @Override
     public int getX() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new Double(this.block.minX).intValue();
     }
 
     /**
@@ -152,7 +153,7 @@ public class LBBlock implements Block {
      */
     @Override
     public int getY() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new Double(this.block.minY).intValue();
     }
 
     /**
@@ -162,7 +163,7 @@ public class LBBlock implements Block {
      */
     @Override
     public int getZ() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new Double(this.block.minZ).intValue();
     }
 
     /**
@@ -172,7 +173,7 @@ public class LBBlock implements Block {
      */
     @Override
     public Location getLocation() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new Location(this.getWorld(), this.getX(), this.getY(), this.getZ());
     }
 
     /**
@@ -207,7 +208,110 @@ public class LBBlock implements Block {
      */
     @Override
     public void setType(Material type) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        switch (type) {
+            case AIR:
+            case STONE:
+            case GRASS:
+            case DIRT:
+            case COBBLESTONE:
+            case WOOD:
+            case SAPLING:
+            case BEDROCK:
+            case WATER:
+            case STATIONARY_WATER:
+            case LAVA:
+            case STATIONARY_LAVA:
+            case SAND:
+            case GRAVEL:
+            case GOLD_ORE:
+            case IRON_ORE:
+            case COAL_ORE:
+            case LOG:
+            case LEAVES:
+            case GLASS:
+            case BED_BLOCK:
+            case POWERED_RAIL:
+            case WEB:
+            case WOOL:
+            case YELLOW_FLOWER:
+            case RED_ROSE:
+            case BROWN_MUSHROOM:
+            case RED_MUSHROOM:
+            case GOLD_BLOCK:
+            case IRON_BLOCK:
+            case DOUBLE_STEP:
+            case STEP:
+            case BRICK:
+            case TNT:
+            case BOOKSHELF:
+            case MOSSY_COBBLESTONE:
+            case OBSIDIAN:
+            case TORCH:
+            case FIRE:
+            case MOB_SPAWNER:
+            case WOOD_STAIRS:
+            case CHEST:
+            case REDSTONE_WIRE:
+            case DIAMOND_ORE:
+            case DIAMOND_BLOCK:
+            case WORKBENCH:
+            case CROPS:
+            case SOIL:
+            case FURNACE:
+            case BURNING_FURNACE:
+            case SIGN_POST:
+            case WOODEN_DOOR:
+            case LADDER:
+            case RAILS:
+            case COBBLESTONE_STAIRS:
+            case WALL_SIGN:
+            case LEVER:
+            case STONE_PLATE:
+            case IRON_DOOR_BLOCK:
+            case WOOD_PLATE:
+            case REDSTONE_ORE:
+            case GLOWING_REDSTONE_ORE:
+            case REDSTONE_TORCH_OFF:
+            case REDSTONE_TORCH_ON:
+            case STONE_BUTTON:
+            case SNOW:
+            case ICE:
+            case SNOW_BLOCK:
+            case CACTUS:
+            case CLAY:
+            case SUGAR_CANE_BLOCK:
+            case JUKEBOX:
+            case FENCE:
+                // BLOCKS THAT DON'T EXIST \\
+            case SPONGE:
+            case LAPIS_ORE:
+            case LAPIS_BLOCK:
+            case DISPENSER:
+            case SANDSTONE:
+            case NOTE_BLOCK:
+            case DETECTOR_RAIL:
+            case PISTON_STICKY_BASE:
+            case LONG_GRASS:
+            case DEAD_BUSH:
+            case PISTON_BASE:
+            case PISTON_EXTENSION:
+            case PISTON_MOVING_PIECE:
+            case PUMPKIN:
+            case NETHERRACK:
+            case SOUL_SAND:
+            case GLOWSTONE:
+            case PORTAL:
+            case JACK_O_LANTERN:
+            case CAKE_BLOCK:
+            case DIODE_BLOCK_OFF:
+            case DIODE_BLOCK_ON:
+            case LOCKED_CHEST:
+            case TRAP_DOOR:
+                throw new UnsupportedOperationException("This Material doesn't exist in Lilypad");
+            default:
+                this.block = net.minecraft.src.Block.dbgBlock;
+        }
+        this.block.onBlockAdded((net.minecraft.src.World) this.getWorld(), this.getX(), this.getY(), this.getZ());
     }
 
     /**

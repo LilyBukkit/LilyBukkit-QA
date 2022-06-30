@@ -1,6 +1,5 @@
 package org.bukkit;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 

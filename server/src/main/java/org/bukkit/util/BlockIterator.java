@@ -1,9 +1,9 @@
 package org.bukkit.util;
 
-import org.bukkit.World;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.World;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.Iterator;
@@ -36,7 +36,7 @@ public class BlockIterator implements Iterator<Block> {
     private int          secondStep;
     private int          thirdStep;
 
-    private BlockFace    mainFace;
+    private BlockFace mainFace;
     private BlockFace    secondFace;
     private BlockFace    thirdFace;
 

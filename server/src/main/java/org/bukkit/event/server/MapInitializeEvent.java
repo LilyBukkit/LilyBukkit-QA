@@ -1,6 +1,5 @@
 package org.bukkit.event.server;
 
-import org.bukkit.event.Event;
 import org.bukkit.map.MapView;
 
 /**

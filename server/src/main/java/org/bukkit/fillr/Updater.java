@@ -1,11 +1,11 @@
 package org.bukkit.fillr;
 
-import org.bukkit.*;
+import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.*;
 
 import java.io.File;
 import java.util.logging.Level;
-import org.bukkit.command.CommandSender;
 
 public class Updater {
     public static String DIRECTORY = Fillr.DIRECTORY;

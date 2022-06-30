@@ -1,7 +1,6 @@
 package ru.vtm.lilybukkit.entity;
 
 import net.minecraft.src.Entity;
-import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
