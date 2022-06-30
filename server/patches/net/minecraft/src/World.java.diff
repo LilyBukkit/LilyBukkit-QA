@@ -1,1610 +1,1084 @@
 --- World.java
 +++ World.java
-@@ -1,7 +1,20 @@
+@@ -1,28 +1,14 @@
  package net.minecraft.src;
  
-+import org.bukkit.*;
-+import org.bukkit.block.Biome;
-+import org.bukkit.entity.*;
-+import org.bukkit.entity.Item;
-+import org.bukkit.generator.BlockPopulator;
-+import org.bukkit.generator.ChunkGenerator;
-+import org.bukkit.inventory.ItemStack;
-+import org.bukkit.metadata.MetadataValue;
-+import org.bukkit.plugin.Plugin;
-+import org.bukkit.plugin.messaging.ChannelNotRegisteredException;
-+import org.bukkit.plugin.messaging.MessageTooLargeException;
-+import org.bukkit.plugin.messaging.Messenger;
-+import org.bukkit.util.Vector;
-+
- import java.io.DataInputStream;
+-import java.io.DataInputStream;
 -import java.util.Iterator;
 -import java.util.Collection;
-+import java.util.*;
- import java.io.InputStream;
- import java.io.FileInputStream;
-@@ -10,13 +23,7 @@
- import java.io.DataOutputStream;
- import java.io.FileOutputStream;
+-import java.io.InputStream;
+-import java.io.FileInputStream;
+-import java.io.IOException;
+-import java.io.OutputStream;
+-import java.io.DataOutputStream;
+-import java.io.FileOutputStream;
 -import java.util.HashSet;
 -import java.util.ArrayList;
- import java.io.File;
+-import java.io.File;
 -import java.util.Random;
 -import java.util.Set;
 -import java.util.TreeSet;
 -import java.util.List;
++import java.io.*;
++import java.util.*;
  
--public class World implements IBlockAccess {
-+public class World implements IBlockAccess, org.bukkit.World {
-     private List lightingToUpdate;
-     public List loadedEntityList;
-@@ -53,5 +60,5 @@
+ public class World implements IBlockAccess {
+-    private List lightingToUpdate;
+-    public List loadedEntityList;
+-    private List unloadedEntityList;
+-    private TreeSet scheduledTickTreeSet;
+-    private Set scheduledTickSet;
+-    public List loadedTileEntityList;
++    private List<MetadataChunkBlock> lightingToUpdate;
++    public List<Entity> loadedEntityList;
++    private List<Entity> unloadedEntityList;
++    private TreeSet<NextTickListEntry> scheduledTickTreeSet;
++    private Set<NextTickListEntry> scheduledTickSet;
++    public List<TileEntity> loadedTileEntityList;
+     public long worldTime;
+     public boolean snowCovered;
+@@ -37,5 +23,5 @@
+     private final long lockTimestamp;
+     protected int autosavePeriod;
+-    public List playerEntities;
++    public List<Entity> playerEntities;
+     public int difficultySetting;
+     public Random rand;
+@@ -44,5 +30,5 @@
+     public int spawnZ;
+     public boolean isNewWorld;
+-    protected List worldAccesses;
++    protected List<IWorldAccess> worldAccesses;
+     private IChunkProvider chunkProvider;
+     public File saveDirectory;
+@@ -52,8 +38,8 @@
+     public final String levelName;
      public boolean worldChunkLoadOverride;
-     private ArrayList collidingBoundingBoxes;
+-    private ArrayList collidingBoundingBoxes;
 -    private Set positionsToUpdate;
-+private Set<ChunkCoordIntPair> positionsToUpdate;
++    private ArrayList<AxisAlignedBB> collidingBoundingBoxes;
++    private Set<ChunkCoordIntPair> positionsToUpdate;
      private int soundCounter;
-     private List entitiesWithinAABBExcludingEntity;
-@@ -1579,3 +1586,1562 @@
+-    private List entitiesWithinAABBExcludingEntity;
++    private List<Entity> entitiesWithinAABBExcludingEntity;
+     public boolean multiplayerWorld;
+     public long milestone;
+@@ -66,5 +52,5 @@
+     public long bossPeriod;
+     private int numLightingUpdates;
+-    
++
+     static {
+         World.lightBrightnessTable = new float[16];
+@@ -75,19 +61,19 @@
          }
      }
-+
-+    /**
-+     * Gets the {@link Block} at the given coordinates
-+     *
-+     * @param x X-coordinate of the block
-+     * @param y Y-coordinate of the block
-+     * @param z Z-coordinate of the block
-+     * @return Block at the given coordinates
-+     * @see #getBlockTypeIdAt(int, int, int) Returns the current type ID of
-+     * the block
-+     */
-+    @Override
-+    public org.bukkit.block.Block getBlockAt(int x, int y, int z) {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the {@link Block} at the given {@link Location}
-+     *
-+     * @param location Location of the block
-+     * @return Block at the given location
-+     * @see #getBlockTypeIdAt(Location) Returns the current type ID
-+     * of the block
-+     */
-+    @Override
-+    public org.bukkit.block.Block getBlockAt(Location location) {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the block type ID at the given coordinates
-+     *
-+     * @param x X-coordinate of the block
-+     * @param y Y-coordinate of the block
-+     * @param z Z-coordinate of the block
-+     * @return Type ID of the block at the given coordinates
-+     * @see #getBlockAt(int, int, int) Returns a live Block object at the
-+     * given location
-+     * @deprecated Magic value
-+     */
-+    @Override
-+    public int getBlockTypeIdAt(int x, int y, int z) {
-+        return 0;
-+    }
-+
-+    /**
-+     * Gets the block type ID at the given {@link Location}
-+     *
-+     * @param location Location of the block
-+     * @return Type ID of the block at the given location
-+     * @see #getBlockAt(Location) Returns a live Block object at
-+     * the given location
-+     * @deprecated Magic value
-+     */
-+    @Override
-+    public int getBlockTypeIdAt(Location location) {
-+        return 0;
-+    }
-+
-+    /**
-+     * Gets the highest non-air coordinate at the given coordinates
-+     *
-+     * @param x X-coordinate of the blocks
-+     * @param z Z-coordinate of the blocks
-+     * @return Y-coordinate of the highest non-air block
-+     */
-+    @Override
-+    public int getHighestBlockYAt(int x, int z) {
-+        return 0;
-+    }
-+
-+    /**
-+     * Gets the highest non-air coordinate at the given {@link Location}
-+     *
-+     * @param location Location of the blocks
-+     * @return Y-coordinate of the highest non-air block
-+     */
-+    @Override
-+    public int getHighestBlockYAt(Location location) {
-+        return 0;
-+    }
-+
-+    /**
-+     * Gets the highest non-empty block at the given coordinates
-+     *
-+     * @param x X-coordinate of the block
-+     * @param z Z-coordinate of the block
-+     * @return Highest non-empty block
-+     */
-+    @Override
-+    public org.bukkit.block.Block getHighestBlockAt(int x, int z) {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the highest non-empty block at the given coordinates
-+     *
-+     * @param location Coordinates to get the highest block
-+     * @return Highest non-empty block
-+     */
-+    @Override
-+    public org.bukkit.block.Block getHighestBlockAt(Location location) {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the {@link Chunk} at the given coordinates
-+     *
-+     * @param x X-coordinate of the chunk
-+     * @param z Z-coordinate of the chunk
-+     * @return Chunk at the given coordinates
-+     */
-+    @Override
-+    public org.bukkit.Chunk getChunkAt(int x, int z) {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the {@link Chunk} at the given {@link Location}
-+     *
-+     * @param location Location of the chunk
-+     * @return Chunk at the given location
-+     */
-+    @Override
-+    public org.bukkit.Chunk getChunkAt(Location location) {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the {@link Chunk} that contains the given {@link Block}
-+     *
-+     * @param block Block to get the containing chunk from
-+     * @return The chunk that contains the given block
-+     */
-+    @Override
-+    public org.bukkit.Chunk getChunkAt(org.bukkit.block.Block block) {
-+        return null;
-+    }
-+
-+    /**
-+     * Checks if the specified {@link Chunk} is loaded
-+     *
-+     * @param chunk The chunk to check
-+     * @return true if the chunk is loaded, otherwise false
-+     */
-+    @Override
-+    public boolean isChunkLoaded(org.bukkit.Chunk chunk) {
-+        return false;
-+    }
-+
-+    /**
-+     * Gets an array of all loaded {@link Chunk}s
-+     *
-+     * @return Chunk[] containing all loaded chunks
-+     */
-+    @Override
-+    public org.bukkit.Chunk[] getLoadedChunks() {
-+        return new org.bukkit.Chunk[0];
-+    }
-+
-+    /**
-+     * Loads the specified {@link Chunk}
-+     *
-+     * @param chunk The chunk to load
-+     */
-+    @Override
-+    public void loadChunk(org.bukkit.Chunk chunk) {
-+
-+    }
-+
-+    /**
-+     * Checks if the {@link Chunk} at the specified coordinates is loaded
-+     *
-+     * @param x X-coordinate of the chunk
-+     * @param z Z-coordinate of the chunk
-+     * @return true if the chunk is loaded, otherwise false
-+     */
-+    @Override
-+    public boolean isChunkLoaded(int x, int z) {
-+        return false;
-+    }
-+
-+    /**
-+     * Checks if the {@link Chunk} at the specified coordinates is loaded and
-+     * in use by one or more players
-+     *
-+     * @param x X-coordinate of the chunk
-+     * @param z Z-coordinate of the chunk
-+     * @return true if the chunk is loaded and in use by one or more players,
-+     * otherwise false
-+     */
-+    @Override
-+    public boolean isChunkInUse(int x, int z) {
-+        return false;
-+    }
-+
-+    /**
-+     * Loads the {@link Chunk} at the specified coordinates
-+     * <p>
-+     * If the chunk does not exist, it will be generated.
-+     * <p>
-+     * This method is analogous to {@link #loadChunk(int, int, boolean)} where
-+     * generate is true.
-+     *
-+     * @param x X-coordinate of the chunk
-+     * @param z Z-coordinate of the chunk
-+     */
-+    @Override
-+    public void loadChunk(int x, int z) {
-+
-+    }
-+
-+    /**
-+     * Loads the {@link Chunk} at the specified coordinates
-+     *
-+     * @param x        X-coordinate of the chunk
-+     * @param z        Z-coordinate of the chunk
-+     * @param generate Whether or not to generate a chunk if it doesn't
-+     *                 already exist
-+     * @return true if the chunk has loaded successfully, otherwise false
-+     */
-+    @Override
-+    public boolean loadChunk(int x, int z, boolean generate) {
-+        return false;
-+    }
-+
-+    /**
-+     * Safely unloads and saves the {@link Chunk} at the specified coordinates
-+     * <p>
-+     * This method is analogous to {@link #unloadChunk(int, int, boolean,
-+     * boolean)} where safe and saveis true
-+     *
-+     * @param chunk the chunk to unload
-+     * @return true if the chunk has unloaded successfully, otherwise false
-+     */
-+    @Override
-+    public boolean unloadChunk(org.bukkit.Chunk chunk) {
-+        return false;
-+    }
-+
-+    /**
-+     * Safely unloads and saves the {@link Chunk} at the specified coordinates
-+     * <p>
-+     * This method is analogous to {@link #unloadChunk(int, int, boolean,
-+     * boolean)} where safe and saveis true
-+     *
-+     * @param x X-coordinate of the chunk
-+     * @param z Z-coordinate of the chunk
-+     * @return true if the chunk has unloaded successfully, otherwise false
-+     */
-+    @Override
-+    public boolean unloadChunk(int x, int z) {
-+        return false;
-+    }
-+
-+    /**
-+     * Safely unloads and optionally saves the {@link Chunk} at the specified
-+     * coordinates
-+     * <p>
-+     * This method is analogous to {@link #unloadChunk(int, int, boolean,
-+     * boolean)} where save is true
-+     *
-+     * @param x    X-coordinate of the chunk
-+     * @param z    Z-coordinate of the chunk
-+     * @param save Whether or not to save the chunk
-+     * @return true if the chunk has unloaded successfully, otherwise false
-+     */
-+    @Override
-+    public boolean unloadChunk(int x, int z, boolean save) {
-+        return false;
-+    }
-+
-+    /**
-+     * Unloads and optionally saves the {@link Chunk} at the specified
-+     * coordinates
-+     *
-+     * @param x    X-coordinate of the chunk
-+     * @param z    Z-coordinate of the chunk
-+     * @param save Controls whether the chunk is saved
-+     * @param safe Controls whether to unload the chunk when players are
-+     *             nearby
-+     * @return true if the chunk has unloaded successfully, otherwise false
-+     */
-+    @Override
-+    public boolean unloadChunk(int x, int z, boolean save, boolean safe) {
-+        return false;
-+    }
-+
-+    /**
-+     * Safely queues the {@link Chunk} at the specified coordinates for
-+     * unloading
-+     * <p>
-+     * This method is analogous to {@link #unloadChunkRequest(int, int,
-+     * boolean)} where safe is true
-+     *
-+     * @param x X-coordinate of the chunk
-+     * @param z Z-coordinate of the chunk
-+     * @return true is the queue attempt was successful, otherwise false
-+     */
-+    @Override
-+    public boolean unloadChunkRequest(int x, int z) {
-+        return false;
-+    }
-+
-+    /**
-+     * Queues the {@link Chunk} at the specified coordinates for unloading
-+     *
-+     * @param x    X-coordinate of the chunk
-+     * @param z    Z-coordinate of the chunk
-+     * @param safe Controls whether to queue the chunk when players are nearby
-+     * @return Whether the chunk was actually queued
-+     */
-+    @Override
-+    public boolean unloadChunkRequest(int x, int z, boolean safe) {
-+        return false;
-+    }
-+
-+    /**
-+     * Regenerates the {@link Chunk} at the specified coordinates
-+     *
-+     * @param x X-coordinate of the chunk
-+     * @param z Z-coordinate of the chunk
-+     * @return Whether the chunk was actually regenerated
-+     */
-+    @Override
-+    public boolean regenerateChunk(int x, int z) {
-+        return false;
-+    }
-+
-+    /**
-+     * Resends the {@link Chunk} to all clients
-+     *
-+     * @param x X-coordinate of the chunk
-+     * @param z Z-coordinate of the chunk
-+     * @return Whether the chunk was actually refreshed
-+     */
-+    @Override
-+    public boolean refreshChunk(int x, int z) {
-+        return false;
-+    }
-+
-+    /**
-+     * Drops an item at the specified {@link Location}
-+     *
-+     * @param location Location to drop the item
-+     * @param item     ItemStack to drop
-+     * @return ItemDrop entity created as a result of this method
-+     */
-+    @Override
-+    public Item dropItem(Location location, ItemStack item) {
-+        return null;
-+    }
-+
-+    /**
-+     * Drops an item at the specified {@link Location} with a random offset
-+     *
-+     * @param location Location to drop the item
-+     * @param item     ItemStack to drop
-+     * @return ItemDrop entity created as a result of this method
-+     */
-+    @Override
-+    public Item dropItemNaturally(Location location, ItemStack item) {
-+        return null;
-+    }
-+
-+    /**
-+     * Creates an {@link Arrow} entity at the given {@link Location}
-+     *
-+     * @param location  Location to spawn the arrow
-+     * @param direction Direction to shoot the arrow in
-+     * @param speed     Speed of the arrow. A recommend speed is 0.6
-+     * @param spread    Spread of the arrow. A recommend spread is 12
-+     * @return Arrow entity spawned as a result of this method
-+     */
-+    @Override
-+    public Arrow spawnArrow(Location location, Vector direction, float speed, float spread) {
-+        return null;
-+    }
-+
-+    /**
-+     * Creates a tree at the given {@link Location}
-+     *
-+     * @param location Location to spawn the tree
-+     * @param type     Type of the tree to create
-+     * @return true if the tree was created successfully, otherwise false
-+     */
-+    @Override
-+    public boolean generateTree(Location location, TreeType type) {
-+        return false;
-+    }
-+
-+    /**
-+     * Creates a tree at the given {@link Location}
-+     *
-+     * @param loc      Location to spawn the tree
-+     * @param type     Type of the tree to create
-+     * @param delegate A class to call for each block changed as a result of
-+     *                 this method
-+     * @return true if the tree was created successfully, otherwise false
-+     */
-+    @Override
-+    public boolean generateTree(Location loc, TreeType type, BlockChangeDelegate delegate) {
-+        return false;
-+    }
-+
-+    /**
-+     * Creates a entity at the given {@link Location}
-+     *
-+     * @param loc  The location to spawn the entity
-+     * @param type The entity to spawn
-+     * @return Resulting Entity of this method, or null if it was unsuccessful
-+     */
-+    @Override
-+    public org.bukkit.entity.Entity spawnEntity(Location loc, EntityType type) {
-+        return null;
-+    }
-+
-+    /**
-+     * Creates a creature at the given {@link Location}
-+     *
-+     * @param loc  The location to spawn the creature
-+     * @param type The creature to spawn
-+     * @return Resulting LivingEntity of this method, or null if it was
-+     * unsuccessful
-+     * @deprecated Has issues spawning non LivingEntities. Use {@link
-+     * #spawnEntity(Location, EntityType) spawnEntity} instead.
-+     */
-+    @Override
-+    public LivingEntity spawnCreature(Location loc, EntityType type) {
-+        return null;
-+    }
-+
-+    /**
-+     * Creates a creature at the given {@link Location}
-+     *
-+     * @param loc  The location to spawn the creature
-+     * @param type The creature to spawn
-+     * @return Resulting LivingEntity of this method, or null if it was
-+     * unsuccessful
-+     */
-+    @Override
-+    public LivingEntity spawnCreature(Location loc, CreatureType type) {
-+        return null;
-+    }
-+
-+    /**
-+     * Strikes lightning at the given {@link Location}
-+     *
-+     * @param loc The location to strike lightning
-+     * @return The lightning entity.
-+     */
-+    @Override
-+    public LightningStrike strikeLightning(Location loc) {
-+        return null;
-+    }
-+
-+    /**
-+     * Strikes lightning at the given {@link Location} without doing damage
-+     *
-+     * @param loc The location to strike lightning
-+     * @return The lightning entity.
-+     */
-+    @Override
-+    public LightningStrike strikeLightningEffect(Location loc) {
-+        return null;
-+    }
-+
-+    /**
-+     * Get a list of all entities in this World
-+     *
-+     * @return A List of all Entities currently residing in this world
-+     */
-+    @Override
-+    public List<org.bukkit.entity.Entity> getEntities() {
-+        return null;
-+    }
-+
-+    /**
-+     * Get a list of all living entities in this World
-+     *
-+     * @return A List of all LivingEntities currently residing in this world
-+     */
-+    @Override
-+    public List<LivingEntity> getLivingEntities() {
-+        return null;
-+    }
-+
-+    /**
-+     * Get a collection of all entities in this World matching the given
-+     * class/interface
-+     *
-+     * @param classes The classes representing the types of entity to match
-+     * @return A List of all Entities currently residing in this world that
-+     * match the given class/interface
-+     */
-+    @Override
-+    public <T extends org.bukkit.entity.Entity> Collection<T> getEntitiesByClass(Class<T>... classes) {
-+        return null;
-+    }
-+
-+    /**
-+     * Get a collection of all entities in this World matching the given
-+     * class/interface
-+     *
-+     * @param cls The class representing the type of entity to match
-+     * @return A List of all Entities currently residing in this world that
-+     * match the given class/interface
-+     */
-+    @Override
-+    public <T extends org.bukkit.entity.Entity> Collection<T> getEntitiesByClass(Class<T> cls) {
-+        return null;
-+    }
-+
-+    /**
-+     * Get a collection of all entities in this World matching any of the
-+     * given classes/interfaces
-+     *
-+     * @param classes The classes representing the types of entity to match
-+     * @return A List of all Entities currently residing in this world that
-+     * match one or more of the given classes/interfaces
-+     */
-+    @Override
-+    public Collection<org.bukkit.entity.Entity> getEntitiesByClasses(Class<?>... classes) {
-+        return null;
-+    }
-+
-+    /**
-+     * Get a list of all players in this World
-+     *
-+     * @return A list of all Players currently residing in this world
-+     */
-+    @Override
-+    public List<Player> getPlayers() {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the unique name of this world
-+     *
-+     * @return Name of this world
-+     */
-+    @Override
-+    public String getName() {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the Unique ID of this world
-+     *
-+     * @return Unique ID of this world.
-+     */
-+    @Override
-+    public UUID getUID() {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the default spawn {@link Location} of this world
-+     *
-+     * @return The spawn location of this world
-+     */
-+    @Override
-+    public Location getSpawnLocation() {
-+        return null;
-+    }
-+
-+    /**
-+     * Sets the spawn location of the world
-+     *
-+     * @param x X coordinate
-+     * @param y Y coordinate
-+     * @param z Z coordinate
-+     * @return True if it was successfully set.
-+     */
-+    @Override
-+    public boolean setSpawnLocation(int x, int y, int z) {
-+        return false;
-+    }
-+
-+    /**
-+     * Gets the relative in-game time of this world.
-+     * <p>
-+     * The relative time is analogous to hours * 1000
-+     *
-+     * @return The current relative time
-+     * @see #getFullTime() Returns an absolute time of this world
-+     */
-+    @Override
-+    public long getTime() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the relative in-game time on the server.
-+     * <p>
-+     * The relative time is analogous to hours * 1000
-+     * <p>
-+     * Note that setting the relative time below the current relative time
-+     * will actually move the clock forward a day. If you require to rewind
-+     * time, please see {@link #setFullTime(long)}
-+     *
-+     * @param time The new relative time to set the in-game time to (in
-+     *             hours*1000)
-+     * @see #setFullTime(long) Sets the absolute time of this world
-+     */
-+    @Override
-+    public void setTime(long time) {
-+
-+    }
-+
-+    /**
-+     * Gets the full in-game time on this world
-+     *
-+     * @return The current absolute time
-+     * @see #getTime() Returns a relative time of this world
-+     */
-+    @Override
-+    public long getFullTime() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the in-game time on the server
-+     * <p>
-+     * Note that this sets the full time of the world, which may cause adverse
-+     * effects such as breaking redstone clocks and any scheduled events
-+     *
-+     * @param time The new absolute time to set this world to
-+     * @see #setTime(long) Sets the relative time of this world
-+     */
-+    @Override
-+    public void setFullTime(long time) {
-+
-+    }
-+
-+    /**
-+     * Returns whether the world has an ongoing storm.
-+     *
-+     * @return Whether there is an ongoing storm
-+     */
-+    @Override
-+    public boolean hasStorm() {
-+        return false;
-+    }
-+
-+    /**
-+     * Set whether there is a storm. A duration will be set for the new
-+     * current conditions.
-+     *
-+     * @param hasStorm Whether there is rain and snow
-+     */
-+    @Override
-+    public void setStorm(boolean hasStorm) {
-+
-+    }
-+
-+    /**
-+     * Get the remaining time in ticks of the current conditions.
-+     *
-+     * @return Time in ticks
-+     */
-+    @Override
-+    public int getWeatherDuration() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Set the remaining time in ticks of the current conditions.
-+     *
-+     * @param duration Time in ticks
-+     */
-+    @Override
-+    public void setWeatherDuration(int duration) {
-+
-+    }
-+
-+    /**
-+     * Returns whether there is thunder.
-+     *
-+     * @return Whether there is thunder
-+     */
-+    @Override
-+    public boolean isThundering() {
-+        return false;
-+    }
-+
-+    /**
-+     * Set whether it is thundering.
-+     *
-+     * @param thundering Whether it is thundering
-+     */
-+    @Override
-+    public void setThundering(boolean thundering) {
-+
-+    }
-+
-+    /**
-+     * Get the thundering duration.
-+     *
-+     * @return Duration in ticks
-+     */
-+    @Override
-+    public int getThunderDuration() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Set the thundering duration.
-+     *
-+     * @param duration Duration in ticks
-+     */
-+    @Override
-+    public void setThunderDuration(int duration) {
-+
-+    }
-+
-+    /**
-+     * Creates explosion at given coordinates with given power
-+     *
-+     * @param x     X coordinate
-+     * @param y     Y coordinate
-+     * @param z     Z coordinate
-+     * @param power The power of explosion, where 4F is TNT
-+     * @return false if explosion was canceled, otherwise true
-+     */
-+    @Override
-+    public boolean createExplosion(double x, double y, double z, float power) {
-+        return false;
-+    }
-+
-+    /**
-+     * Creates explosion at given coordinates with given power and optionally
-+     * setting blocks on fire.
-+     *
-+     * @param x       X coordinate
-+     * @param y       Y coordinate
-+     * @param z       Z coordinate
-+     * @param power   The power of explosion, where 4F is TNT
-+     * @param setFire Whether or not to set blocks on fire
-+     * @return false if explosion was canceled, otherwise true
-+     */
-+    @Override
-+    public boolean createExplosion(double x, double y, double z, float power, boolean setFire) {
-+        return false;
-+    }
-+
-+    /**
-+     * Creates explosion at given coordinates with given power and optionally
-+     * setting blocks on fire or breaking blocks.
-+     *
-+     * @param x           X coordinate
-+     * @param y           Y coordinate
-+     * @param z           Z coordinate
-+     * @param power       The power of explosion, where 4F is TNT
-+     * @param setFire     Whether or not to set blocks on fire
-+     * @param breakBlocks Whether or not to have blocks be destroyed
-+     * @return false if explosion was canceled, otherwise true
-+     */
-+    @Override
-+    public boolean createExplosion(double x, double y, double z, float power, boolean setFire, boolean breakBlocks) {
-+        return false;
-+    }
-+
-+    /**
-+     * Creates explosion at given coordinates with given power
-+     *
-+     * @param loc   Location to blow up
-+     * @param power The power of explosion, where 4F is TNT
-+     * @return false if explosion was canceled, otherwise true
-+     */
-+    @Override
-+    public boolean createExplosion(Location loc, float power) {
-+        return false;
-+    }
-+
-+    /**
-+     * Creates explosion at given coordinates with given power and optionally
-+     * setting blocks on fire.
-+     *
-+     * @param loc     Location to blow up
-+     * @param power   The power of explosion, where 4F is TNT
-+     * @param setFire Whether or not to set blocks on fire
-+     * @return false if explosion was canceled, otherwise true
-+     */
-+    @Override
-+    public boolean createExplosion(Location loc, float power, boolean setFire) {
-+        return false;
-+    }
-+
-+    /**
-+     * Gets the {@link Environment} type of this world
-+     *
-+     * @return This worlds Environment type
-+     */
-+    @Override
-+    public Environment getEnvironment() {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the Seed for this world.
-+     *
-+     * @return This worlds Seed
-+     */
-+    @Override
-+    public long getSeed() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Gets the current PVP setting for this world.
-+     *
-+     * @return True if PVP is enabled
-+     */
-+    @Override
-+    public boolean getPVP() {
-+        return false;
-+    }
-+
-+    /**
-+     * Sets the PVP setting for this world.
-+     *
-+     * @param pvp True/False whether PVP should be Enabled.
-+     */
-+    @Override
-+    public void setPVP(boolean pvp) {
-+
-+    }
-+
-+    /**
-+     * Gets the chunk generator for this world
-+     *
-+     * @return ChunkGenerator associated with this world
-+     */
-+    @Override
-+    public ChunkGenerator getGenerator() {
-+        return null;
-+    }
-+
-+    /**
-+     * Saves world to disk
-+     */
-+    @Override
-+    public void save() {
-+
-+    }
-+
-+    /**
-+     * Gets a list of all applied {@link BlockPopulator}s for this World
-+     *
-+     * @return List containing any or none BlockPopulators
-+     */
-+    @Override
-+    public List<BlockPopulator> getPopulators() {
-+        return null;
-+    }
-+
-+    /**
-+     * Spawn an entity of a specific class at the given {@link Location}
-+     *
-+     * @param location the {@link Location} to spawn the entity at
-+     * @param clazz    the class of the {@link Entity} to spawn
-+     * @return an instance of the spawned {@link Entity}
-+     * @throws IllegalArgumentException if either parameter is null or the
-+     *                                  {@link Entity} requested cannot be spawned
-+     */
-+    @Override
-+    public <T extends org.bukkit.entity.Entity> T spawn(Location location, Class<T> clazz) throws IllegalArgumentException {
-+        return null;
-+    }
-+
-+    /**
-+     * Spawn a {@link FallingBlock} entity at the given {@link Location} of
-+     * the specified {@link Material}. The material dictates what is falling.
-+     * When the FallingBlock hits the ground, it will place that block.
-+     * <p>
-+     * The Material must be a block type, which is uncheckable. The Material may not be air.
-+     *
-+     * @param location The {@link Location} to spawn the FallingBlock
-+     * @param material The block {@link Material} type
-+     * @param data     The block data
-+     * @return The spawned {@link FallingBlock} instance
-+     * @throws IllegalArgumentException if {@link Location} or {@link
-+     *                                  Material} are null or {@link Material} is not a block
-+     * @deprecated Magic value
-+     */
-+    @Override
-+    public FallingBlock spawnFallingBlock(Location location, org.bukkit.Material material, byte data) throws IllegalArgumentException {
-+        return null;
-+    }
-+
-+    /**
-+     * Spawn a {@link FallingBlock} entity at the given {@link Location} of
-+     * the specified blockId (converted to {@link Material})
-+     *
-+     * @param location  The {@link Location} to spawn the FallingBlock
-+     * @param blockId   The id of the intended material
-+     * @param blockData The block data
-+     * @return The spawned FallingBlock instance
-+     * @throws IllegalArgumentException if location is null, or blockId is
-+     *                                  invalid
-+     * @see #spawnFallingBlock(Location, org.bukkit.Material, byte)
-+     * @deprecated Magic value
-+     */
-+    @Override
-+    public FallingBlock spawnFallingBlock(Location location, int blockId, byte blockData) throws IllegalArgumentException {
-+        return null;
-+    }
-+
-+    /**
-+     * Plays an effect to all players within a default radius around a given
-+     * location.
-+     *
-+     * @param location the {@link Location} around which players must be to
-+     *                 hear the sound
-+     * @param effect   the {@link Effect}
-+     * @param data     a data bit needed for some effects
-+     */
-+    @Override
-+    public void playEffect(Location location, Effect effect, int data) {
-+
-+    }
-+
-+    /**
-+     * Plays an effect to all players within a given radius around a location.
-+     *
-+     * @param location the {@link Location} around which players must be to
-+     *                 hear the effect
-+     * @param effect   the {@link Effect}
-+     * @param data     a data bit needed for some effects
-+     * @param radius   the radius around the location
-+     */
-+    @Override
-+    public void playEffect(Location location, Effect effect, int data, int radius) {
-+
-+    }
-+
-+    /**
-+     * Plays an effect to all players within a default radius around a given
-+     * location.
-+     *
-+     * @param location the {@link Location} around which players must be to
-+     *                 hear the sound
-+     * @param effect   the {@link Effect}
-+     * @param data     a data bit needed for some effects
-+     */
-+    @Override
-+    public <T> void playEffect(Location location, Effect effect, T data) {
-+
-+    }
-+
-+    /**
-+     * Plays an effect to all players within a given radius around a location.
-+     *
-+     * @param location the {@link Location} around which players must be to
-+     *                 hear the effect
-+     * @param effect   the {@link Effect}
-+     * @param data     a data bit needed for some effects
-+     * @param radius   the radius around the location
-+     */
-+    @Override
-+    public <T> void playEffect(Location location, Effect effect, T data, int radius) {
-+
-+    }
-+
-+    /**
-+     * Get empty chunk snapshot (equivalent to all air blocks), optionally
-+     * including valid biome data. Used for representing an ungenerated chunk,
-+     * or for fetching only biome data without loading a chunk.
-+     *
-+     * @param x                    - chunk x coordinate
-+     * @param z                    - chunk z coordinate
-+     * @param includeBiome         - if true, snapshot includes per-coordinate biome
-+     *                             type
-+     * @param includeBiomeTempRain - if true, snapshot includes per-coordinate
-+     *                             raw biome temperature and rainfall
-+     * @return The empty snapshot.
-+     */
-+    @Override
-+    public ChunkSnapshot getEmptyChunkSnapshot(int x, int z, boolean includeBiome, boolean includeBiomeTempRain) {
-+        return null;
-+    }
-+
-+    /**
-+     * Sets the spawn flags for this.
-+     *
-+     * @param allowMonsters - if true, monsters are allowed to spawn in this
-+     *                      world.
-+     * @param allowAnimals  - if true, animals are allowed to spawn in this
-+     *                      world.
-+     */
-+    @Override
-+    public void setSpawnFlags(boolean allowMonsters, boolean allowAnimals) {
-+
-+    }
-+
-+    /**
-+     * Gets whether animals can spawn in this world.
-+     *
-+     * @return whether animals can spawn in this world.
-+     */
-+    @Override
-+    public boolean getAllowAnimals() {
-+        return false;
-+    }
-+
-+    /**
-+     * Gets whether monsters can spawn in this world.
-+     *
-+     * @return whether monsters can spawn in this world.
-+     */
-+    @Override
-+    public boolean getAllowMonsters() {
-+        return false;
-+    }
-+
-+    /**
-+     * Gets the biome for the given block coordinates.
-+     *
-+     * @param x X coordinate of the block
-+     * @param z Z coordinate of the block
-+     * @return Biome of the requested block
-+     */
-+    @Override
-+    public Biome getBiome(int x, int z) {
-+        return null;
-+    }
-+
-+    /**
-+     * Sets the biome for the given block coordinates
-+     *
-+     * @param x   X coordinate of the block
-+     * @param z   Z coordinate of the block
-+     * @param bio new Biome type for this block
-+     */
-+    @Override
-+    public void setBiome(int x, int z, Biome bio) {
-+
-+    }
-+
-+    /**
-+     * Gets the temperature for the given block coordinates.
-+     * <p>
-+     * It is safe to run this method when the block does not exist, it will
-+     * not create the block.
-+     *
-+     * @param x X coordinate of the block
-+     * @param z Z coordinate of the block
-+     * @return Temperature of the requested block
-+     */
-+    @Override
-+    public double getTemperature(int x, int z) {
-+        return 0;
-+    }
-+
-+    /**
-+     * Gets the humidity for the given block coordinates.
-+     * <p>
-+     * It is safe to run this method when the block does not exist, it will
-+     * not create the block.
-+     *
-+     * @param x X coordinate of the block
-+     * @param z Z coordinate of the block
-+     * @return Humidity of the requested block
-+     */
-+    @Override
-+    public double getHumidity(int x, int z) {
-+        return 0;
-+    }
-+
-+    /**
-+     * Gets the maximum height of this world.
-+     * <p>
-+     * If the max height is 100, there are only blocks from y=0 to y=99.
-+     *
-+     * @return Maximum height of the world
-+     */
-+    @Override
-+    public int getMaxHeight() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Gets the sea level for this world.
-+     * <p>
-+     * This is often half of {@link #getMaxHeight()}
-+     *
-+     * @return Sea level
-+     */
-+    @Override
-+    public int getSeaLevel() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Gets whether the world's spawn area should be kept loaded into memory
-+     * or not.
-+     *
-+     * @return true if the world's spawn area will be kept loaded into memory.
-+     */
-+    @Override
-+    public boolean getKeepSpawnInMemory() {
-+        return false;
-+    }
-+
-+    /**
-+     * Sets whether the world's spawn area should be kept loaded into memory
-+     * or not.
-+     *
-+     * @param keepLoaded if true then the world's spawn area will be kept
-+     *                   loaded into memory.
-+     */
-+    @Override
-+    public void setKeepSpawnInMemory(boolean keepLoaded) {
-+
-+    }
-+
-+    /**
-+     * Gets whether or not the world will automatically save
-+     *
-+     * @return true if the world will automatically save, otherwise false
-+     */
-+    @Override
-+    public boolean isAutoSave() {
-+        return false;
-+    }
-+
-+    /**
-+     * Sets whether or not the world will automatically save
-+     *
-+     * @param value true if the world should automatically save, otherwise
-+     *              false
-+     */
-+    @Override
-+    public void setAutoSave(boolean value) {
-+
-+    }
-+
-+    /**
-+     * Sets the Difficulty of the world.
-+     *
-+     * @param difficulty the new difficulty you want to set the world to
-+     */
-+    @Override
-+    public void setDifficulty(Difficulty difficulty) {
-+
-+    }
-+
-+    /**
-+     * Gets the Difficulty of the world.
-+     *
-+     * @return The difficulty of the world.
-+     */
-+    @Override
-+    public Difficulty getDifficulty() {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the folder of this world on disk.
-+     *
-+     * @return The folder of this world.
-+     */
-+    @Override
-+    public File getWorldFolder() {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets the type of this world.
-+     *
-+     * @return Type of this world.
-+     */
-+    @Override
-+    public WorldType getWorldType() {
-+        return null;
-+    }
-+
-+    /**
-+     * Gets whether or not structures are being generated.
-+     *
-+     * @return True if structures are being generated.
-+     */
-+    @Override
-+    public boolean canGenerateStructures() {
-+        return false;
-+    }
-+
-+    /**
-+     * Gets the world's ticks per animal spawns value
-+     * <p>
-+     * This value determines how many ticks there are between attempts to
-+     * spawn animals.
-+     * <p>
-+     * <b>Example Usage:</b>
-+     * <ul>
-+     * <li>A value of 1 will mean the server will attempt to spawn animals in
-+     *     this world every tick.
-+     * <li>A value of 400 will mean the server will attempt to spawn animals
-+     *     in this world every 400th tick.
-+     * <li>A value below 0 will be reset back to Minecraft's default.
-+     * </ul>
-+     * <p>
-+     * <b>Note:</b>
-+     * If set to 0, animal spawning will be disabled for this world. We
-+     * recommend using {@link #setSpawnFlags(boolean, boolean)} to control
-+     * this instead.
-+     * <p>
-+     * Minecraft default: 400.
-+     *
-+     * @return The world's ticks per animal spawns value
-+     */
-+    @Override
-+    public long getTicksPerAnimalSpawns() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the world's ticks per animal spawns value
-+     * <p>
-+     * This value determines how many ticks there are between attempts to
-+     * spawn animals.
-+     * <p>
-+     * <b>Example Usage:</b>
-+     * <ul>
-+     * <li>A value of 1 will mean the server will attempt to spawn animals in
-+     *     this world every tick.
-+     * <li>A value of 400 will mean the server will attempt to spawn animals
-+     *     in this world every 400th tick.
-+     * <li>A value below 0 will be reset back to Minecraft's default.
-+     * </ul>
-+     * <p>
-+     * <b>Note:</b>
-+     * If set to 0, animal spawning will be disabled for this world. We
-+     * recommend using {@link #setSpawnFlags(boolean, boolean)} to control
-+     * this instead.
-+     * <p>
-+     * Minecraft default: 400.
-+     *
-+     * @param ticksPerAnimalSpawns the ticks per animal spawns value you want
-+     *                             to set the world to
-+     */
-+    @Override
-+    public void setTicksPerAnimalSpawns(int ticksPerAnimalSpawns) {
-+
-+    }
-+
-+    /**
-+     * Gets the world's ticks per monster spawns value
-+     * <p>
-+     * This value determines how many ticks there are between attempts to
-+     * spawn monsters.
-+     * <p>
-+     * <b>Example Usage:</b>
-+     * <ul>
-+     * <li>A value of 1 will mean the server will attempt to spawn monsters in
-+     *     this world every tick.
-+     * <li>A value of 400 will mean the server will attempt to spawn monsters
-+     *     in this world every 400th tick.
-+     * <li>A value below 0 will be reset back to Minecraft's default.
-+     * </ul>
-+     * <p>
-+     * <b>Note:</b>
-+     * If set to 0, monsters spawning will be disabled for this world. We
-+     * recommend using {@link #setSpawnFlags(boolean, boolean)} to control
-+     * this instead.
-+     * <p>
-+     * Minecraft default: 1.
-+     *
-+     * @return The world's ticks per monster spawns value
-+     */
-+    @Override
-+    public long getTicksPerMonsterSpawns() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the world's ticks per monster spawns value
-+     * <p>
-+     * This value determines how many ticks there are between attempts to
-+     * spawn monsters.
-+     * <p>
-+     * <b>Example Usage:</b>
-+     * <ul>
-+     * <li>A value of 1 will mean the server will attempt to spawn monsters in
-+     *     this world on every tick.
-+     * <li>A value of 400 will mean the server will attempt to spawn monsters
-+     *     in this world every 400th tick.
-+     * <li>A value below 0 will be reset back to Minecraft's default.
-+     * </ul>
-+     * <p>
-+     * <b>Note:</b>
-+     * If set to 0, monsters spawning will be disabled for this world. We
-+     * recommend using {@link #setSpawnFlags(boolean, boolean)} to control
-+     * this instead.
-+     * <p>
-+     * Minecraft default: 1.
-+     *
-+     * @param ticksPerMonsterSpawns the ticks per monster spawns value you
-+     *                              want to set the world to
-+     */
-+    @Override
-+    public void setTicksPerMonsterSpawns(int ticksPerMonsterSpawns) {
-+
-+    }
-+
-+    /**
-+     * Gets limit for number of monsters that can spawn in a chunk in this
-+     * world
-+     *
-+     * @return The monster spawn limit
-+     */
-+    @Override
-+    public int getMonsterSpawnLimit() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the limit for number of monsters that can spawn in a chunk in this
-+     * world
-+     * <p>
-+     * <b>Note:</b> If set to a negative number the world will use the
-+     * server-wide spawn limit instead.
-+     *
-+     * @param limit
-+     */
-+    @Override
-+    public void setMonsterSpawnLimit(int limit) {
-+
-+    }
-+
-+    /**
-+     * Gets the limit for number of animals that can spawn in a chunk in this
-+     * world
-+     *
-+     * @return The animal spawn limit
-+     */
-+    @Override
-+    public int getAnimalSpawnLimit() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the limit for number of animals that can spawn in a chunk in this
-+     * world
-+     * <p>
-+     * <b>Note:</b> If set to a negative number the world will use the
-+     * server-wide spawn limit instead.
-+     *
-+     * @param limit
-+     */
-+    @Override
-+    public void setAnimalSpawnLimit(int limit) {
-+
-+    }
-+
-+    /**
-+     * Gets the limit for number of water animals that can spawn in a chunk in
-+     * this world
-+     *
-+     * @return The water animal spawn limit
-+     */
-+    @Override
-+    public int getWaterAnimalSpawnLimit() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the limit for number of water animals that can spawn in a chunk in
-+     * this world
-+     * <p>
-+     * <b>Note:</b> If set to a negative number the world will use the
-+     * server-wide spawn limit instead.
-+     *
-+     * @param limit
-+     */
-+    @Override
-+    public void setWaterAnimalSpawnLimit(int limit) {
-+
-+    }
-+
-+    /**
-+     * Gets the limit for number of ambient mobs that can spawn in a chunk in
-+     * this world
-+     *
-+     * @return The ambient spawn limit
-+     */
-+    @Override
-+    public int getAmbientSpawnLimit() {
-+        return 0;
-+    }
-+
-+    /**
-+     * Sets the limit for number of ambient mobs that can spawn in a chunk in
-+     * this world
-+     * <p>
-+     * <b>Note:</b> If set to a negative number the world will use the
-+     * server-wide spawn limit instead.
-+     *
-+     * @param limit
-+     */
-+    @Override
-+    public void setAmbientSpawnLimit(int limit) {
-+
-+    }
-+
-+    /**
-+     * Play a Sound at the provided Location in the World
-+     * <p>
-+     * This function will fail silently if Location or Sound are null.
-+     *
-+     * @param location The location to play the sound
-+     * @param sound    The sound to play
-+     * @param volume   The volume of the sound
-+     * @param pitch    The pitch of the sound
-+     */
-+    @Override
-+    public void playSound(Location location, Sound sound, float volume, float pitch) {
-+
-+    }
-+
-+    /**
-+     * Get existing rules
-+     *
-+     * @return An array of rules
-+     */
-+    @Override
-+    public String[] getGameRules() {
-+        return new String[0];
-+    }
-+
-+    /**
-+     * Gets the current state of the specified rule
-+     * <p>
-+     * Will return null if rule passed is null
-+     *
-+     * @param rule Rule to look up value of
-+     * @return String value of rule
-+     */
-+    @Override
-+    public String getGameRuleValue(String rule) {
-+        return null;
-+    }
-+
-+    /**
-+     * Set the specified gamerule to specified value.
-+     * <p>
-+     * The rule may attempt to validate the value passed, will return true if
-+     * value was set.
-+     * <p>
-+     * If rule is null, the function will return false.
-+     *
-+     * @param rule  Rule to set
-+     * @param value Value to set rule to
-+     * @return True if rule was set
-+     */
-+    @Override
-+    public boolean setGameRuleValue(String rule, String value) {
-+        return false;
-+    }
-+
-+    /**
-+     * Checks if string is a valid game rule
-+     *
-+     * @param rule Rule to check
-+     * @return True if rule exists
-+     */
-+    @Override
-+    public boolean isGameRule(String rule) {
-+        return false;
-+    }
-+
-+    /**
-+     * Sets a metadata value in the implementing object's metadata store.
-+     *
-+     * @param metadataKey      A unique key to identify this metadata.
-+     * @param newMetadataValue The metadata value to apply.
-+     * @throws IllegalArgumentException If value is null, or the owning plugin
-+     *                                  is null
-+     */
-+    @Override
-+    public void setMetadata(String metadataKey, MetadataValue newMetadataValue) {
-+
-+    }
-+
-+    /**
-+     * Returns a list of previously set metadata values from the implementing
-+     * object's metadata store.
-+     *
-+     * @param metadataKey the unique metadata key being sought.
-+     * @return A list of values, one for each plugin that has set the
-+     * requested value.
-+     */
-+    @Override
-+    public List<MetadataValue> getMetadata(String metadataKey) {
-+        return null;
-+    }
-+
-+    /**
-+     * Tests to see whether the implementing object contains the given
-+     * metadata value in its metadata store.
-+     *
-+     * @param metadataKey the unique metadata key being queried.
-+     * @return the existence of the metadataKey within subject.
-+     */
-+    @Override
-+    public boolean hasMetadata(String metadataKey) {
-+        return false;
-+    }
-+
-+    /**
-+     * Removes the given metadata value from the implementing object's
-+     * metadata store.
-+     *
-+     * @param metadataKey  the unique metadata key identifying the metadata to
-+     *                     remove.
-+     * @param owningPlugin This plugin's metadata value will be removed. All
-+     *                     other values will be left untouched.
-+     * @throws IllegalArgumentException If plugin is null
-+     */
-+    @Override
-+    public void removeMetadata(String metadataKey, Plugin owningPlugin) {
-+
-+    }
-+
-+    /**
-+     * Sends this recipient a Plugin Message on the specified outgoing
-+     * channel.
-+     * <p>
-+     * The message may not be larger than {@link Messenger#MAX_MESSAGE_SIZE}
-+     * bytes, and the plugin must be registered to send messages on the
-+     * specified channel.
-+     *
-+     * @param source  The plugin that sent this message.
-+     * @param channel The channel to send this message on.
-+     * @param message The raw message to send.
-+     * @throws IllegalArgumentException      Thrown if the source plugin is
-+     *                                       disabled.
-+     * @throws IllegalArgumentException      Thrown if source, channel or message
-+     *                                       is null.
-+     * @throws MessageTooLargeException      Thrown if the message is too big.
-+     * @throws ChannelNotRegisteredException Thrown if the channel is not
-+     *                                       registered for this plugin.
-+     */
-+    @Override
-+    public void sendPluginMessage(Plugin source, String channel, byte[] message) {
-+
-+    }
-+
-+    /**
-+     * Gets a set containing all the Plugin Channels that this client is
-+     * listening on.
-+     *
-+     * @return Set containing all the channels that this client may accept.
-+     */
-+    @Override
-+    public Set<String> getListeningPluginChannels() {
-+        return null;
-+    }
- }
+-    
++
+     public MobGiant SpawnGiant(final double x, final double y, final double z) {
+-        final MobGiant mobGiant7 = new MobGiant(this, (int)this.milestone);
++        final MobGiant mobGiant7 = new MobGiant(this, (int) this.milestone);
+         mobGiant7.setLocationAndAngles(x, y, z, this.rand.nextFloat() * 360.0f, 0.0f);
+         this.spawnEntityInWorld(mobGiant7);
+         return mobGiant7;
+     }
+-    
++
+     public void CueSpawnBossFrom(final int n, final int n2) {
+     }
+-    
++
+     public World(final File worldFile, final String levelName) {
+         this(worldFile, levelName, new Random().nextLong());
+     }
+-    
++
+     public World(final String levelName) {
+         this.milestone = 0L;
+@@ -100,10 +86,10 @@
+         this.bossPeriod = 10L;
+         this.numLightingUpdates = 0;
+-        this.lightingToUpdate = (List)new ArrayList();
+-        this.loadedEntityList = (List)new ArrayList();
+-        this.unloadedEntityList = (List)new ArrayList();
++        this.lightingToUpdate = (List) new ArrayList();
++        this.loadedEntityList = (List) new ArrayList();
++        this.unloadedEntityList = (List) new ArrayList();
+         this.scheduledTickTreeSet = new TreeSet();
+-        this.scheduledTickSet = (Set)new HashSet();
+-        this.loadedTileEntityList = (List)new ArrayList();
++        this.scheduledTickSet = (Set) new HashSet();
++        this.loadedTileEntityList = (List) new ArrayList();
+         this.worldTime = 0L;
+         this.snowCovered = false;
+@@ -117,14 +103,14 @@
+         this.lockTimestamp = System.currentTimeMillis();
+         this.autosavePeriod = 40;
+-        this.playerEntities = (List)new ArrayList();
++        this.playerEntities = (List) new ArrayList();
+         this.rand = new Random();
+         this.isNewWorld = false;
+-        this.worldAccesses = (List)new ArrayList();
++        this.worldAccesses = (List) new ArrayList();
+         this.randomSeed = 0L;
+         this.sizeOnDisk = 0L;
+         this.collidingBoundingBoxes = new ArrayList();
+-        this.positionsToUpdate = (Set)new HashSet();
++        this.positionsToUpdate = (Set) new HashSet();
+         this.soundCounter = this.rand.nextInt(12000);
+-        this.entitiesWithinAABBExcludingEntity = (List)new ArrayList();
++        this.entitiesWithinAABBExcludingEntity = (List) new ArrayList();
+         this.multiplayerWorld = false;
+         this.levelName = levelName;
+@@ -132,5 +118,5 @@
+         this.calculateInitialSkylight();
+     }
+-    
++
+     public World(final File baseDir, final String levelName, final long randomSeed) {
+         this.milestone = 0L;
+@@ -143,10 +129,10 @@
+         this.bossPeriod = 10L;
+         this.numLightingUpdates = 0;
+-        this.lightingToUpdate = (List)new ArrayList();
+-        this.loadedEntityList = (List)new ArrayList();
+-        this.unloadedEntityList = (List)new ArrayList();
++        this.lightingToUpdate = (List) new ArrayList();
++        this.loadedEntityList = (List) new ArrayList();
++        this.unloadedEntityList = (List) new ArrayList();
+         this.scheduledTickTreeSet = new TreeSet();
+-        this.scheduledTickSet = (Set)new HashSet();
+-        this.loadedTileEntityList = (List)new ArrayList();
++        this.scheduledTickSet = (Set) new HashSet();
++        this.loadedTileEntityList = (List) new ArrayList();
+         this.worldTime = 0L;
+         this.snowCovered = false;
+@@ -160,14 +146,14 @@
+         this.lockTimestamp = System.currentTimeMillis();
+         this.autosavePeriod = 40;
+-        this.playerEntities = (List)new ArrayList();
++        this.playerEntities = (List) new ArrayList();
+         this.rand = new Random();
+         this.isNewWorld = false;
+-        this.worldAccesses = (List)new ArrayList();
++        this.worldAccesses = (List) new ArrayList();
+         this.randomSeed = 0L;
+         this.sizeOnDisk = 0L;
+         this.collidingBoundingBoxes = new ArrayList();
+-        this.positionsToUpdate = (Set)new HashSet();
++        this.positionsToUpdate = (Set) new HashSet();
+         this.soundCounter = this.rand.nextInt(12000);
+-        this.entitiesWithinAABBExcludingEntity = (List)new ArrayList();
++        this.entitiesWithinAABBExcludingEntity = (List) new ArrayList();
+         this.multiplayerWorld = false;
+         this.levelName = levelName;
+@@ -176,14 +162,12 @@
+         try {
+             final File file5 = new File(this.saveDirectory, "session.lock");
+-            final DataOutputStream dataOutputStream6 = new DataOutputStream((OutputStream)new FileOutputStream(file5));
++            final DataOutputStream dataOutputStream6 = new DataOutputStream((OutputStream) new FileOutputStream(file5));
+             try {
+                 dataOutputStream6.writeLong(this.lockTimestamp);
+-            }
+-            finally {
++            } finally {
+                 dataOutputStream6.close();
+             }
+             dataOutputStream6.close();
+-        }
+-        catch (IOException iOException13) {
++        } catch (IOException iOException13) {
+             throw new RuntimeException("Failed to check session lock, aborting");
+         }
+@@ -192,5 +176,5 @@
+         if (file5.exists()) {
+             try {
+-                final NBTTagCompound nBTTagCompound14 = CompressedStreamTools.readCompressed((InputStream)new FileInputStream(file5));
++                final NBTTagCompound nBTTagCompound14 = CompressedStreamTools.readCompressed((InputStream) new FileInputStream(file5));
+                 final NBTTagCompound nBTTagCompound15 = nBTTagCompound14.getCompoundTag("Data");
+                 this.randomSeed = nBTTagCompound15.getLong("RandomSeed");
+@@ -207,10 +191,8 @@
+                 this.exclFrailMode = nBTTagCompound15.getBoolean("ExclusivelyFrail");
+                 System.out.println(new StringBuilder("Current milestone: ").append(this.milestone).toString());
+-            }
+-            catch (Exception exception11) {
++            } catch (Exception exception11) {
+                 exception11.printStackTrace();
+             }
+-        }
+-        else {
++        } else {
+             this.snowCovered = (this.rand.nextInt(4) == 0);
+         }
+@@ -234,20 +216,21 @@
+         this.calculateInitialSkylight();
+     }
+-    
++
+     protected IChunkProvider getChunkProvider(final File saveDir) {
+         return new ChunkProviderLoadOrGenerate(this, new ChunkLoader(saveDir, true), new ChunkProviderGenerate(this, this.randomSeed));
+     }
+-    
++
+     private boolean findSpawn(final int x, final int z) {
+         final int i3 = this.getFirstUncoveredBlock(x, z);
+         return i3 == Block.sand.blockID;
+     }
+-    
++
+     private int getFirstUncoveredBlock(final int x, final int z) {
+         int i3;
+-        for (i3 = 63; this.getBlockId(x, i3 + 1, z) != 0; ++i3) {}
++        for (i3 = 63; this.getBlockId(x, i3 + 1, z) != 0; ++i3) {
++        }
+         return this.getBlockId(x, i3, z);
+     }
+-    
++
+     public void saveWorld(final boolean flag, final IProgressUpdate progressUpdate) {
+         if (this.chunkProvider.canSave()) {
+@@ -262,5 +245,5 @@
+         }
+     }
+-    
++
+     private void saveLevel() {
+         this.checkSessionLock();
+@@ -278,5 +261,5 @@
+         EntityPlayer entityPlayer2 = null;
+         if (this.playerEntities.size() > 0) {
+-            entityPlayer2 = (EntityPlayer)this.playerEntities.get(0);
++            entityPlayer2 = (EntityPlayer) this.playerEntities.get(0);
+         }
+         if (entityPlayer2 != null) {
+@@ -286,10 +269,10 @@
+         }
+         final NBTTagCompound nBTTagCompound2 = new NBTTagCompound();
+-        nBTTagCompound2.setTag("Data", (NBTBase)nBTTagCompound1);
++        nBTTagCompound2.setTag("Data", (NBTBase) nBTTagCompound1);
+         try {
+             final File file4 = new File(this.saveDirectory, "level.dat_new");
+             final File file5 = new File(this.saveDirectory, "level.dat_old");
+             final File file6 = new File(this.saveDirectory, "level.dat");
+-            CompressedStreamTools.writeCompressed(nBTTagCompound2, (OutputStream)new FileOutputStream(file4));
++            CompressedStreamTools.writeCompressed(nBTTagCompound2, (OutputStream) new FileOutputStream(file4));
+             if (file5.exists()) {
+                 file5.delete();
+@@ -303,18 +286,17 @@
+                 file4.delete();
+             }
+-        }
+-        catch (Exception exception7) {
++        } catch (Exception exception7) {
+             exception7.printStackTrace();
+         }
+     }
+-    
++
+     public int getBlockId(final int blockX, final int blockY, final int blockZ) {
+         return (blockX >= -32000000 && blockZ >= -32000000 && blockX < 32000000 && blockZ <= 32000000) ? ((blockY < 0) ? 0 : ((blockY >= 128) ? 0 : this.getChunkFromChunkCoords(blockX >> 4, blockZ >> 4).getBlockID(blockX & 0xF, blockY, blockZ & 0xF))) : 0;
+     }
+-    
++
+     public boolean blockExists(final int x, final int y, final int z) {
+         return y >= 0 && y < 128 && this.chunkExists(x >> 4, z >> 4);
+     }
+-    
++
+     public boolean checkChunksExist(int i1, int i2, int i3, int i4, int i5, int i6) {
+         if (i5 >= 0 && i2 < 128) {
+@@ -336,17 +318,17 @@
+         return false;
+     }
+-    
++
+     private boolean chunkExists(final int x, final int z) {
+         return this.chunkProvider.chunkExists(x, z);
+     }
+-    
++
+     public Chunk getChunkFromBlockCoords(final int x, final int z) {
+         return this.getChunkFromChunkCoords(x >> 4, z >> 4);
+     }
+-    
++
+     public Chunk getChunkFromChunkCoords(final int x, final int z) {
+         return this.chunkProvider.provideChunk(x, z);
+     }
+-    
++
+     public boolean setBlockAndMetadata(final int x, final int y, final int z, final int i4, final int i5) {
+         if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
+@@ -362,5 +344,5 @@
+         return chunk6.setBlockIDWithMetadata(x & 0xF, y, z & 0xF, i4, i5);
+     }
+-    
++
+     public boolean setBlock(final int x, final int y, final int z, final int i4) {
+         if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
+@@ -376,10 +358,10 @@
+         return chunk5.setBlockID(x & 0xF, y, z & 0xF, i4);
+     }
+-    
++
+     public Material getBlockMaterial(final int x, final int y, final int z) {
+         final int i4 = this.getBlockId(x, y, z);
+         return (i4 == 0) ? Material.air : Block.blocksList[i4].material;
+     }
+-    
++
+     public int getBlockMetadata(int x, final int y, int z) {
+         if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
+@@ -397,9 +379,9 @@
+         return chunk4.getBlockMetadata(x, y, z);
+     }
+-    
++
+     public void setBlockMetadataWithNotify(final int i1, final int i2, final int i3, final int i4) {
+         this.setBlockMetadata(i1, i2, i3, i4);
+     }
+-    
++
+     public boolean setBlockMetadata(int x, final int y, int z, final int i4) {
+         if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
+@@ -418,5 +400,5 @@
+         return true;
+     }
+-    
++
+     public boolean setBlockWithNotify(final int x, final int y, final int z, final int i4) {
+         if (this.setBlock(x, y, z, i4)) {
+@@ -426,5 +408,5 @@
+         return false;
+     }
+-    
++
+     public boolean setBlockAndMetadataWithNotify(final int x, final int y, final int z, final int i4, final int i5) {
+         if (this.setBlockAndMetadata(x, y, z, i4, i5)) {
+@@ -434,16 +416,16 @@
+         return false;
+     }
+-    
++
+     public void markBlockNeedsUpdate(final int x, final int y, final int z) {
+         for (int i4 = 0; i4 < this.worldAccesses.size(); ++i4) {
+-            ((IWorldAccess)this.worldAccesses.get(i4)).markBlockAndNeighborsNeedsUpdate(x, y, z);
++            ((IWorldAccess) this.worldAccesses.get(i4)).markBlockAndNeighborsNeedsUpdate(x, y, z);
+         }
+     }
+-    
++
+     protected void notifyBlockChange(final int x, final int y, final int z, final int i4) {
+         this.markBlockNeedsUpdate(x, y, z);
+         this.notifyBlocksOfNeighborChange(x, y, z, i4);
+     }
+-    
++
+     public void markBlocksDirtyVertical(final int x, final int z, int y, int i4) {
+         if (y > i4) {
+@@ -454,11 +436,11 @@
+         this.markBlocksDirty(x, y, z, x, i4, z);
+     }
+-    
++
+     public void markBlocksDirty(final int i1, final int i2, final int i3, final int i4, final int i5, final int i6) {
+         for (int i7 = 0; i7 < this.worldAccesses.size(); ++i7) {
+-            ((IWorldAccess)this.worldAccesses.get(i7)).markBlockRangeNeedsUpdate(i1, i2, i3, i4, i5, i6);
++            ((IWorldAccess) this.worldAccesses.get(i7)).markBlockRangeNeedsUpdate(i1, i2, i3, i4, i5, i6);
+         }
+     }
+-    
++
+     public void notifyBlocksOfNeighborChange(final int x, final int y, final int z, final int i4) {
+         this.notifyBlockOfNeighborChange(x - 1, y, z, i4);
+@@ -469,5 +451,5 @@
+         this.notifyBlockOfNeighborChange(x, y, z + 1, i4);
+     }
+-    
++
+     private void notifyBlockOfNeighborChange(final int x, final int y, final int z, final int i4) {
+         if (!this.editingBlocks && !this.multiplayerWorld) {
+@@ -478,13 +460,13 @@
+         }
+     }
+-    
++
+     public boolean canBlockSeeTheSky(final int x, final int y, final int z) {
+         return this.getChunkFromChunkCoords(x >> 4, z >> 4).canBlockSeeTheSky(x & 0xF, y, z & 0xF);
+     }
+-    
++
+     public int getBlockLightValue(final int x, final int y, final int z) {
+         return this.getBlockLightValue_do(x, y, z, true);
+     }
+-    
++
+     public int getBlockLightValue_do(int x, final int y, int z, final boolean z4) {
+         if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
+@@ -529,5 +511,5 @@
+         return chunk11.getBlockLightValue(x, y, z, this.skylightSubtracted);
+     }
+-    
++
+     public boolean canExistingBlockSeeTheSky(int x, final int y, int z) {
+         if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
+@@ -548,5 +530,5 @@
+         return chunk4.canBlockSeeTheSky(x, y, z);
+     }
+-    
++
+     public int getHeightValue(final int blockX, final int blockZ) {
+         if (blockX < -32000000 || blockZ < -32000000 || blockX >= 32000000 || blockZ > 32000000) {
+@@ -559,5 +541,5 @@
+         return chunk3.getHeightValue(blockX & 0xF, blockZ & 0xF);
+     }
+-    
++
+     public void neighborLightPropagationChanged(final EnumSkyBlock skyBlock, final int x, final int y, final int z, int i5) {
+         if (this.blockExists(x, y, z)) {
+@@ -566,6 +548,5 @@
+                     i5 = 15;
+                 }
+-            }
+-            else if (skyBlock == EnumSkyBlock.Block) {
++            } else if (skyBlock == EnumSkyBlock.Block) {
+                 final int i6 = this.getBlockId(x, y, z);
+                 if (Block.lightValue[i6] > i5) {
+@@ -578,5 +559,5 @@
+         }
+     }
+-    
++
+     public int getSavedLightValue(final EnumSkyBlock skyBlock, final int blockX, final int blockY, final int blockZ) {
+         if (blockY < 0 || blockY >= 128 || blockX < -32000000 || blockZ < -32000000 || blockX >= 32000000 || blockZ > 32000000) {
+@@ -591,5 +572,5 @@
+         return chunk7.getSavedLightValue(skyBlock, blockX & 0xF, blockY, blockZ & 0xF);
+     }
+-    
++
+     public void setLightValue(final EnumSkyBlock skyBlock, final int blockX, final int blockY, final int blockZ, final int i5) {
+         if (blockX >= -32000000 && blockZ >= -32000000 && blockX < 32000000 && blockZ <= 32000000 && blockY >= 0 && blockY < 128 && this.chunkExists(blockX >> 4, blockZ >> 4)) {
+@@ -597,21 +578,21 @@
+             chunk6.setLightValue(skyBlock, blockX & 0xF, blockY, blockZ & 0xF, i5);
+             for (int i6 = 0; i6 < this.worldAccesses.size(); ++i6) {
+-                ((IWorldAccess)this.worldAccesses.get(i6)).markBlockAndNeighborsNeedsUpdate(blockX, blockY, blockZ);
++                ((IWorldAccess) this.worldAccesses.get(i6)).markBlockAndNeighborsNeedsUpdate(blockX, blockY, blockZ);
+             }
+         }
+     }
+-    
++
+     public float getBrightness(final int x, final int y, final int z) {
+         return World.lightBrightnessTable[this.getBlockLightValue(x, y, z)];
+     }
+-    
++
+     public boolean isDaytime() {
+         return this.skylightSubtracted < 4;
+     }
+-    
++
+     public MovingObjectPosition rayTraceBlocks(final Vec3D vector1, final Vec3D vector2) {
+         return this.rayTraceBlocks_do(vector1, vector2, false);
+     }
+-    
++
+     public MovingObjectPosition rayTraceBlocks_do(final Vec3D vector1, final Vec3D vector2, final boolean z3) {
+         if (Double.isNaN(vector1.xCoord) || Double.isNaN(vector1.yCoord) || Double.isNaN(vector1.zCoord)) {
+@@ -674,6 +655,5 @@
+                     if (i4 > i7) {
+                         b35 = 4;
+-                    }
+-                    else {
++                    } else {
+                         b35 = 5;
+                     }
+@@ -681,10 +661,8 @@
+                     vector1.yCoord += d18 * d14;
+                     vector1.zCoord += d19 * d14;
+-                }
+-                else if (d15 < d16) {
++                } else if (d15 < d16) {
+                     if (i5 > i8) {
+                         b35 = 0;
+-                    }
+-                    else {
++                    } else {
+                         b35 = 1;
+                     }
+@@ -692,10 +670,8 @@
+                     vector1.yCoord = d12;
+                     vector1.zCoord += d19 * d15;
+-                }
+-                else {
++                } else {
+                     if (i6 > i9) {
+                         b35 = 2;
+-                    }
+-                    else {
++                    } else {
+                         b35 = 3;
+                     }
+@@ -708,5 +684,5 @@
+                 final double xCoord = MathHelper.floor_double(vector1.xCoord);
+                 vector3.xCoord = xCoord;
+-                i7 = (int)xCoord;
++                i7 = (int) xCoord;
+                 if (b35 == 5) {
+                     --i7;
+@@ -717,5 +693,5 @@
+                 final double yCoord = MathHelper.floor_double(vector1.yCoord);
+                 vec3D32.yCoord = yCoord;
+-                i8 = (int)yCoord;
++                i8 = (int) yCoord;
+                 if (b35 == 1) {
+                     --i8;
+@@ -726,5 +702,5 @@
+                 final double zCoord = MathHelper.floor_double(vector1.zCoord);
+                 vec3D34.zCoord = zCoord;
+-                i9 = (int)zCoord;
++                i9 = (int) zCoord;
+                 if (b35 == 3) {
+                     --i9;
+@@ -747,29 +723,29 @@
+         return null;
+     }
+-    
++
+     public void playSoundAtEntity(final Entity entity, final String soundName, final float f3, final float f4) {
+         for (int i5 = 0; i5 < this.worldAccesses.size(); ++i5) {
+-            ((IWorldAccess)this.worldAccesses.get(i5)).playSound(soundName, entity.posX, entity.posY - entity.yOffset, entity.posZ, f3, f4);
++            ((IWorldAccess) this.worldAccesses.get(i5)).playSound(soundName, entity.posX, entity.posY - entity.yOffset, entity.posZ, f3, f4);
+         }
+     }
+-    
++
+     public void playSoundEffect(final double x, final double y, final double z, final String soundName, final float f8, final float f9) {
+         for (int i10 = 0; i10 < this.worldAccesses.size(); ++i10) {
+-            ((IWorldAccess)this.worldAccesses.get(i10)).playSound(soundName, x, y, z, f8, f9);
++            ((IWorldAccess) this.worldAccesses.get(i10)).playSound(soundName, x, y, z, f8, f9);
+         }
+     }
+-    
++
+     public void playRecord(final String recordName, final int x, final int y, final int z) {
+         for (int i5 = 0; i5 < this.worldAccesses.size(); ++i5) {
+-            ((IWorldAccess)this.worldAccesses.get(i5)).playRecord(recordName, x, y, z);
++            ((IWorldAccess) this.worldAccesses.get(i5)).playRecord(recordName, x, y, z);
+         }
+     }
+-    
++
+     public void spawnParticle(final String particleName, final double x, final double y, final double z, final double d8, final double d10, final double d12) {
+         for (int i14 = 0; i14 < this.worldAccesses.size(); ++i14) {
+-            ((IWorldAccess)this.worldAccesses.get(i14)).spawnParticle(particleName, x, y, z, d8, d10, d12);
++            ((IWorldAccess) this.worldAccesses.get(i14)).spawnParticle(particleName, x, y, z, d8, d10, d12);
+         }
+     }
+-    
++
+     public boolean spawnEntityInWorld(final Entity entity) {
+         final int i2 = MathHelper.floor_double(entity.posX / 16.0);
+@@ -791,17 +767,17 @@
+         return true;
+     }
+-    
++
+     protected void obtainEntitySkin(final Entity entity) {
+         for (int i2 = 0; i2 < this.worldAccesses.size(); ++i2) {
+-            ((IWorldAccess)this.worldAccesses.get(i2)).obtainEntitySkin(entity);
++            ((IWorldAccess) this.worldAccesses.get(i2)).obtainEntitySkin(entity);
+         }
+     }
+-    
++
+     protected void releaseEntitySkin(final Entity entity) {
+         for (int i2 = 0; i2 < this.worldAccesses.size(); ++i2) {
+-            ((IWorldAccess)this.worldAccesses.get(i2)).releaseEntitySkin(entity);
++            ((IWorldAccess) this.worldAccesses.get(i2)).releaseEntitySkin(entity);
+         }
+     }
+-    
++
+     public void setEntityDead(final Entity entity) {
+         entity.setEntityDead();
+@@ -811,9 +787,9 @@
+         }
+     }
+-    
++
+     public void addWorldAccess(final IWorldAccess worldAccess) {
+         this.worldAccesses.add(worldAccess);
+     }
+-    
++
+     public List getCollidingBoundingBoxes(final Entity entity, final AxisAlignedBB aabb) {
+         this.collidingBoundingBoxes.clear();
+@@ -839,16 +815,16 @@
+         final List list15 = this.getEntitiesWithinAABBExcludingEntity(entity, aabb.expand(d14, d14, d14));
+         for (int i12 = 0; i12 < list15.size(); ++i12) {
+-            AxisAlignedBB axisAlignedBB13 = ((Entity)list15.get(i12)).getBoundingBox();
++            AxisAlignedBB axisAlignedBB13 = ((Entity) list15.get(i12)).getBoundingBox();
+             if (axisAlignedBB13 != null && axisAlignedBB13.intersectsWith(aabb)) {
+                 this.collidingBoundingBoxes.add(axisAlignedBB13);
+             }
+-            axisAlignedBB13 = entity.getCollisionBox((Entity)list15.get(i12));
++            axisAlignedBB13 = entity.getCollisionBox((Entity) list15.get(i12));
+             if (axisAlignedBB13 != null && axisAlignedBB13.intersectsWith(aabb)) {
+                 this.collidingBoundingBoxes.add(axisAlignedBB13);
+             }
+         }
+-        return (List)this.collidingBoundingBoxes;
++        return (List) this.collidingBoundingBoxes;
+     }
+-    
++
+     public int calculateSkylightSubtracted(final float f1) {
+         final float f2 = this.getCelestialAngle(f1);
+@@ -860,9 +836,9 @@
+             f3 = 1.0f;
+         }
+-        return (int)(f3 * 11.0f);
++        return (int) (f3 * 11.0f);
+     }
+-    
++
+     public float getCelestialAngle(final float f1) {
+-        final int i2 = (int)(this.worldTime % 24000L);
++        final int i2 = (int) (this.worldTime % 24000L);
+         float f2 = (i2 + f1) / 24000.0f - 0.25f;
+         if (f2 < 0.0f) {
+@@ -873,9 +849,9 @@
+         }
+         final float f3 = f2;
+-        f2 = 1.0f - (float)((Math.cos(f2 * 3.141592653589793) + 1.0) / 2.0);
++        f2 = 1.0f - (float) ((Math.cos(f2 * 3.141592653589793) + 1.0) / 2.0);
+         f2 = f3 + (f2 - f3) / 3.0f;
+         return f2;
+     }
+-    
++
+     public int getTopSolidOrLiquidBlock(int x, int z) {
+         final Chunk chunk3 = this.getChunkFromBlockCoords(x, z);
+@@ -892,5 +868,5 @@
+         return -1;
+     }
+-    
++
+     public void scheduleBlockUpdate(final int i1, final int i2, final int i3, final int i4) {
+         final NextTickListEntry nextTickListEntry5 = new NextTickListEntry(i1, i2, i3, i4);
+@@ -906,9 +882,9 @@
+         }
+     }
+-    
++
+     public void updateEntities() {
+-        this.loadedEntityList.removeAll((Collection)this.unloadedEntityList);
++        this.loadedEntityList.removeAll((Collection) this.unloadedEntityList);
+         for (int i1 = 0; i1 < this.unloadedEntityList.size(); ++i1) {
+-            final Entity entity2 = (Entity)this.unloadedEntityList.get(i1);
++            final Entity entity2 = (Entity) this.unloadedEntityList.get(i1);
+             final int i2 = entity2.chunkCoordX;
+             final int i3 = entity2.chunkCoordZ;
+@@ -918,9 +894,9 @@
+         }
+         for (int i1 = 0; i1 < this.unloadedEntityList.size(); ++i1) {
+-            this.releaseEntitySkin((Entity)this.unloadedEntityList.get(i1));
++            this.releaseEntitySkin((Entity) this.unloadedEntityList.get(i1));
+         }
+         this.unloadedEntityList.clear();
+         for (int i1 = 0; i1 < this.loadedEntityList.size(); ++i1) {
+-            final Entity entity2 = (Entity)this.loadedEntityList.get(i1);
++            final Entity entity2 = (Entity) this.loadedEntityList.get(i1);
+             if (entity2.ridingEntity != null) {
+                 if (!entity2.ridingEntity.isDead && entity2.ridingEntity.riddenByEntity == entity2) {
+@@ -944,9 +920,9 @@
+         }
+         for (int i1 = 0; i1 < this.loadedTileEntityList.size(); ++i1) {
+-            final TileEntity tileEntity5 = (TileEntity)this.loadedTileEntityList.get(i1);
++            final TileEntity tileEntity5 = (TileEntity) this.loadedTileEntityList.get(i1);
+             tileEntity5.updateEntity();
+         }
+     }
+-    
++
+     protected void updateEntity(final Entity entity) {
+         final int i2 = MathHelper.floor_double(entity.posX);
+@@ -961,6 +937,5 @@
+             if (entity.ridingEntity != null) {
+                 entity.updateRidden();
+-            }
+-            else {
++            } else {
+                 entity.onUpdate();
+             }
+@@ -974,6 +949,5 @@
+                 if (this.chunkExists(i4, i6)) {
+                     this.getChunkFromChunkCoords(i4, i6).addEntity(entity);
+-                }
+-                else {
++                } else {
+                     entity.addedToChunk = false;
+                     System.out.println("Removing entity because it's not in a chunk!!");
+@@ -984,6 +958,5 @@
+                 if (!entity.riddenByEntity.isDead && entity.riddenByEntity.ridingEntity == entity) {
+                     this.updateEntity(entity.riddenByEntity);
+-                }
+-                else {
++                } else {
+                     entity.riddenByEntity.ridingEntity = null;
+                     entity.riddenByEntity = null;
+@@ -999,17 +972,17 @@
+                 entity.posZ = entity.lastTickPosZ;
+             }
+-            if (Double.isNaN((double)entity.rotationPitch) || Double.isInfinite((double)entity.rotationPitch)) {
++            if (Double.isNaN((double) entity.rotationPitch) || Double.isInfinite((double) entity.rotationPitch)) {
+                 entity.rotationPitch = entity.prevRotationPitch;
+             }
+-            if (Double.isNaN((double)entity.rotationYaw) || Double.isInfinite((double)entity.rotationYaw)) {
++            if (Double.isNaN((double) entity.rotationYaw) || Double.isInfinite((double) entity.rotationYaw)) {
+                 entity.rotationYaw = entity.prevRotationYaw;
+             }
+         }
+     }
+-    
++
+     public boolean checkIfAABBIsClear(final AxisAlignedBB aabb) {
+         final List list2 = this.getEntitiesWithinAABBExcludingEntity(null, aabb);
+         for (int i3 = 0; i3 < list2.size(); ++i3) {
+-            final Entity entity4 = (Entity)list2.get(i3);
++            final Entity entity4 = (Entity) list2.get(i3);
+             if (!entity4.isDead && entity4.preventEntitySpawning) {
+                 return false;
+@@ -1018,5 +991,5 @@
+         return true;
+     }
+-    
++
+     public boolean getIsAnyLiquid(final AxisAlignedBB aabb) {
+         int i2 = MathHelper.floor_double(aabb.minX);
+@@ -1047,5 +1020,5 @@
+         return false;
+     }
+-    
++
+     public boolean isBoundingBoxBurning(final AxisAlignedBB aabb) {
+         final int i2 = MathHelper.floor_double(aabb.minX);
+@@ -1067,5 +1040,5 @@
+         return false;
+     }
+-    
++
+     public boolean handleMaterialAcceleration(final AxisAlignedBB aabb, final Material material, final Entity entity) {
+         final int i4 = MathHelper.floor_double(aabb.minX);
+@@ -1100,5 +1073,5 @@
+         return z10;
+     }
+-    
++
+     public boolean isMaterialInBB(final AxisAlignedBB aabb, final Material material) {
+         final int i3 = MathHelper.floor_double(aabb.minX);
+@@ -1120,5 +1093,5 @@
+         return false;
+     }
+-    
++
+     public boolean isAABBInMaterial(final AxisAlignedBB aabb, final Material material) {
+         final int i3 = MathHelper.floor_double(aabb.minX);
+@@ -1147,9 +1120,9 @@
+         return false;
+     }
+-    
++
+     public void createExplosion(final Entity entity, final double x, final double y, final double z, final float f8) {
+         new Explosion().doExplosion(this, entity, x, y, z, f8);
+     }
+-    
++
+     public float getBlockDensity(final Vec3D vector, final AxisAlignedBB aabb) {
+         final double d3 = 1.0 / ((aabb.maxX - aabb.minX) * 2.0 + 1.0);
+@@ -1158,7 +1131,7 @@
+         int i9 = 0;
+         int i10 = 0;
+-        for (float f11 = 0.0f; f11 <= 1.0f; f11 += (float)d3) {
+-            for (float f12 = 0.0f; f12 <= 1.0f; f12 += (float)d4) {
+-                for (float f13 = 0.0f; f13 <= 1.0f; f13 += (float)d5) {
++        for (float f11 = 0.0f; f11 <= 1.0f; f11 += (float) d3) {
++            for (float f12 = 0.0f; f12 <= 1.0f; f12 += (float) d4) {
++                for (float f13 = 0.0f; f13 <= 1.0f; f13 += (float) d5) {
+                     final double d6 = aabb.minX + (aabb.maxX - aabb.minX) * f11;
+                     final double d7 = aabb.minY + (aabb.maxY - aabb.minY) * f12;
+@@ -1171,12 +1144,12 @@
+             }
+         }
+-        return i9 / (float)i10;
++        return i9 / (float) i10;
+     }
+-    
++
+     public TileEntity getBlockTileEntity(final int x, final int y, final int z) {
+         final Chunk chunk4 = this.getChunkFromChunkCoords(x >> 4, z >> 4);
+         return (chunk4 != null) ? chunk4.getChunkBlockTileEntity(x & 0xF, y, z & 0xF) : null;
+     }
+-    
++
+     public void setBlockTileEntity(final int x, final int y, final int z, final TileEntity tileEntity) {
+         final Chunk chunk5 = this.getChunkFromChunkCoords(x >> 4, z >> 4);
+@@ -1185,5 +1158,5 @@
+         }
+     }
+-    
++
+     public void removeBlockTileEntity(final int x, final int y, final int z) {
+         final Chunk chunk4 = this.getChunkFromChunkCoords(x >> 4, z >> 4);
+@@ -1192,10 +1165,10 @@
+         }
+     }
+-    
++
+     public boolean isBlockNormalCube(final int x, final int y, final int z) {
+         final Block block4 = Block.blocksList[this.getBlockId(x, y, z)];
+         return block4 != null && block4.isOpaqueCube();
+     }
+-    
++
+     public boolean updatingLighting() {
+         ++this.numLightingUpdates;
+@@ -1210,13 +1183,13 @@
+                 return true;
+             }
+-            ((MetadataChunkBlock)this.lightingToUpdate.remove(this.lightingToUpdate.size() - 1)).updateLight(this);
++            ((MetadataChunkBlock) this.lightingToUpdate.remove(this.lightingToUpdate.size() - 1)).updateLight(this);
+         }
+         return false;
+     }
+-    
++
+     public void scheduleLightingUpdate(final EnumSkyBlock skyBlock, final int i2, final int i3, final int i4, final int i5, final int i6, final int i7) {
+         this.scheduleLightingUpdate_do(skyBlock, i2, i3, i4, i5, i6, i7, true);
+     }
+-    
++
+     public void scheduleLightingUpdate_do(final EnumSkyBlock skyBlock, final int i2, final int i3, final int i4, final int i5, final int i6, final int i7, final boolean z8) {
+         final int i8 = (i5 + i2) / 2;
+@@ -1230,5 +1203,5 @@
+                 }
+                 for (int i12 = 0; i12 < i11; ++i12) {
+-                    final MetadataChunkBlock metadataChunkBlock14 = (MetadataChunkBlock)this.lightingToUpdate.get(this.lightingToUpdate.size() - i12 - 1);
++                    final MetadataChunkBlock metadataChunkBlock14 = (MetadataChunkBlock) this.lightingToUpdate.get(this.lightingToUpdate.size() - i12 - 1);
+                     if (metadataChunkBlock14.skyBlock == skyBlock && metadataChunkBlock14.getLightUpdated(i2, i3, i4, i5, i6, i7)) {
+                         return;
+@@ -1244,5 +1217,5 @@
+         }
+     }
+-    
++
+     public void calculateInitialSkylight() {
+         final int i1 = this.calculateSkylightSubtracted(1.0f);
+@@ -1251,5 +1224,5 @@
+         }
+     }
+-    
++
+     public void tick() {
+         this.numLightingUpdates = 0;
+@@ -1259,5 +1232,5 @@
+             this.skylightSubtracted = i1;
+             for (int i2 = 0; i2 < this.worldAccesses.size(); ++i2) {
+-                ((IWorldAccess)this.worldAccesses.get(i2)).updateAllRenderers();
++                ((IWorldAccess) this.worldAccesses.get(i2)).updateAllRenderers();
+             }
+         }
+@@ -1285,9 +1258,9 @@
+         this.updateBlocksAndPlayCaveSounds();
+     }
+-    
++
+     protected void updateBlocksAndPlayCaveSounds() {
+         this.positionsToUpdate.clear();
+         for (int i1 = 0; i1 < this.playerEntities.size(); ++i1) {
+-            final EntityPlayer entityPlayer2 = (EntityPlayer)this.playerEntities.get(i1);
++            final EntityPlayer entityPlayer2 = (EntityPlayer) this.playerEntities.get(i1);
+             final int i2 = MathHelper.floor_double(entityPlayer2.posX / 16.0);
+             final int i3 = MathHelper.floor_double(entityPlayer2.posZ / 16.0);
+@@ -1352,5 +1325,5 @@
+         }
+     }
+-    
++
+     public boolean tickUpdates(final boolean z1) {
+         int i2 = this.scheduledTickTreeSet.size();
+@@ -1362,5 +1335,5 @@
+         }
+         for (int i3 = 0; i3 < i2; ++i3) {
+-            final NextTickListEntry nextTickListEntry4 = (NextTickListEntry)this.scheduledTickTreeSet.first();
++            final NextTickListEntry nextTickListEntry4 = (NextTickListEntry) this.scheduledTickTreeSet.first();
+             if (!z1 && nextTickListEntry4.scheduledTime > this.worldTime) {
+                 break;
+@@ -1378,5 +1351,5 @@
+         return this.scheduledTickTreeSet.size() != 0;
+     }
+-    
++
+     public List getEntitiesWithinAABBExcludingEntity(final Entity entity, final AxisAlignedBB aabb) {
+         this.entitiesWithinAABBExcludingEntity.clear();
+@@ -1394,5 +1367,5 @@
+         return this.entitiesWithinAABBExcludingEntity;
+     }
+-    
++
+     public List getEntitiesWithinAABB(final Class clazz, final AxisAlignedBB aabb) {
+         final int i3 = MathHelper.floor_double((aabb.minX - 2.0) / 16.0);
+@@ -1404,11 +1377,11 @@
+             for (int i8 = i5; i8 <= i6; ++i8) {
+                 if (this.chunkExists(i7, i8)) {
+-                    this.getChunkFromChunkCoords(i7, i8).getEntitiesOfTypeWithinAAAB(clazz, aabb, (List)arrayList7);
++                    this.getChunkFromChunkCoords(i7, i8).getEntitiesOfTypeWithinAAAB(clazz, aabb, (List) arrayList7);
+                 }
+             }
+         }
+-        return (List)arrayList7;
++        return (List) arrayList7;
+     }
+-    
++
+     public void updateTileEntityChunkAndDoNothing(final int x, final int y, final int z, final TileEntity tileEntity) {
+         if (this.blockExists(x, y, z)) {
+@@ -1416,12 +1389,12 @@
+         }
+         for (int i5 = 0; i5 < this.worldAccesses.size(); ++i5) {
+-            ((IWorldAccess)this.worldAccesses.get(i5)).doNothingWithTileEntity(x, y, z, tileEntity);
++            ((IWorldAccess) this.worldAccesses.get(i5)).doNothingWithTileEntity(x, y, z, tileEntity);
+         }
+     }
+-    
++
+     public int countEntities(final Class clazz) {
+         int i2 = 0;
+         for (int i3 = 0; i3 < this.loadedEntityList.size(); ++i3) {
+-            final Entity entity4 = (Entity)this.loadedEntityList.get(i3);
++            final Entity entity4 = (Entity) this.loadedEntityList.get(i3);
+             if (clazz.isAssignableFrom(entity4.getClass())) {
+                 ++i2;
+@@ -1430,16 +1403,16 @@
+         return i2;
+     }
+-    
++
+     public void addLoadedEntities(final List list) {
+-        this.loadedEntityList.addAll((Collection)list);
++        this.loadedEntityList.addAll((Collection) list);
+         for (int i2 = 0; i2 < list.size(); ++i2) {
+-            this.obtainEntitySkin((Entity)list.get(i2));
++            this.obtainEntitySkin((Entity) list.get(i2));
+         }
+     }
+-    
++
+     public void unloadEntities(final List list) {
+-        this.unloadedEntityList.addAll((Collection)list);
++        this.unloadedEntityList.addAll((Collection) list);
+     }
+-    
++
+     public boolean canBlockBePlacedAt(final int blockID, final int x, final int y, final int z, final boolean z5) {
+         final int i6 = this.getBlockId(x, y, z);
+@@ -1452,10 +1425,10 @@
+         return (axisAlignedBB9 == null || this.checkIfAABBIsClear(axisAlignedBB9)) && (block7 == Block.waterMoving || block7 == Block.waterStill || block7 == Block.lavaMoving || block7 == Block.lavaStill || block7 == Block.fire || block7 == Block.snow || (blockID > 0 && block7 == null && block8.canPlaceBlockAt(this, x, y, z)));
+     }
+-    
++
+     public PathEntity getPathToEntity(final Entity entity1, final Entity entity2, final float f3) {
+         final int i4 = MathHelper.floor_double(entity1.posX);
+         final int i5 = MathHelper.floor_double(entity1.posY);
+         final int i6 = MathHelper.floor_double(entity1.posZ);
+-        final int i7 = (int)(f3 + 16.0f);
++        final int i7 = (int) (f3 + 16.0f);
+         final int i8 = i4 - i7;
+         final int i9 = i5 - i7;
+@@ -1467,10 +1440,10 @@
+         return new Pathfinder(chunkCache14).createEntityPathTo(entity1, entity2, f3);
+     }
+-    
++
+     public PathEntity getEntityPathToXYZ(final Entity entity, final int x, final int y, final int z, final float f5) {
+         final int i6 = MathHelper.floor_double(entity.posX);
+         final int i7 = MathHelper.floor_double(entity.posY);
+         final int i8 = MathHelper.floor_double(entity.posZ);
+-        final int i9 = (int)(f5 + 8.0f);
++        final int i9 = (int) (f5 + 8.0f);
+         final int i10 = i6 - i9;
+         final int i11 = i7 - i9;
+@@ -1482,14 +1455,14 @@
+         return new Pathfinder(chunkCache16).createEntityPathTo(entity, x, y, z, f5);
+     }
+-    
++
+     public boolean isBlockProvidingPowerTo(final int x, final int y, final int z, final int i4) {
+         final int i5 = this.getBlockId(x, y, z);
+         return i5 != 0 && Block.blocksList[i5].isIndirectlyPoweringTo(this, x, y, z, i4);
+     }
+-    
++
+     public boolean isBlockGettingPowered(final int i1, final int i2, final int i3) {
+         return this.isBlockProvidingPowerTo(i1, i2 - 1, i3, 0) || this.isBlockProvidingPowerTo(i1, i2 + 1, i3, 1) || this.isBlockProvidingPowerTo(i1, i2, i3 - 1, 2) || this.isBlockProvidingPowerTo(i1, i2, i3 + 1, 3) || this.isBlockProvidingPowerTo(i1 - 1, i2, i3, 4) || this.isBlockProvidingPowerTo(i1 + 1, i2, i3, 5);
+     }
+-    
++
+     public boolean isBlockIndirectlyProvidingPowerTo(final int x, final int y, final int z, final int i4) {
+         if (this.isBlockNormalCube(x, y, z)) {
+@@ -1499,18 +1472,18 @@
+         return i5 != 0 && Block.blocksList[i5].isPoweringTo(this, x, y, z, i4);
+     }
+-    
++
+     public boolean isBlockIndirectlyGettingPowered(final int x, final int y, final int z) {
+         return this.isBlockIndirectlyProvidingPowerTo(x, y - 1, z, 0) || this.isBlockIndirectlyProvidingPowerTo(x, y + 1, z, 1) || this.isBlockIndirectlyProvidingPowerTo(x, y, z - 1, 2) || this.isBlockIndirectlyProvidingPowerTo(x, y, z + 1, 3) || this.isBlockIndirectlyProvidingPowerTo(x - 1, y, z, 4) || this.isBlockIndirectlyProvidingPowerTo(x + 1, y, z, 5);
+     }
+-    
++
+     public EntityPlayer getClosestPlayerToEntity(final Entity entity, final double d2) {
+         return this.getClosestPlayer(entity.posX, entity.posY, entity.posZ, d2);
+     }
+-    
++
+     public EntityPlayer getClosestPlayer(final double d1, final double d3, final double d5, final double d7) {
+         double d8 = -1.0;
+         EntityPlayer entityPlayer11 = null;
+         for (int i12 = 0; i12 < this.playerEntities.size(); ++i12) {
+-            final EntityPlayer entityPlayer12 = (EntityPlayer)this.playerEntities.get(i12);
++            final EntityPlayer entityPlayer12 = (EntityPlayer) this.playerEntities.get(i12);
+             final double d9 = entityPlayer12.getDistanceSq(d1, d3, d5);
+             if ((d7 < 0.0 || d9 < d7 * d7) && (d8 == -1.0 || d9 < d8)) {
+@@ -1521,5 +1494,5 @@
+         return entityPlayer11;
+     }
+-    
++
+     public byte[] getChunkData(final int i1, final int i2, final int i3, final int x, final int y, final int z) {
+         final byte[] b7 = new byte[x * y * z * 5 / 2];
+@@ -1560,20 +1533,18 @@
+         return b7;
+     }
+-    
++
+     public void checkSessionLock() {
+         try {
+             final File file1 = new File(this.saveDirectory, "session.lock");
+-            final DataInputStream dataInputStream2 = new DataInputStream((InputStream)new FileInputStream(file1));
++            final DataInputStream dataInputStream2 = new DataInputStream((InputStream) new FileInputStream(file1));
+             try {
+                 if (dataInputStream2.readLong() != this.lockTimestamp) {
+                     throw new MinecraftException("The save is being accessed from another location, aborting");
+                 }
+-            }
+-            finally {
++            } finally {
+                 dataInputStream2.close();
+             }
+             dataInputStream2.close();
+-        }
+-        catch (IOException iOException7) {
++        } catch (IOException iOException7) {
+             throw new MinecraftException("Failed to check session lock, aborting");
+         }

@@ -1,4 +1,4 @@
-rootProject.name = 'Rosepad'
+rootProject.name = 'LilyBukkit'
 
 include 'server'
 include 'client'
