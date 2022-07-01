@@ -3,6 +3,9 @@ package ru.vladthemountain.lilybukkit.scheduler;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBTask implements BukkitTask {
     /**
      * Returns the taskId for the task

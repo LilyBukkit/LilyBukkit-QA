@@ -2,12 +2,17 @@ package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityTNTPrimed;
 import org.bukkit.entity.TNTPrimed;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBTNTPrimed extends LBExplosive implements TNTPrimed {
 
     EntityTNTPrimed entity;
 
-    public LBTNTPrimed(EntityTNTPrimed e) {
+    public LBTNTPrimed(LBWorld w, EntityTNTPrimed e) {
+        super(w, e);
         this.entity = e;
     }
 

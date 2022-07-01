@@ -3,6 +3,11 @@ package ru.vladthemountain.lilybukkit;
 import org.bukkit.BlockChangeDelegate;
 import org.bukkit.World;
 
+/**
+ * {@link BlockChangeDelegate} implementation
+ *
+ * @author VladTheMountain
+ */
 public class LBBlockChangeDelegate implements BlockChangeDelegate {
 
     private World world;

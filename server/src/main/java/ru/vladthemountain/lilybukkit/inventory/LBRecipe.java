@@ -3,6 +3,9 @@ package ru.vladthemountain.lilybukkit.inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBRecipe implements Recipe {
     /**
      * Get the result of this recipe.

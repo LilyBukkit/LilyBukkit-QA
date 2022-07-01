@@ -9,20 +9,27 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
 import java.net.InetSocketAddress;
 import java.util.Set;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBPlayer extends LBLivingEntity implements Player {
 
     EntityPlayerMP entity;
     String displayName;
     Location spawnPoint;
+    LBWorld world;
 
-    public LBPlayer(EntityPlayerMP p) {
+    public LBPlayer(LBWorld w, EntityPlayerMP p) {
+        super(w, p);
         this.entity = p;
+        this.world = w;
         this.displayName = p.username;
-        this.spawnPoint = new Location(Bukkit.getServer().getWorld(p.mcServer.worldMngr.levelName), p.mcServer.worldMngr.spawnX, p.mcServer.worldMngr.spawnY, p.mcServer.worldMngr.spawnZ);
+        this.spawnPoint = new Location(this.world, p.mcServer.worldMngr.spawnX, p.mcServer.worldMngr.spawnY, p.mcServer.worldMngr.spawnZ);
     }
 
     /**
@@ -193,20 +200,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isSleepingIgnored() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Play a note for a player at a location. This requires a note block
-     * at the particular location (as far as the client is concerned). This
-     * will not work without a note block. This will not work with cake.
-     *
-     * @param loc
-     * @param instrument
-     * @param note
-     */
-    @Override
-    public void playNote(Location loc, byte instrument, byte note) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

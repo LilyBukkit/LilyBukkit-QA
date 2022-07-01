@@ -2,12 +2,17 @@ package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntitySheep;
 import org.bukkit.entity.Sheep;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBSheep extends LBAnimals implements Sheep {
 
     EntitySheep entity;
 
-    public LBSheep(EntitySheep e) {
+    public LBSheep(LBWorld w, EntitySheep e) {
+        super(w, e);
         this.entity = e;
     }
 

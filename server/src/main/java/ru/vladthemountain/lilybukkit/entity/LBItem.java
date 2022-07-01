@@ -3,12 +3,17 @@ package ru.vladthemountain.lilybukkit.entity;
 import net.minecraft.src.EntityItem;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBItem extends LBEntity implements Item {
 
     EntityItem entity;
 
-    public LBItem(EntityItem e) {
+    public LBItem(LBWorld w, EntityItem e) {
+        super(w, e);
         this.entity = e;
     }
 

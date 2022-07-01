@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * {@link org.bukkit.Server} implementation
+ * {@link Server} implementation
  *
  * @author VladTheMountain
  */

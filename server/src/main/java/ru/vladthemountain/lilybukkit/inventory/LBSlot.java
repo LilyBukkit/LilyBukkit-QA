@@ -4,6 +4,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Slot;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBSlot implements Slot {
     /**
      * Gets the inventory this slot belongs to

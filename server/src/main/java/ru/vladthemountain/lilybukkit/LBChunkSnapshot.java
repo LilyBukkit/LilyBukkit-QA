@@ -3,6 +3,11 @@ package ru.vladthemountain.lilybukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 
+/**
+ * {@link ChunkSnapshot} implementation
+ *
+ * @author VladTheMountain
+ */
 public class LBChunkSnapshot implements ChunkSnapshot {
 
     private Chunk chunk;

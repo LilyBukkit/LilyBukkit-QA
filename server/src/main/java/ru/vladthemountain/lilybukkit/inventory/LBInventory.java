@@ -6,6 +6,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBInventory implements Inventory {
     /**
      * Returns the size of the inventory

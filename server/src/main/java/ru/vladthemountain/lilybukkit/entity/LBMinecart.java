@@ -1,21 +1,22 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityMinecart;
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
-import java.util.List;
-import java.util.UUID;
-
+/**
+ * @author VladTheMountain
+ */
 public class LBMinecart extends LBVehicle implements Minecart {
 
     EntityMinecart entity;
     double maxSpeed = 0.4;
+
+    public LBMinecart(LBWorld w, EntityMinecart e) {
+        super(w, e);
+        this.entity = e;
+    }
 
     /**
      * Sets a minecart's damage.

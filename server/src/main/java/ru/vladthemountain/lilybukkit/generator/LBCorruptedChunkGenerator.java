@@ -5,6 +5,9 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Random;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBCorruptedChunkGenerator extends ChunkGenerator {
     /**
      * Shapes the chunk for the given coordinates.<br />

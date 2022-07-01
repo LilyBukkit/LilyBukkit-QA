@@ -1,12 +1,21 @@
 package ru.vladthemountain.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBProjectile extends LBEntity implements Projectile {
 
     LBLivingEntity shooter;
     boolean bounces;
+
+    public LBProjectile(LBWorld w, Entity e){
+        super(w,e);
+    }
 
     /**
      * Retrieve the shooter of this projectile. The returned value can be null

@@ -131,17 +131,6 @@ public interface Player extends HumanEntity, CommandSender {
     public boolean isSleepingIgnored();
 
     /**
-     * Play a note for a player at a location. This requires a note block
-     * at the particular location (as far as the client is concerned). This
-     * will not work without a note block. This will not work with cake.
-     *
-     * @param loc
-     * @param instrument
-     * @param note
-     */
-    public void playNote(Location loc, byte instrument, byte note);
-
-    /**
      * Plays an effect to just this player.
      *
      * @param loc the player to play the effect for

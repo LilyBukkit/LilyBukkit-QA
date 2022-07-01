@@ -1,11 +1,20 @@
 package ru.vladthemountain.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import org.bukkit.entity.Explosive;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBExplosive extends LBEntity implements Explosive {
 
     float affectedRadius;
     boolean spawnsFire;
+
+    public LBExplosive(LBWorld w, Entity e) {
+        super(w, e);
+    }
 
     /**
      * Set the radius affected by this explosive's explosion

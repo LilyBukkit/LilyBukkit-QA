@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * {@link World} implementation
+ *
+ * @author VladTheMountain
+ */
 public class LBWorld implements World {
 
     private final net.minecraft.src.WorldServer world;
@@ -388,7 +393,7 @@ public class LBWorld implements World {
      */
     @Override
     public Item dropItem(Location location, ItemStack item) {
-        return new LBItem(this.world.getClosestPlayer(location.getBlockX(), location.getBlockY(), location.getBlockZ(), 16.0).dropItem(item.getTypeId(), item.getAmount()));
+        return new LBItem(this, this.world.getClosestPlayer(location.getBlockX(), location.getBlockY(), location.getBlockZ(), 16.0).dropItem(item.getTypeId(), item.getAmount()));
     }
 
     /**
@@ -401,7 +406,7 @@ public class LBWorld implements World {
     @Override
     public Item dropItemNaturally(Location location, ItemStack item) {
         EntityItem i = new EntityItem(this.world, new Integer(location.getBlockX()).doubleValue(), new Integer(location.getBlockY()).doubleValue(), new Integer(location.getBlockZ()).doubleValue(), new net.minecraft.src.ItemStack(item.getTypeId(), item.getAmount(), item.getData().getData()));
-        if (this.world.spawnEntityInWorld(i)) return new LBItem(i);
+        if (this.world.spawnEntityInWorld(i)) return new LBItem(this, i);
         return null;
     }
 
@@ -419,7 +424,7 @@ public class LBWorld implements World {
         EntityArrow e = new EntityArrow(this.world);
         e.setPosition(new Integer(location.getBlockX()).doubleValue(), new Integer(location.getBlockY()).doubleValue(), new Integer(location.getBlockZ()).doubleValue());
         e.setArrowHeading(velocity.getX(), velocity.getY(), velocity.getZ(), velocity.angle(new Vector(0, velocity.getY(), 0)), velocity.angle(new Vector(velocity.getX(), 0, 0)));
-        if (this.world.spawnEntityInWorld(e)) return new LBArrow(e);
+        if (this.world.spawnEntityInWorld(e)) return new LBArrow(this, e);
         return null;
     }
 
@@ -527,7 +532,7 @@ public class LBWorld implements World {
         List<Player> playerEntities = new ArrayList<>();
         for (net.minecraft.src.Entity e : loadedEntities) {
             if (e instanceof net.minecraft.src.EntityPlayer) {
-                playerEntities.add(new LBPlayer((EntityPlayerMP) e));
+                playerEntities.add(new LBPlayer(this, (EntityPlayerMP) e));
             }
         }
         return playerEntities;

@@ -1,5 +1,6 @@
 package ru.vladthemountain.lilybukkit.entity;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -12,10 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBEntity implements Entity {
 
     LBWorld world;
     net.minecraft.src.Entity entity;
+
+    public LBEntity(LBWorld w, net.minecraft.src.Entity e) {
+        this.world = w;
+        this.entity = e;
+    }
 
 
     /**

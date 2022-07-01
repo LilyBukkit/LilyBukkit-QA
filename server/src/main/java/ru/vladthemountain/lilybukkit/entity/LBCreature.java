@@ -1,11 +1,21 @@
 package ru.vladthemountain.lilybukkit.entity;
 
+import net.minecraft.src.EntityCreature;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBCreature extends LBLivingEntity implements Creature {
 
-    LivingEntity targetEntity;
+    EntityCreature entity;
+
+    public LBCreature(LBWorld w, EntityCreature e) {
+        super(w, e);
+        this.entity = e;
+    }
 
     /**
      * Instructs this Creature to set the specified LivingEntity as its target.
@@ -16,7 +26,7 @@ public class LBCreature extends LBLivingEntity implements Creature {
      */
     @Override
     public void setTarget(LivingEntity target) {
-        this.targetEntity = target;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
@@ -26,6 +36,6 @@ public class LBCreature extends LBLivingEntity implements Creature {
      */
     @Override
     public LivingEntity getTarget() {
-        return this.targetEntity;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

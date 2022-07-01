@@ -6,6 +6,9 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashMap;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBPlayerInventory implements PlayerInventory {
     /**
      * Get all ItemStacks from the armor slots

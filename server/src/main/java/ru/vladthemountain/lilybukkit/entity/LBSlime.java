@@ -1,14 +1,18 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
 import net.minecraft.src.EntitySlime;
 import org.bukkit.entity.Slime;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBSlime extends LBLivingEntity implements Slime {
 
     EntitySlime entity;
 
-    public LBSlime(EntitySlime e) {
+    public LBSlime(LBWorld w, EntitySlime e) {
+        super(w, e);
         this.entity = e;
     }
 

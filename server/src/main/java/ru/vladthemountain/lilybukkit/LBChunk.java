@@ -14,6 +14,10 @@ import ru.vladthemountain.lilybukkit.block.LBBlockState;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link Chunk} implementation
+ * @author VladTheMountain
+ */
 public class LBChunk implements Chunk {
 
     private net.minecraft.src.Chunk chunk;

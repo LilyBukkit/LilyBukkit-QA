@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBScheduler implements BukkitScheduler {
     /**
      * Schedules a once off task to occur after a delay

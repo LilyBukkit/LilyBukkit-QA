@@ -2,10 +2,19 @@ package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityPig;
 import org.bukkit.entity.Pig;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBPig extends LBAnimals implements Pig {
 
     EntityPig entity;
+
+    public LBPig(LBWorld w, EntityPig e) {
+        super(w, e);
+        this.entity = e;
+    }
 
     /**
      * Check if the pig has a saddle.

@@ -6,6 +6,9 @@ import org.bukkit.generator.BlockPopulator;
 
 import java.util.Random;
 
+/**
+ * @author VladTheMountain
+ */
 public class LBPillarGenPopulator extends BlockPopulator {
     /**
      * Populates an area of blocks at or around the given chunk.
