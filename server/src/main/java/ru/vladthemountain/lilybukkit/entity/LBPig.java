@@ -1,13 +1,11 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPig;
 import org.bukkit.entity.Pig;
 
 public class LBPig extends LBAnimals implements Pig {
 
-    public LBPig(Entity e) {
-        super(e);
-    }
+    EntityPig entity;
 
     /**
      * Check if the pig has a saddle.
@@ -16,7 +14,7 @@ public class LBPig extends LBAnimals implements Pig {
      */
     @Override
     public boolean hasSaddle() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.saddled;
     }
 
     /**
@@ -26,6 +24,6 @@ public class LBPig extends LBAnimals implements Pig {
      */
     @Override
     public void setSaddle(boolean saddled) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.saddled = saddled;
     }
 }

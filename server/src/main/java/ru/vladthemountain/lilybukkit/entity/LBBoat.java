@@ -1,20 +1,19 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.EntityBoat;
 import org.bukkit.entity.Boat;
 
 public class LBBoat extends LBVehicle implements Boat {
 
-    public LBBoat(Entity e) {
-        super(e);
-    }
+    EntityBoat entity;
+    double maxSpeed = 0.4;
 
     /**
      * Gets the maximum speed of a boat. The speed is unrelated to the velocity.
      */
     @Override
     public double getMaxSpeed() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.maxSpeed;
     }
 
     /**
@@ -24,6 +23,6 @@ public class LBBoat extends LBVehicle implements Boat {
      */
     @Override
     public void setMaxSpeed(double speed) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.maxSpeed = speed;
     }
 }

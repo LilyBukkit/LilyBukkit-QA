@@ -1,11 +1,13 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.EntitySpider;
 import org.bukkit.entity.Spider;
 
 public class LBSpider extends LBMonster implements Spider {
 
-    public LBSpider(Entity e) {
-        super(e);
+    EntitySpider entity;
+
+    public LBSpider(EntitySpider e) {
+        this.entity = e;
     }
 }

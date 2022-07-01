@@ -1,6 +1,6 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPlayerMP;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,8 +15,14 @@ import java.util.Set;
 
 public class LBPlayer extends LBLivingEntity implements Player {
 
-    public LBPlayer(Entity e) {
-        super(e);
+    EntityPlayerMP entity;
+    String displayName;
+    Location spawnPoint;
+
+    public LBPlayer(EntityPlayerMP p) {
+        this.entity = p;
+        this.displayName = p.username;
+        this.spawnPoint = new Location(Bukkit.getServer().getWorld(p.mcServer.worldMngr.levelName), p.mcServer.worldMngr.spawnX, p.mcServer.worldMngr.spawnY, p.mcServer.worldMngr.spawnZ);
     }
 
     /**
@@ -26,7 +32,10 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isOnline() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+            if (p.equals(this)) return true;
+        }
+        return false;
     }
 
     /**
@@ -39,7 +48,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public String getDisplayName() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.displayName;
     }
 
     /**
@@ -52,7 +61,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void setDisplayName(String name) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.displayName = name;
     }
 
     /**
@@ -62,7 +71,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void setCompassTarget(Location loc) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.spawnPoint = loc;
     }
 
     /**
@@ -72,7 +81,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public Location getCompassTarget() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.spawnPoint;
     }
 
     /**

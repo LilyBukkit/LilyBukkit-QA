@@ -1,11 +1,14 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.EntitySheep;
 import org.bukkit.entity.Sheep;
 
 public class LBSheep extends LBAnimals implements Sheep {
-    public LBSheep(Entity e) {
-        super(e);
+
+    EntitySheep entity;
+
+    public LBSheep(EntitySheep e) {
+        this.entity = e;
     }
 
     /**
@@ -14,7 +17,7 @@ public class LBSheep extends LBAnimals implements Sheep {
      */
     @Override
     public boolean isSheared() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.sheared;
     }
 
     /**
@@ -23,6 +26,7 @@ public class LBSheep extends LBAnimals implements Sheep {
      */
     @Override
     public void setSheared(boolean flag) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.sheared = flag;
+        this.entity.onUpdate();
     }
 }

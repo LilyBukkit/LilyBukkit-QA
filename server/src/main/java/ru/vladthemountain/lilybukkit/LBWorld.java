@@ -3,6 +3,7 @@ package ru.vladthemountain.lilybukkit;
 import net.minecraft.src.EntityArrow;
 import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -418,7 +419,7 @@ public class LBWorld implements World {
         EntityArrow e = new EntityArrow(this.world);
         e.setPosition(new Integer(location.getBlockX()).doubleValue(), new Integer(location.getBlockY()).doubleValue(), new Integer(location.getBlockZ()).doubleValue());
         e.setArrowHeading(velocity.getX(), velocity.getY(), velocity.getZ(), velocity.angle(new Vector(0, velocity.getY(), 0)), velocity.angle(new Vector(velocity.getX(), 0, 0)));
-        if (this.world.spawnEntityInWorld(e)) return new LBArrow(e, null);
+        if (this.world.spawnEntityInWorld(e)) return new LBArrow(e);
         return null;
     }
 
@@ -525,8 +526,8 @@ public class LBWorld implements World {
         List<net.minecraft.src.Entity> loadedEntities = this.world.loadedEntityList;
         List<Player> playerEntities = new ArrayList<>();
         for (net.minecraft.src.Entity e : loadedEntities) {
-            if (e instanceof net.minecraft.src.EntityLiving) {
-                playerEntities.add(new LBPlayer(e));
+            if (e instanceof net.minecraft.src.EntityPlayer) {
+                playerEntities.add(new LBPlayer((EntityPlayerMP) e));
             }
         }
         return playerEntities;

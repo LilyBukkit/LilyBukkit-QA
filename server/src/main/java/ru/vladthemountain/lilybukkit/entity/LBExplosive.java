@@ -1,12 +1,11 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
 import org.bukkit.entity.Explosive;
 
 public class LBExplosive extends LBEntity implements Explosive {
-    public LBExplosive(Entity e) {
-        super(e);
-    }
+
+    float affectedRadius;
+    boolean spawnsFire;
 
     /**
      * Set the radius affected by this explosive's explosion
@@ -15,7 +14,7 @@ public class LBExplosive extends LBEntity implements Explosive {
      */
     @Override
     public void setYield(float yield) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.affectedRadius = yield;
     }
 
     /**
@@ -25,7 +24,7 @@ public class LBExplosive extends LBEntity implements Explosive {
      */
     @Override
     public float getYield() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.affectedRadius;
     }
 
     /**
@@ -35,7 +34,7 @@ public class LBExplosive extends LBEntity implements Explosive {
      */
     @Override
     public void setIsIncendiary(boolean isIncendiary) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.spawnsFire = isIncendiary;
     }
 
     /**
@@ -45,6 +44,6 @@ public class LBExplosive extends LBEntity implements Explosive {
      */
     @Override
     public boolean isIncendiary() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.spawnsFire;
     }
 }

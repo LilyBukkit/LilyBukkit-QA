@@ -1,12 +1,15 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.Entity;
+import net.minecraft.src.EntitySlime;
 import org.bukkit.entity.Slime;
 
 public class LBSlime extends LBLivingEntity implements Slime {
 
-    public LBSlime(Entity e) {
-        super(e);
+    EntitySlime entity;
+
+    public LBSlime(EntitySlime e) {
+        this.entity = e;
     }
 
     /**
@@ -15,7 +18,7 @@ public class LBSlime extends LBLivingEntity implements Slime {
      */
     @Override
     public int getSize() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.size;
     }
 
     /**
@@ -24,6 +27,6 @@ public class LBSlime extends LBLivingEntity implements Slime {
      */
     @Override
     public void setSize(int sz) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.setSlimeSize(sz);
     }
 }

@@ -1,11 +1,13 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.EntitySkeleton;
 import org.bukkit.entity.Skeleton;
 
 public class LBSkeleton extends LBMonster implements Skeleton {
 
-    public LBSkeleton(Entity e) {
-        super(e);
+    EntitySkeleton entity;
+
+    public LBSkeleton(EntitySkeleton e) {
+        this.entity = e;
     }
 }

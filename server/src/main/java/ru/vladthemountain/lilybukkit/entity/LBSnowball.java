@@ -1,11 +1,12 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.EntitySnowball;
 import org.bukkit.entity.Snowball;
 
 public class LBSnowball extends LBProjectile implements Snowball {
+    EntitySnowball entity;
 
-    public LBSnowball(Entity e) {
-        super(e);
+    public LBSnowball(EntitySnowball e) {
+        this.entity = e;
     }
 }

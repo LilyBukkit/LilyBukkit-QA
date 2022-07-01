@@ -1,12 +1,14 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.EntityTNTPrimed;
 import org.bukkit.entity.TNTPrimed;
 
 public class LBTNTPrimed extends LBExplosive implements TNTPrimed {
 
-    public LBTNTPrimed(Entity e) {
-        super(e);
+    EntityTNTPrimed entity;
+
+    public LBTNTPrimed(EntityTNTPrimed e) {
+        this.entity = e;
     }
 
     /**
@@ -16,7 +18,8 @@ public class LBTNTPrimed extends LBExplosive implements TNTPrimed {
      */
     @Override
     public void setFuseTicks(int fuseTicks) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.fuse = fuseTicks;
+        this.entity.onUpdate();
     }
 
     /**
@@ -26,6 +29,6 @@ public class LBTNTPrimed extends LBExplosive implements TNTPrimed {
      */
     @Override
     public int getFuseTicks() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.fuse;
     }
 }
