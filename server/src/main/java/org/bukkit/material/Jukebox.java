@@ -7,8 +7,8 @@ import org.bukkit.Material;
 public class Jukebox extends MaterialData {
     private static HashSet<Material> recordTypes = new HashSet<Material>();
     static {
-        recordTypes.add(Material.GOLD_RECORD);
-        recordTypes.add(Material.GREEN_RECORD);
+        recordTypes.add(Material.HIDDEN_DEN_RECORD);
+        recordTypes.add(Material.LEMURIA_RECORD);
     }
 
     public Jukebox() {
@@ -46,10 +46,10 @@ public class Jukebox extends MaterialData {
             return null;
 
         case 0x1:
-            return Material.GOLD_RECORD;
+            return Material.HIDDEN_DEN_RECORD;
 
         case 0x2:
-            return Material.GREEN_RECORD;
+            return Material.LEMURIA_RECORD;
         }
     }
 
@@ -63,11 +63,11 @@ public class Jukebox extends MaterialData {
             setData((byte) 0x0);
         } else {
             switch (rec) {
-            case GOLD_RECORD:
+            case HIDDEN_DEN_RECORD:
                 setData((byte) 0x1);
                 break;
 
-            case GREEN_RECORD:
+            case LEMURIA_RECORD:
                 setData((byte) 0x2);
                 break;
 

@@ -190,13 +190,6 @@ public interface Block {
     BlockState getState();
 
     /**
-     * Returns the biome that this block resides in
-     *
-     * @return Biome type containing this block
-     */
-    Biome getBiome();
-
-    /**
      * Returns true if the block is being powered by Redstone.
      *
      * @return
@@ -270,11 +263,4 @@ public interface Block {
      * @return Humidity of this block
      */
     double getHumidity();
-
-    /**
-     * Returns the reaction of the block when moved by a piston
-     *
-     * @return reaction
-     */
-    PistonMoveReaction getPistonMoveReaction();
 }

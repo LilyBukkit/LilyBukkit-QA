@@ -1,12 +1,13 @@
 package org.bukkit;
 
+import org.bukkit.material.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bukkit.material.*;
 
 /**
  * An enum of all material ids accepted by the official server + client
@@ -33,26 +34,11 @@ public enum Material {
     LEAVES(18, Tree.class),
     SPONGE(19),
     GLASS(20),
-    LAPIS_ORE(21),
-    LAPIS_BLOCK(22),
-    DISPENSER(23, Dispenser.class),
-    SANDSTONE(24),
-    NOTE_BLOCK(25),
-    BED_BLOCK(26, Bed.class),
-    POWERED_RAIL(27, PoweredRail.class),
-    DETECTOR_RAIL(28, DetectorRail.class),
-    PISTON_STICKY_BASE(29, PistonBaseMaterial.class),
-    WEB(30),
-    LONG_GRASS(31, LongGrass.class),
-    DEAD_BUSH(32),
-    PISTON_BASE(33, PistonBaseMaterial.class),
-    PISTON_EXTENSION(34, PistonExtensionMaterial.class),
     WOOL(35, Wool.class),
-    PISTON_MOVING_PIECE(36),
-    YELLOW_FLOWER(37),
-    RED_ROSE(38),
+    BLUE_FLOWER(37),
+    SILVER_ROSE(38),
     BROWN_MUSHROOM(39),
-    RED_MUSHROOM(40),
+    PINK_MUSHROOM(40),
     GOLD_BLOCK(41),
     IRON_BLOCK(42),
     DOUBLE_STEP(43, Step.class),
@@ -67,7 +53,7 @@ public enum Material {
     MOB_SPAWNER(52),
     WOOD_STAIRS(53, Stairs.class),
     CHEST(54),
-    REDSTONE_WIRE(55, RedstoneWire.class),
+    GREENSTONE_WIRE(55, GreenstoneWire.class),
     DIAMOND_ORE(56),
     DIAMOND_BLOCK(57),
     WORKBENCH(58),
@@ -87,8 +73,8 @@ public enum Material {
     WOOD_PLATE(72, PressurePlate.class),
     REDSTONE_ORE(73),
     GLOWING_REDSTONE_ORE(74),
-    REDSTONE_TORCH_OFF(75, RedstoneTorch.class),
-    REDSTONE_TORCH_ON(76, RedstoneTorch.class),
+    REDSTONE_TORCH_OFF(75, GreenstoneTorch.class),
+    REDSTONE_TORCH_ON(76, GreenstoneTorch.class),
     STONE_BUTTON(77, Button.class),
     SNOW(78),
     ICE(79),
@@ -98,17 +84,37 @@ public enum Material {
     SUGAR_CANE_BLOCK(83, MaterialData.class),
     JUKEBOX(84, Jukebox.class),
     FENCE(85),
-    PUMPKIN(86, Pumpkin.class),
-    NETHERRACK(87),
-    SOUL_SAND(88),
-    GLOWSTONE(89),
-    PORTAL(90),
-    JACK_O_LANTERN(91, Pumpkin.class),
-    CAKE_BLOCK(92, 1, Cake.class),
-    DIODE_BLOCK_OFF(93, Diode.class),
-    DIODE_BLOCK_ON(94, Diode.class),
-    LOCKED_CHEST(95),
-    TRAP_DOOR(96, TrapDoor.class),
+    QUAD_WINDOW_GLASS(90),
+    PILLAR(91),
+    SCAFFOLD(92),
+    X_RAY_SCAFFOLD(93),
+    TRANSPARENT_SCAFFOLD(94),
+    DIMENSION_FLOOR(95),
+    DIMENSION_WALL(96),
+    DBG_BLOCK(97),
+    BLUE_TILE(98),
+    YELLOW_TILE(99),
+    FAKE_GRASS(100),
+    CYAN_MOJANG_BLOCK(101),
+    WHITE_MOJANG_BLOCK(102),
+    GREEN_MOJANG_BLOCK(103),
+    BARRIER(104),
+    STAIR_LADDER(105, Ladder.class),
+    FAKE_DIRT(106),
+    FAKE_STONE(107),
+    FAKE_SAND(108),
+    PINK_WOOL(109),
+    BLUE_WOOL(110),
+    GREEN_WOOL(111),
+    BLACK_WOOL(112),
+    DBG(113, MaterialData.class),
+    SALT(114),
+    GLOWING_FLOWER(115),
+    BLUE_FLAME(116, MaterialData.class),
+    INFUSED_GLOWING_FLOWER(117),
+    GOLD_INFUSED_GLOWING_FLOWER(118),
+    OBSIDIAN_INFUSED_GLOWING_FLOWER(119),
+    SAFE_BLOCK(120),
     // ----- Item Separator -----
     IRON_SPADE(256, 1, 250),
     IRON_PICKAXE(257, 1, 250),
@@ -200,22 +206,25 @@ public enum Material {
     POWERED_MINECART(343, 1),
     EGG(344, 16),
     COMPASS(345),
-    FISHING_ROD(346, 1, 64),
-    WATCH(347),
-    GLOWSTONE_DUST(348),
-    RAW_FISH(349, 1),
-    COOKED_FISH(350, 1),
-    INK_SACK(351, Dye.class),
-    BONE(352),
-    SUGAR(353),
-    CAKE(354, 1),
-    BED(355, 1),
-    DIODE(356),
-    COOKIE(357, 8),
-    MAP(358, 1, MaterialData.class),
-    SHEARS(359, 1, 238),
-    GOLD_RECORD(2256, 1),
-    GREEN_RECORD(2257, 1);
+    OBSIDIAN_HELMET(346, 1),
+    OBSIDIAN_CHESTPLATE(347, 1),
+    OBSIDIAN_LEGGINGS(348, 1),
+    OBSIDIAN_BOOTS(349, 1),
+    OBSIDIAN_SWORD(350, 1),
+    OBSIDIAN_SPADE(351, 1),
+    OBSIDIAN_PICKAXE(352, 1),
+    OBSIDIAN_AXE(353, 1),
+    OBSIDIAN_HOE(354, 1),
+    OBSIDIAN_INGOT(355, 1),
+    BLACK_DYE(356, Dye.class),
+    GREEN_DYE(357, Dye.class),
+    BLUE_DYE(358, Dye.class),
+    PINK_DYE(359, Dye.class),
+    FRYSHROOM(360),
+    EDIBLE_FLAME(361),
+    FLAMEBERGE(362, 1),
+    HIDDEN_DEN_RECORD(2256, 1),
+    LEMURIA_RECORD(2257, 1);
 
     private final int id;
     private final Class<? extends MaterialData> data;
@@ -303,17 +312,8 @@ public enum Material {
             Constructor<? extends MaterialData> ctor = data.getConstructor(int.class, byte.class);
 
             return ctor.newInstance(id, raw);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
-            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
+        } catch (InstantiationException | IllegalAccessException | SecurityException | NoSuchMethodException |
+                 InvocationTargetException | IllegalArgumentException ex) {
             Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -364,7 +364,8 @@ public enum Material {
 
         try {
             result = getMaterial(Integer.parseInt(name));
-        } catch (NumberFormatException ex) {}
+        } catch (NumberFormatException ignored) {
+        }
 
         if (result == null) {
             String filtered = name.toUpperCase();

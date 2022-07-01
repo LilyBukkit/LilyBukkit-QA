@@ -6,7 +6,7 @@ import org.bukkit.Material;
 /**
  * Represents a lever
  */
-public class Lever extends SimpleAttachableMaterialData implements Redstone {
+public class Lever extends SimpleAttachableMaterialData implements Greenstone {
     public Lever() {
         super(Material.LEVER);
     }

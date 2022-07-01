@@ -12,15 +12,7 @@ public enum TreeSpecies {
     /**
      * Represents the common tree species.
      */
-    GENERIC((byte) 0x0),
-    /**
-     * Represents the darker barked/leaved tree species.
-     */
-    REDWOOD((byte) 0x1),
-    /**
-     * Represents birches.
-     */
-    BIRCH((byte) 0x2);
+    GENERIC((byte) 0x0);
 
     private final byte data;
     private final static Map<Byte, TreeSpecies> species = new HashMap<Byte, TreeSpecies>();

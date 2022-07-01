@@ -1,8 +1,7 @@
 package org.bukkit.event;
 
 import org.bukkit.entity.Projectile;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockGreenstoneEvent;
 import org.bukkit.generator.BlockPopulator;
 
 import java.io.Serializable;
@@ -244,12 +243,6 @@ public abstract class Event implements Serializable {
          */
         PLAYER_TELEPORT(Category.PLAYER),
         /**
-         * Called when a player completes the portaling process by standing in a portal
-         *
-         * @see org.bukkit.event.player.PlayerPortalEvent
-         */
-        PLAYER_PORTAL(Category.PLAYER),
-        /**
          * Called when a player changes their held item
          *
          * @see org.bukkit.event.player.PlayerItemHeldEvent
@@ -298,11 +291,17 @@ public abstract class Event implements Serializable {
          */
         PLAYER_BED_LEAVE(Category.PLAYER),
         /**
-         * Called when a player is fishing
+         * Called when a player dashes
          *
-         * @see org.bukkit.event.player.PlayerFishEvent
+         * @see org.bukkit.event.player.PlayerDashEvent
          */
-        PLAYER_FISH(Category.PLAYER),
+        PLAYER_DASH(Category.PLAYER),
+        /**
+         * Called when player uses cheats
+         *
+         * @see org.bukkit.event.player.PlayerCheatEvent
+         */
+        PLAYER_CHEAT(Category.PLAYER),
 
         /**
          * BLOCK EVENTS
@@ -381,7 +380,7 @@ public abstract class Event implements Serializable {
          * that are actually capable of transmitting or carrying a redstone
          * current
          *
-         * @see org.bukkit.event.block.BlockRedstoneEvent
+         * @see BlockGreenstoneEvent
          */
         REDSTONE_CHANGE(Category.BLOCK),
         /**
@@ -408,18 +407,6 @@ public abstract class Event implements Serializable {
          * @see org.bukkit.event.block.BlockFadeEvent
          */
         BLOCK_FADE(Category.BLOCK),
-        /**
-         * Called when a piston extends
-         *
-         * @see BlockPistonExtendEvent
-         */
-        BLOCK_PISTON_EXTEND(Category.BLOCK),
-        /**
-         * Called when a piston retracts
-         *
-         * @see BlockPistonRetractEvent
-         */
-        BLOCK_PISTON_RETRACT(Category.BLOCK),
 
         /**
          * INVENTORY EVENTS
@@ -560,12 +547,6 @@ public abstract class Event implements Serializable {
          * @see org.bukkit.event.world.WorldUnloadEvent
          */
         WORLD_UNLOAD(Category.WORLD),
-        /**
-         * Called when world attempts to create a matching end to a portal
-         *
-         * @see org.bukkit.event.world.PortalCreateEvent
-         */
-        PORTAL_CREATE(Category.WORLD),
 
         /**
          * ENTITY EVENTS
@@ -583,12 +564,6 @@ public abstract class Event implements Serializable {
          * @see org.bukkit.event.painting.PaintingBreakEvent
          */
         PAINTING_BREAK(Category.ENTITY),
-        /**
-         * Called when an entity touches a portal block
-         *
-         * @see org.bukkit.event.entity.EntityPortalEnterEvent
-         */
-        ENTITY_PORTAL_ENTER(Category.ENTITY),
 
         /**
          * LIVING_ENTITY EVENTS
@@ -658,18 +633,6 @@ public abstract class Event implements Serializable {
          */
         CREEPER_POWER(Category.LIVING_ENTITY),
         /**
-         * Called when a pig is zapped, zombifying it
-         *
-         * @see org.bukkit.event.entity.PigZapEvent
-         */
-        PIG_ZAP(Category.LIVING_ENTITY),
-        /**
-         * Called when a LivingEntity is tamed
-         *
-         * @see org.bukkit.event.entity.EntityTameEvent
-         */
-        ENTITY_TAME(Category.LIVING_ENTITY),
-        /**
          * Called when a {@link Projectile} hits something
          *
          * @see org.bukkit.event.entity.ProjectileHitEvent
@@ -682,29 +645,6 @@ public abstract class Event implements Serializable {
          * @see org.bukkit.event.entity.EntityRegainHealthEvent
          */
         ENTITY_REGAIN_HEALTH(Category.LIVING_ENTITY),
-
-        /**
-         * WEATHER EVENTS
-         */
-
-        /**
-         * Called when a lightning entity strikes somewhere
-         *
-         * @see org.bukkit.event.weather.LightningStrikeEvent
-         */
-        LIGHTNING_STRIKE(Category.WEATHER),
-        /**
-         * Called when the weather in a world changes
-         *
-         * @see org.bukkit.event.weather.WeatherChangeEvent
-         */
-        WEATHER_CHANGE(Category.WEATHER),
-        /**
-         * Called when the thunder state in a world changes
-         *
-         * @see org.bukkit.event.weather.ThunderChangeEvent
-         */
-        THUNDER_CHANGE(Category.WEATHER),
 
         /**
          * VEHICLE EVENTS
@@ -764,6 +704,17 @@ public abstract class Event implements Serializable {
          * @see org.bukkit.event.vehicle.VehicleUpdateEvent
          */
         VEHICLE_UPDATE(Category.VEHICLE),
+
+        /**
+         * LILYPAD-SPECIFIC EVENTS
+         */
+        /**
+         * Called when a player inputs a code into the Safe Block
+         *
+         * @see org.bukkit.event.block.SafeCodeInputEvent
+         */
+        CODE_INPUT(Category.BLOCK),
+
         /**
          * MISCELLANEOUS EVENTS
          */

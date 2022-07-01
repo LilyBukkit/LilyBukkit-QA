@@ -8,18 +8,14 @@ public enum CreatureType {
     CHICKEN("Chicken"),
     COW("Cow"),
     CREEPER("Creeper"),
-    GHAST("Ghast"),
     GIANT("Giant"),
     MONSTER("Monster"),
     PIG("Pig"),
-    PIG_ZOMBIE("PigZombie"),
     SHEEP("Sheep"),
     SKELETON("Skeleton"),
     SLIME("Slime"),
     SPIDER("Spider"),
-    SQUID("Squid"),
-    ZOMBIE("Zombie"),
-    WOLF("Wolf");
+    ZOMBIE("Zombie");
 
     private String name;
 

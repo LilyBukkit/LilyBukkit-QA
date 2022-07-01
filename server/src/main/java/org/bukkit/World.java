@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.generator.BlockPopulator;
@@ -311,21 +310,6 @@ public interface World {
      */
     public LivingEntity spawnCreature(Location loc, CreatureType type);
 
-    /**
-     * Strikes lightning at the given {@link Location}
-     *
-     * @param loc The location to strike lightning
-     * @return
-     */
-    public LightningStrike strikeLightning(Location loc);
-
-    /**
-     * Strikes lightning at the given {@link Location} without doing damage
-     *
-     * @param loc The location to strike lightning
-     * @return
-     */
-    public LightningStrike strikeLightningEffect(Location loc);
 
     /**
      * Get a list of all entities in this World
@@ -640,18 +624,6 @@ public interface World {
      * @return whether monsters can spawn in this world.
      */
     public boolean getAllowMonsters();
-
-    /**
-     * Gets the biome for the given block coordinates.
-     *
-     * It is safe to run this method when the block does not exist, it will not create the block.
-     *
-     * @param x X coordinate of the block
-     * @param z Z coordinate of the block
-     *
-     * @return Biome of the requested block
-     */
-    public Biome getBiome(int x, int z);
 
     /**
      * Gets the temperature for the given block coordinates.

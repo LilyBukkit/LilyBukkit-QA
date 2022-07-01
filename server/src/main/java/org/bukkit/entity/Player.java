@@ -1,15 +1,11 @@
 package org.bukkit.entity;
 
 import java.net.InetSocketAddress;
-import org.bukkit.Achievement;
 import org.bukkit.Effect;
-import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Note;
 import org.bukkit.Statistic;
 import org.bukkit.command.CommandSender;
-import org.bukkit.map.MapView;
 
 /**
  * Represents a player, connected or not
@@ -146,17 +142,6 @@ public interface Player extends HumanEntity, CommandSender {
     public void playNote(Location loc, byte instrument, byte note);
 
     /**
-     * Play a note for a player at a location. This requires a note block
-     * at the particular location (as far as the client is concerned). This
-     * will not work without a note block. This will not work with cake.
-     *
-     * @param loc
-     * @param instrument
-     * @param note
-     */
-    public void playNote(Location loc, Instrument instrument, Note note);
-
-    /**
      * Plays an effect to just this player.
      *
      * @param loc the player to play the effect for
@@ -203,14 +188,6 @@ public interface Player extends HumanEntity, CommandSender {
      * @param data
      */
     public void sendBlockChange(Location loc, int material, byte data);
-    
-    /**
-     * Render a map and send it to the player in its entirety. This may be used
-     * when streaming the map in the normal manner is not desirbale.
-     * 
-     * @pram map The map to be sent
-     */
-    public void sendMap(MapView map);
 
     /**
      * Forces an update of the player's entire inventory.
@@ -219,13 +196,6 @@ public interface Player extends HumanEntity, CommandSender {
      */
     @Deprecated
     public void updateInventory();
-
-    /**
-     * Awards this player the given achievement
-     *
-     * @param achievement Achievement to award
-     */
-    public void awardAchievement(Achievement achievement);
 
     /**
      * Increments the given statistic for this player
@@ -299,5 +269,11 @@ public interface Player extends HumanEntity, CommandSender {
      * Equivalent to calling setPlayerTime(0, true).
      */
     public void resetPlayerTime();
+
+    /**
+     * Returns the player's hunger meter value
+     * @return How full is the hunger meter
+     */
+    public int getHunger();
 
 }

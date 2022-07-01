@@ -15,11 +15,7 @@ public enum GrassSpecies {
     /**
      * Represents the normal grass species.
      */
-    NORMAL((byte) 0x1),
-    /**
-     * Represents the fern-looking grass species.
-     */
-    FERN_LIKE((byte) 0x2);
+    NORMAL((byte) 0x1);
 
     private final byte data;
     private final static Map<Byte, GrassSpecies> species = new HashMap<Byte, GrassSpecies>();

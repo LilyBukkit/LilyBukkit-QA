@@ -25,7 +25,6 @@ import org.bukkit.event.player.*;
 import org.bukkit.event.server.*;
 import org.bukkit.event.vehicle.*;
 import org.bukkit.event.world.*;
-import org.bukkit.event.weather.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.plugin.*;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -301,13 +300,6 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             };
 
-        case PLAYER_PORTAL:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((PlayerListener) listener).onPlayerPortal((PlayerPortalEvent) event);
-                }
-            };
-
         case PLAYER_INTERACT:
             return new EventExecutor() {
                 public void execute(Listener listener, Event event) {
@@ -413,13 +405,6 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             };
 
-        case PLAYER_FISH:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((PlayerListener) listener).onPlayerFish((PlayerFishEvent) event);
-                }
-            };
-
         // Block Events
         case BLOCK_PHYSICS:
             return new EventExecutor() {
@@ -480,7 +465,7 @@ public final class JavaPluginLoader implements PluginLoader {
         case REDSTONE_CHANGE:
             return new EventExecutor() {
                 public void execute(Listener listener, Event event) {
-                    ((BlockListener) listener).onBlockRedstoneChange((BlockRedstoneEvent) event);
+                    ((BlockListener) listener).onBlockRedstoneChange((BlockGreenstoneEvent) event);
                 }
             };
 
@@ -524,20 +509,6 @@ public final class JavaPluginLoader implements PluginLoader {
             return new EventExecutor() {
                 public void execute(Listener listener, Event event) {
                     ((BlockListener) listener).onBlockDispense((BlockDispenseEvent) event);
-                }
-            };
-
-        case BLOCK_PISTON_RETRACT:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((BlockListener) listener).onBlockPistonRetract((BlockPistonRetractEvent) event);
-                }
-            };
-
-        case BLOCK_PISTON_EXTEND:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((BlockListener) listener).onBlockPistonExtend((BlockPistonExtendEvent) event);
                 }
             };
 
@@ -627,13 +598,6 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             };
 
-        case PORTAL_CREATE:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((WorldListener) listener).onPortalCreate((PortalCreateEvent) event);
-                }
-            };
-
         // Painting Events
         case PAINTING_PLACE:
             return new EventExecutor() {
@@ -699,13 +663,6 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             };
 
-        case ENTITY_PORTAL_ENTER:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((EntityListener) listener).onEntityPortalEnter((EntityPortalEnterEvent) event);
-                }
-            };
-
         case CREATURE_SPAWN:
             return new EventExecutor() {
                 public void execute(Listener listener, Event event) {
@@ -720,24 +677,10 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             };
 
-        case PIG_ZAP:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((EntityListener) listener).onPigZap((PigZapEvent) event);
-                }
-            };
-
         case CREEPER_POWER:
             return new EventExecutor() {
                 public void execute(Listener listener, Event event) {
                     ((EntityListener) listener).onCreeperPower((CreeperPowerEvent) event);
-                }
-            };
-
-        case ENTITY_TAME:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((EntityListener) listener).onEntityTame((EntityTameEvent) event);
                 }
             };
 
@@ -819,28 +762,6 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             };
 
-        // Weather Events
-        case WEATHER_CHANGE:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((WeatherListener) listener).onWeatherChange((WeatherChangeEvent) event);
-                }
-            };
-
-        case THUNDER_CHANGE:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((WeatherListener) listener).onThunderChange((ThunderChangeEvent) event);
-                }
-            };
-
-        case LIGHTNING_STRIKE:
-            return new EventExecutor() {
-                public void execute(Listener listener, Event event) {
-                    ((WeatherListener) listener).onLightningStrike((LightningStrikeEvent) event);
-                }
-            };
-
         // Inventory Events
         case FURNACE_SMELT:
             return new EventExecutor() {
@@ -854,6 +775,31 @@ public final class JavaPluginLoader implements PluginLoader {
                     ((InventoryListener) listener).onFurnaceBurn((FurnaceBurnEvent) event);
                 }
             };
+
+        //Lilypad Events
+        case PLAYER_DASH:
+            return new EventExecutor() {
+                @Override
+                public void execute(Listener listener, Event event) {
+                    ((PlayerListener) listener).onPlayerDash((PlayerDashEvent) event);
+                }
+            };
+
+            case PLAYER_CHEAT:
+                return new EventExecutor() {
+                    @Override
+                    public void execute(Listener listener, Event event) {
+                        ((PlayerListener) listener).onPlayerCheat((PlayerCheatEvent) event);
+                    }
+                };
+
+            case CODE_INPUT:
+                return new EventExecutor() {
+                    @Override
+                    public void execute(Listener listener, Event event) {
+                        ((BlockListener) listener).onCodeInput((SafeCodeInputEvent) event);
+                    }
+                };
 
         // Custom Events
         case CUSTOM_EVENT:
