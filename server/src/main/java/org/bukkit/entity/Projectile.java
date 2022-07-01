@@ -1,6 +1,5 @@
 package org.bukkit.entity;
 
-import org.bukkit.block.Dispenser;
 
 /**
  * Represents a shootable entity
@@ -9,7 +8,7 @@ public interface Projectile extends Entity {
 
     /**
      * Retrieve the shooter of this projectile. The returned value can be null
-     * for projectiles shot from a {@link Dispenser} for example.
+     * for projectiles shot from a block for example.
      *
      * @return the {@link LivingEntity} that shot this projectile
      */

@@ -8,10 +8,9 @@ public class LBChunkSnapshot implements ChunkSnapshot {
     private Chunk chunk;
     private long timestamp;
 
-    public LBChunkSnapshot(Chunk chunk, long fullTime, boolean maxBlockY, boolean biomeType, boolean biomeWeather) {
+    public LBChunkSnapshot(Chunk chunk, long fullTime, boolean maxBlockY) {
         this.chunk = chunk;
         this.timestamp = fullTime;
-        //TODO: Make use of booleans
     }
 
     /**

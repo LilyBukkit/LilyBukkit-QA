@@ -418,7 +418,7 @@ public class LBWorld implements World {
         EntityArrow e = new EntityArrow(this.world);
         e.setPosition(new Integer(location.getBlockX()).doubleValue(), new Integer(location.getBlockY()).doubleValue(), new Integer(location.getBlockZ()).doubleValue());
         e.setArrowHeading(velocity.getX(), velocity.getY(), velocity.getZ(), velocity.angle(new Vector(0, velocity.getY(), 0)), velocity.angle(new Vector(velocity.getX(), 0, 0)));
-        if (this.world.spawnEntityInWorld(e)) return new LBArrow(e);
+        if (this.world.spawnEntityInWorld(e)) return new LBArrow(e, null);
         return null;
     }
 
@@ -475,10 +475,9 @@ public class LBWorld implements World {
                 return this.spawn(loc, LBZombie.class);
             case CREEPER:
                 return this.spawn(loc, LBCreeper.class);
-            case MONSTER:
-                return this.spawn(loc, LBMonster.class);
             case SKELETON:
                 return this.spawn(loc, LBSkeleton.class);
+            case MONSTER:
             default:
                 return null;
         }
@@ -494,7 +493,7 @@ public class LBWorld implements World {
         List<net.minecraft.src.Entity> loadedEntities = this.world.loadedEntityList;
         List<Entity> entities = new ArrayList<>();
         for (net.minecraft.src.Entity e : loadedEntities) {
-            entities.add(new LBEntity(e));
+            entities.add((Entity) e);
         }
         return entities;
     }
@@ -510,7 +509,7 @@ public class LBWorld implements World {
         List<LivingEntity> livingEntities = new ArrayList<>();
         for (net.minecraft.src.Entity e : loadedEntities) {
             if (e instanceof net.minecraft.src.EntityLiving) {
-                livingEntities.add(new LBLivingEntity(e));
+                livingEntities.add((LivingEntity) e);
             }
         }
         return livingEntities;
@@ -891,14 +890,12 @@ public class LBWorld implements World {
      * Get empty chunk snapshot (equivalent to all air blocks), optionally including valid biome
      * data.  Used for representing an ungenerated chunk, or for fetching only biome data without loading a chunk.
      *
-     * @param x                    - chunk x coordinate
-     * @param z                    - chunk z coordinate
-     * @param includeBiome         - if true, snapshot includes per-coordinate biome type
-     * @param includeBiomeTempRain - if true, snapshot includes per-coordinate raw biome temperature and rainfall
+     * @param x - chunk x coordinate
+     * @param z - chunk z coordinate
      */
     @Override
-    public ChunkSnapshot getEmptyChunkSnapshot(int x, int z, boolean includeBiome, boolean includeBiomeTempRain) {
-        return new LBChunkSnapshot(new LBChunk(new net.minecraft.src.Chunk(this.world, x, z)), this.getFullTime(), false, includeBiome, includeBiomeTempRain);
+    public ChunkSnapshot getEmptyChunkSnapshot(int x, int z) {
+        return new LBChunkSnapshot(new LBChunk(new net.minecraft.src.Chunk(this.world, x, z)), this.getFullTime(), false);
     }
 
     /**

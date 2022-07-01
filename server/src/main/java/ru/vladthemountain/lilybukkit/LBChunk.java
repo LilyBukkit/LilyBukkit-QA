@@ -10,7 +10,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import ru.vladthemountain.lilybukkit.block.LBBlock;
 import ru.vladthemountain.lilybukkit.block.LBBlockState;
-import ru.vladthemountain.lilybukkit.entity.LBEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,20 +74,18 @@ public class LBChunk implements Chunk {
      */
     @Override
     public ChunkSnapshot getChunkSnapshot() {
-        return this.getChunkSnapshot(false, false, false);
+        return this.getChunkSnapshot(false);
     }
 
     /**
      * Capture thread-safe read-only snapshot of chunk data
      *
      * @param includeMaxblocky     - if true, snapshot includes per-coordinate maximum Y values
-     * @param includeBiome         - if true, snapshot includes per-coordinate biome type
-     * @param includeBiomeTempRain - if true, snapshot includes per-coordinate raw biome temperature and rainfall
      * @return ChunkSnapshot
      */
     @Override
-    public ChunkSnapshot getChunkSnapshot(boolean includeMaxblocky, boolean includeBiome, boolean includeBiomeTempRain) {
-        return new LBChunkSnapshot(this, this.world.getFullTime(), includeMaxblocky, includeBiome, includeBiomeTempRain);
+    public ChunkSnapshot getChunkSnapshot(boolean includeMaxblocky) {
+        return new LBChunkSnapshot(this, this.world.getFullTime(), includeMaxblocky);
     }
 
     @Override
@@ -97,7 +94,7 @@ public class LBChunk implements Chunk {
         this.chunk.getEntitiesOfTypeWithinAAAB(net.minecraft.src.Entity.class, AxisAlignedBB.getBoundingBoxFromPool(new Integer(this.chunk.xPosition).doubleValue(), 0.0, new Integer(this.chunk.zPosition).doubleValue(), new Integer(this.chunk.xPosition + 16).doubleValue(), 127.0, new Integer(this.chunk.zPosition).doubleValue()), vEntityList);
         List<Entity> bEntityList = new ArrayList<>();
         for (net.minecraft.src.Entity e : vEntityList) {
-            bEntityList.add(new LBEntity(e));
+            bEntityList.add((Entity) e);
         }
         return bEntityList.toArray(new Entity[]{});
     }
