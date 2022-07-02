@@ -78,13 +78,6 @@ public class EntityListener implements Listener {
     public void onEntityInteract(EntityInteractEvent event) {}
 
     /**
-     * Called when an entity enters a portal
-     *
-     * @param event Relevant event details
-     */
-    public void onEntityPortalEnter(EntityPortalEnterEvent event) {}
-
-    /**
      * Called when a painting is placed
      *
      * @param event Relevant event details
@@ -99,13 +92,6 @@ public class EntityListener implements Listener {
     public void onPaintingBreak(PaintingBreakEvent event) {}
 
     /**
-     * Called when a Pig is struck by lightning
-     *
-     * @param event Relevant event details
-     */
-    public void onPigZap(PigZapEvent event) {}
-
-    /**
      * Called when a Creeper is struck by lightning.
      *<p />
      * If a Creeper Power event is cancelled, the Creeper will not be powered.
@@ -113,13 +99,6 @@ public class EntityListener implements Listener {
      * @param event Relevant event details
      */
     public void onCreeperPower(CreeperPowerEvent event) {}
-
-    /**
-     * Called when an entity is tamed (currently only applies to Wolves)
-     *
-     * @param event Relevant event details
-     */
-    public void onEntityTame(EntityTameEvent event) {}
 
     /**
      * Called when an entity regains health (currently only applies to Players)

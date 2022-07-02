@@ -1,19 +1,13 @@
 package org.bukkit.material;
 
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 
 /**
  * Represents a Wool/Cloth block
  */
-public class Wool extends MaterialData implements Colorable {
+public class Wool extends MaterialData {
     public Wool() {
         super(Material.WOOL);
-    }
-
-    public Wool(DyeColor color) {
-        this();
-        setColor(color);
     }
 
     public Wool(final int type) {
@@ -32,26 +26,8 @@ public class Wool extends MaterialData implements Colorable {
         super(type, data);
     }
 
-    /**
-     * Gets the current color of this dye
-     *
-     * @return DyeColor of this dye
-     */
-    public DyeColor getColor() {
-        return DyeColor.getByData(getData());
-    }
-
-    /**
-     * Sets the color of this dye
-     *
-     * @param color New color of this dye
-     */
-    public void setColor(DyeColor color) {
-        setData(color.getData());
-    }
-
     @Override
     public String toString() {
-        return getColor() + " " + super.toString();
+        return super.toString();
     }
 }

@@ -96,7 +96,7 @@ public class Rails extends MaterialData {
     }
 
     /**
-     * Return the data without the extended properties used by {@link PoweredRail} and {@link DetectorRail}. Overridden in {@link ExtendedRails}
+     * Return the data without the extended properties used by PoweredRail and DetectorRail. Overridden in xtendedRails
      * @return the data without the extended part
      */
     protected byte getConvertedData() {

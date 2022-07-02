@@ -10,7 +10,6 @@ import org.bukkit.Material;
 public class Step extends MaterialData {
     private static HashSet<Material> stepTypes = new HashSet<Material>();
     static {
-        stepTypes.add(Material.SANDSTONE);
         stepTypes.add(Material.WOOD);
         stepTypes.add(Material.COBBLESTONE);
         stepTypes.add(Material.STONE);
@@ -46,9 +45,6 @@ public class Step extends MaterialData {
      */
     public Material getMaterial() {
         switch ((int) getData()) {
-        case 1:
-            return Material.SANDSTONE;
-
         case 2:
             return Material.WOOD;
 
@@ -68,10 +64,6 @@ public class Step extends MaterialData {
      */
     public void setMaterial(Material material) {
         switch (material) {
-        case SANDSTONE:
-            setData((byte) 0x1);
-            break;
-
         case WOOD:
             setData((byte) 0x2);
             break;

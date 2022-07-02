@@ -1,5 +1,12 @@
 --- World.java
 +++ World.java
+@@ -20,5 +20,5 @@
+ public class World implements IBlockAccess {
+     private List lightingToUpdate;
+-    public List loadedEntityList;
++    public List<Entity> loadedEntityList;
+     private List unloadedEntityList;
+     private TreeSet scheduledTickTreeSet;
 @@ -53,5 +53,5 @@
      public boolean worldChunkLoadOverride;
      private ArrayList collidingBoundingBoxes;
