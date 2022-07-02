@@ -62,8 +62,7 @@ public class LilyBukkit implements Server {
         this.commandList = new ArrayList<>();
         this.pluginCommandList = new ArrayList<>();
         this.recipeManager = new ArrayList<>();
-        Logger.getLogger("Minecraft").info("LilyBukkit initialized");
-        System.out.println("LilyBukkit initialized");
+        MinecraftServer.logger.info("LilyBukkit initialized.");
     }
 
     /**

@@ -467,7 +467,7 @@
 +
      private void print(final String string1, final String string2) {
          final String string3 = String.valueOf(string1) + ": " + string2;
-@@ -466,43 +474,42 @@
+@@ -466,18 +474,17 @@
          MinecraftServer.logger.info(string3);
      }
 -    
@@ -490,11 +490,10 @@
 +
      public static void main(final String[] args) {
          try {
-             final MinecraftServer minecraftServer1 = new MinecraftServer();
-+            org.bukkit.Bukkit.setServer(new ru.vladthemountain.lilybukkit.LilyBukkit(minecraftServer1));
-             if (!GraphicsEnvironment.isHeadless() && (args.length <= 0 || !args[0].equals("nogui"))) {
+@@ -486,23 +493,23 @@
                  ServerGUI.initGui(minecraftServer1);
              }
++            org.bukkit.Bukkit.setServer(new ru.vladthemountain.lilybukkit.LilyBukkit(minecraftServer1));
              new ThreadServerApplication("Server thread", minecraftServer1).start();
 +        } catch (Exception exception2) {
 +            MinecraftServer.logger.log(Level.SEVERE, "Failed to start the minecraft server", (Throwable) exception2);
