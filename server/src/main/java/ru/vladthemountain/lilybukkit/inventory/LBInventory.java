@@ -1,5 +1,6 @@
 package ru.vladthemountain.lilybukkit.inventory;
 
+import net.minecraft.src.IInventory;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -10,6 +11,14 @@ import java.util.HashMap;
  * @author VladTheMountain
  */
 public class LBInventory implements Inventory {
+
+    private final IInventory inventory;
+    private String invName = "Chest";
+
+    public LBInventory(IInventory i) {
+        this.inventory = i;
+    }
+
     /**
      * Returns the size of the inventory
      *
@@ -17,7 +26,7 @@ public class LBInventory implements Inventory {
      */
     @Override
     public int getSize() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.inventory.getSizeInventory();
     }
 
     /**
@@ -27,7 +36,7 @@ public class LBInventory implements Inventory {
      */
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.invName;
     }
 
     /**
@@ -38,7 +47,8 @@ public class LBInventory implements Inventory {
      */
     @Override
     public ItemStack getItem(int index) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.ItemStack vIS = this.inventory.getStackInSlot(index);
+        return new ItemStack(vIS.itemID, vIS.stackSize, (short) vIS.itemDmg);
     }
 
     /**

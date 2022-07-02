@@ -6,8 +6,8 @@ import org.bukkit.entity.CreatureType;
 
 public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
 
-    public LBCreatureSpawner(Entity e) {
-        super(e);
+    public LBCreatureSpawner(LBBlock b) {
+        super(b);
     }
 
     /**
