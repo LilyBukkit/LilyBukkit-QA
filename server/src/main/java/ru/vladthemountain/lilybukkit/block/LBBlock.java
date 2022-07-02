@@ -13,19 +13,25 @@ public class LBBlock implements Block {
 
     private net.minecraft.src.Block block;
     private LBWorld world;
-    private LBBlockState blockState;
+    private byte data;
 
     public LBBlock(LBWorld w, net.minecraft.src.Block b) {
-        this.world = w;
-        this.block = b;
+        this(w, b.blockID);
     }
 
     public LBBlock(LBWorld w, int id) {
-        switch (id) {
-            case 0:
-            default:
-                throw new UnsupportedOperationException("Not implemented yet");
-        }
+        this.world = w;
+        this.block = net.minecraft.src.Block.blocksList[id];
+    }
+
+    /**
+     * Gets the metadata for this block
+     *
+     * @return block specific metadata
+     */
+    @Override
+    public byte getData() {
+        return this.data;
     }
 
     /**
@@ -207,6 +213,24 @@ public class LBBlock implements Block {
     }
 
     /**
+     * Sets the metadata for this block
+     *
+     * @param data New block specific metadata
+     */
+    @Override
+    public void setData(byte data) {
+        this.setData(data, false);
+    }
+
+    @Override
+    public void setData(byte data, boolean applyPhyiscs) {
+        this.data = data;
+        if (applyPhyiscs) {
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+    }
+
+    /**
      * Sets the type of this block
      *
      * @param type Material to change this block to
@@ -269,7 +293,7 @@ public class LBBlock implements Block {
      */
     @Override
     public BlockState getState() {
-        return this.blockState;
+        return new LBBlockState(this);
     }
 
     /**

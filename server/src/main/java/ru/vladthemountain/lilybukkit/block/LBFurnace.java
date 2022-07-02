@@ -1,13 +1,14 @@
 package ru.vladthemountain.lilybukkit.block;
 
 import net.minecraft.src.Entity;
+import org.bukkit.block.Block;
 import org.bukkit.block.Furnace;
 import org.bukkit.inventory.Inventory;
 
 public class LBFurnace extends LBBlockState implements Furnace {
 
-    public LBFurnace(Entity e) {
-        super(e);
+    public LBFurnace(LBBlock b) {
+        super(b);
     }
 
     /**

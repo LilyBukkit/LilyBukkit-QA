@@ -14,6 +14,13 @@ import org.bukkit.Location;
 public interface Block {
 
     /**
+     * Gets the metadata for this block
+     *
+     * @return block specific metadata
+     */
+    byte getData();
+
+    /**
      * @deprecated use {@link #getRelative(BlockFace face)}
      */
     @Deprecated Block getFace(BlockFace face);
@@ -124,6 +131,15 @@ public interface Block {
      * @return Containing Chunk
      */
     Chunk getChunk();
+
+    /**
+     * Sets the metadata for this block
+     *
+     * @param data New block specific metadata
+     */
+    void setData(byte data);
+
+    void setData(byte data, boolean applyPhyiscs);
 
     /**
      * Sets the type of this block

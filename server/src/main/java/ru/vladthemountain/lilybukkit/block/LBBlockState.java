@@ -8,16 +8,20 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.material.Furnace;
 import org.bukkit.material.MaterialData;
-import org.bukkit.material.Sign;
 
 public class LBBlockState implements BlockState {
 
     TileEntity tileEntity;
+    LBBlock block;
 
-    public LBBlockState(TileEntity e) {
-        this.tileEntity = e;
+    public LBBlockState(LBBlock b) {
+        this.block = b;
+        if (b.getType().equals(Material.FURNACE)) {
+            this.tileEntity = new TileEntityFurnace();
+        } else if (b.getType().equals(Material.SIGN_POST) || b.getType().equals(Material.WALL_SIGN)) {
+            this.tileEntity = new TileEntitySign();
+        }
     }
 
     /**
@@ -37,12 +41,12 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public MaterialData getData() {
-        if (this.tileEntity instanceof TileEntityFurnace) {
-            return new Furnace();
-        } else if (this.tileEntity instanceof TileEntitySign) {
-            return new Sign();
+        //Code adapted from RhysB/Project-Poseidon
+        Material mat = Material.getMaterial(this.getTypeId());
+        if (mat == null || mat.getData() == null) {
+            return new MaterialData(this.getType(), this.block.getData());
         } else {
-            return null;
+            return mat.getNewData(this.block.getData());
         }
     }
 
@@ -53,7 +57,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public Material getType() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.getType();
     }
 
     /**
@@ -63,7 +67,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public int getTypeId() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.getTypeId();
     }
 
     /**
@@ -73,7 +77,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public byte getLightLevel() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.getLightLevel();
     }
 
     /**
@@ -83,7 +87,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public World getWorld() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.getWorld();
     }
 
     /**
@@ -93,7 +97,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public int getX() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.getX();
     }
 
     /**
@@ -103,7 +107,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public int getY() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.getY();
     }
 
     /**
