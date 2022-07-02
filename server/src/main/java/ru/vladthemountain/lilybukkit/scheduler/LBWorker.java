@@ -7,6 +7,16 @@ import org.bukkit.scheduler.BukkitWorker;
  * @author VladTheMountain
  */
 public class LBWorker implements BukkitWorker {
+
+    private final int taskId;
+    private final Plugin owner;
+    private final Thread task;
+
+    public LBWorker(int id, Plugin p, Thread t){
+        this.taskId = id;
+        this.owner = p;
+        this.task = t;
+    }
     /**
      * Returns the taskId for the task being executed by this worker
      *
@@ -14,7 +24,7 @@ public class LBWorker implements BukkitWorker {
      */
     @Override
     public int getTaskId() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.taskId;
     }
 
     /**
@@ -24,7 +34,7 @@ public class LBWorker implements BukkitWorker {
      */
     @Override
     public Plugin getOwner() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.owner;
     }
 
     /**
@@ -34,6 +44,6 @@ public class LBWorker implements BukkitWorker {
      */
     @Override
     public Thread getThread() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.task;
     }
 }

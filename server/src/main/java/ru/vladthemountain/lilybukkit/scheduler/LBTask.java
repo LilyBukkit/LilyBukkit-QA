@@ -7,6 +7,19 @@ import org.bukkit.scheduler.BukkitTask;
  * @author VladTheMountain
  */
 public class LBTask implements BukkitTask {
+
+    private final int taskId;
+    private final Plugin owner;
+    private final boolean synced;
+    private final long delayed;
+
+    public LBTask(int id, Plugin p, Runnable code, boolean isSync, long delay){
+        this.taskId = id;
+        this.owner = p;
+        this.synced = isSync;
+        this.delayed = delay;
+    }
+
     /**
      * Returns the taskId for the task
      *
@@ -14,7 +27,7 @@ public class LBTask implements BukkitTask {
      */
     @Override
     public int getTaskId() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.taskId;
     }
 
     /**
@@ -24,7 +37,7 @@ public class LBTask implements BukkitTask {
      */
     @Override
     public Plugin getOwner() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.owner;
     }
 
     /**
@@ -34,6 +47,6 @@ public class LBTask implements BukkitTask {
      */
     @Override
     public boolean isSync() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.synced;
     }
 }

@@ -5,6 +5,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitWorker;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -13,6 +14,15 @@ import java.util.concurrent.Future;
  * @author VladTheMountain
  */
 public class LBScheduler implements BukkitScheduler {
+
+    private List<BukkitTask> taskSchedule;
+    private List<BukkitWorker> workerList;
+
+    public LBScheduler() {
+        this.taskSchedule = new ArrayList<>();
+        this.workerList = new ArrayList<>();
+    }
+
     /**
      * Schedules a once off task to occur after a delay
      * This task will be executed by the main server thread
@@ -24,7 +34,9 @@ public class LBScheduler implements BukkitScheduler {
      */
     @Override
     public int scheduleSyncDelayedTask(Plugin plugin, Runnable task, long delay) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int id = taskSchedule.size(); //This puts the task to the end of the queue
+        taskSchedule.add(id, new LBTask(id, plugin, task, true, delay));
+        return id;
     }
 
     /**
@@ -37,7 +49,7 @@ public class LBScheduler implements BukkitScheduler {
      */
     @Override
     public int scheduleSyncDelayedTask(Plugin plugin, Runnable task) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.scheduleSyncDelayedTask(plugin, task, 0);
     }
 
     /**
@@ -120,7 +132,7 @@ public class LBScheduler implements BukkitScheduler {
      */
     @Override
     public void cancelTask(int taskId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.taskSchedule.remove(taskId);
     }
 
     /**
@@ -130,7 +142,9 @@ public class LBScheduler implements BukkitScheduler {
      */
     @Override
     public void cancelTasks(Plugin plugin) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (BukkitTask t : this.taskSchedule) {
+            if (t.getOwner().equals(plugin)) this.cancelTask(t.getTaskId());
+        }
     }
 
     /**
@@ -138,7 +152,7 @@ public class LBScheduler implements BukkitScheduler {
      */
     @Override
     public void cancelAllTasks() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.taskSchedule.clear();
     }
 
     /**
@@ -168,7 +182,10 @@ public class LBScheduler implements BukkitScheduler {
      */
     @Override
     public boolean isQueued(int taskId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (BukkitTask t : this.taskSchedule) {
+            if (t.getTaskId() == taskId) return true;
+        }
+        return false;
     }
 
     /**
@@ -180,7 +197,7 @@ public class LBScheduler implements BukkitScheduler {
      */
     @Override
     public List<BukkitWorker> getActiveWorkers() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.workerList;
     }
 
     /**
@@ -190,6 +207,6 @@ public class LBScheduler implements BukkitScheduler {
      */
     @Override
     public List<BukkitTask> getPendingTasks() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.taskSchedule;
     }
 }
