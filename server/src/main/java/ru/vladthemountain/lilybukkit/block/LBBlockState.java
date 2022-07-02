@@ -13,7 +13,7 @@ import org.bukkit.material.MaterialData;
 public class LBBlockState implements BlockState {
 
     TileEntity tileEntity;
-    LBBlock block;
+    Block block;
 
     public LBBlockState(LBBlock b) {
         this.block = b;
@@ -41,13 +41,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public MaterialData getData() {
-        //Code adapted from RhysB/Project-Poseidon
-        Material mat = Material.getMaterial(this.getTypeId());
-        if (mat == null || mat.getData() == null) {
-            return new MaterialData(this.getType(), this.block.getData());
-        } else {
-            return mat.getNewData(this.block.getData());
-        }
+        return this.getType().getNewData(this.block.getData());
     }
 
     /**
@@ -117,7 +111,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public int getZ() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.getZ();
     }
 
     /**
@@ -127,7 +121,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public Chunk getChunk() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.getChunk();
     }
 
     /**
@@ -137,7 +131,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public void setData(MaterialData data) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.block.setData(data.getData());
     }
 
     /**
@@ -147,7 +141,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public void setType(Material type) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.block.setType(type);
     }
 
     /**
@@ -157,7 +151,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public boolean setTypeId(int type) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.block.setTypeId(type);
     }
 
     /**
@@ -174,7 +168,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public boolean update() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.update(false);
     }
 
     /**
@@ -193,11 +187,12 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public boolean update(boolean force) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.block = this.block.getWorld().getBlockAt(this.block.getLocation());
+        return true;
     }
 
     @Override
     public byte getRawData() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getData().getData();
     }
 }
