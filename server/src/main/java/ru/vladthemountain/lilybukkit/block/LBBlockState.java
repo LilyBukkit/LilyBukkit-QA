@@ -1,16 +1,23 @@
 package ru.vladthemountain.lilybukkit.block;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.TileEntity;
+import net.minecraft.src.TileEntityFurnace;
+import net.minecraft.src.TileEntitySign;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.material.Furnace;
 import org.bukkit.material.MaterialData;
+import org.bukkit.material.Sign;
 
 public class LBBlockState implements BlockState {
-    public LBBlockState(Entity e) {
-        
+
+    TileEntity tileEntity;
+
+    public LBBlockState(TileEntity e) {
+        this.tileEntity = e;
     }
 
     /**
@@ -20,7 +27,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public Block getBlock() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getWorld().getBlockAt(this.tileEntity.xCoord, this.tileEntity.yCoord, this.tileEntity.zCoord);
     }
 
     /**
@@ -30,7 +37,13 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public MaterialData getData() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (this.tileEntity instanceof TileEntityFurnace) {
+            return new Furnace();
+        } else if (this.tileEntity instanceof TileEntitySign) {
+            return new Sign();
+        } else {
+            return null;
+        }
     }
 
     /**

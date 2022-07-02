@@ -9,23 +9,23 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import ru.vladthemountain.lilybukkit.block.LBBlock;
-import ru.vladthemountain.lilybukkit.block.LBBlockState;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * {@link Chunk} implementation
+ *
  * @author VladTheMountain
  */
 public class LBChunk implements Chunk {
 
     private net.minecraft.src.Chunk chunk;
-    private World world;
+    private LBWorld world;
 
     public LBChunk(net.minecraft.src.Chunk chunk) {
         this.chunk = chunk;
-        this.world = Bukkit.getServer().getWorld(this.chunk.worldObj.levelName);
+        this.world = (LBWorld) Bukkit.getServer().getWorld(this.chunk.worldObj.levelName);
     }
 
     /**
@@ -68,7 +68,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public Block getBlock(int x, int y, int z) {
-        return new LBBlock(this.chunk.getBlockID(x, y, z));
+        return new LBBlock(this.world, this.chunk.getBlockID(x, y, z));
     }
 
     /**
@@ -84,7 +84,7 @@ public class LBChunk implements Chunk {
     /**
      * Capture thread-safe read-only snapshot of chunk data
      *
-     * @param includeMaxblocky     - if true, snapshot includes per-coordinate maximum Y values
+     * @param includeMaxblocky - if true, snapshot includes per-coordinate maximum Y values
      * @return ChunkSnapshot
      */
     @Override
@@ -105,13 +105,14 @@ public class LBChunk implements Chunk {
 
     @Override
     public BlockState[] getTileEntities() {
-        List<net.minecraft.src.Entity> vEntityList = new ArrayList<>();
+        /*List<net.minecraft.src.Entity> vEntityList = new ArrayList<>();
         this.chunk.getEntitiesOfTypeWithinAAAB(net.minecraft.src.TileEntity.class, AxisAlignedBB.getBoundingBoxFromPool(new Integer(this.chunk.xPosition).doubleValue(), 0.0, new Integer(this.chunk.zPosition).doubleValue(), new Integer(this.chunk.xPosition + 16).doubleValue(), 127.0, new Integer(this.chunk.zPosition).doubleValue()), vEntityList);
         List<BlockState> bEntityList = new ArrayList<>();
         for (net.minecraft.src.Entity e : vEntityList) {
             bEntityList.add(new LBBlockState(e));
         }
-        return bEntityList.toArray(new BlockState[]{});
+        return bEntityList.toArray(new BlockState[]{});*/
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**

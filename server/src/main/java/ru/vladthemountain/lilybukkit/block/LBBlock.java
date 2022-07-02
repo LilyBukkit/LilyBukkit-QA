@@ -4,29 +4,28 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
 public class LBBlock implements Block {
 
     private net.minecraft.src.Block block;
+    private LBWorld world;
+    private LBBlockState blockState;
 
-    public LBBlock(int id) {
-        switch (id) {
-            case 1:
-            case 0:
-            default:
-                //TODO: Create an air block stub
-        }
+    public LBBlock(LBWorld w, net.minecraft.src.Block b) {
+        this.world = w;
+        this.block = b;
     }
 
-    /**
-     * Gets the metadata for this block
-     *
-     * @return block specific metadata
-     */
-    @Override
-    public byte getData() {
-        throw new UnsupportedOperationException("Data values don't exist in Lilypad");
+    public LBBlock(LBWorld w, int id) {
+        switch (id) {
+            case 0:
+            default:
+                throw new UnsupportedOperationException("Not implemented yet");
+        }
     }
 
     /**
@@ -72,7 +71,7 @@ public class LBBlock implements Block {
      */
     @Override
     public Block getRelative(BlockFace face) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getRelative(face, 1);
     }
 
     /**
@@ -92,7 +91,29 @@ public class LBBlock implements Block {
      */
     @Override
     public Block getRelative(BlockFace face, int distance) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        switch (face) {
+            case UP:
+            case DOWN:
+            case EAST:
+            case WEST:
+            case NORTH:
+            case SOUTH:
+            case NORTH_EAST:
+            case NORTH_WEST:
+            case WEST_NORTH_WEST:
+            case NORTH_NORTH_WEST:
+            case SOUTH_EAST:
+            case EAST_SOUTH_EAST:
+            case SOUTH_SOUTH_EAST:
+            case EAST_NORTH_EAST:
+            case NORTH_NORTH_EAST:
+            case WEST_SOUTH_WEST:
+            case SOUTH_WEST:
+            case SOUTH_SOUTH_WEST:
+            case SELF:
+            default:
+                throw new UnsupportedOperationException("Not implemented yet");
+        }
     }
 
     /**
@@ -102,7 +123,7 @@ public class LBBlock implements Block {
      */
     @Override
     public Material getType() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return Material.getMaterial(this.getTypeId());
     }
 
     /**
@@ -132,7 +153,7 @@ public class LBBlock implements Block {
      */
     @Override
     public World getWorld() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world;
     }
 
     /**
@@ -182,22 +203,7 @@ public class LBBlock implements Block {
      */
     @Override
     public Chunk getChunk() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Sets the metadata for this block
-     *
-     * @param data New block specific metadata
-     */
-    @Override
-    public void setData(byte data) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public void setData(byte data, boolean applyPhyiscs) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.getChunkAt(this);
     }
 
     /**
@@ -207,82 +213,7 @@ public class LBBlock implements Block {
      */
     @Override
     public void setType(Material type) {
-        switch (type) {
-            case AIR:
-            case STONE:
-            case GRASS:
-            case DIRT:
-            case COBBLESTONE:
-            case WOOD:
-            case SAPLING:
-            case BEDROCK:
-            case WATER:
-            case STATIONARY_WATER:
-            case LAVA:
-            case STATIONARY_LAVA:
-            case SAND:
-            case GRAVEL:
-            case GOLD_ORE:
-            case IRON_ORE:
-            case COAL_ORE:
-            case LOG:
-            case LEAVES:
-            case GLASS:
-            case WOOL:
-            case BLUE_FLOWER:
-            case SILVER_ROSE:
-            case BROWN_MUSHROOM:
-            case PINK_MUSHROOM:
-            case GOLD_BLOCK:
-            case IRON_BLOCK:
-            case DOUBLE_STEP:
-            case STEP:
-            case BRICK:
-            case TNT:
-            case BOOKSHELF:
-            case MOSSY_COBBLESTONE:
-            case OBSIDIAN:
-            case TORCH:
-            case FIRE:
-            case MOB_SPAWNER:
-            case WOOD_STAIRS:
-            case CHEST:
-            case GREENSTONE_WIRE:
-            case DIAMOND_ORE:
-            case DIAMOND_BLOCK:
-            case WORKBENCH:
-            case CROPS:
-            case SOIL:
-            case FURNACE:
-            case BURNING_FURNACE:
-            case SIGN_POST:
-            case WOODEN_DOOR:
-            case LADDER:
-            case RAILS:
-            case COBBLESTONE_STAIRS:
-            case WALL_SIGN:
-            case LEVER:
-            case STONE_PLATE:
-            case IRON_DOOR_BLOCK:
-            case WOOD_PLATE:
-            case REDSTONE_ORE:
-            case GLOWING_REDSTONE_ORE:
-            case REDSTONE_TORCH_OFF:
-            case REDSTONE_TORCH_ON:
-            case STONE_BUTTON:
-            case SNOW:
-            case ICE:
-            case SNOW_BLOCK:
-            case CACTUS:
-            case CLAY:
-            case SUGAR_CANE_BLOCK:
-            case JUKEBOX:
-            case FENCE:
-                throw new UnsupportedOperationException("This Material doesn't exist in Lilypad");
-            default:
-                this.block = net.minecraft.src.Block.dbgBlock;
-        }
-        this.block.onBlockAdded((net.minecraft.src.World) this.getWorld(), this.getX(), this.getY(), this.getZ());
+        this.setTypeId(type.getId());
     }
 
     /**
@@ -338,7 +269,7 @@ public class LBBlock implements Block {
      */
     @Override
     public BlockState getState() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.blockState;
     }
 
     /**

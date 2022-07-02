@@ -65,7 +65,7 @@ public class LBWorld implements World {
      */
     @Override
     public Block getBlockAt(int x, int y, int z) {
-        return this.world.blockExists(x, y, z) ? new LBBlock(this.world.getBlockId(x, y, z)) : new LBBlock(0);
+        return this.world.blockExists(x, y, z) ? new LBBlock(this, this.world.getBlockId(x, y, z)) : new LBBlock(this, 0);
     }
 
     /**
