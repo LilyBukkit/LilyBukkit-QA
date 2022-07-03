@@ -138,5 +138,5 @@ dependencies{
     implementation group: "com.google.guava", name: "guava-collections", version: "r03"
 }
 
-group 'net.buj'
-version '1.1-SNAPSHOT'
+group 'ru.vladthemountain'
+version '1.0.0'

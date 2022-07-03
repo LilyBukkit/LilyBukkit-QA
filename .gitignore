@@ -1,12 +1,8 @@
 
 build
 .gradle
-client/src/main/resources/*
-client/src/main/java/net/minecraft
-client/src/main/java/org
-client/src/main/java/adaptive
+client
 server/src/main/java/net/minecraft
-client/src/orig
 server/src/orig
 jars/*
 /bin/
