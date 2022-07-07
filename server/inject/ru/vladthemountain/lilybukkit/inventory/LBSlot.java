@@ -8,6 +8,17 @@ import org.bukkit.inventory.Slot;
  * @author VladTheMountain
  */
 public class LBSlot implements Slot {
+
+    private LBInventory inventory;
+    private int index;
+    private ItemStack itemStack;
+
+    public LBSlot(LBInventory parent, int index, ItemStack item) {
+        this.inventory = parent;
+        this.index = index;
+        this.itemStack = item;
+    }
+
     /**
      * Gets the inventory this slot belongs to
      *
@@ -15,7 +26,7 @@ public class LBSlot implements Slot {
      */
     @Override
     public Inventory getInventory() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.inventory;
     }
 
     /**
@@ -25,7 +36,7 @@ public class LBSlot implements Slot {
      */
     @Override
     public int getIndex() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.index;
     }
 
     /**
@@ -35,6 +46,6 @@ public class LBSlot implements Slot {
      */
     @Override
     public ItemStack getItem() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.itemStack;
     }
 }

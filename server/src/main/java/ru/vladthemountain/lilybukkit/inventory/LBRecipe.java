@@ -7,6 +7,7 @@ import org.bukkit.inventory.Recipe;
  * @author VladTheMountain
  */
 public class LBRecipe implements Recipe {
+
     /**
      * Get the result of this recipe.
      *

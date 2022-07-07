@@ -40,11 +40,12 @@ public class LilyBukkit implements Server {
     final String ONLINE_MODE = "online-mode";
     final String ALLOW_FLIGHT = "allow-flight";
     final String SERVER_NAME = "server-name";
+    final String SERVER_ID = "server-id";
 
     private LBPlayer[] playerList;
     private MinecraftServer mc;
     private final PluginManager pluginMngr;
-    private BukkitScheduler scheduler;
+    private final BukkitScheduler scheduler;
     private final ServicesManager servicesMngr;
     private List<LBWorld> worldList;
     private List<Command> commandList;
@@ -153,7 +154,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getServerId() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return mc.propertyManagerObj.getStringProperty(SERVER_ID, UUID.fromString(this.getName()).toString());
     }
 
     /**

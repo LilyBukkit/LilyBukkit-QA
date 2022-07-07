@@ -1,6 +1,6 @@
 package ru.vladthemountain.lilybukkit.inventory;
 
-import net.minecraft.src.IInventory;
+import net.minecraft.src.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -15,8 +15,8 @@ public class LBInventory implements Inventory {
     private final IInventory inventory;
     private String invName = "Chest";
 
-    public LBInventory(IInventory i) {
-        this.inventory = i;
+    public LBInventory(IInventory blockContainer) {
+        this.inventory = blockContainer;
     }
 
     /**
@@ -47,8 +47,8 @@ public class LBInventory implements Inventory {
      */
     @Override
     public ItemStack getItem(int index) {
-        net.minecraft.src.ItemStack vIS = this.inventory.getStackInSlot(index);
-        return new ItemStack(vIS.itemID, vIS.stackSize, (short) vIS.itemDmg);
+        net.minecraft.src.ItemStack vanillaItemStack = this.inventory.getStackInSlot(index);
+        return new ItemStack(vanillaItemStack.itemID, vanillaItemStack.stackSize, (short) vanillaItemStack.itemDmg);
     }
 
     /**
@@ -59,7 +59,30 @@ public class LBInventory implements Inventory {
      */
     @Override
     public void setItem(int index, ItemStack item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.ItemStack vanillaItemStack = new net.minecraft.src.ItemStack(item.getTypeId(), item.getAmount());
+        if (this.inventory instanceof TileEntityChest) {
+            if (index > this.inventory.getSizeInventory() || index < 0) {
+                throw new IllegalArgumentException("Attempted to set an ItemStack to slot " + index + " which Chest " + this.inventory.toString() + " does not have.");
+            } else {
+                ((TileEntityChest) this.inventory).setInventorySlotContents(index, vanillaItemStack);
+                ((TileEntityChest) this.inventory).onInventoryChanged();
+            }
+        } else if (this.inventory instanceof TileEntityFurnace) {
+            if (index < 0 || index > 2) {
+                // Yeah...
+                NBTTagCompound furnaceContents = new NBTTagCompound();
+                ((TileEntityFurnace) this.inventory).writeToNBT(furnaceContents);
+                NBTTagList newItemList = furnaceContents.getTagList("Items");
+                NBTTagCompound newFurnaceContents = new NBTTagCompound();
+                newFurnaceContents.setByte("Slot", (byte) index);
+                vanillaItemStack.writeToNBT(newFurnaceContents);
+                newItemList.setTag(newFurnaceContents);
+                furnaceContents.setTag("Items", (NBTBase) newItemList);
+                ((TileEntityFurnace) this.inventory).onInventoryChanged();
+            } else {
+                throw new IllegalArgumentException("Attempted to set an ItemStack to slot " + index + " which Furnace " + this.inventory.toString() + " does not have.");
+            }
+        }
     }
 
     /**
@@ -73,7 +96,26 @@ public class LBInventory implements Inventory {
      */
     @Override
     public HashMap<Integer, ItemStack> addItem(ItemStack... items) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        HashMap<Integer, ItemStack> didntFit = new HashMap<>();
+        for (int slot = 0; slot < this.getSize(); slot++) {
+            ItemStack currentInventoryItem = this.getItem(slot);
+            for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
+                ItemStack currentNewItem = items[itemIndex];
+                if (currentInventoryItem.getType().equals(currentNewItem.getType()) && currentInventoryItem.getAmount() < currentInventoryItem.getMaxStackSize()) {
+                    if (currentNewItem.getAmount() + currentInventoryItem.getAmount() <= currentInventoryItem.getMaxStackSize()) {
+                        currentInventoryItem.setAmount(currentInventoryItem.getAmount() + currentNewItem.getAmount());
+                    } else {
+                        currentNewItem.setAmount(currentInventoryItem.getAmount() + currentNewItem.getAmount() - currentInventoryItem.getMaxStackSize());
+                        didntFit.put(slot, currentNewItem);
+                        currentInventoryItem.setAmount(currentInventoryItem.getMaxStackSize());
+                    }
+                    this.setItem(slot, currentInventoryItem);
+                } else {
+                    this.setItem(slot, currentNewItem);
+                }
+            }
+        }
+        return didntFit;
     }
 
     /**
@@ -97,7 +139,12 @@ public class LBInventory implements Inventory {
      */
     @Override
     public ItemStack[] getContents() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        ItemStack[] contents = new ItemStack[this.getSize()];
+        for (int i = 0; i < this.getSize(); i++) {
+            net.minecraft.src.ItemStack vanillaItemStack = this.inventory.getStackInSlot(i);
+            contents[i] = new ItemStack(vanillaItemStack.itemID, vanillaItemStack.stackSize, (short) vanillaItemStack.itemDmg);
+        }
+        return contents;
     }
 
     /**
@@ -108,7 +155,15 @@ public class LBInventory implements Inventory {
      */
     @Override
     public void setContents(ItemStack[] items) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (items.length > this.getSize()) {
+            throw new IllegalArgumentException("ItemStack array too large");
+        } else {
+            for (int i = 0; i < items.length; i++) {
+                this.inventory.getStackInSlot(i).itemID = items[i].getTypeId();
+                this.inventory.getStackInSlot(i).stackSize = items[i].getAmount();
+                this.inventory.getStackInSlot(i).itemDmg = items[i].getDurability();
+            }
+        }
     }
 
     /**
@@ -296,7 +351,7 @@ public class LBInventory implements Inventory {
      */
     @Override
     public void clear(int index) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.inventory.getStackInSlot(index).readFromNBT(new NBTTagCompound()); //Idk, tbh
     }
 
     /**
@@ -304,6 +359,8 @@ public class LBInventory implements Inventory {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (int i = 0; i < this.getSize(); i++) {
+            this.clear(i);
+        }
     }
 }
