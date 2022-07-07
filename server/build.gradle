@@ -139,4 +139,4 @@ dependencies{
 }
 
 group 'net.buj'
-version 'SNAPSHOT-1.1'
+version '1.1-SNAPSHOT'
