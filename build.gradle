@@ -1,8 +1,8 @@
 import java.nio.file.*
 import java.util.zip.*
 
-group 'ru.vladthemountain'
-version '1.0.0'
+group 'net.buj'
+version 'SNAPSHOT-1.1'
 
 if (System.getenv("TOOLKIT_JAVA17") == null) {
     throw new RuntimeException("Running Rosepad toolchain requires JDK 17. Set TOOLKIT_JAVA17 environment variable " +
