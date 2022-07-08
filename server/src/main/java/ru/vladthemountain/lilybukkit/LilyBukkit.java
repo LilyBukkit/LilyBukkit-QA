@@ -2,6 +2,8 @@ package ru.vladthemountain.lilybukkit;
 
 import com.avaje.ebean.config.ServerConfig;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPlayerMP;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Server;
@@ -18,7 +20,6 @@ import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.SimpleServicesManager;
 import org.bukkit.scheduler.BukkitScheduler;
-import ru.vladthemountain.lilybukkit.entity.LBPlayer;
 import ru.vladthemountain.lilybukkit.scheduler.LBScheduler;
 
 import java.util.*;
@@ -42,19 +43,16 @@ public class LilyBukkit implements Server {
     final String SERVER_NAME = "server-name";
     final String SERVER_ID = "server-id";
 
-    private LBPlayer[] playerList;
-    private MinecraftServer mc;
+    private final MinecraftServer mc;
     private final PluginManager pluginMngr;
     private final BukkitScheduler scheduler;
     private final ServicesManager servicesMngr;
-    private List<LBWorld> worldList;
-    private List<Command> commandList;
-    //TODO: Redo to make both lists combinable
-    private List<PluginCommand> pluginCommandList;
-    private List<Recipe> recipeManager;
+    private final List<LBWorld> worldList;
+    private final List<Command> commandList;
+    private final List<PluginCommand> pluginCommandList;
+    private final List<Recipe> recipeManager;
 
     public LilyBukkit(MinecraftServer parent) {
-        this.playerList = new LBPlayer[]{};
         this.mc = parent;
         this.pluginMngr = new SimplePluginManager(Bukkit.getServer(), null /*TODO*/);
         this.scheduler = new LBScheduler();
@@ -93,7 +91,11 @@ public class LilyBukkit implements Server {
      */
     @Override
     public Player[] getOnlinePlayers() {
-        return playerList;
+        List<Player> playerList = new ArrayList<>();
+        for (Entity player : this.mc.worldMngr.playerEntities) {
+            playerList.add(this.getPlayer(((EntityPlayerMP) player).username));
+        }
+        return playerList.toArray(new Player[]{});
     }
 
     /**
@@ -176,7 +178,7 @@ public class LilyBukkit implements Server {
     @Override
     public int broadcastMessage(String message) {
         int c = 0;
-        for (LBPlayer p : this.playerList) {
+        for (Player p : this.getOnlinePlayers()) {
             p.sendMessage(message);
             c++;
         }
@@ -204,7 +206,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public Player getPlayer(String name) {
-        for (LBPlayer p : this.playerList) {
+        for (Player p : this.getOnlinePlayers()) {
             if (p.getName().equals(name)) return p;
         }
         return null;
@@ -223,7 +225,7 @@ public class LilyBukkit implements Server {
     @Override
     public List<Player> matchPlayer(String name) {
         List<Player> pl = new ArrayList<>();
-        for (LBPlayer p : this.playerList) {
+        for (Player p : this.getOnlinePlayers()) {
             if (p.getName().equals(name)) {
                 pl.add(p);
             }
@@ -348,19 +350,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean unloadWorld(String name, boolean save) {
-        for (LBWorld world : this.worldList) {
-            if (world.getName().equals(name)) {
-                boolean unloaded = true;
-                for (Chunk chunk : world.getLoadedChunks()) {
-                    unloaded = unloaded && chunk.unload(save);
-                    if (!unloaded) {
-                        break;
-                    }
-                }
-                return unloaded;
-            }
-        }
-        return false;
+        return this.unloadWorld(this.getWorld(name), save);
     }
 
     /**
@@ -448,7 +438,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public void savePlayers() {
-        for (LBPlayer player : this.playerList) player.saveData();
+        for (Player player : this.getOnlinePlayers()) player.saveData();
     }
 
     /**

@@ -7,6 +7,7 @@ import org.bukkit.scheduler.BukkitWorker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -15,8 +16,8 @@ import java.util.concurrent.Future;
  */
 public class LBScheduler implements BukkitScheduler {
 
-    private List<BukkitTask> taskSchedule;
-    private List<BukkitWorker> workerList;
+    private final List<BukkitTask> taskSchedule;
+    private final List<BukkitWorker> workerList;
 
     public LBScheduler() {
         this.taskSchedule = new ArrayList<>();
@@ -34,9 +35,10 @@ public class LBScheduler implements BukkitScheduler {
      */
     @Override
     public int scheduleSyncDelayedTask(Plugin plugin, Runnable task, long delay) {
-        int id = taskSchedule.size(); //This puts the task to the end of the queue
-        taskSchedule.add(id, new LBTask(id, plugin, task, true, delay));
-        return id;
+        int id = new Random().nextInt();
+        LBTask lbTask = new LBTask(id, plugin, task, true, delay);
+        taskSchedule.add(id, lbTask);
+        return taskSchedule.get(id).equals(lbTask) ? id : -1;
     }
 
     /**

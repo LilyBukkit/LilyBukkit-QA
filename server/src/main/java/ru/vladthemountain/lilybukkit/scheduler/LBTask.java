@@ -11,13 +11,15 @@ public class LBTask implements BukkitTask {
     private final int taskId;
     private final Plugin owner;
     private final boolean synced;
-    private final long delayed;
+    public final long delayed;
+    public final Runnable code;
 
-    public LBTask(int id, Plugin p, Runnable code, boolean isSync, long delay){
+    public LBTask(int id, Plugin p, Runnable code, boolean isSync, long delay) {
         this.taskId = id;
         this.owner = p;
         this.synced = isSync;
         this.delayed = delay;
+        this.code = code;
     }
 
     /**

@@ -15,7 +15,7 @@ public class LBBlockState implements BlockState {
     TileEntity tileEntity;
     Block block;
 
-    public LBBlockState(LBBlock b) {
+    public LBBlockState(Block b) {
         this.block = b;
         if (b.getType().equals(Material.FURNACE)) {
             this.tileEntity = new TileEntityFurnace();
