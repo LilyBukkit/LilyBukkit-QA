@@ -1,41 +1,11 @@
 --- ItemDoor.java
 +++ ItemDoor.java
-@@ -3,5 +3,5 @@
- public class ItemDoor extends Item {
-     private Material material;
--    
-+
-     public ItemDoor(final int itemID, final Material material) {
-         super(itemID);
-@@ -10,5 +10,5 @@
-         this.maxStackSize = 1;
-     }
--    
-+
-     @Override
-     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, int y, final int z, final int i7) {
-@@ -20,6 +20,5 @@
-         if (this.material == Material.wood) {
-             block8 = Block.doorWood;
--        }
--        else {
-+        } else {
-             block8 = Block.doorSteel;
-         }
-@@ -42,6 +41,6 @@
+@@ -42,6 +42,6 @@
              b10 = 1;
          }
 -        final int i9 = (world.isBlockNormalCube(x - b10, y, z - b11) + world.isBlockNormalCube(x - b10, y + 1, z - b11)) ? 1 : 0;
 -        final int i10 = (world.isBlockNormalCube(x + b10, y, z + b11) + world.isBlockNormalCube(x + b10, y + 1, z + b11)) ? 1 : 0;
-+        final int i9 = (world.isBlockNormalCube(x - b10, y, z - b11) || world.isBlockNormalCube(x - b10, y + 1, z - b11)) ? 1 : 0;
-+        final int i10 = (world.isBlockNormalCube(x + b10, y, z + b11) || world.isBlockNormalCube(x + b10, y + 1, z + b11)) ? 1 : 0;
++final int i9 = (world.isBlockNormalCube(x - b10, y, z - b11) && world.isBlockNormalCube(x - b10, y + 1, z - b11)) ? 1 : 0;
++final int i10 = (world.isBlockNormalCube(x + b10, y, z + b11) && world.isBlockNormalCube(x + b10, y + 1, z + b11)) ? 1 : 0;
          final boolean z2 = world.getBlockId(x - b10, y, z - b11) == block8.blockID || world.getBlockId(x - b10, y + 1, z - b11) == block8.blockID;
          final boolean z3 = world.getBlockId(x + b10, y, z + b11) == block8.blockID || world.getBlockId(x + b10, y + 1, z + b11) == block8.blockID;
-@@ -49,6 +48,5 @@
-         if (z2 && !z3) {
-             z4 = true;
--        }
--        else if (i10 > i9) {
-+        } else if (i10 > i9) {
-             z4 = true;
-         }

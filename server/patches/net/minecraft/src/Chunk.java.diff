@@ -5,7 +5,7 @@
      public final int zPosition;
 -    public Map chunkTileEntityMap;
 -    public List[] entities;
-+    public Map<ChunkPosition,TileEntity> chunkTileEntityMap;
-+    public List<Entity>[] entities;
++public Map<ChunkPosition, TileEntity> chunkTileEntityMap;
++public List<Entity>[] entities;
      public boolean isTerrainPopulated;
      public boolean isModified;
