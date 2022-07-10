@@ -3,6 +3,7 @@ package ru.vladthemountain.lilybukkit;
 import com.avaje.ebean.config.ServerConfig;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -12,6 +13,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.Recipe;
@@ -20,7 +22,6 @@ import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.SimpleServicesManager;
 import org.bukkit.scheduler.BukkitScheduler;
-import ru.vladthemountain.lilybukkit.scheduler.LBScheduler;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -56,7 +57,7 @@ public class LilyBukkit implements Server {
     public LilyBukkit(MinecraftServer parent) {
         this.mc = parent;
         this.pluginMngr = new SimplePluginManager(Bukkit.getServer(), null /*TODO*/);
-        this.scheduler = new LBScheduler();
+        this.scheduler = new CraftScheduler(this);
         this.servicesMngr = new SimpleServicesManager();
         this.worldList = new ArrayList<>();
         this.commandList = new ArrayList<>();
