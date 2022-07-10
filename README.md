@@ -10,6 +10,8 @@ This server core is based on [5GameMaker/Rosepad](https://github.com/5GameMaker/
 
 *More info on the ARG can be found [here](https://alphaver.fandom.com/wiki).*
 
+*You can discuss the project on my Discord server: https://discord.gg/sVR3FeGV*
+
 ## Installation
 
 > The current version is not yet runnable, so no installation guide is provided.
