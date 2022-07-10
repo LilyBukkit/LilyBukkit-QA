@@ -382,7 +382,7 @@ public abstract class Event implements Serializable {
          *
          * @see BlockGreenstoneEvent
          */
-        REDSTONE_CHANGE(Category.BLOCK),
+        GREENSTONE_CHANGE(Category.BLOCK),
         /**
          * Called when a block is broken by a player
          *

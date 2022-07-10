@@ -7,7 +7,7 @@ import org.bukkit.Material;
  */
 public class GreenstoneTorch extends Torch implements Greenstone {
     public GreenstoneTorch() {
-        super(Material.REDSTONE_TORCH_ON);
+        super(Material.GREENSTONE_TORCH_ON);
     }
 
     public GreenstoneTorch(final int type) {
@@ -33,7 +33,7 @@ public class GreenstoneTorch extends Torch implements Greenstone {
      * @return true if powered, otherwise false
      */
     public boolean isPowered() {
-        return getItemType() == Material.REDSTONE_TORCH_ON;
+        return getItemType() == Material.GREENSTONE_TORCH_ON;
     }
 
     @Override

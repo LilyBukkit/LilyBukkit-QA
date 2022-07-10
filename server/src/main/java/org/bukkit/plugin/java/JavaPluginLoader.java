@@ -455,10 +455,10 @@ public final class JavaPluginLoader implements PluginLoader {
                 }
             };
 
-        case REDSTONE_CHANGE:
+        case GREENSTONE_CHANGE:
             return new EventExecutor() {
                 public void execute(Listener listener, Event event) {
-                    ((BlockListener) listener).onBlockRedstoneChange((BlockGreenstoneEvent) event);
+                    ((BlockListener) listener).onBlockGreenstoneChange((BlockGreenstoneEvent) event);
                 }
             };
 

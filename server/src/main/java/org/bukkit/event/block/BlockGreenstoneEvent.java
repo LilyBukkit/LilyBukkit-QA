@@ -10,7 +10,7 @@ public class BlockGreenstoneEvent extends BlockEvent {
     private int newCurrent;
 
     public BlockGreenstoneEvent(Block block, int oldCurrent, int newCurrent) {
-        super(Type.REDSTONE_CHANGE, block);
+        super(Type.GREENSTONE_CHANGE, block);
         this.oldCurrent = oldCurrent;
         this.newCurrent = newCurrent;
     }
