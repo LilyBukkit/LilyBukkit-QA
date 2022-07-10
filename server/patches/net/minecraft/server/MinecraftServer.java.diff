@@ -52,22 +52,14 @@
 +    public static HashMap<String, Integer> playerList;
      public NetworkListenThread networkServer;
      public PropertyManager propertyManagerObj;
-@@ -51,5 +25,5 @@
-     public int percentDone;
-     private List playersOnline;
--    private List commands;
-+    private List<ServerCommand> commands;
-     public EntityTracker entityTracker;
-     public boolean onlineMode;
-@@ -57,20 +31,20 @@
+@@ -57,5 +31,5 @@
      public String serverId;
      private static Random rand;
 -    
 +
      static {
          MinecraftServer.logger = Logger.getLogger("Minecraft");
--        MinecraftServer.playerList = new HashMap();
-+        MinecraftServer.playerList = new HashMap<>();
+@@ -63,14 +37,14 @@
          MinecraftServer.rand = new Random(System.currentTimeMillis());
      }
 -    
@@ -78,8 +70,8 @@
          this.deathTime = 0;
 -        this.playersOnline = (List)new ArrayList();
 -        this.commands = Collections.synchronizedList((List)new ArrayList());
-+        this.playersOnline = new ArrayList<>();
-+        this.commands = Collections.synchronizedList(new ArrayList<>());
++        this.playersOnline = (List) new ArrayList();
++        this.commands = Collections.synchronizedList((List) new ArrayList());
          new ThreadSleepForeverServer(this);
      }
 -    
@@ -378,76 +370,11 @@
 +                } else if (string2.toLowerCase().startsWith("tell ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length < 3) {
-@@ -431,10 +375,73 @@
+@@ -431,10 +375,8 @@
                      }
                      iCommandListener3.addHelpCommandMessage("There's no player by that name online.");
 -                }
 -                else {
-+                } else if (string2.toLowerCase().startsWith("whitelist")) {
-+                    final String[] args = string2.substring(Math.min("whitelist".length() + 1, string2.length() - 1)).split(" ");
-+                    if (args.length == 0) {
-+                        iCommandListener3.addHelpCommandMessage("Whitelist subcommands:");
-+                        iCommandListener3.addHelpCommandMessage("   enable              enable whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   disable             disable whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   add <player>        add player to whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   remove <player>     remove player from whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   add-ip <ip>         add IP to whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   remove-ip <ip>      remove IP from whitelist");
-+                    } else if (args[0].equalsIgnoreCase("enable")) {
-+                        this.configManager.enableWhitelist();
-+                        this.print(string3, "Whitelist enabled");
-+                    } else if (args[0].equalsIgnoreCase("disable")) {
-+                        this.configManager.disableWhitelist();
-+                        this.print(string3, "Whitelist disabled");
-+                    } else if (args[0].equalsIgnoreCase("add") && args.length > 1) {
-+                        StringBuilder username = new StringBuilder();
-+                        for (int i = 1; i < args.length; i++) {
-+                            if (i != 1) username.append(" ");
-+                            username.append(args[i]);
-+                        }
-+                        this.print(string3, "Added player \"" + username.toString()
-+                                .replaceAll("\\\\", "\\\\")
-+                                .replaceAll("\\\\\"", "\\\"") + "\" to whitelist");
-+                        this.configManager.whitelistPlayer(username.toString().toLowerCase());
-+                    } else if (args[0].equalsIgnoreCase("remove") && args.length > 1) {
-+                        StringBuilder username = new StringBuilder();
-+                        for (int i = 1; i < args.length; i++) {
-+                            if (i != 1) username.append(" ");
-+                            username.append(args[i]);
-+                        }
-+                        this.print(string3, "Remove player \"" + username.toString()
-+                                .replaceAll("\\\\", "\\\\")
-+                                .replaceAll("\\\\\"", "\\\"") + "\" from whitelist");
-+                        this.configManager.unwhitelistPlayer(username.toString().toLowerCase());
-+                    } else if (args[0].equalsIgnoreCase("add-ip") && args.length > 1) {
-+                        StringBuilder username = new StringBuilder();
-+                        for (int i = 1; i < args.length; i++) {
-+                            if (i != 1) username.append(" ");
-+                            username.append(args[i]);
-+                        }
-+                        this.print(string3, "Added IP \"" + username.toString()
-+                                .replaceAll("\\\\", "\\\\")
-+                                .replaceAll("\\\\\"", "\\\"") + "\" to whitelist");
-+                        this.configManager.whitelistIP(username.toString().toLowerCase());
-+                    } else if (args[0].equalsIgnoreCase("remove-ip") && args.length > 1) {
-+                        StringBuilder username = new StringBuilder();
-+                        for (int i = 1; i < args.length; i++) {
-+                            if (i != 1) username.append(" ");
-+                            username.append(args[i]);
-+                        }
-+                        this.print(string3, "Remove IP \"" + username.toString()
-+                                .replaceAll("\\\\", "\\\\")
-+                                .replaceAll("\\\\\"", "\\\"") + "\" from whitelist");
-+                        this.configManager.unwhitelistIP(username.toString().toLowerCase());
-+                    } else {
-+                        iCommandListener3.addHelpCommandMessage("Whitelist subcommands:");
-+                        iCommandListener3.addHelpCommandMessage("   enable              enable whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   disable             disable whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   add <player>        add player to whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   remove <player>     remove player from whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   add-ip <player>     add IP to whitelist");
-+                        iCommandListener3.addHelpCommandMessage("   remove-ip <player>  remove IP from whitelist");
-+                    }
 +                } else {
                      MinecraftServer.logger.info("Unknown console command. Type \"help\" for help.");
                  }
@@ -456,18 +383,14 @@
 +            } else {
                  iCommandListener3.addHelpCommandMessage("To run the server without a gui, start it like this:");
                  iCommandListener3.addHelpCommandMessage("   java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui");
-@@ -457,8 +464,9 @@
-                 iCommandListener3.addHelpCommandMessage("   list                      lists all currently connected players");
-                 iCommandListener3.addHelpCommandMessage("   say <message>             broadcasts a message to all players");
-+                iCommandListener3.addHelpCommandMessage("   whitelist                 manage server whitelist");
-             }
+@@ -460,5 +402,5 @@
          }
      }
 -    
 +
      private void print(final String string1, final String string2) {
          final String string3 = String.valueOf(string1) + ": " + string2;
-@@ -466,18 +474,17 @@
+@@ -466,18 +408,17 @@
          MinecraftServer.logger.info(string3);
      }
 -    
@@ -490,10 +413,8 @@
 +
      public static void main(final String[] args) {
          try {
-@@ -486,23 +493,23 @@
-                 ServerGUI.initGui(minecraftServer1);
+@@ -487,22 +428,21 @@
              }
-+            org.bukkit.Bukkit.setServer(new ru.vladthemountain.lilybukkit.LilyBukkit(minecraftServer1));
              new ThreadServerApplication("Server thread", minecraftServer1).start();
 +        } catch (Exception exception2) {
 +            MinecraftServer.logger.log(Level.SEVERE, "Failed to start the minecraft server", (Throwable) exception2);

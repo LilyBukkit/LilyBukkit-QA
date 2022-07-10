@@ -1,59 +1,36 @@
 --- NetworkWriterThread.java
 +++ NetworkWriterThread.java
-@@ -10,42 +10,18 @@
-     
+@@ -3,10 +3,10 @@
+ class NetworkWriterThread extends Thread {
+     final NetworkManager netManager;
+-    
++
+     NetworkWriterThread(final NetworkManager netManager, final String threadName) {
+         super(threadName);
+         this.netManager = netManager;
+     }
+-    
++
      public void run() {
--        Object object1 = NetworkManager.threadSyncObject;
--        synchronized (NetworkManager.threadSyncObject) {
--            ++NetworkManager.numWriteThreads;
--        }
--        // monitorexit(NetworkManager.threadSyncObject)
--        while (true) {
--            boolean z11 = false;
--            try {
--                z11 = true;
--                if (!NetworkManager.isRunning(this.netManager)) {
--                    z11 = false;
--                }
--                NetworkManager.sendNetworkPacket(this.netManager);
+         Object object1 = NetworkManager.threadSyncObject;
+@@ -23,6 +23,5 @@
+                 }
+                 NetworkManager.sendNetworkPacket(this.netManager);
 -            }
 -            finally {
--                if (z11) {
--                    final Object object2 = NetworkManager.threadSyncObject;
--                    synchronized (NetworkManager.threadSyncObject) {
--                        --NetworkManager.numWriteThreads;
--                    }
--                    // monitorexit(NetworkManager.threadSyncObject)
--                }
--            }
--            if (z11) {
--                final Object object2 = NetworkManager.threadSyncObject;
--                synchronized (NetworkManager.threadSyncObject) {
--                    --NetworkManager.numWriteThreads;
--                    // monitorexit(NetworkManager.threadSyncObject)
--                    continue;
--                }
++            } finally {
+                 if (z11) {
+                     final Object object2 = NetworkManager.threadSyncObject;
+@@ -40,10 +39,10 @@
+                     continue;
+                 }
 -                object1 = NetworkManager.threadSyncObject;
--                synchronized (NetworkManager.threadSyncObject) {
--                    --NetworkManager.numWriteThreads;
--                }
--                // monitorexit(NetworkManager.threadSyncObject)
++                /* object1 = NetworkManager.threadSyncObject;
+                 synchronized (NetworkManager.threadSyncObject) {
+                     --NetworkManager.numWriteThreads;
+                 }
+                 // monitorexit(NetworkManager.threadSyncObject)
 -                break;
--            }
--        }
-+synchronized (NetworkManager.threadSyncObject) {
-+++NetworkManager.numWriteThreads;
-+}
-+try {
-+while (NetworkManager.isRunning(this.netManager)) {
-+NetworkManager.sendNetworkPacket(this.netManager);
-+}
-+}
-+catch (Exception e) {
-+e.printStackTrace();
-+}
-+synchronized (NetworkManager.threadSyncObject) {
-+--NetworkManager.numWriteThreads;
-+}
-     }
- }
++                break;*/
+             }
+         }

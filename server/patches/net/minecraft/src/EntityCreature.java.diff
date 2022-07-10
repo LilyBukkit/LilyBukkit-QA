@@ -1,9 +1,0 @@
---- EntityCreature.java
-+++ EntityCreature.java
-@@ -3,5 +3,5 @@
- public class EntityCreature extends EntityLiving {
-     private PathEntity pathToEntity;
--    protected Entity entityToAttack;
-+    public Entity entityToAttack;
-     protected boolean hasAttacked;
-     
