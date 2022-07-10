@@ -1,11 +1,12 @@
 package ru.vladthemountain.lilybukkit;
 
-import net.minecraft.src.EntityArrow;
-import net.minecraft.src.EntityItem;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.*;
+import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.*;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
@@ -17,6 +18,7 @@ import ru.vladthemountain.lilybukkit.entity.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -437,7 +439,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean generateTree(Location location, TreeType type) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.generateTree(location, type, new LBBlockChangeDelegate(this));
     }
 
     /**
@@ -450,7 +452,8 @@ public class LBWorld implements World {
      */
     @Override
     public boolean generateTree(Location loc, TreeType type, BlockChangeDelegate delegate) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        WorldGenTrees generator = new WorldGenTrees();
+        return generator.generate(this.world, new Random(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
 
     /**

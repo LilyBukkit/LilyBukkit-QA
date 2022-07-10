@@ -4,7 +4,6 @@ import java.net.InetSocketAddress;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Statistic;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -90,18 +89,6 @@ public interface Player extends HumanEntity, CommandSender {
     public boolean performCommand(String command);
 
     /**
-     * Returns if the player is in sneak mode
-     * @return true if player is in sneak mode
-     */
-    public boolean isSneaking();
-
-    /**
-     * Sets the sneak mode the player
-     * @param sneak true if player should appear sneaking
-     */
-    public void setSneaking(boolean sneak);
-
-    /**
      * Saves the players current location, health, inventory, motion, and other information into the username.dat file, in the world/player folder
      */
     public void saveData();
@@ -112,23 +99,6 @@ public interface Player extends HumanEntity, CommandSender {
      * Note: This will overwrite the players current inventory, health, motion, etc, with the state from the saved dat file.
      */
     public void loadData();
-
-    /**
-     * Sets whether the player is ignored as not sleeping. If everyone is
-     * either sleeping or has this flag set, then time will advance to the
-     * next day. If everyone has this flag set but no one is actually in bed,
-     * then nothing will happen.
-     *
-     * @param isSleeping
-     */
-    public void setSleepingIgnored(boolean isSleeping);
-
-    /**
-     * Returns whether the player is sleeping ignored.
-     *
-     * @return
-     */
-    public boolean isSleepingIgnored();
 
     /**
      * Plays an effect to just this player.
@@ -185,38 +155,6 @@ public interface Player extends HumanEntity, CommandSender {
      */
     @Deprecated
     public void updateInventory();
-
-    /**
-     * Increments the given statistic for this player
-     *
-     * @param statistic Statistic to increment
-     */
-    public void incrementStatistic(Statistic statistic);
-
-    /**
-     * Increments the given statistic for this player
-     *
-     * @param statistic Statistic to increment
-     * @param amount Amount to increment this statistic by
-     */
-    public void incrementStatistic(Statistic statistic, int amount);
-
-    /**
-     * Increments the given statistic for this player for the given material
-     *
-     * @param statistic Statistic to increment
-     * @param material Material to offset the statistic with
-     */
-    public void incrementStatistic(Statistic statistic, Material material);
-
-    /**
-     * Increments the given statistic for this player for the given material
-     *
-     * @param statistic Statistic to increment
-     * @param material Material to offset the statistic with
-     * @param amount Amount to increment this statistic by
-     */
-    public void incrementStatistic(Statistic statistic, Material material, int amount);
 
     /**
      * Sets the current time on the player's client. When relative is true the player's time

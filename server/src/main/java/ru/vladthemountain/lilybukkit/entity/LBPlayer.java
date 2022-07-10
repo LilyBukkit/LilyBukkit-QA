@@ -1,7 +1,10 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.EntityPlayerMP;
-import org.bukkit.*;
+import net.minecraft.src.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -12,6 +15,8 @@ import org.bukkit.plugin.Plugin;
 import ru.vladthemountain.lilybukkit.LBWorld;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,12 +29,17 @@ public class LBPlayer extends LBLivingEntity implements Player {
     Location spawnPoint;
     LBWorld world;
 
+    List<PermissionAttachment> permissionList;
+
     public LBPlayer(LBWorld w, EntityPlayerMP p) {
         super(w, p);
         this.entity = p;
         this.world = w;
         this.displayName = p.username;
         this.spawnPoint = new Location(this.world, p.mcServer.worldMngr.spawnX, p.mcServer.worldMngr.spawnY, p.mcServer.worldMngr.spawnZ);
+        this.permissionList = new ArrayList<>();
+        //init perms
+        //TODO
     }
 
     /**
@@ -98,7 +108,8 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public InetSocketAddress getAddress() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        String fullAddress = this.entity.playerNetServerHandler.netManager.getRemoteAddress().toString();
+        return new InetSocketAddress(fullAddress.substring(0, fullAddress.indexOf(':')), new Integer(fullAddress.substring(fullAddress.indexOf(':'))));
     }
 
     /**
@@ -108,7 +119,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void sendRawMessage(String message) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.playerNetServerHandler.handleChat(new Packet3Chat(message));
     }
 
     /**
@@ -118,7 +129,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void kickPlayer(String message) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.playerNetServerHandler.kickPlayer(message);
     }
 
     /**
@@ -128,7 +139,11 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void chat(String msg) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (msg.startsWith("/")) {
+            Bukkit.getServer().dispatchCommand(this, msg);
+        } else {
+            this.sendMessage(msg);
+        }
     }
 
     /**
@@ -139,27 +154,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean performCommand(String command) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Returns if the player is in sneak mode
-     *
-     * @return true if player is in sneak mode
-     */
-    @Override
-    public boolean isSneaking() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Sets the sneak mode the player
-     *
-     * @param sneak true if player should appear sneaking
-     */
-    @Override
-    public void setSneaking(boolean sneak) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return Bukkit.getServer().dispatchCommand(this, command);
     }
 
     /**
@@ -177,29 +172,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void loadData() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Sets whether the player is ignored as not sleeping. If everyone is
-     * either sleeping or has this flag set, then time will advance to the
-     * next day. If everyone has this flag set but no one is actually in bed,
-     * then nothing will happen.
-     *
-     * @param isSleeping
-     */
-    @Override
-    public void setSleepingIgnored(boolean isSleeping) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Returns whether the player is sleeping ignored.
-     *
-     * @return
-     */
-    @Override
-    public boolean isSleepingIgnored() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -225,7 +197,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void sendBlockChange(Location loc, Material material, byte data) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.sendBlockChange(loc, material.getId(), data);
     }
 
     /**
@@ -246,7 +218,10 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean sendChunkChange(Location loc, int sx, int sy, int sz, byte[] data) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Packet51MapChunk packet = new Packet51MapChunk(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), sx, sy, sz, this.entity.mcServer.worldMngr);
+        packet.chunkData = data;
+        this.entity.playerNetServerHandler.handleMapChunk(packet);
+        return true;
     }
 
     /**
@@ -259,7 +234,10 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void sendBlockChange(Location loc, int material, byte data) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Packet53BlockChange packet = new Packet53BlockChange(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), this.entity.mcServer.worldMngr);
+        packet.type = material;
+        packet.metadata = data;
+        this.entity.playerNetServerHandler.handleBlockChange(packet);
     }
 
     /**
@@ -269,51 +247,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void updateInventory() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Increments the given statistic for this player
-     *
-     * @param statistic Statistic to increment
-     */
-    @Override
-    public void incrementStatistic(Statistic statistic) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Increments the given statistic for this player
-     *
-     * @param statistic Statistic to increment
-     * @param amount    Amount to increment this statistic by
-     */
-    @Override
-    public void incrementStatistic(Statistic statistic, int amount) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Increments the given statistic for this player for the given material
-     *
-     * @param statistic Statistic to increment
-     * @param material  Material to offset the statistic with
-     */
-    @Override
-    public void incrementStatistic(Statistic statistic, Material material) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Increments the given statistic for this player for the given material
-     *
-     * @param statistic Statistic to increment
-     * @param material  Material to offset the statistic with
-     * @param amount    Amount to increment this statistic by
-     */
-    @Override
-    public void incrementStatistic(Statistic statistic, Material material, int amount) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.playerNetServerHandler.handlePlayerInventory(new Packet5PlayerInventory());
     }
 
     /**
@@ -328,7 +262,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void setPlayerTime(long time, boolean relative) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.playerNetServerHandler.handleUpdateTime(new Packet4UpdateTime(time));
     }
 
     /**
@@ -338,7 +272,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public long getPlayerTime() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.mcServer.worldMngr.worldTime; //Yeah
     }
 
     /**
@@ -379,7 +313,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public int getHunger() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Can't find it");
     }
 
     /**
@@ -399,7 +333,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.username;
     }
 
     /**
@@ -434,26 +368,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
     }
 
     /**
-     * Returns whether this player is slumbering.
-     *
-     * @return slumber state
-     */
-    @Override
-    public boolean isSleeping() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Get the sleep ticks of the player. This value may be capped.
-     *
-     * @return slumber ticks
-     */
-    @Override
-    public int getSleepTicks() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
      * Checks if this object contains an override for the specified permission, by fully qualified name
      *
      * @param name Name of the permission
@@ -461,7 +375,12 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isPermissionSet(String name) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (PermissionAttachment p : this.permissionList) {
+            if (p.getPermissions().containsKey(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -472,7 +391,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isPermissionSet(Permission perm) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.isPermissionSet(perm.getName());
     }
 
     /**
@@ -485,7 +404,16 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean hasPermission(String name) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (this.isPermissionSet(name)) {
+            for (PermissionAttachment p : this.permissionList) {
+                if (p.getPermissions().containsKey(name)) {
+                    return p.getPermissions().get(name);
+                }
+            }
+        } else {
+            return new Permission(name).getDefault().getValue(this.isOp());
+        }
+        return false;
     }
 
     /**
@@ -498,7 +426,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean hasPermission(Permission perm) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.hasPermission(perm.getName());
     }
 
     /**
@@ -511,7 +439,9 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        PermissionAttachmentInfo attachment = new PermissionAttachmentInfo(this, name, new PermissionAttachment(plugin, this), value);
+        this.permissionList.add(attachment.getAttachment());
+        return attachment.getAttachment();
     }
 
     /**
@@ -522,7 +452,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public PermissionAttachment addAttachment(Plugin plugin) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.addAttachment(plugin, "", false);
     }
 
     /**
@@ -536,7 +466,9 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value, int ticks) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        PermissionAttachment attachment = this.addAttachment(plugin, name, value);
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> removeAttachment(attachment));
+        return attachment;
     }
 
     /**
@@ -548,7 +480,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, int ticks) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.addAttachment(plugin, "", false, ticks);
     }
 
     /**
@@ -559,7 +491,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void removeAttachment(PermissionAttachment attachment) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.permissionList.remove(attachment);
     }
 
     /**
@@ -569,7 +501,13 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void recalculatePermissions() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (PermissionAttachment attachment : this.permissionList) {
+            for (String permission : attachment.getPermissions().keySet()) {
+                if (attachment.getPermissions().get(permission) == null) {
+                    attachment.getPermissions().put(permission, new Permission(permission).getDefault().getValue(this.isOp())); //What the hell is this
+                }
+            }
+        }
     }
 
     /**

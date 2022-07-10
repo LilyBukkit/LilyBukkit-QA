@@ -46,18 +46,4 @@ public interface HumanEntity extends LivingEntity, Permissible {
      *
      public void selectItemInHand(int index);
      */
-
-    /**
-     * Returns whether this player is slumbering.
-     *
-     * @return slumber state
-     */
-    public boolean isSleeping();
-
-    /**
-     * Get the sleep ticks of the player. This value may be capped.
-     *
-     * @return slumber ticks
-     */
-    public int getSleepTicks();
 }

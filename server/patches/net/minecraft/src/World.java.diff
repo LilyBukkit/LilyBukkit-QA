@@ -1,13 +1,36 @@
 --- World.java
 +++ World.java
-@@ -20,5 +20,5 @@
+@@ -2,5 +2,4 @@
+ 
+ import java.io.DataInputStream;
+-import java.util.Iterator;
+ import java.util.Collection;
+ import java.io.InputStream;
+@@ -19,10 +18,10 @@
+ 
  public class World implements IBlockAccess {
-     private List lightingToUpdate;
+-    private List lightingToUpdate;
 -    public List loadedEntityList;
+-    private List unloadedEntityList;
+-    private TreeSet scheduledTickTreeSet;
+-    private Set scheduledTickSet;
+-    public List loadedTileEntityList;
++    private List<MetadataChunkBlock> lightingToUpdate;
 +    public List<Entity> loadedEntityList;
-     private List unloadedEntityList;
-     private TreeSet scheduledTickTreeSet;
-@@ -53,5 +53,5 @@
++    private List<Entity> unloadedEntityList;
++    private TreeSet<NextTickListEntry> scheduledTickTreeSet;
++    private Set<NextTickListEntry> scheduledTickSet;
++    public List<TileEntity> loadedTileEntityList;
+     public long worldTime;
+     public boolean snowCovered;
+@@ -37,5 +36,5 @@
+     private final long lockTimestamp;
+     protected int autosavePeriod;
+-    public List playerEntities;
++    public List<Entity> playerEntities;
+     public int difficultySetting;
+     public Random rand;
+@@ -53,5 +52,5 @@
      public boolean worldChunkLoadOverride;
      private ArrayList collidingBoundingBoxes;
 -    private Set positionsToUpdate;

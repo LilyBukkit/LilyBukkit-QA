@@ -323,4 +323,11 @@ public interface Server {
      * @return Whether this server allows flying or not.
      */
     public boolean getAllowFlight();
+
+    /**
+     * I don't remember if it existed.<br>
+     * Gets whether this server allows PVP or not.
+     * @return whether this server allows PVP or not
+     */
+    public boolean getPVPEnabled();
 }

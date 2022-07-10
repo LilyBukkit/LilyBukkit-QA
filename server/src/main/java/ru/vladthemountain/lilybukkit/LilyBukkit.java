@@ -42,6 +42,7 @@ public class LilyBukkit implements Server {
     final String ALLOW_FLIGHT = "allow-flight";
     final String SERVER_NAME = "server-name";
     final String SERVER_ID = "server-id";
+    final String PVP_ENABLED = "pvp-enabled";
 
     private final MinecraftServer mc;
     private final PluginManager pluginMngr;
@@ -527,5 +528,16 @@ public class LilyBukkit implements Server {
     @Override
     public boolean getAllowFlight() {
         return this.mc.propertyManagerObj.getBooleanProperty(ALLOW_FLIGHT, false);
+    }
+
+    /**
+     * I don't remember if it existed.<br>
+     * Gets whether this server allows PVP or not.
+     *
+     * @return whether this server allows PVP or not
+     */
+    @Override
+    public boolean getPVPEnabled() {
+        return this.mc.propertyManagerObj.getBooleanProperty(PVP_ENABLED, false);
     }
 }

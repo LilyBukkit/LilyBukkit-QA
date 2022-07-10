@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import ru.vladthemountain.lilybukkit.block.LBBlock;
+import ru.vladthemountain.lilybukkit.block.LBBlockState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,14 +106,13 @@ public class LBChunk implements Chunk {
 
     @Override
     public BlockState[] getTileEntities() {
-        /*List<net.minecraft.src.Entity> vEntityList = new ArrayList<>();
-        this.chunk.getEntitiesOfTypeWithinAAAB(net.minecraft.src.TileEntity.class, AxisAlignedBB.getBoundingBoxFromPool(new Integer(this.chunk.xPosition).doubleValue(), 0.0, new Integer(this.chunk.zPosition).doubleValue(), new Integer(this.chunk.xPosition + 16).doubleValue(), 127.0, new Integer(this.chunk.zPosition).doubleValue()), vEntityList);
+        List<net.minecraft.src.Entity> vEntityList = new ArrayList<>();
+        this.chunk.getEntitiesOfTypeWithinAAAB(net.minecraft.src.TileEntity.class, AxisAlignedBB.getBoundingBoxFromPool(new Integer(this.chunk.xPosition).doubleValue(), 0.0, new Integer(this.chunk.zPosition).doubleValue(), new Integer(this.chunk.xPosition + 16).doubleValue(), 128.0, new Integer(this.chunk.zPosition).doubleValue()), vEntityList);
         List<BlockState> bEntityList = new ArrayList<>();
         for (net.minecraft.src.Entity e : vEntityList) {
-            bEntityList.add(new LBBlockState(e));
+            bEntityList.add(new LBBlockState(this.getBlock((int) e.posX, (int) e.posY, (int) e.posZ)));
         }
-        return bEntityList.toArray(new BlockState[]{});*/
-        throw new UnsupportedOperationException("Not implemented yet");
+        return bEntityList.toArray(new BlockState[bEntityList.size()]);
     }
 
     /**
