@@ -129,7 +129,23 @@ public class LBInventory implements Inventory {
      */
     @Override
     public HashMap<Integer, ItemStack> removeItem(ItemStack... items) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        HashMap<Integer, ItemStack> didntFit = new HashMap<>();
+        for (int i = 0; i < this.getSize(); i++) {
+            ItemStack currentSlot = this.getItem(i);
+            for (int j = 0; j < items.length; j++) {
+                if (currentSlot.getTypeId() == items[j].getTypeId()) {
+                    if (!(currentSlot.getAmount() - items[j].getAmount() > 64)) {
+                        currentSlot.setAmount(currentSlot.getAmount() - items[j].getAmount());
+                        items[i].setAmount(0);
+                    } else {
+                        currentSlot.setAmount(0);
+                        items[i].setAmount(items[i].getAmount() - 64);
+                        didntFit.put(i, items[i]);
+                    }
+                }
+            }
+        }
+        return didntFit;
     }
 
     /**
@@ -174,7 +190,11 @@ public class LBInventory implements Inventory {
      */
     @Override
     public boolean contains(int materialId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        boolean flag = false;
+        for (ItemStack i : this.getContents()) {
+            flag = flag || i.getTypeId() == materialId;
+        }
+        return flag;
     }
 
     /**
@@ -185,7 +205,7 @@ public class LBInventory implements Inventory {
      */
     @Override
     public boolean contains(Material material) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.contains(material.getId());
     }
 
     /**
@@ -197,7 +217,11 @@ public class LBInventory implements Inventory {
      */
     @Override
     public boolean contains(ItemStack item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        boolean flag = false;
+        for (ItemStack i : this.getContents()) {
+            flag = flag || (i.getTypeId() == item.getTypeId() && i.getAmount() == item.getAmount());
+        }
+        return flag;
     }
 
     /**
@@ -209,7 +233,11 @@ public class LBInventory implements Inventory {
      */
     @Override
     public boolean contains(int materialId, int amount) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        boolean flag = false;
+        for (ItemStack i : this.getContents()) {
+            flag = flag || (i.getTypeId() == materialId && i.getAmount() >= amount);
+        }
+        return flag;
     }
 
     /**
@@ -221,7 +249,7 @@ public class LBInventory implements Inventory {
      */
     @Override
     public boolean contains(Material material, int amount) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.contains(material.getId(), amount);
     }
 
     /**
