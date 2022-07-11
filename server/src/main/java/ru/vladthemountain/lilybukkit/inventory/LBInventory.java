@@ -338,7 +338,12 @@ public class LBInventory implements Inventory {
      */
     @Override
     public int firstEmpty() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (int i = 0; i < this.getSize(); i++) {
+            if (this.getContents()[i] == null || this.getContents()[i].getTypeId() == 0) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
