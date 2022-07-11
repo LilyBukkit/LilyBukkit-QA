@@ -231,12 +231,6 @@ public abstract class Event implements Serializable {
          */
         PLAYER_INTERACT_ENTITY(Category.PLAYER),
         /**
-         * Called when a player throws an egg
-         *
-         * @see org.bukkit.event.player.PlayerEggThrowEvent
-         */
-        PLAYER_EGG_THROW(Category.PLAYER),
-        /**
          * Called when a player teleports from one position to another
          *
          * @see org.bukkit.event.player.PlayerTeleportEvent
@@ -382,7 +376,7 @@ public abstract class Event implements Serializable {
          *
          * @see BlockGreenstoneEvent
          */
-        REDSTONE_CHANGE(Category.BLOCK),
+        GREENSTONE_CHANGE(Category.BLOCK),
         /**
          * Called when a block is broken by a player
          *

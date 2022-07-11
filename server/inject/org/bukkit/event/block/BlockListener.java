@@ -75,7 +75,7 @@ public class BlockListener implements Listener {
      *
      * @param event Relevant event details
      */
-    public void onBlockRedstoneChange(BlockGreenstoneEvent event) {}
+    public void onBlockGreenstoneChange(BlockGreenstoneEvent event) {}
 
     /**
      * Called when leaves are decaying naturally.
