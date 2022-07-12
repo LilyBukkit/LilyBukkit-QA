@@ -28,32 +28,40 @@ import java.util.UUID;
  */
 public class LBWorld implements World {
 
-    private final net.minecraft.src.WorldServer world;
-    private boolean allowMonsters;
-    private boolean allowAnimals;
+    public final net.minecraft.src.WorldServer world;
+    boolean allowMonsters;
+    boolean allowAnimals;
 
-    //Part of that bad solution
-    //TODO: Initialize this List in constructors by performing a scan of world and adding every single loaded chunk
-    private List<Chunk> loadedChunks;
+    List<Chunk> loadedChunks;
+    List<BlockPopulator> blockPopulatorList;
+    ChunkGenerator chunkGen;
+    boolean spawnInMemory;
+    boolean isPVPAllowed;
 
     public LBWorld(String name) {
-        world = new net.minecraft.src.WorldServer(new File(name), name, true);
-        this.loadedChunks = new ArrayList<>();
+        this(name, new Random().nextLong());
     }
 
     public LBWorld(String name, long seed) {
         world = new net.minecraft.src.WorldServer(new File(name), name, true);
+        world.randomSeed = seed;
         this.loadedChunks = new ArrayList<>();
+        for (EntityPlayer p : this.world.playerEntities) {
+            for (ChunkCoordIntPair c : ((EntityPlayerMP) p).loadedChunks) {
+                this.loadedChunks.add(this.getChunkAt(c.chunkXPos, c.chunkZPos));
+            }
+        }
+        this.blockPopulatorList = new ArrayList<>();
+        this.isPVPAllowed = Bukkit.getServer().getPVPEnabled();
     }
 
     public LBWorld(String name, ChunkGenerator chunkGen) {
-        this(name);
-        //TODO
+        this(name, new Random().nextLong(), chunkGen);
     }
 
     public LBWorld(String name, long seed, ChunkGenerator chunkGen) {
         this(name, seed);
-        //TODO
+        this.chunkGen = chunkGen;
     }
 
     /**
@@ -609,7 +617,7 @@ public class LBWorld implements World {
      */
     @Override
     public long getTime() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.worldTime;
     }
 
     /**
@@ -626,7 +634,7 @@ public class LBWorld implements World {
      */
     @Override
     public void setTime(long time) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.world.worldTime = time;
     }
 
     /**
@@ -652,87 +660,6 @@ public class LBWorld implements World {
     @Override
     public void setFullTime(long time) {
         this.world.worldTime = time;
-    }
-
-    /**
-     * Returns whether the world has an ongoing storm.
-     *
-     * @return Whether there is an ongoing storm
-     */
-    @Override
-    public boolean hasStorm() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Set whether there is a storm. A duration will be set for the new
-     * current conditions.
-     *
-     * @param hasStorm Whether there is rain and snow
-     */
-    @Override
-    public void setStorm(boolean hasStorm) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Get the remaining time in ticks of the current conditions.
-     *
-     * @return Time in ticks
-     */
-    @Override
-    public int getWeatherDuration() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Set the remaining time in ticks of the current conditions.
-     *
-     * @param duration Time in ticks
-     */
-    @Override
-    public void setWeatherDuration(int duration) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Returns whether there is thunder.
-     *
-     * @return Whether there is thunder
-     */
-    @Override
-    public boolean isThundering() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Set whether it is thundering.
-     *
-     * @param thundering Whether it is thundering
-     */
-    @Override
-    public void setThundering(boolean thundering) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Get the thundering duration.
-     *
-     * @return Duration in ticks
-     */
-    @Override
-    public int getThunderDuration() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Set the thundering duration.
-     *
-     * @param duration Duration in ticks
-     */
-    @Override
-    public void setThunderDuration(int duration) {
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     /**
@@ -810,8 +737,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean getPVP() {
-        //Because it's broken
-        return false;
+        return this.isPVPAllowed;
     }
 
     /**
@@ -821,7 +747,7 @@ public class LBWorld implements World {
      */
     @Override
     public void setPVP(boolean pvp) {
-        throw new UnsupportedOperationException("PvP is broken, sorry");
+        this.isPVPAllowed = pvp;
     }
 
     /**
@@ -831,7 +757,7 @@ public class LBWorld implements World {
      */
     @Override
     public ChunkGenerator getGenerator() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.chunkGen;
     }
 
     /**
@@ -850,7 +776,7 @@ public class LBWorld implements World {
      */
     @Override
     public List<BlockPopulator> getPopulators() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.blockPopulatorList;
     }
 
     /**
@@ -863,7 +789,71 @@ public class LBWorld implements World {
      */
     @Override
     public <T extends Entity> T spawn(Location location, Class<T> clazz) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.Entity entityToSpawn = null;
+        Entity entityToReturn = null;
+        if (clazz.equals(LBBoat.class)) {
+            entityToSpawn = new EntityBoat(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBBoat(this, (EntityBoat) entityToSpawn);
+        } else if (clazz.equals(LBChicken.class)) {
+            entityToSpawn = new EntityChicken(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBChicken(this, (EntityChicken) entityToSpawn);
+        } else if (clazz.equals(LBCow.class)) {
+            entityToSpawn = new EntityCow(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBCow(this, (EntityCow) entityToSpawn);
+        } else if (clazz.equals(LBCreeper.class)) {
+            entityToSpawn = new EntityCreeper(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBCreeper(this, (EntityCreeper) entityToSpawn);
+        } else if (clazz.equals(LBFallingSand.class)) {
+            entityToSpawn = new EntityFallingSand(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBFallingSand(this, (EntityFallingSand) entityToSpawn);
+        } else if (clazz.equals(LBGiant.class)) {
+            entityToSpawn = new EntityGiantZombie(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBGiant(this, (EntityGiantZombie) entityToSpawn);
+        }/* else if (clazz.equals(LBItem.class)) {
+            entityToSpawn = new EntityItem(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBItem(this, (EntityItem) entityToSpawn);
+        }*/ else if (clazz.equals(LBMinecart.class)) {
+            entityToSpawn = new EntityMinecart(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBMinecart(this, (EntityMinecart) entityToSpawn);
+        } else if (clazz.equals(LBPig.class)) {
+            entityToSpawn = new EntityPig(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBPig(this, (EntityPig) entityToSpawn);
+        } else if (clazz.equals(LBSheep.class)) {
+            entityToSpawn = new EntitySheep(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBSheep(this, (EntitySheep) entityToSpawn);
+        } else if (clazz.equals(LBSkeleton.class)) {
+            entityToSpawn = new EntitySkeleton(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBSkeleton(this, (EntitySkeleton) entityToSpawn);
+        } else if (clazz.equals(LBSlime.class)) {
+            entityToSpawn = new EntitySlime(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBSlime(this, (EntitySlime) entityToSpawn);
+        } else if (clazz.equals(LBSpider.class)) {
+            entityToSpawn = new EntitySpider(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBSpider(this, (EntitySpider) entityToSpawn);
+        } else if (clazz.equals(LBTNTPrimed.class)) {
+            entityToSpawn = new EntityTNTPrimed(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBTNTPrimed(this, (EntityTNTPrimed) entityToSpawn);
+        } else if (clazz.equals(LBZombie.class)) {
+            entityToSpawn = new EntityZombie(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBZombie(this, (EntityZombie) entityToSpawn);
+        }
+        if (entityToSpawn != null && this.world.spawnEntityInWorld(entityToSpawn)) return (T) entityToReturn;
+        else throw new IllegalArgumentException("Can't spawn entity");
     }
 
     /**
@@ -940,34 +930,6 @@ public class LBWorld implements World {
     }
 
     /**
-     * Gets the temperature for the given block coordinates.
-     * <p>
-     * It is safe to run this method when the block does not exist, it will not create the block.
-     *
-     * @param x X coordinate of the block
-     * @param z Z coordinate of the block
-     * @return Temperature of the requested block
-     */
-    @Override
-    public double getTemperature(int x, int z) {
-        return this.getBlockAt(x, this.getHighestBlockYAt(x, z), z).getTemperature();
-    }
-
-    /**
-     * Gets the humidity for the given block coordinates.
-     * <p>
-     * It is safe to run this method when the block does not exist, it will not create the block.
-     *
-     * @param x X coordinate of the block
-     * @param z Z coordinate of the block
-     * @return Humidity of the requested block
-     */
-    @Override
-    public double getHumidity(int x, int z) {
-        return this.getBlockAt(x, this.getHighestBlockYAt(x, z), z).getHumidity();
-    }
-
-    /**
      * Gets the maximum height of this world.
      * <p>
      * If the max height is 100, there are only blocks from y=0 to y=99.
@@ -976,10 +938,7 @@ public class LBWorld implements World {
      */
     @Override
     public int getMaxHeight() {
-        //i don't give a sh*t rn
-        //also
-        //TODO
-        return 256;
+        return 128;
     }
 
     /**
@@ -989,7 +948,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean getKeepSpawnInMemory() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.spawnInMemory;
     }
 
     /**
@@ -999,6 +958,11 @@ public class LBWorld implements World {
      */
     @Override
     public void setKeepSpawnInMemory(boolean keepLoaded) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.spawnInMemory = keepLoaded;
+    }
+
+    @Override
+    public boolean isWinter() {
+        return this.world.snowCovered;
     }
 }

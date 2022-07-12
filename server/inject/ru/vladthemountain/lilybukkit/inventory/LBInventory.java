@@ -47,6 +47,7 @@ public class LBInventory implements Inventory {
      */
     @Override
     public ItemStack getItem(int index) {
+        if (index < 0 || index > this.getSize()) return null;
         net.minecraft.src.ItemStack vanillaItemStack = this.inventory.getStackInSlot(index);
         return new ItemStack(vanillaItemStack.itemID, vanillaItemStack.stackSize, (short) vanillaItemStack.itemDmg);
     }
@@ -241,7 +242,7 @@ public class LBInventory implements Inventory {
      * Check if the inventory contains any ItemStacks with the given material and at least the minimum amount specified
      *
      * @param material The material to check for
-     * @param amount The minimal amount of the item
+     * @param amount   The minimal amount of the item
      * @return If any ItemStacks were found
      */
     @Override
@@ -373,7 +374,11 @@ public class LBInventory implements Inventory {
      */
     @Override
     public void remove(int materialId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (int i = 0; i < this.getSize(); i++) {
+            if (this.getContents()[i].getTypeId() == materialId) {
+                this.inventory.getStackInSlot(i).stackSize = 0;
+            }
+        }
     }
 
     /**
@@ -383,7 +388,7 @@ public class LBInventory implements Inventory {
      */
     @Override
     public void remove(Material material) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.remove(material.getId());
     }
 
     /**
@@ -394,7 +399,11 @@ public class LBInventory implements Inventory {
      */
     @Override
     public void remove(ItemStack item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (int i = 0; i < this.getSize(); i++) {
+            if (this.getContents()[i].equals(item)) {
+                this.inventory.getStackInSlot(i).stackSize = 0;
+            }
+        }
     }
 
     /**

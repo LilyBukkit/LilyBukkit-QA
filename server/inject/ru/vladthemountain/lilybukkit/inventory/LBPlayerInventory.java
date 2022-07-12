@@ -1,19 +1,21 @@
 package ru.vladthemountain.lilybukkit.inventory;
 
-import net.minecraft.src.IInventory;
 import net.minecraft.src.InventoryPlayer;
-import org.bukkit.Material;
+import net.minecraft.src.MinecraftException;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.HashMap;
 
 /**
  * @author VladTheMountain
  */
 public class LBPlayerInventory extends LBInventory implements PlayerInventory {
+
+    InventoryPlayer inventoryPlayer;
+
     public LBPlayerInventory(InventoryPlayer inventory) {
         super(inventory);
+        inventoryPlayer = inventory;
     }
 
     /**
@@ -23,7 +25,7 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public ItemStack[] getArmorContents() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new ItemStack[]{this.getHelmet(), this.getChestplate(), this.getLeggings(), this.getBoots()};
     }
 
     /**
@@ -33,7 +35,8 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public ItemStack getHelmet() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.ItemStack helmet = this.inventoryPlayer.armorInventory[0];
+        return new ItemStack(helmet.itemID, helmet.stackSize, (short) helmet.itemDmg);
     }
 
     /**
@@ -43,7 +46,8 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public ItemStack getChestplate() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.ItemStack chestplate = this.inventoryPlayer.armorInventory[1];
+        return new ItemStack(chestplate.itemID, chestplate.stackSize, (short) chestplate.itemDmg);
     }
 
     /**
@@ -53,7 +57,8 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public ItemStack getLeggings() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.ItemStack leggings = this.inventoryPlayer.armorInventory[2];
+        return new ItemStack(leggings.itemID, leggings.stackSize, (short) leggings.itemDmg);
     }
 
     /**
@@ -63,7 +68,8 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public ItemStack getBoots() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.ItemStack boots = this.inventoryPlayer.armorInventory[3];
+        return new ItemStack(boots.itemID, boots.stackSize, (short) boots.itemDmg);
     }
 
     /**
@@ -73,7 +79,11 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public void setArmorContents(ItemStack[] items) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.ItemStack[] newArmorContents = new net.minecraft.src.ItemStack[4];
+        for (int i = 0; i < newArmorContents.length; i++) {
+            newArmorContents[i] = new net.minecraft.src.ItemStack(items[i].getTypeId(), items[i].getAmount(), items[i].getDurability());
+        }
+        this.inventoryPlayer.armorInventory = newArmorContents.clone();
     }
 
     /**
@@ -84,7 +94,7 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public void setHelmet(ItemStack helmet) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.inventoryPlayer.armorInventory[0] = new net.minecraft.src.ItemStack(helmet.getTypeId(), helmet.getAmount(), helmet.getDurability());
     }
 
     /**
@@ -95,7 +105,7 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public void setChestplate(ItemStack chestplate) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.inventoryPlayer.armorInventory[1] = new net.minecraft.src.ItemStack(chestplate.getTypeId(), chestplate.getAmount(), chestplate.getDurability());
     }
 
     /**
@@ -106,7 +116,7 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public void setLeggings(ItemStack leggings) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.inventoryPlayer.armorInventory[2] = new net.minecraft.src.ItemStack(leggings.getTypeId(), leggings.getAmount(), leggings.getDurability());
     }
 
     /**
@@ -117,7 +127,7 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public void setBoots(ItemStack boots) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.inventoryPlayer.armorInventory[3] = new net.minecraft.src.ItemStack(boots.getTypeId(), boots.getAmount(), boots.getDurability());
     }
 
     /**
@@ -127,7 +137,7 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public ItemStack getItemInHand() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getItem(this.inventoryPlayer.currentItem);
     }
 
     /**
@@ -137,7 +147,15 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public void setItemInHand(ItemStack stack) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (this.getItem(this.first(stack)) != null) {
+            this.inventoryPlayer.currentItem = this.first(stack);
+        } else {
+            if (this.inventoryPlayer.addItemStackToInventory(new net.minecraft.src.ItemStack(stack.getTypeId(), stack.getAmount(), stack.getDurability()))) {
+                this.inventoryPlayer.currentItem = this.first(stack);
+            } else {
+                throw new MinecraftException("Couldn't add item " + stack.getTypeId() + " to inventory " + this.inventoryPlayer);
+            }
+        }
     }
 
     /**
@@ -147,6 +165,6 @@ public class LBPlayerInventory extends LBInventory implements PlayerInventory {
      */
     @Override
     public int getHeldItemSlot() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.inventoryPlayer.currentItem;
     }
 }

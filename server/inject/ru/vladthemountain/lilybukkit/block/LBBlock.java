@@ -1,5 +1,6 @@
 package ru.vladthemountain.lilybukkit.block;
 
+import net.minecraft.src.MinecraftException;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,9 +12,8 @@ import ru.vladthemountain.lilybukkit.LBWorld;
 
 public class LBBlock implements Block {
 
-    private net.minecraft.src.Block block;
-    private LBWorld world;
-    private byte data;
+    final net.minecraft.src.Block block;
+    final LBWorld world;
 
     public LBBlock(LBWorld w, net.minecraft.src.Block b) {
         this(w, b.blockID);
@@ -31,7 +31,7 @@ public class LBBlock implements Block {
      */
     @Override
     public byte getData() {
-        return this.data;
+        return (byte) this.world.world.getBlockMetadata(this.getX(), this.getY(), this.getZ());
     }
 
     /**
@@ -40,7 +40,7 @@ public class LBBlock implements Block {
      */
     @Override
     public Block getFace(BlockFace face) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getRelative(face);
     }
 
     /**
@@ -50,7 +50,7 @@ public class LBBlock implements Block {
      */
     @Override
     public Block getFace(BlockFace face, int distance) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getRelative(face, distance);
     }
 
     /**
@@ -97,29 +97,7 @@ public class LBBlock implements Block {
      */
     @Override
     public Block getRelative(BlockFace face, int distance) {
-        switch (face) {
-            case UP:
-            case DOWN:
-            case EAST:
-            case WEST:
-            case NORTH:
-            case SOUTH:
-            case NORTH_EAST:
-            case NORTH_WEST:
-            case WEST_NORTH_WEST:
-            case NORTH_NORTH_WEST:
-            case SOUTH_EAST:
-            case EAST_SOUTH_EAST:
-            case SOUTH_SOUTH_EAST:
-            case EAST_NORTH_EAST:
-            case NORTH_NORTH_EAST:
-            case WEST_SOUTH_WEST:
-            case SOUTH_WEST:
-            case SOUTH_SOUTH_WEST:
-            case SELF:
-            default:
-                throw new UnsupportedOperationException("Not implemented yet");
-        }
+        return this.getRelative(face.getModX() * distance, face.getModY() * distance, face.getModZ() * distance);
     }
 
     /**
@@ -219,15 +197,13 @@ public class LBBlock implements Block {
      */
     @Override
     public void setData(byte data) {
-        this.setData(data, false);
+        this.setData(data, true);
     }
 
     @Override
-    public void setData(byte data, boolean applyPhyiscs) {
-        this.data = data;
-        if (applyPhyiscs) {
-            throw new UnsupportedOperationException("Not implemented yet");
-        }
+    public void setData(byte data, boolean applyPhysics) {
+        if (applyPhysics) this.world.world.setBlockMetadataWithNotify(this.getX(), this.getY(), this.getZ(), data);
+        else this.world.world.setBlockMetadata(this.getX(), this.getY(), this.getZ(), data);
     }
 
     /**
@@ -248,17 +224,20 @@ public class LBBlock implements Block {
      */
     @Override
     public boolean setTypeId(int type) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.setTypeId(type, true);
     }
 
     @Override
     public boolean setTypeId(int type, boolean applyPhysics) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (applyPhysics) return this.world.world.setBlockWithNotify(this.getX(), this.getY(), this.getZ(), type);
+        else return this.world.world.setBlock(this.getX(), this.getY(), this.getZ(), type);
     }
 
     @Override
-    public boolean setTypeIdAndData(int type, byte data, boolean applyPhyiscs) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public boolean setTypeIdAndData(int type, byte data, boolean applyPhysics) {
+        if (applyPhysics)
+            return this.world.world.setBlockAndMetadataWithNotify(this.getX(), this.getY(), this.getZ(), type, data);
+        else return this.world.world.setBlockAndMetadata(this.getX(), this.getY(), this.getZ(), type, data);
     }
 
     /**
@@ -279,7 +258,12 @@ public class LBBlock implements Block {
      */
     @Override
     public BlockFace getFace(Block block) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (BlockFace f : BlockFace.values()) {
+            if (this.getX() + f.getModX() == block.getX() && this.getY() + f.getModY() == block.getY() && this.getZ() + f.getModZ() == block.getZ()) {
+                return f;
+            }
+        }
+        return null;
     }
 
     /**
@@ -303,7 +287,7 @@ public class LBBlock implements Block {
      */
     @Override
     public boolean isBlockPowered() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.world.isBlockGettingPowered(this.getX(), this.getY(), this.getZ());
     }
 
     /**
@@ -313,7 +297,7 @@ public class LBBlock implements Block {
      */
     @Override
     public boolean isBlockIndirectlyPowered() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.world.isBlockIndirectlyGettingPowered(this.getX(), this.getY(), this.getZ());
     }
 
     /**
@@ -324,7 +308,22 @@ public class LBBlock implements Block {
      */
     @Override
     public boolean isBlockFacePowered(BlockFace face) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        switch (face) {
+            case DOWN:
+                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 0);
+            case UP:
+                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 1);
+            case EAST:
+                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 2);
+            case WEST:
+                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 3);
+            case NORTH:
+                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 4);
+            case SOUTH:
+                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 5);
+            default:
+                return false;
+        }
     }
 
     /**
@@ -335,7 +334,22 @@ public class LBBlock implements Block {
      */
     @Override
     public boolean isBlockFaceIndirectlyPowered(BlockFace face) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        switch (face) {
+            case DOWN:
+                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 0);
+            case UP:
+                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 1);
+            case EAST:
+                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 2);
+            case WEST:
+                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 3);
+            case NORTH:
+                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 4);
+            case SOUTH:
+                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 5);
+            default:
+                return false;
+        }
     }
 
     /**
@@ -346,7 +360,7 @@ public class LBBlock implements Block {
      */
     @Override
     public int getBlockPower(BlockFace face) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /**
@@ -368,7 +382,7 @@ public class LBBlock implements Block {
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getType().equals(Material.AIR);
     }
 
     /**
@@ -380,26 +394,6 @@ public class LBBlock implements Block {
      */
     @Override
     public boolean isLiquid() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Gets the temperature of the biome of this block
-     *
-     * @return Temperature of this block
-     */
-    @Override
-    public double getTemperature() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Gets the humidity of the biome of this block
-     *
-     * @return Humidity of this block
-     */
-    @Override
-    public double getHumidity() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getType().equals(Material.WATER) || this.getType().equals(Material.STATIONARY_WATER) || this.getType().equals(Material.LAVA) || this.getType().equals(Material.STATIONARY_LAVA);
     }
 }

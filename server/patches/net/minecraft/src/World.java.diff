@@ -1,10 +1,17 @@
 --- World.java
 +++ World.java
+@@ -20,5 +20,5 @@
+ public class World implements IBlockAccess {
+     private List lightingToUpdate;
+-    public List loadedEntityList;
++    public List<Entity> loadedEntityList;
+     private List unloadedEntityList;
+     private TreeSet scheduledTickTreeSet;
 @@ -37,5 +37,5 @@
      private final long lockTimestamp;
      protected int autosavePeriod;
 -    public List playerEntities;
-+    public List<Entity> playerEntities;
++    public List<EntityPlayer> playerEntities;
      public int difficultySetting;
      public Random rand;
 @@ -53,5 +53,5 @@
@@ -14,3 +21,10 @@
 +private Set<ChunkCoordIntPair> positionsToUpdate;
      private int soundCounter;
      private List entitiesWithinAABBExcludingEntity;
+@@ -783,5 +783,5 @@
+         }
+         if (entity instanceof EntityPlayer) {
+-            this.playerEntities.add(entity);
++            this.playerEntities.add((EntityPlayer) entity);
+             System.out.println(new StringBuilder("Player count: ").append(this.playerEntities.size()).toString());
+         }

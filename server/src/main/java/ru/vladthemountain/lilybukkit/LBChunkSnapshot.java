@@ -118,30 +118,6 @@ public class LBChunkSnapshot implements ChunkSnapshot {
     }
 
     /**
-     * Get raw biome temperature (0.0-1.0) at given coordinate
-     *
-     * @param x X-coordinate
-     * @param z Z-coordinate
-     * @return temperature at given coordinate
-     */
-    @Override
-    public double getRawBiomeTemperature(int x, int z) {
-        return this.chunk.getBlock(x, this.getHighestBlockYAt(x, z), z).getTemperature();
-    }
-
-    /**
-     * Get raw biome rainfall (0.0-1.0) at given coordinate
-     *
-     * @param x X-coordinate
-     * @param z Z-coordinate
-     * @return rainfall at given coordinate
-     */
-    @Override
-    public double getRawBiomeRainfall(int x, int z) {
-        return this.chunk.getBlock(x, this.getHighestBlockYAt(x, z), z).getHumidity();
-    }
-
-    /**
      * Get world full time when chunk snapshot was captured
      *
      * @return time in ticks

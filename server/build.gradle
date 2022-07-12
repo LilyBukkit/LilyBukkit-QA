@@ -139,7 +139,7 @@ repositories{
 }
 
 dependencies{
-    implementation group: "ru.vladthemountain", name: "lilybukkit", version: "1.0.0"
+    implementation group: "ru.vladthemountain", name: "lilybukkit", version: "1.0.2"
 }
 
 group 'net.buj'
