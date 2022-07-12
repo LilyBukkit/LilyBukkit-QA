@@ -12,10 +12,12 @@ public class LBMinecart extends LBVehicle implements Minecart {
 
     EntityMinecart entity;
     double maxSpeed = 0.4;
+    boolean isSlow;
 
     public LBMinecart(LBWorld w, EntityMinecart e) {
         super(w, e);
         this.entity = e;
+        this.isSlow = false;
     }
 
     /**
@@ -59,7 +61,7 @@ public class LBMinecart extends LBVehicle implements Minecart {
      */
     @Override
     public boolean isSlowWhenEmpty() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.isSlow;
     }
 
     /**
@@ -69,7 +71,7 @@ public class LBMinecart extends LBVehicle implements Minecart {
      */
     @Override
     public void setSlowWhenEmpty(boolean slow) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.isSlow = slow;
     }
 
     /**
@@ -78,7 +80,7 @@ public class LBMinecart extends LBVehicle implements Minecart {
      */
     @Override
     public Vector getFlyingVelocityMod() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new Vector(this.entity.motionX, this.entity.motionY, this.entity.motionZ);
     }
 
     /**
@@ -89,7 +91,7 @@ public class LBMinecart extends LBVehicle implements Minecart {
      */
     @Override
     public void setFlyingVelocityMod(Vector flying) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.addVelocity(flying.getX(), flying.getY(), flying.getZ());
     }
 
     /**
@@ -99,7 +101,7 @@ public class LBMinecart extends LBVehicle implements Minecart {
      */
     @Override
     public Vector getDerailedVelocityMod() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.getFlyingVelocityMod();
     }
 
     /**
@@ -110,6 +112,6 @@ public class LBMinecart extends LBVehicle implements Minecart {
      */
     @Override
     public void setDerailedVelocityMod(Vector derailed) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.setFlyingVelocityMod(derailed);
     }
 }

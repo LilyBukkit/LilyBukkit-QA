@@ -150,7 +150,7 @@ sourceSets {
 }
 
 dependencies{
-    implementation group: "ru.vladthemountain", name: "lilybukkit", version: "1.0.2"
+    implementation group: "ru.vladthemountain", name: "lilybukkit", version: "1.0.4"
 }
 
 group 'net.buj'

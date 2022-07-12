@@ -791,7 +791,11 @@ public class LBWorld implements World {
     public <T extends Entity> T spawn(Location location, Class<T> clazz) throws IllegalArgumentException {
         net.minecraft.src.Entity entityToSpawn = null;
         Entity entityToReturn = null;
-        if (clazz.equals(LBBoat.class)) {
+        if (clazz.equals(LBArrow.class)) {
+            entityToSpawn = new EntityArrow(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBArrow(this, (EntityArrow) entityToSpawn);
+        } else if (clazz.equals(LBBoat.class)) {
             entityToSpawn = new EntityBoat(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
             entityToReturn = new LBBoat(this, (EntityBoat) entityToSpawn);
@@ -839,6 +843,10 @@ public class LBWorld implements World {
             entityToSpawn = new EntitySlime(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
             entityToReturn = new LBSlime(this, (EntitySlime) entityToSpawn);
+        } else if (clazz.equals(LBSnowball.class)) {
+            entityToSpawn = new EntitySnowball(this.world);
+            entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
+            entityToReturn = new LBSnowball(this, (EntitySnowball) entityToSpawn);
         } else if (clazz.equals(LBSpider.class)) {
             entityToSpawn = new EntitySpider(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());

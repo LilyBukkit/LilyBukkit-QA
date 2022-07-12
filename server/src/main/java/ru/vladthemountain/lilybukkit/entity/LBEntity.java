@@ -1,5 +1,6 @@
 package ru.vladthemountain.lilybukkit.entity;
 
+import net.minecraft.src.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -20,6 +21,7 @@ public class LBEntity implements Entity {
 
     LBWorld world;
     net.minecraft.src.Entity entity;
+    EntityDamageEvent lastDamageCause;
 
     public LBEntity(LBWorld w, net.minecraft.src.Entity e) {
         this.world = w;
@@ -114,7 +116,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public int getEntityId() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.entityID;
     }
 
     /**
@@ -124,7 +126,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public int getFireTicks() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.fire;
     }
 
     /**
@@ -134,7 +136,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public int getMaxFireTicks() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.fireResistance;
     }
 
     /**
@@ -144,7 +146,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public void setFireTicks(int ticks) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.fireResistance = ticks;
     }
 
     /**
@@ -152,7 +154,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public void remove() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.setEntityDead();
     }
 
     /**
@@ -160,7 +162,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public boolean isDead() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.isDead;
     }
 
     /**
@@ -170,7 +172,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public Server getServer() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return Bukkit.getServer();
     }
 
     /**
@@ -181,7 +183,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public Entity getPassenger() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBEntity(this.world, this.entity.riddenByEntity);
     }
 
     /**
@@ -192,47 +194,46 @@ public class LBEntity implements Entity {
      */
     @Override
     public boolean setPassenger(Entity passenger) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.Entity passengerEntity = null;
+        if (passenger instanceof LBPlayer) {
+            passengerEntity = new EntityPlayer(this.world.world);
+        }
+        //TODO add other entities
+        this.entity.riddenByEntity = passengerEntity;
+        return this.entity.riddenByEntity != null;
     }
 
     /**
      * Returns true if the vehicle has no passengers.
-     *
-     * @return
      */
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.riddenByEntity == null;
     }
 
     /**
      * Eject any passenger. True if there was a passenger.
-     *
-     * @return
      */
     @Override
     public boolean eject() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.riddenByEntity.mountEntity(this.entity);
+        return this.entity.riddenByEntity == null;
     }
 
     /**
      * Returns the distance this entity has fallen
-     *
-     * @return
      */
     @Override
     public float getFallDistance() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return (float) (this.entity.prevPosY - this.entity.posY);
     }
 
     /**
      * Sets the fall distance for this entity
-     *
-     * @param distance
      */
     @Override
     public void setFallDistance(float distance) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.prevPosY = this.entity.posY + distance;
     }
 
     /**
@@ -242,7 +243,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public void setLastDamageCause(EntityDamageEvent event) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.lastDamageCause = event;
     }
 
     /**
@@ -252,7 +253,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public EntityDamageEvent getLastDamageCause() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.lastDamageCause;
     }
 
     /**
@@ -262,6 +263,6 @@ public class LBEntity implements Entity {
      */
     @Override
     public UUID getUniqueId() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return UUID.fromString(String.valueOf(this.entity.entityID));
     }
 }

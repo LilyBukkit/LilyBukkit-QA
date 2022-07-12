@@ -27,7 +27,7 @@ public class LBCreature extends LBLivingEntity implements Creature {
      */
     @Override
     public void setTarget(LivingEntity target) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.entityToAttack = target == null ? null : new EntityLiving(this.world.world);
     }
 
     /**

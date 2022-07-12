@@ -86,7 +86,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getVersion() {
-        return "1.0.0";
+        return "1.0.0.0";
     }
 
     /**

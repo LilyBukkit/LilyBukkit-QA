@@ -13,9 +13,11 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import ru.vladthemountain.lilybukkit.LBWorld;
+import ru.vladthemountain.lilybukkit.inventory.LBPlayerInventory;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +30,9 @@ public class LBPlayer extends LBLivingEntity implements Player {
     String displayName;
     Location spawnPoint;
     LBWorld world;
+    LBPlayerInventory inventory;
+    boolean op;
+    long playerTime;
 
     List<PermissionAttachment> permissionList;
 
@@ -38,8 +43,9 @@ public class LBPlayer extends LBLivingEntity implements Player {
         this.displayName = p.username;
         this.spawnPoint = new Location(this.world, p.mcServer.worldMngr.spawnX, p.mcServer.worldMngr.spawnY, p.mcServer.worldMngr.spawnZ);
         this.permissionList = new ArrayList<>();
-        //init perms
-        //TODO
+        this.inventory = new LBPlayerInventory(this.entity.inventory);
+        this.op = false;
+        this.playerTime = this.world.getTime();
     }
 
     /**
@@ -73,8 +79,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
      * <p>
      * Note that this name will not be displayed in game, only in chat and places
      * defined by plugins
-     *
-     * @param name
      */
     @Override
     public void setDisplayName(String name) {
@@ -83,8 +87,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
 
     /**
      * Set the target of the player's compass.
-     *
-     * @param loc
      */
     @Override
     public void setCompassTarget(Location loc) {
@@ -162,7 +164,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void saveData() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.world.save();
     }
 
     /**
@@ -172,7 +174,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void loadData() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        new LBPlayer(this.world, this.entity);
     }
 
     /**
@@ -184,16 +186,12 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void playEffect(Location loc, Effect effect, int data) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.mcServer.worldMngr.playSoundAtEntity(this.entity, effect.name(), 100, data); // minus ears
     }
 
     /**
      * Send a block change. This fakes a block change packet for a user at
      * a certain location. This will not actually change the world in any way.
-     *
-     * @param loc
-     * @param material
-     * @param data
      */
     @Override
     public void sendBlockChange(Location loc, Material material, byte data) {
@@ -227,10 +225,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
     /**
      * Send a block change. This fakes a block change packet for a user at
      * a certain location. This will not actually change the world in any way.
-     *
-     * @param loc
-     * @param material
-     * @param data
      */
     @Override
     public void sendBlockChange(Location loc, int material, byte data) {
@@ -262,28 +256,29 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void setPlayerTime(long time, boolean relative) {
-        this.entity.playerNetServerHandler.handleUpdateTime(new Packet4UpdateTime(time));
+        if (relative) {
+            this.entity.playerNetServerHandler.handleUpdateTime(new Packet4UpdateTime(this.world.getTime() + time));
+            playerTime = this.world.getTime() + time;
+        } else {
+            playerTime = time;
+        }
     }
 
     /**
      * Returns the player's current timestamp.
-     *
-     * @return
      */
     @Override
     public long getPlayerTime() {
-        return this.entity.mcServer.worldMngr.worldTime; //Yeah
+        return this.playerTime;
     }
 
     /**
      * Returns the player's current time offset relative to server time, or the current player's fixed time
      * if the player's time is absolute.
-     *
-     * @return
      */
     @Override
     public long getPlayerTimeOffset() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.getTime() - this.playerTime;
     }
 
     /**
@@ -294,7 +289,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isPlayerTimeRelative() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.world.getTime() == this.playerTime;
     }
 
     /**
@@ -303,17 +298,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void resetPlayerTime() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    /**
-     * Returns the player's hunger meter value
-     *
-     * @return How full is the hunger meter
-     */
-    @Override
-    public int getHunger() {
-        throw new UnsupportedOperationException("Can't find it");
+        this.setPlayerTime(0, true);
     }
 
     /**
@@ -323,7 +308,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void sendMessage(String message) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.playerNetServerHandler.handleChat(new Packet3Chat(message));
     }
 
     /**
@@ -343,7 +328,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public PlayerInventory getInventory() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.inventory;
     }
 
     /**
@@ -353,7 +338,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public ItemStack getItemInHand() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.inventory.getItemInHand();
     }
 
     /**
@@ -364,7 +349,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void setItemInHand(ItemStack item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.inventory.setItemInHand(item);
     }
 
     /**
@@ -517,7 +502,14 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public Set<PermissionAttachmentInfo> getEffectivePermissions() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Set<PermissionAttachmentInfo> perms = new HashSet<>();
+        for (PermissionAttachment p : this.permissionList) {
+            for (String key : p.getPermissions().keySet()) {
+                if (p.getPermissions().get(key))
+                    perms.add(new PermissionAttachmentInfo(p.getPermissible(), key, p, p.getPermissions().get(key)));
+            }
+        }
+        return perms;
     }
 
     /**
@@ -527,7 +519,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isOp() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.op;
     }
 
     /**
@@ -537,6 +529,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void setOp(boolean value) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.op = value;
     }
 }
