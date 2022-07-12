@@ -1,10 +1,15 @@
 
 build
 .gradle
-client
-server/src/main/java/net/minecraft/server
-server/src/main/java/net/minecraft/src
+client/src/main/resources/*
+client/src/main/java/net/minecraft
+client/src/main/java/org
+client/src/main/java/adaptive
+server/src/main/java/net/minecraft
+client/src/orig
 server/src/orig
 jars/*
 /bin/
+/server/bin
+/client/bin
 /.metadata/

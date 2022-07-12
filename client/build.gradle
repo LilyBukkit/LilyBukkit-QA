@@ -118,14 +118,14 @@ tasks.register("deletePatches", DeletePatches) {
 }
 
 tasks.register("injectClasses", InjectClasses) {
-	source = "${projectDir}/inject"
+	source = "${projectDir}/inject/java"
 	dest = "${projectDir}/src/main/java"
 }
 
 tasks.register("ejectClasses", CreateInjectClasses) {
 	source = "${projectDir}/src/main/java"
 	orig = "${projectDir}/src/orig/java"
-	dest = "${projectDir}/inject"
+	dest = "${projectDir}/inject/java"
 }
 
 processPatches {
@@ -143,6 +143,17 @@ createPatches {
 
 shadowJar {
     configurations = [project.configurations.shadow]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
 }
 
 group 'net.buj'

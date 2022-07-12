@@ -138,6 +138,17 @@ repositories{
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
 dependencies{
     implementation group: "ru.vladthemountain", name: "lilybukkit", version: "1.0.2"
 }

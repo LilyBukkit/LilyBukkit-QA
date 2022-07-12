@@ -1,12 +1,5 @@
 --- World.java
 +++ World.java
-@@ -20,5 +20,5 @@
- public class World implements IBlockAccess {
-     private List lightingToUpdate;
--    public List loadedEntityList;
-+    public List<Entity> loadedEntityList;
-     private List unloadedEntityList;
-     private TreeSet scheduledTickTreeSet;
 @@ -37,5 +37,5 @@
      private final long lockTimestamp;
      protected int autosavePeriod;
