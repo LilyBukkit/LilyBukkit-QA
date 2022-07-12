@@ -1,18 +1,17 @@
 package ru.vladthemountain.lilybukkit;
 
+import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.dbplatform.SQLitePlatform;
+import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Entity;
-import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandException;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
+import org.bukkit.command.*;
 import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
@@ -22,7 +21,9 @@ import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.SimpleServicesManager;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.util.config.Configuration;
 
+import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -53,6 +54,7 @@ public class LilyBukkit implements Server {
     private final List<Command> commandList;
     private final List<PluginCommand> pluginCommandList;
     private final List<Recipe> recipeManager;
+    private final CommandMap commandMap;
 
     public LilyBukkit(MinecraftServer parent) {
         this.mc = parent;
@@ -63,6 +65,7 @@ public class LilyBukkit implements Server {
         this.commandList = new ArrayList<>();
         this.pluginCommandList = new ArrayList<>();
         this.recipeManager = new ArrayList<>();
+        this.commandMap = new SimpleCommandMap(this);
         MinecraftServer.logger.info("LilyBukkit initialized.");
     }
 
@@ -364,14 +367,12 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean unloadWorld(World world, boolean save) {
-        boolean unloaded = true;
         for (Chunk chunk : world.getLoadedChunks()) {
-            unloaded = unloaded && chunk.unload(save);
-            if (!unloaded) {
-                break;
+            if (!chunk.unload(save)) {
+                return false;
             }
         }
-        return unloaded;
+        return true;
     }
 
     /**
@@ -407,7 +408,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public void reload() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Bukkit.setServer(new LilyBukkit(mc));
     }
 
     /**
@@ -453,7 +454,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean dispatchCommand(CommandSender sender, String commandLine) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.commandMap.dispatch(sender, commandLine);
     }
 
     /**
@@ -463,7 +464,46 @@ public class LilyBukkit implements Server {
      */
     @Override
     public void configureDbConfig(ServerConfig config) {
-        throw new UnsupportedOperationException("Not supported yet");
+        // THE FOLLOWING CODE IS TAKEN FROM CRAFTBUKKIT `54bcd1c1f36691a714234e5ca2f30a20b3ad2816`\\
+
+        // CraftServer
+        Configuration configuration = new Configuration(new File("lilybukkit.cfg"));
+
+        // loadConfig
+        configuration.load();
+        configuration.getString("database.url", "jdbc:sqlite:{DIR}{NAME}.db");
+        configuration.getString("database.username", "bukkit");
+        configuration.getString("database.password", "walrus");
+        configuration.getString("database.driver", "org.sqlite.JDBC");
+        configuration.getString("database.isolation", "SERIALIZABLE");
+
+        configuration.getString("settings.update-folder", this.getUpdateFolder());
+        configuration.getInt("settings.spawn-radius", this.getSpawnRadius());
+
+        configuration.getString("settings.permissions-file", "permissions.yml");
+
+        if (configuration.getNode("aliases") == null) {
+            List<String> icanhasbukkit = new ArrayList<String>();
+            icanhasbukkit.add("version");
+            configuration.setProperty("aliases.icanhasbukkit", icanhasbukkit);
+        }
+        configuration.save();
+
+        // configureDbConfig
+        DataSourceConfig ds = new DataSourceConfig();
+        ds.setDriver(configuration.getString("database.driver"));
+        ds.setUrl(configuration.getString("database.url"));
+        ds.setUsername(configuration.getString("database.username"));
+        ds.setPassword(configuration.getString("database.password"));
+        ds.setIsolationLevel(TransactionIsolation.getLevel(configuration.getString("database.isolation")));
+
+        if (ds.getDriver().contains("sqlite")) {
+            config.setDatabasePlatform(new SQLitePlatform());
+            config.getDatabasePlatform().getDbDdlSyntax().setIdentity("");
+        }
+
+        config.setDataSourceConfig(ds);
+        // END OF CRAFTBUKKIT CODE \\
     }
 
     /**
