@@ -1,5 +1,7 @@
 # LilyBukkit
 
+[![build](https://github.com/Vladg24YT/LilyBukkit/actions/workflows/main.yml/badge.svg?branch=master&event=push)](https://github.com/Vladg24YT/LilyBukkit/actions/workflows/main.yml)
+
 **LilyBukkit** is a server core that implements a modified Bukkit API. The only supported version of Minecraft
 is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 
