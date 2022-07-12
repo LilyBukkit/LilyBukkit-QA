@@ -3,10 +3,21 @@ package ru.vladthemountain.lilybukkit.inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
+import java.util.HashMap;
+
 /**
  * @author VladTheMountain
  */
 public class LBRecipe implements Recipe {
+
+    HashMap<Integer, ItemStack> grid = new HashMap<>(9);
+    ItemStack result;
+
+    public LBRecipe(ItemStack result, HashMap<Integer, ItemStack> items) {
+        if (items.size() > 9) throw new IllegalArgumentException("The recipe grid is too large");
+        this.grid = items;
+        this.result = result;
+    }
 
     /**
      * Get the result of this recipe.
@@ -15,6 +26,6 @@ public class LBRecipe implements Recipe {
      */
     @Override
     public ItemStack getResult() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.result;
     }
 }

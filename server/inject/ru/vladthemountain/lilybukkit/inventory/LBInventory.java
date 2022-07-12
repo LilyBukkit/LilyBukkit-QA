@@ -62,7 +62,7 @@ public class LBInventory implements Inventory {
         net.minecraft.src.ItemStack vanillaItemStack = new net.minecraft.src.ItemStack(item.getTypeId(), item.getAmount());
         if (this.inventory instanceof TileEntityChest) {
             if (index > this.inventory.getSizeInventory() || index < 0) {
-                throw new IllegalArgumentException("Attempted to set an ItemStack to slot " + index + " which Chest " + this.inventory.toString() + " does not have.");
+                throw new IllegalArgumentException("Attempted to set an ItemStack to slot " + index + " which Chest " + this.inventory + " does not have.");
             } else {
                 ((TileEntityChest) this.inventory).setInventorySlotContents(index, vanillaItemStack);
                 ((TileEntityChest) this.inventory).onInventoryChanged();
@@ -77,10 +77,10 @@ public class LBInventory implements Inventory {
                 newFurnaceContents.setByte("Slot", (byte) index);
                 vanillaItemStack.writeToNBT(newFurnaceContents);
                 newItemList.setTag(newFurnaceContents);
-                furnaceContents.setTag("Items", (NBTBase) newItemList);
+                furnaceContents.setTag("Items", newItemList);
                 ((TileEntityFurnace) this.inventory).onInventoryChanged();
             } else {
-                throw new IllegalArgumentException("Attempted to set an ItemStack to slot " + index + " which Furnace " + this.inventory.toString() + " does not have.");
+                throw new IllegalArgumentException("Attempted to set an ItemStack to slot " + index + " which Furnace " + this.inventory + " does not have.");
             }
         }
     }
@@ -92,15 +92,14 @@ public class LBInventory implements Inventory {
      * It will return a HashMap of what it couldn't fit.
      *
      * @param items The ItemStacks to add
-     * @return
+     * @return what the method couldn't remove
      */
     @Override
     public HashMap<Integer, ItemStack> addItem(ItemStack... items) {
         HashMap<Integer, ItemStack> didntFit = new HashMap<>();
         for (int slot = 0; slot < this.getSize(); slot++) {
             ItemStack currentInventoryItem = this.getItem(slot);
-            for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
-                ItemStack currentNewItem = items[itemIndex];
+            for (ItemStack currentNewItem : items) {
                 if (currentInventoryItem.getType().equals(currentNewItem.getType()) && currentInventoryItem.getAmount() < currentInventoryItem.getMaxStackSize()) {
                     if (currentNewItem.getAmount() + currentInventoryItem.getAmount() <= currentInventoryItem.getMaxStackSize()) {
                         currentInventoryItem.setAmount(currentInventoryItem.getAmount() + currentNewItem.getAmount());
@@ -125,11 +124,27 @@ public class LBInventory implements Inventory {
      * give as arguments. It will return a HashMap of what it couldn't remove.
      *
      * @param items The ItemStacks to remove
-     * @return
+     * @return what the method couldn't remove
      */
     @Override
     public HashMap<Integer, ItemStack> removeItem(ItemStack... items) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        HashMap<Integer, ItemStack> didntFit = new HashMap<>();
+        for (int i = 0; i < this.getSize(); i++) {
+            ItemStack currentSlot = this.getItem(i);
+            for (ItemStack item : items) {
+                if (currentSlot.getTypeId() == item.getTypeId()) {
+                    if (!(currentSlot.getAmount() - item.getAmount() > 64)) {
+                        currentSlot.setAmount(currentSlot.getAmount() - item.getAmount());
+                        items[i].setAmount(0);
+                    } else {
+                        currentSlot.setAmount(0);
+                        items[i].setAmount(items[i].getAmount() - 64);
+                        didntFit.put(i, items[i]);
+                    }
+                }
+            }
+        }
+        return didntFit;
     }
 
     /**
@@ -150,8 +165,7 @@ public class LBInventory implements Inventory {
     /**
      * Set the inventory's contents
      *
-     * @param items
-     * @return All the ItemStacks from all slots
+     * @param items the inventory's new contents
      */
     @Override
     public void setContents(ItemStack[] items) {
@@ -174,7 +188,11 @@ public class LBInventory implements Inventory {
      */
     @Override
     public boolean contains(int materialId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        boolean flag = false;
+        for (ItemStack i : this.getContents()) {
+            flag = flag || i.getTypeId() == materialId;
+        }
+        return flag;
     }
 
     /**
@@ -185,7 +203,7 @@ public class LBInventory implements Inventory {
      */
     @Override
     public boolean contains(Material material) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.contains(material.getId());
     }
 
     /**
@@ -197,7 +215,11 @@ public class LBInventory implements Inventory {
      */
     @Override
     public boolean contains(ItemStack item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        boolean flag = false;
+        for (ItemStack i : this.getContents()) {
+            flag = flag || (i.getTypeId() == item.getTypeId() && i.getAmount() == item.getAmount());
+        }
+        return flag;
     }
 
     /**
@@ -209,19 +231,22 @@ public class LBInventory implements Inventory {
      */
     @Override
     public boolean contains(int materialId, int amount) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (ItemStack i : this.getContents()) {
+            if (i.getTypeId() == materialId && i.getAmount() >= amount) return true;
+        }
+        return false;
     }
 
     /**
      * Check if the inventory contains any ItemStacks with the given material and at least the minimum amount specified
      *
      * @param material The material to check for
-     * @param amount
+     * @param amount The minimal amount of the item
      * @return If any ItemStacks were found
      */
     @Override
     public boolean contains(Material material, int amount) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.contains(material.getId(), amount);
     }
 
     /**
@@ -229,12 +254,15 @@ public class LBInventory implements Inventory {
      * This will only match if both the type and the amount of the stack match
      *
      * @param item   The ItemStack to match against
-     * @param amount
+     * @param amount The minimal amount of the item
      * @return If any matching ItemStacks were found
      */
     @Override
     public boolean contains(ItemStack item, int amount) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (ItemStack i : this.getContents()) {
+            if (i.equals(item) && i.getAmount() >= amount) return true;
+        }
+        return false;
     }
 
     /**
@@ -245,17 +273,22 @@ public class LBInventory implements Inventory {
      */
     @Override
     public HashMap<Integer, ? extends ItemStack> all(int materialId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        HashMap<Integer, ItemStack> found = new HashMap<>();
+        for (int i = 0; i < this.getSize(); i++) {
+            if (this.getContents()[i].getTypeId() == materialId) found.put(i, this.getContents()[i]);
+        }
+        return found;
     }
 
     /**
      * Find all slots in the inventory containing any ItemStacks with the given material
      *
-     * @param material@return The Slots found.
+     * @param material the {@link Material} to look for
+     * @return The Slots found.
      */
     @Override
     public HashMap<Integer, ? extends ItemStack> all(Material material) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.all(material.getId());
     }
 
     /**
@@ -267,7 +300,11 @@ public class LBInventory implements Inventory {
      */
     @Override
     public HashMap<Integer, ? extends ItemStack> all(ItemStack item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        HashMap<Integer, ItemStack> found = new HashMap<>();
+        for (int i = 0; i < this.getSize(); i++) {
+            if (this.getContents()[i].equals(item)) found.put(i, this.getContents()[i]);
+        }
+        return found;
     }
 
     /**
@@ -278,17 +315,23 @@ public class LBInventory implements Inventory {
      */
     @Override
     public int first(int materialId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (int i = 0; i < this.getSize(); i++) {
+            if (this.getContents()[i].getTypeId() == materialId) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
      * Find the first slot in the inventory containing an ItemStack with the given material
      *
-     * @param material@return The Slot found.
+     * @param material the {@link Material} to look for
+     * @return The Slot found. -1 if not found
      */
     @Override
     public int first(Material material) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.first(material.getId());
     }
 
     /**
@@ -296,21 +339,31 @@ public class LBInventory implements Inventory {
      * This will only match a slot if both the type and the amount of the stack match
      *
      * @param item The ItemStack to match against
-     * @return The Slot found.
+     * @return The Slot found. -1 if not found
      */
     @Override
     public int first(ItemStack item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (int i = 0; i < this.getSize(); i++) {
+            if (this.getContents()[i].equals(item)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
      * Find the first empty Slot.
      *
-     * @return The first empty Slot found.
+     * @return The first empty Slot found. -1 if not found
      */
     @Override
     public int firstEmpty() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        for (int i = 0; i < this.getSize(); i++) {
+            if (this.getContents()[i] == null || this.getContents()[i].getTypeId() == 0) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
