@@ -1,14 +1,21 @@
 package ru.vladthemountain.lilybukkit.block;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.IInventory;
+import net.minecraft.src.NBTTagCompound;
+import net.minecraft.src.TileEntityFurnace;
 import org.bukkit.block.Block;
 import org.bukkit.block.Furnace;
 import org.bukkit.inventory.Inventory;
+import ru.vladthemountain.lilybukkit.LBWorld;
+import ru.vladthemountain.lilybukkit.inventory.LBInventory;
 
 public class LBFurnace extends LBBlockState implements Furnace {
 
-    public LBFurnace(LBBlock b) {
-        super(b);
+    TileEntityFurnace entity;
+
+    public LBFurnace(LBWorld w, Block b) {
+        super(w, b);
+        this.entity = (TileEntityFurnace) w.world.getBlockTileEntity(b.getX(), b.getY(), b.getZ());
     }
 
     /**
@@ -18,46 +25,46 @@ public class LBFurnace extends LBBlockState implements Furnace {
      */
     @Override
     public short getBurnTime() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return (short) this.entity.getBurnTimeRemainingScaled(1);
     }
 
     /**
      * Set burn time.
-     *
-     * @param burnTime
      */
     @Override
     public void setBurnTime(short burnTime) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        NBTTagCompound furnaceContents = new NBTTagCompound();
+        this.entity.writeToNBT(furnaceContents);
+        furnaceContents.setShort("BurnTime", burnTime);
+        this.entity.onInventoryChanged();
+        this.entity.updateEntity();
     }
 
     /**
      * Get cook time.
-     *
-     * @return
      */
     @Override
     public short getCookTime() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return (short) this.entity.getCookProgressScaled(1);
     }
 
     /**
      * Set cook time.
-     *
-     * @param cookTime
      */
     @Override
     public void setCookTime(short cookTime) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        NBTTagCompound furnaceContents = new NBTTagCompound();
+        this.entity.writeToNBT(furnaceContents);
+        furnaceContents.setShort("CookTime", cookTime);
+        this.entity.onInventoryChanged();
+        this.entity.updateEntity();
     }
 
     /**
      * Get the block's inventory.
-     *
-     * @return
      */
     @Override
     public Inventory getInventory() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBInventory((IInventory) world.world.getBlockTileEntity(this.getX(), this.getY(), this.getZ()));
     }
 }

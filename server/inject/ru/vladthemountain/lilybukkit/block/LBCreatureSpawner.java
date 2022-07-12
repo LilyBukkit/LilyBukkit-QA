@@ -1,13 +1,18 @@
 package ru.vladthemountain.lilybukkit.block;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.TileEntityMobSpawner;
+import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.CreatureType;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
 public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
 
-    public LBCreatureSpawner(LBBlock b) {
-        super(b);
+    TileEntityMobSpawner entity;
+
+    public LBCreatureSpawner(LBWorld w, Block b) {
+        super(w, b);
+        this.entity = (TileEntityMobSpawner) w.world.getBlockTileEntity(b.getX(), b.getY(), b.getZ());
     }
 
     /**
@@ -17,7 +22,7 @@ public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
      */
     @Override
     public CreatureType getCreatureType() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return CreatureType.fromName(this.getCreatureTypeId());
     }
 
     /**
@@ -27,7 +32,7 @@ public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
      */
     @Override
     public void setCreatureType(CreatureType creatureType) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.setCreatureTypeId(creatureType.getName());
     }
 
     /**
@@ -37,7 +42,7 @@ public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
      */
     @Override
     public String getCreatureTypeId() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.mobID;
     }
 
     /**
@@ -47,7 +52,7 @@ public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
      */
     @Override
     public void setCreatureTypeId(String creatureType) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.mobID = creatureType;
     }
 
     /**
@@ -57,7 +62,7 @@ public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
      */
     @Override
     public int getDelay() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.delay;
     }
 
     /**
@@ -67,6 +72,6 @@ public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
      */
     @Override
     public void setDelay(int delay) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.delay = delay;
     }
 }

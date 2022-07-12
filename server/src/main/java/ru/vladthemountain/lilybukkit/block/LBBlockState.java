@@ -1,27 +1,24 @@
 package ru.vladthemountain.lilybukkit.block;
 
 import net.minecraft.src.TileEntity;
-import net.minecraft.src.TileEntityFurnace;
-import net.minecraft.src.TileEntitySign;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.material.MaterialData;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
 public class LBBlockState implements BlockState {
 
     TileEntity tileEntity;
     Block block;
+    LBWorld world;
 
-    public LBBlockState(Block b) {
+    public LBBlockState(LBWorld w, Block b) {
         this.block = b;
-        if (b.getType().equals(Material.FURNACE)) {
-            this.tileEntity = new TileEntityFurnace();
-        } else if (b.getType().equals(Material.SIGN_POST) || b.getType().equals(Material.WALL_SIGN)) {
-            this.tileEntity = new TileEntitySign();
-        }
+        this.world = w;
+        this.tileEntity = w.world.getBlockTileEntity(b.getX(), b.getY(), b.getZ());
     }
 
     /**

@@ -1,12 +1,17 @@
 package ru.vladthemountain.lilybukkit.block;
 
-import net.minecraft.src.Entity;
+import net.minecraft.src.TileEntitySign;
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import ru.vladthemountain.lilybukkit.LBWorld;
 
 public class LBSign extends LBBlockState implements Sign {
 
-    public LBSign(LBBlock b) {
-        super(b);
+    TileEntitySign entity;
+
+    public LBSign(LBWorld w, Block b) {
+        super(w, b);
+        this.entity = (TileEntitySign) w.world.getBlockTileEntity(b.getX(), b.getY(), b.getZ());
     }
 
     /**
@@ -16,7 +21,7 @@ public class LBSign extends LBBlockState implements Sign {
      */
     @Override
     public String[] getLines() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.entity.signText;
     }
 
     /**
@@ -30,7 +35,8 @@ public class LBSign extends LBBlockState implements Sign {
      */
     @Override
     public String getLine(int index) throws IndexOutOfBoundsException {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (index > this.entity.signText.length) throw new IndexOutOfBoundsException();
+        else return this.entity.signText[index];
     }
 
     /**
@@ -45,6 +51,7 @@ public class LBSign extends LBBlockState implements Sign {
      */
     @Override
     public void setLine(int index, String line) throws IndexOutOfBoundsException {
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (index > this.entity.signText.length) throw new IndexOutOfBoundsException();
+        else this.entity.signText[index] = line;
     }
 }

@@ -1,6 +1,6 @@
 package ru.vladthemountain.lilybukkit.block;
 
-import net.minecraft.src.MinecraftException;
+import net.minecraft.src.BlockRedstoneWire;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,7 +35,6 @@ public class LBBlock implements Block {
     }
 
     /**
-     * @param face
      * @deprecated use {@link #getRelative(BlockFace face)}
      */
     @Override
@@ -44,8 +43,6 @@ public class LBBlock implements Block {
     }
 
     /**
-     * @param face
-     * @param distance
      * @deprecated use {@link #getRelative(BlockFace face, int distance)}
      */
     @Override
@@ -127,7 +124,7 @@ public class LBBlock implements Block {
      */
     @Override
     public byte getLightLevel() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return (byte) this.world.world.getBlockLightValue(this.getX(), this.getY(), this.getZ());
     }
 
     /**
@@ -277,13 +274,11 @@ public class LBBlock implements Block {
      */
     @Override
     public BlockState getState() {
-        return new LBBlockState(this);
+        return new LBBlockState(world, this);
     }
 
     /**
-     * Returns true if the block is being powered by Redstone.
-     *
-     * @return
+     * Returns true if the block is being powered by Greenstone.
      */
     @Override
     public boolean isBlockPowered() {
@@ -291,9 +286,7 @@ public class LBBlock implements Block {
     }
 
     /**
-     * Returns true if the block is being indirectly powered by Redstone.
-     *
-     * @return
+     * Returns true if the block is being indirectly powered by Greenstone.
      */
     @Override
     public boolean isBlockIndirectlyPowered() {
@@ -301,10 +294,7 @@ public class LBBlock implements Block {
     }
 
     /**
-     * Returns true if the block face is being powered by Redstone.
-     *
-     * @param face
-     * @return
+     * Returns true if the block face is being powered by Greenstone.
      */
     @Override
     public boolean isBlockFacePowered(BlockFace face) {
@@ -327,10 +317,7 @@ public class LBBlock implements Block {
     }
 
     /**
-     * Returns true if the block face is being indirectly powered by Redstone.
-     *
-     * @param face
-     * @return
+     * Returns true if the block face is being indirectly powered by Greenstone.
      */
     @Override
     public boolean isBlockFaceIndirectlyPowered(BlockFace face) {
@@ -353,24 +340,34 @@ public class LBBlock implements Block {
     }
 
     /**
-     * Returns the redstone power being provided to this block face
+     * Returns the Greenstone power being provided to this block face
      *
      * @param face the face of the block to query or BlockFace.SELF for the block itself
-     * @return
      */
     @Override
     public int getBlockPower(BlockFace face) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        switch (face) {
+            case SOUTH:
+            case WEST:
+            case SELF:
+            case NORTH:
+            case EAST:
+                return this.getBlockPower();
+            default:
+                return 0;
+        }
     }
 
     /**
-     * Returns the redstone power being provided to this block
-     *
-     * @return
+     * Returns the Greenstone power being provided to this block
      */
     @Override
     public int getBlockPower() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        //As it's the only block that stores the power
+        if (this.block instanceof BlockRedstoneWire) {
+            return this.world.world.getBlockMetadata(this.getX(), this.getY(), this.getZ());
+        }
+        return 0;
     }
 
     /**
