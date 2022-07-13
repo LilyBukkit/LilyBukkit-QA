@@ -124,7 +124,7 @@
 +            throw new RuntimeException(e);
 +        }
 +        Runtime.getRuntime().addShutdownHook(new ServerShutdownThread(this));
-+        // CraftBukkit end
++        //
      }
 -    
 +
@@ -329,12 +329,12 @@
 +
 +            // CraftBukkit start - ServerCommand for preprocessing
 +            ServerCommandEvent event = new ServerCommandEvent(this.console, serverCommand1.command);
-+            Bukkit.getServer().getPluginManager().callEvent(event);
++            this.server.getPluginManager().callEvent(event);
 +            serverCommand1 = new ServerCommand(event.getCommand(), serverCommand1.commandListener);
 +            // CraftBukkit end
 +
 +            // this.consoleCommandHandler.handle(servercommand); // CraftBukkit - Removed its now called in server.dispatchCommand
-+            Bukkit.getServer().dispatchCommand(this.console, serverCommand1.command); // CraftBukkit
++            this.server.dispatchCommand(this.console, serverCommand1.command); // CraftBukkit
 +            /*String string2 = serverCommand1.command;
              final ICommandListener iCommandListener3 = serverCommand1.commandListener;
              final String string3 = iCommandListener3.getUsername();
@@ -605,7 +605,7 @@
 +            } else {
                  iCommandListener3.addHelpCommandMessage("To run the server without a gui, start it like this:");
                  iCommandListener3.addHelpCommandMessage("   java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui");
-@@ -457,54 +529,171 @@
+@@ -457,54 +529,173 @@
                  iCommandListener3.addHelpCommandMessage("   list                      lists all currently connected players");
                  iCommandListener3.addHelpCommandMessage("   say <message>             broadcasts a message to all players");
 -            }
@@ -755,7 +755,7 @@
 +                if (!GraphicsEnvironment.isHeadless() && (args.length <= 0 || !args[0].equals("nogui"))) {
 +                    ServerGUI.initGui(minecraftServer1);
 +                }
-+                new LilyBukkit(minecraftServer1);
++                server = new LilyBukkit(minecraftServer1);
 +                new ThreadServerApplication("Server thread", minecraftServer1).start();
 +            } catch (Exception exception2) {
 +                MinecraftServer.logger.log(Level.SEVERE, "Failed to start the minecraft server", exception2);
@@ -789,9 +789,11 @@
 +    //CraftBukkit
 +    public static boolean useJline = true;
 +    public OptionSet options;
-+    public ColouredConsoleSender console;
++    // CraftBukkit end
++    // LilyBukkit
++    public ColouredConsoleSender console = new ColouredConsoleSender(server);
 +    public ConsoleReader reader;
-+    public static int currentTick;
++    public static LilyBukkit server;
 +
 +    private static List<String> asList(String... params) {
 +        return Arrays.asList(params);

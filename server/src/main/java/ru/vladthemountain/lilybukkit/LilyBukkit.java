@@ -566,6 +566,16 @@ public class LilyBukkit implements Server {
         this.mc.configManager.enableWhitelist();
     }
 
+    @Override
+    public Set<OfflinePlayer> getOperators() {
+        return new HashSet(this.mc.configManager.ops);
+    }
+
+    @Override
+    public ConsoleCommandSender getConsoleSender() {
+        return this.mc.console;
+    }
+
     // ########################### \\
     // CRAFTBUKKIT TERRITORY AHEAD \\
     // ########################### \\
@@ -845,32 +855,28 @@ public class LilyBukkit implements Server {
 
     @Override
     public Set<String> getIPBans() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new HashSet(this.mc.configManager.bannedIPs);
     }
 
     @Override
     public void banIP(String s) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.mc.configManager.banIP(s);
     }
 
     @Override
     public void unbanIP(String s) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.mc.configManager.pardonIP(s);
     }
 
     @Override
     public Set<OfflinePlayer> getBannedPlayers() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
+        Set<OfflinePlayer> result = new HashSet<OfflinePlayer>();
 
-    @Override
-    public Set<OfflinePlayer> getOperators() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
+        for (Object name : this.mc.configManager.bannedPlayers) {
+            result.add(getOfflinePlayer((String) name));
+        }
 
-    @Override
-    public ConsoleCommandSender getConsoleSender() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return result;
     }
 
     public ServerConfigurationManager getHandle() {

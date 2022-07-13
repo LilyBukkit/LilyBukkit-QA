@@ -15,9 +15,11 @@
      private PlayerManager playerManagerObj;
      private int maxPlayers;
 -    private Set<String> bannedPlayers;
+-    private Set<String> bannedIPs;
+-    private Set<String> ops;
 +    public Set<String> bannedPlayers;
-     private Set<String> bannedIPs;
-     private Set<String> ops;
++    public Set<String> bannedIPs;
++    public Set<String> ops;
      private Set<String> authenticatedPlayers;
 +    public Set<String> whitelistedPlayers;
 +    private Set<String> whitelistedIPs;
