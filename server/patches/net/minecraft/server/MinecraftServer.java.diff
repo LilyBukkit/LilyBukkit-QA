@@ -1,6 +1,6 @@
 --- MinecraftServer.java
 +++ MinecraftServer.java
-@@ -1,44 +1,20 @@
+@@ -1,44 +1,29 @@
  package net.minecraft.server;
  
 -import net.minecraft.src.ThreadServerApplication;
@@ -20,14 +20,22 @@
 -import net.minecraft.src.IProgressUpdate;
 -import net.minecraft.src.IWorldAccess;
 -import net.minecraft.src.WorldManager;
++import jline.ConsoleReader;
++import joptsimple.OptionParser;
++import joptsimple.OptionSet;
 +import net.minecraft.src.*;
 +import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.LoggerOutputStream;
++import org.bukkit.craftbukkit.command.ColouredConsoleSender;
++import org.bukkit.craftbukkit.util.ServerShutdownThread;
++import org.bukkit.event.server.ServerCommandEvent;
 +import ru.vladthemountain.lilybukkit.LilyBukkit;
 +
 +import java.awt.*;
 +import java.io.File;
  import java.io.IOException;
 -import java.util.logging.Level;
++import java.io.PrintStream;
  import java.net.InetAddress;
 -import java.io.File;
 -import net.minecraft.src.ConsoleLogManager;
@@ -37,6 +45,7 @@
 -import java.util.ArrayList;
 -import java.util.Random;
 -import net.minecraft.src.EntityTracker;
++import java.text.SimpleDateFormat;
  import java.util.List;
 -import net.minecraft.src.ServerConfigurationManager;
 -import net.minecraft.src.WorldServer;
@@ -54,14 +63,16 @@
 +    public static HashMap<String, Integer> playerList;
      public NetworkListenThread networkServer;
      public PropertyManager propertyManagerObj;
-@@ -51,5 +27,5 @@
+@@ -50,6 +35,6 @@
+     public String currentTask;
      public int percentDone;
-     private List playersOnline;
+-    private List playersOnline;
 -    private List commands;
++    private List<IUpdatePlayerListBox> playersOnline;
 +    private List<ServerCommand> commands;
      public EntityTracker entityTracker;
      public boolean onlineMode;
-@@ -57,20 +33,40 @@
+@@ -57,20 +42,50 @@
      public String serverId;
      private static Random rand;
 -    
@@ -93,8 +104,9 @@
          MinecraftServer.rand = new Random(System.currentTimeMillis());
      }
 -    
+-    public MinecraftServer() {
 +
-     public MinecraftServer() {
++    public MinecraftServer(OptionSet options) {
          this.serverRunning = true;
          this.serverStopped = false;
          this.deathTime = 0;
@@ -103,30 +115,58 @@
 +        this.playersOnline = new ArrayList<>();
 +        this.commands = Collections.synchronizedList(new ArrayList<>());
          new ThreadSleepForeverServer(this);
++
++        // CraftBukkit start
++        this.options = options;
++        try {
++            this.reader = new ConsoleReader();
++        } catch (IOException e) {
++            throw new RuntimeException(e);
++        }
++        Runtime.getRuntime().addShutdownHook(new ServerShutdownThread(this));
++        // CraftBukkit end
      }
 -    
 +
      private boolean startServer() throws IOException {
          final ThreadCommandReader threadCommandReader1 = new ThreadCommandReader(this);
-@@ -78,5 +74,5 @@
+@@ -78,5 +93,11 @@
          threadCommandReader1.start();
          ConsoleLogManager.init();
 -        MinecraftServer.logger.info("Starting minecraft server version 0.2.1");
++
++        // CraftBukkit start
++        System.setOut(new PrintStream(new LoggerOutputStream(logger, Level.INFO), true));
++        System.setErr(new PrintStream(new LoggerOutputStream(logger, Level.SEVERE), true));
++        // CraftBukkit end
++
 +        MinecraftServer.logger.info("Starting minecraft server version " + getVersionString());
          if (Runtime.getRuntime().maxMemory() / 1024L / 1024L < 512L) {
              MinecraftServer.logger.warning("**** NOT ENOUGH RAM!");
-@@ -95,8 +91,8 @@
-         MinecraftServer.logger.info(new StringBuilder("Starting Minecraft server on ").append((string2.length() == 0) ? "*" : string2).append(":").append(i4).toString());
+@@ -84,5 +105,5 @@
+         }
+         MinecraftServer.logger.info("Loading properties");
+-        this.propertyManagerObj = new PropertyManager(new File("server.properties"));
++        this.propertyManagerObj = new PropertyManager(this.options); // CraftBukkit - CLI argument support
+         final String string2 = this.propertyManagerObj.getStringProperty("server-ip", "");
+         this.onlineMode = false;
+@@ -93,12 +114,11 @@
+         }
+         final int i4 = this.propertyManagerObj.getIntProperty("server-port", 25565);
+-        MinecraftServer.logger.info(new StringBuilder("Starting Minecraft server on ").append((string2.length() == 0) ? "*" : string2).append(":").append(i4).toString());
++        MinecraftServer.logger.info("Starting Minecraft server on " + ((string2.length() == 0) ? "*" : string2) + ":" + i4);
          this.serverId = Long.toHexString(MinecraftServer.rand.nextLong());
-+        MinecraftServer.logger.info(new StringBuilder("\nThis server is running ").append(Bukkit.getServer().getName()).append(" version ").append(Bukkit.getServer().getVersion()).append("\n").toString());
          try {
              this.networkServer = new NetworkListenThread(this, inetAddress3, i4);
 -        }
 -        catch (IOException iOException6) {
 +        } catch (IOException iOException6) {
              MinecraftServer.logger.warning("**** FAILED TO BIND TO PORT!");
-             MinecraftServer.logger.log(Level.WARNING, new StringBuilder("The exception was: ").append(iOException6.toString()).toString());
-@@ -108,6 +104,5 @@
+-            MinecraftServer.logger.log(Level.WARNING, new StringBuilder("The exception was: ").append(iOException6.toString()).toString());
++            MinecraftServer.logger.log(Level.WARNING, "The exception was: " + iOException6);
+             MinecraftServer.logger.warning("Perhaps a server is already running on that port?");
+             return false;
+@@ -108,6 +128,5 @@
              MinecraftServer.logger.info("The server will authenticate usernames.");
              MinecraftServer.logger.info("Unauthenticated players may still join by default, and their abilities can be configured in the unauth.config file.");
 -        }
@@ -134,22 +174,29 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -123,5 +118,5 @@
+@@ -118,10 +137,10 @@
+         this.entityTracker = new EntityTracker(this);
+         final String string3 = this.propertyManagerObj.getStringProperty("level-name", "world");
+-        MinecraftServer.logger.info(new StringBuilder("Preparing level \"").append(string3).append("\"").toString());
++        MinecraftServer.logger.info("Preparing level \"" + string3 + "\"");
+         this.initWorld(string3);
+         MinecraftServer.logger.info("Done! For help, type \"help\" or \"?\"");
          return true;
      }
 -    
 +
      private void initWorld(final String worldName) {
          MinecraftServer.logger.info("Preparing start region");
-@@ -141,5 +136,5 @@
+@@ -141,21 +160,21 @@
          this.clearCurrentTask();
      }
 -    
 +
      private void outputPercentRemaining(final String currentTask, final int percent) {
          this.currentTask = currentTask;
-@@ -147,15 +142,15 @@
-         System.out.println(String.valueOf(currentTask) + ": " + percent + "%");
+         this.percentDone = percent;
+-        System.out.println(String.valueOf(currentTask) + ": " + percent + "%");
++        System.out.println(currentTask + ": " + percent + "%");
      }
 -    
 +
@@ -167,7 +214,7 @@
 +
      private void stop() {
          MinecraftServer.logger.info("Stopping server");
-@@ -167,9 +162,9 @@
+@@ -167,9 +186,9 @@
          }
      }
 -    
@@ -179,7 +226,7 @@
 +
      public void run() {
          try {
-@@ -196,32 +191,27 @@
+@@ -196,32 +215,27 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -201,7 +248,7 @@
 +        } catch (Exception exception16) {
              exception16.printStackTrace();
 -            MinecraftServer.logger.log(Level.SEVERE, "Unexpected exception", (Throwable)exception16);
-+            MinecraftServer.logger.log(Level.SEVERE, "Unexpected exception", (Throwable) exception16);
++            MinecraftServer.logger.log(Level.SEVERE, "Unexpected exception", exception16);
              while (this.serverRunning) {
                  this.commandLineParser();
                  try {
@@ -218,16 +265,17 @@
 +        } finally {
              this.stop();
              this.serverStopped = true;
-@@ -232,13 +222,12 @@
+@@ -232,18 +246,17 @@
          System.exit(0);
      }
 -    
 +
      private void doTick() throws IOException {
-         final ArrayList arrayList1 = new ArrayList();
+-        final ArrayList arrayList1 = new ArrayList();
++        final ArrayList<String> arrayList1 = new ArrayList<>();
          for (final String string3 : MinecraftServer.playerList.keySet()) {
 -            final int i4 = (int)MinecraftServer.playerList.get(string3);
-+            final int i4 = (int) MinecraftServer.playerList.get(string3);
++            final int i4 = MinecraftServer.playerList.get(string3);
              if (i4 > 0) {
                  MinecraftServer.playerList.put(string3, (i4 - 1));
 -            }
@@ -235,7 +283,14 @@
 +            } else {
                  arrayList1.add(string3);
              }
-@@ -254,5 +243,6 @@
+         }
+-        for (int i5 = 0; i5 < arrayList1.size(); ++i5) {
+-            MinecraftServer.playerList.remove(arrayList1.get(i5));
++        for (Object o : arrayList1) {
++            MinecraftServer.playerList.remove(o);
+         }
+         AxisAlignedBB.clearBoundingBoxPool();
+@@ -254,77 +267,77 @@
          }
          this.worldMngr.tick();
 -        while (this.worldMngr.updatingLighting()) {}
@@ -243,16 +298,17 @@
 +        }
          this.worldMngr.updateEntities();
          this.networkServer.handleNetworkListenThread();
-@@ -260,21 +250,20 @@
+         this.configManager.onTick();
          this.entityTracker.updateTrackedEntities();
-         for (int i5 = 0; i5 < this.playersOnline.size(); ++i5) {
+-        for (int i5 = 0; i5 < this.playersOnline.size(); ++i5) {
 -            ((IUpdatePlayerListBox)this.playersOnline.get(i5)).addAllPlayers();
-+            ((IUpdatePlayerListBox) this.playersOnline.get(i5)).addAllPlayers();
++        for (IUpdatePlayerListBox iUpdatePlayerListBox : this.playersOnline) {
++            iUpdatePlayerListBox.addAllPlayers();
          }
          try {
              this.commandLineParser();
 +        } catch (Exception exception5) {
-+            MinecraftServer.logger.log(Level.WARNING, "Unexpected exception while parsing console command", (Throwable) exception5);
++            MinecraftServer.logger.log(Level.WARNING, "Unexpected exception while parsing console command", exception5);
          }
 -        catch (Exception exception5) {
 -            MinecraftServer.logger.log(Level.WARNING, "Unexpected exception while parsing console command", (Throwable)exception5);
@@ -268,14 +324,26 @@
      public void commandLineParser() {
          while (this.commands.size() > 0) {
 -            final ServerCommand serverCommand1 = (ServerCommand)this.commands.remove(0);
-+            final ServerCommand serverCommand1 = (ServerCommand) this.commands.remove(0);
-             String string2 = serverCommand1.command;
+-            String string2 = serverCommand1.command;
++            ServerCommand serverCommand1 = this.commands.remove(0);
++
++            // CraftBukkit start - ServerCommand for preprocessing
++            ServerCommandEvent event = new ServerCommandEvent(this.console, serverCommand1.command);
++            Bukkit.getServer().getPluginManager().callEvent(event);
++            serverCommand1 = new ServerCommand(event.getCommand(), serverCommand1.commandListener);
++            // CraftBukkit end
++
++            // this.consoleCommandHandler.handle(servercommand); // CraftBukkit - Removed its now called in server.dispatchCommand
++            Bukkit.getServer().dispatchCommand(this.console, serverCommand1.command); // CraftBukkit
++            /*String string2 = serverCommand1.command;
              final ICommandListener iCommandListener3 = serverCommand1.commandListener;
-@@ -283,45 +272,36 @@
+             final String string3 = iCommandListener3.getUsername();
+             if (!string2.toLowerCase().startsWith("help") && !string2.toLowerCase().startsWith("?")) {
                  if (string2.toLowerCase().startsWith("list")) {
-                     iCommandListener3.addHelpCommandMessage(new StringBuilder("Connected players: ").append(this.configManager.getPlayerList()).toString());
+-                    iCommandListener3.addHelpCommandMessage(new StringBuilder("Connected players: ").append(this.configManager.getPlayerList()).toString());
 -                }
 -                else if (string2.toLowerCase().startsWith("stop")) {
++                    iCommandListener3.addHelpCommandMessage("Connected players: " + this.configManager.getPlayerList());
 +                } else if (string2.toLowerCase().startsWith("stop")) {
                      this.print(string3, "Stopping the server..");
                      this.serverRunning = false;
@@ -300,7 +368,8 @@
 +                } else if (string2.toLowerCase().startsWith("op ")) {
                      final String string4 = string2.substring(string2.indexOf(" ")).trim();
                      this.configManager.opPlayer(string4);
-                     this.print(string3, new StringBuilder("Opping ").append(string4).toString());
+-                    this.print(string3, new StringBuilder("Opping ").append(string4).toString());
++                    this.print(string3, "Opping " + string4);
                      this.configManager.sendChatMessageToPlayer(string4, "§eYou are now op!");
 -                }
 -                else if (string2.toLowerCase().startsWith("deop ")) {
@@ -308,25 +377,32 @@
                      final String string4 = string2.substring(string2.indexOf(" ")).trim();
                      this.configManager.deopPlayer(string4);
                      this.configManager.sendChatMessageToPlayer(string4, "§eYou are no longer op!");
-                     this.print(string3, new StringBuilder("De-opping ").append(string4).toString());
+-                    this.print(string3, new StringBuilder("De-opping ").append(string4).toString());
 -                }
 -                else if (string2.toLowerCase().startsWith("ban-ip ")) {
++                    this.print(string3, "De-opping " + string4);
 +                } else if (string2.toLowerCase().startsWith("ban-ip ")) {
                      final String string4 = string2.substring(string2.indexOf(" ")).trim();
                      this.configManager.banIP(string4);
-                     this.print(string3, new StringBuilder("Banning ip ").append(string4).toString());
+-                    this.print(string3, new StringBuilder("Banning ip ").append(string4).toString());
 -                }
 -                else if (string2.toLowerCase().startsWith("pardon-ip ")) {
++                    this.print(string3, "Banning ip " + string4);
 +                } else if (string2.toLowerCase().startsWith("pardon-ip ")) {
                      final String string4 = string2.substring(string2.indexOf(" ")).trim();
                      this.configManager.pardonIP(string4);
-                     this.print(string3, new StringBuilder("Pardoning ip ").append(string4).toString());
+-                    this.print(string3, new StringBuilder("Pardoning ip ").append(string4).toString());
 -                }
 -                else if (string2.toLowerCase().startsWith("ban ")) {
++                    this.print(string3, "Pardoning ip " + string4);
 +                } else if (string2.toLowerCase().startsWith("ban ")) {
                      final String string4 = string2.substring(string2.indexOf(" ")).trim();
                      this.configManager.banPlayer(string4);
-@@ -332,15 +312,13 @@
+-                    this.print(string3, new StringBuilder("Banning ").append(string4).toString());
++                    this.print(string3, "Banning " + string4);
+                     final EntityPlayerMP entityPlayerMP12 = this.configManager.getPlayerEntity(string4);
+                     if (entityPlayerMP12 == null) {
+@@ -332,15 +345,13 @@
                      }
                      entityPlayerMP12.playerNetServerHandler.kickPlayer("Banned by admin");
 -                }
@@ -334,42 +410,50 @@
 +                } else if (string2.toLowerCase().startsWith("pardon ")) {
                      final String string4 = string2.substring(string2.indexOf(" ")).trim();
                      this.configManager.pardonPlayer(string4);
-                     this.print(string3, new StringBuilder("Pardoning ").append(string4).toString());
+-                    this.print(string3, new StringBuilder("Pardoning ").append(string4).toString());
 -                }
 -                else if (string2.toLowerCase().startsWith("kick ")) {
++                    this.print(string3, "Pardoning " + string4);
 +                } else if (string2.toLowerCase().startsWith("kick ")) {
                      final String string4 = string2.substring(string2.indexOf(" ")).trim();
                      EntityPlayerMP entityPlayerMP12 = null;
                      for (int i13 = 0; i13 < this.configManager.playerEntities.size(); ++i13) {
 -                        final EntityPlayerMP entityPlayerMP13 = (EntityPlayerMP)this.configManager.playerEntities.get(i13);
-+                        final EntityPlayerMP entityPlayerMP13 = (EntityPlayerMP) this.configManager.playerEntities.get(i13);
++                        final EntityPlayerMP entityPlayerMP13 = this.configManager.playerEntities.get(i13);
                          if (entityPlayerMP13.username.equalsIgnoreCase(string4)) {
                              entityPlayerMP12 = entityPlayerMP13;
-@@ -350,10 +328,8 @@
+@@ -349,11 +360,9 @@
+                     if (entityPlayerMP12 != null) {
                          entityPlayerMP12.playerNetServerHandler.kickPlayer("Kicked by admin");
-                         this.print(string3, new StringBuilder("Kicking ").append(entityPlayerMP12.username).toString());
--                    }
--                    else {
+-                        this.print(string3, new StringBuilder("Kicking ").append(entityPlayerMP12.username).toString());
++                        this.print(string3, "Kicking " + entityPlayerMP12.username);
 +                    } else {
-                         iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string4).append(". No kick.").toString());
++                        iCommandListener3.addHelpCommandMessage("Can't find user " + string4 + ". No kick.");
                      }
+-                    else {
+-                        iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string4).append(". No kick.").toString());
+-                    }
 -                }
 -                else if (string2.toLowerCase().startsWith("tp ")) {
 +                } else if (string2.toLowerCase().startsWith("tp ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length == 3) {
-@@ -362,18 +338,14 @@
+@@ -361,19 +370,15 @@
+                         final EntityPlayerMP entityPlayerMP14 = this.configManager.getPlayerEntity(string5[2]);
                          if (entityPlayerMP12 == null) {
-                             iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string5[1]).append(". No tp.").toString());
+-                            iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string5[1]).append(". No tp.").toString());
 -                        }
 -                        else if (entityPlayerMP14 == null) {
-+                        } else if (entityPlayerMP14 == null) {
-                             iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string5[2]).append(". No tp.").toString());
+-                            iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string5[2]).append(". No tp.").toString());
 -                        }
 -                        else {
++                            iCommandListener3.addHelpCommandMessage("Can't find user " + string5[1] + ". No tp.");
++                        } else if (entityPlayerMP14 == null) {
++                            iCommandListener3.addHelpCommandMessage("Can't find user " + string5[2] + ". No tp.");
 +                        } else {
                              entityPlayerMP12.playerNetServerHandler.teleportTo(entityPlayerMP14.posX, entityPlayerMP14.posY, entityPlayerMP14.posZ, entityPlayerMP14.rotationYaw, entityPlayerMP14.rotationPitch);
-                             this.print(string3, new StringBuilder("Teleporting ").append(string5[1]).append(" to ").append(string5[2]).append(".").toString());
+-                            this.print(string3, new StringBuilder("Teleporting ").append(string5[1]).append(" to ").append(string5[2]).append(".").toString());
++                            this.print(string3, "Teleporting " + string5[1] + " to " + string5[2] + ".");
                          }
 -                    }
 -                    else {
@@ -381,36 +465,59 @@
 +                } else if (string2.toLowerCase().startsWith("give ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length != 3 && string5.length != 4) {
-@@ -398,23 +370,18 @@
+@@ -386,5 +391,5 @@
+                             final int i14 = Integer.parseInt(string5[2]);
+                             if (Item.itemsList[i14] != null) {
+-                                this.print(string3, new StringBuilder("Giving ").append(entityPlayerMP14.username).append(" some ").append(i14).toString());
++                                this.print(string3, "Giving " + entityPlayerMP14.username + " some " + i14);
+                                 int i15 = 1;
+                                 if (string5.length > 3) {
+@@ -398,23 +403,18 @@
                                  }
                                  entityPlayerMP14.dropPlayerItem(new ItemStack(i14, i15));
--                            }
--                            else {
 +                            } else {
-                                 iCommandListener3.addHelpCommandMessage(new StringBuilder("There's no item with id ").append(i14).toString());
++                                iCommandListener3.addHelpCommandMessage("There's no item with id " + i14);
                              }
--                        }
--                        catch (NumberFormatException numberFormatException10) {
+-                            else {
+-                                iCommandListener3.addHelpCommandMessage(new StringBuilder("There's no item with id ").append(i14).toString());
+-                            }
 +                        } catch (NumberFormatException numberFormatException10) {
-                             iCommandListener3.addHelpCommandMessage(new StringBuilder("There's no item with id ").append(string5[2]).toString());
++                            iCommandListener3.addHelpCommandMessage("There's no item with id " + string5[2]);
                          }
--                    }
--                    else {
+-                        catch (NumberFormatException numberFormatException10) {
+-                            iCommandListener3.addHelpCommandMessage(new StringBuilder("There's no item with id ").append(string5[2]).toString());
+-                        }
 +                    } else {
-                         iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string6).toString());
++                        iCommandListener3.addHelpCommandMessage("Can't find user " + string6);
                      }
+-                    else {
+-                        iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string6).toString());
+-                    }
 -                }
 -                else if (string2.toLowerCase().startsWith("say ")) {
 +                } else if (string2.toLowerCase().startsWith("say ")) {
                      string2 = string2.substring(string2.indexOf(" ")).trim();
-                     MinecraftServer.logger.info(new StringBuilder("[").append(string3).append("] ").append(string2).toString());
-                     this.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("§d[Server] ").append(string2).toString()));
+-                    MinecraftServer.logger.info(new StringBuilder("[").append(string3).append("] ").append(string2).toString());
+-                    this.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("§d[Server] ").append(string2).toString()));
 -                }
 -                else if (string2.toLowerCase().startsWith("tell ")) {
++                    MinecraftServer.logger.info("[" + string3 + "] " + string2);
++                    this.configManager.sendPacketToAllPlayers(new Packet3Chat("§d[Server] " + string2));
 +                } else if (string2.toLowerCase().startsWith("tell ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length < 3) {
-@@ -431,10 +398,74 @@
+@@ -423,7 +423,7 @@
+                     string2 = string2.substring(string2.indexOf(" ")).trim();
+                     string2 = string2.substring(string2.indexOf(" ")).trim();
+-                    MinecraftServer.logger.info(new StringBuilder("[").append(string3).append("->").append(string5[1]).append("] ").append(string2).toString());
+-                    this.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("§d[Server] ").append(string2).toString()));
+-                    string2 = new StringBuilder("§7").append(string3).append(" whispers ").append(string2).toString();
++                    MinecraftServer.logger.info("[" + string3 + "->" + string5[1] + "] " + string2);
++                    this.configManager.sendPacketToAllPlayers(new Packet3Chat("§d[Server] " + string2));
++                    string2 = "§7" + string3 + " whispers " + string2;
+                     MinecraftServer.logger.info(string2);
+                     if (this.configManager.sendPacketToPlayer(string5[1], new Packet3Chat(string2))) {
+@@ -431,10 +431,82 @@
                      }
                      iCommandListener3.addHelpCommandMessage("There's no player by that name online.");
 +                } else if (string2.toLowerCase().startsWith("whitelist")) {
@@ -479,8 +586,16 @@
 +                        iCommandListener3.addHelpCommandMessage("   remove-ip <player>  remove IP from whitelist");
 +                    }
 +                } else {
-+                    if (!(Bukkit.getServer().dispatchCommand(null, string2)))
-+                        MinecraftServer.logger.info("Unknown console command. Type \"help\" for help.");
++                    if (Bukkit.getServer().getPlayer(iCommandListener3.getUsername()) == null) {
++                        MinecraftServer.logger.info("Executing command as Server");
++                        if (!(Bukkit.getServer().dispatchCommand(new ConsoleCommandSender(Bukkit.getServer()), string2))) {
++                            MinecraftServer.logger.info("Unknown console command. Type \"help\" for help.");
++                        }
++                    } else {
++                        MinecraftServer.logger.info("Executing command as " + iCommandListener3.getUsername());
++                        if (!(Bukkit.getServer().getPlayer(iCommandListener3.getUsername()).performCommand(string2)))
++                            MinecraftServer.logger.info("Unknown console command. Type \"help\" for help.");
++                    }
                  }
 -                else {
 -                    MinecraftServer.logger.info("Unknown console command. Type \"help\" for help.");
@@ -490,18 +605,21 @@
 +            } else {
                  iCommandListener3.addHelpCommandMessage("To run the server without a gui, start it like this:");
                  iCommandListener3.addHelpCommandMessage("   java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui");
-@@ -457,8 +488,9 @@
+@@ -457,54 +529,171 @@
                  iCommandListener3.addHelpCommandMessage("   list                      lists all currently connected players");
                  iCommandListener3.addHelpCommandMessage("   say <message>             broadcasts a message to all players");
+-            }
 +                iCommandListener3.addHelpCommandMessage("   whitelist                 manage server whitelist");
-             }
++            }*/
          }
      }
 -    
 +
      private void print(final String string1, final String string2) {
-         final String string3 = String.valueOf(string1) + ": " + string2;
-@@ -466,18 +498,17 @@
+-        final String string3 = String.valueOf(string1) + ": " + string2;
+-        this.configManager.sendChatMessageToAllOps(new StringBuilder("§7(").append(string3).append(")").toString());
++        final String string3 = string1 + ": " + string2;
++        this.configManager.sendChatMessageToAllOps("§7(" + string3 + ")");
          MinecraftServer.logger.info(string3);
      }
 -    
@@ -523,14 +641,125 @@
 -    
 +
      public static void main(final String[] args) {
++        // CraftBukkit stuff for CLI parameters
++        OptionParser parser = new OptionParser() {
++            {
++                acceptsAll(asList("?", "help"), "Show the help");
++
++                acceptsAll(asList("c", "config"), "Properties file to use")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("server.properties"))
++                        .describedAs("Properties file");
++
++                acceptsAll(asList("P", "plugins"), "Plugin directory to use")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("plugins"))
++                        .describedAs("Plugin directory");
++
++                acceptsAll(asList("h", "host", "server-ip"), "Host to listen on")
++                        .withRequiredArg()
++                        .ofType(String.class)
++                        .describedAs("Hostname or IP");
++
++                acceptsAll(asList("w", "world", "level-name"), "World directory")
++                        .withRequiredArg()
++                        .ofType(String.class)
++                        .describedAs("World dir");
++
++                acceptsAll(asList("p", "port", "server-port"), "Port to listen on")
++                        .withRequiredArg()
++                        .ofType(Integer.class)
++                        .describedAs("Port");
++
++                acceptsAll(asList("o", "online-mode"), "Whether to use online authentication")
++                        .withRequiredArg()
++                        .ofType(Boolean.class)
++                        .describedAs("Authentication");
++
++                acceptsAll(asList("s", "size", "max-players"), "Maximum amount of players")
++                        .withRequiredArg()
++                        .ofType(Integer.class)
++                        .describedAs("Server size");
++
++                acceptsAll(asList("d", "date-format"), "Format of the date to display in the console (for log entries)")
++                        .withRequiredArg()
++                        .ofType(SimpleDateFormat.class)
++                        .describedAs("Log date format");
++
++                acceptsAll(asList("log-pattern"), "Specfies the log filename pattern")
++                        .withRequiredArg()
++                        .ofType(String.class)
++                        .defaultsTo("server.log")
++                        .describedAs("Log filename");
++
++                acceptsAll(asList("log-limit"), "Limits the maximum size of the log file (0 = unlimited)")
++                        .withRequiredArg()
++                        .ofType(Integer.class)
++                        .defaultsTo(0)
++                        .describedAs("Max log size");
++
++                acceptsAll(asList("log-count"), "Specified how many log files to cycle through")
++                        .withRequiredArg()
++                        .ofType(Integer.class)
++                        .defaultsTo(1)
++                        .describedAs("Log count");
++
++                acceptsAll(asList("log-append"), "Whether to append to the log file")
++                        .withRequiredArg()
++                        .ofType(Boolean.class)
++                        .defaultsTo(true)
++                        .describedAs("Log append");
++
++                acceptsAll(asList("b", "bukkit-settings"), "File for bukkit settings")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("bukkit.yml"))
++                        .describedAs("Yml file");
++
++                acceptsAll(asList("nojline"), "Disables jline and emulates the vanilla console");
++
++                acceptsAll(asList("v", "version"), "Show the CraftBukkit Version");
++            }
++        };
++        OptionSet options = null;
          try {
-@@ -486,23 +517,23 @@
-                 ServerGUI.initGui(minecraftServer1);
+-            final MinecraftServer minecraftServer1 = new MinecraftServer();
+-            if (!GraphicsEnvironment.isHeadless() && (args.length <= 0 || !args[0].equals("nogui"))) {
+-                ServerGUI.initGui(minecraftServer1);
++            options = parser.parse(args);
++        } catch (joptsimple.OptionException ex) {
++            Logger.getLogger(MinecraftServer.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
++        }
++        if ((options == null) || (options.has("?"))) {
++            try {
++                parser.printHelpOn(System.out);
++            } catch (IOException ex) {
++                Logger.getLogger(MinecraftServer.class.getName()).log(Level.SEVERE, null, ex);
              }
-+            Bukkit.setServer(new LilyBukkit(minecraftServer1));
-             new ThreadServerApplication("Server thread", minecraftServer1).start();
-+        } catch (Exception exception2) {
-+            MinecraftServer.logger.log(Level.SEVERE, "Failed to start the minecraft server", (Throwable) exception2);
+-            new ThreadServerApplication("Server thread", minecraftServer1).start();
++        } else if (options.has("v")) {
++            System.out.println(LilyBukkit.class.getPackage().getImplementationVersion());
++        } else {
++            useJline = !"jline.UnsupportedTerminal".equals(System.getProperty("jline.terminal"));
++
++            if (options.has("nojline")) {
++                System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
++                System.setProperty("user.language", "en");
++                useJline = false;
++            }
++            // End of CraftBukkit stuff
++            try {
++                final MinecraftServer minecraftServer1 = new MinecraftServer(options);
++                if (!GraphicsEnvironment.isHeadless() && (args.length <= 0 || !args[0].equals("nogui"))) {
++                    ServerGUI.initGui(minecraftServer1);
++                }
++                new LilyBukkit(minecraftServer1);
++                new ThreadServerApplication("Server thread", minecraftServer1).start();
++            } catch (Exception exception2) {
++                MinecraftServer.logger.log(Level.SEVERE, "Failed to start the minecraft server", exception2);
++            }
          }
 -        catch (Exception exception2) {
 -            MinecraftServer.logger.log(Level.SEVERE, "Failed to start the minecraft server", (Throwable)exception2);
@@ -555,3 +784,16 @@
 +
      public static boolean isServerRunning(final MinecraftServer mcServer) {
          return mcServer.serverRunning;
+     }
++
++    //CraftBukkit
++    public static boolean useJline = true;
++    public OptionSet options;
++    public ColouredConsoleSender console;
++    public ConsoleReader reader;
++    public static int currentTick;
++
++    private static List<String> asList(String... params) {
++        return Arrays.asList(params);
++    }
+ }

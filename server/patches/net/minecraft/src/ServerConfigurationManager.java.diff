@@ -6,19 +6,22 @@
 -import java.util.Iterator;
  import java.io.Writer;
  import java.io.PrintWriter;
-@@ -19,5 +18,5 @@
+@@ -19,16 +18,22 @@
  public class ServerConfigurationManager {
      public static Logger logger;
 -    public List playerEntities;
 +    public List<EntityPlayerMP> playerEntities;
      private MinecraftServer mcServer;
      private PlayerManager playerManagerObj;
-@@ -27,8 +26,14 @@
+     private int maxPlayers;
+-    private Set<String> bannedPlayers;
++    public Set<String> bannedPlayers;
+     private Set<String> bannedIPs;
      private Set<String> ops;
      private Set<String> authenticatedPlayers;
-+    private Set<String> whitelistedPlayers;
++    public Set<String> whitelistedPlayers;
 +    private Set<String> whitelistedIPs;
-+    private boolean whitelistEnabled;
++    public boolean whitelistEnabled;
 +    private boolean enforceRosepad;
      private File bannedPlayersFile;
      private File ipBanFile;
