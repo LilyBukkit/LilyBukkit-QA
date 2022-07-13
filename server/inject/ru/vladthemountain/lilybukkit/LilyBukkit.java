@@ -4,27 +4,38 @@ import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.SQLitePlatform;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
+import jline.ConsoleReader;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityPlayerMP;
-import org.bukkit.Bukkit;
+import net.minecraft.src.*;
 import org.bukkit.Chunk;
-import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.*;
+import org.bukkit.craftbukkit.CraftOfflinePlayer;
 import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
+import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.Recipe;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.ServicesManager;
-import org.bukkit.plugin.SimplePluginManager;
-import org.bukkit.plugin.SimpleServicesManager;
+import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.Permission;
+import org.bukkit.plugin.*;
+import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitWorker;
 import org.bukkit.util.config.Configuration;
+import org.bukkit.util.permissions.DefaultPermissions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -39,8 +50,6 @@ public class LilyBukkit implements Server {
     final String VIEW_DISTANCE = "view-distance";
     final String SERVER_IP = "server-ip";
     final String WHITELIST_ENABLED = "whitelist";
-    final String SPAWN_PROTECTION = "spawn-protection";
-    final String ONLINE_MODE = "online-mode";
     final String ALLOW_FLIGHT = "allow-flight";
     final String SERVER_NAME = "server-name";
     final String SERVER_ID = "server-id";
@@ -54,11 +63,15 @@ public class LilyBukkit implements Server {
     private final List<Command> commandList;
     private final List<PluginCommand> pluginCommandList;
     private final List<Recipe> recipeManager;
-    private final CommandMap commandMap;
+    private final SimpleCommandMap commandMap;
+
+    //CRAFTBUKKIT
+    private final Configuration configuration;
 
     public LilyBukkit(MinecraftServer parent) {
+        Bukkit.setServer(this);
+
         this.mc = parent;
-        this.pluginMngr = new SimplePluginManager(Bukkit.getServer(), null /*TODO*/);
         this.scheduler = new CraftScheduler(this);
         this.servicesMngr = new SimpleServicesManager();
         this.worldList = new ArrayList<>();
@@ -66,7 +79,16 @@ public class LilyBukkit implements Server {
         this.pluginCommandList = new ArrayList<>();
         this.recipeManager = new ArrayList<>();
         this.commandMap = new SimpleCommandMap(this);
-        MinecraftServer.logger.info("LilyBukkit initialized.");
+        this.pluginMngr = new SimplePluginManager(Bukkit.getServer(), this.commandMap);
+        this.getLogger().info("LilyBukkit initialized.");
+
+        // CONFIGURATION HANDLING FROM CRAFTBUKKIT
+        // CraftServer
+        configuration = new Configuration(new File("config/lilybukkit.yml"));
+        this.loadConfig();
+
+        // PLUGIN HANDLING
+        loadPlugins();
     }
 
     /**
@@ -198,7 +220,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getUpdateFolder() {
-        return "pluginUpdate";
+        return configuration.getString("settings.update-folder", "update");
     }
 
     /**
@@ -291,6 +313,7 @@ public class LilyBukkit implements Server {
     public World createWorld(String name, World.Environment environment) {
         LBWorld newWorld = new LBWorld(name);
         this.worldList.add(newWorld);
+        this.pluginMngr.callEvent(new WorldInitEvent(newWorld));
         return newWorld;
     }
 
@@ -308,6 +331,7 @@ public class LilyBukkit implements Server {
     public World createWorld(String name, World.Environment environment, long seed) {
         LBWorld newWorld = new LBWorld(name, seed);
         this.worldList.add(newWorld);
+        this.pluginMngr.callEvent(new WorldInitEvent(newWorld));
         return newWorld;
     }
 
@@ -325,6 +349,7 @@ public class LilyBukkit implements Server {
     public World createWorld(String name, World.Environment environment, ChunkGenerator generator) {
         LBWorld newWorld = new LBWorld(name, generator);
         this.worldList.add(newWorld);
+        this.pluginMngr.callEvent(new WorldInitEvent(newWorld));
         return newWorld;
     }
 
@@ -343,6 +368,7 @@ public class LilyBukkit implements Server {
     public World createWorld(String name, World.Environment environment, long seed, ChunkGenerator generator) {
         LBWorld newWorld = new LBWorld(name, seed, generator);
         this.worldList.add(newWorld);
+        this.pluginMngr.callEvent(new WorldInitEvent(newWorld));
         return newWorld;
     }
 
@@ -367,6 +393,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean unloadWorld(World world, boolean save) {
+        this.pluginMngr.callEvent(new WorldUnloadEvent(world));
         for (Chunk chunk : world.getLoadedChunks()) {
             if (!chunk.unload(save)) {
                 return false;
@@ -404,21 +431,13 @@ public class LilyBukkit implements Server {
     }
 
     /**
-     * Reloads the server, refreshing settings and plugin information
-     */
-    @Override
-    public void reload() {
-        Bukkit.setServer(new LilyBukkit(mc));
-    }
-
-    /**
      * Returns the primary logger associated with this server instance
      *
      * @return Logger associated with this server
      */
     @Override
     public Logger getLogger() {
-        return Logger.getLogger("Minecraft");
+        return MinecraftServer.logger;
     }
 
     /**
@@ -458,55 +477,6 @@ public class LilyBukkit implements Server {
     }
 
     /**
-     * Populates a given {@link ServerConfig} with values attributes to this server
-     *
-     * @param config ServerConfig to populate
-     */
-    @Override
-    public void configureDbConfig(ServerConfig config) {
-        // THE FOLLOWING CODE IS TAKEN FROM CRAFTBUKKIT `54bcd1c1f36691a714234e5ca2f30a20b3ad2816`\\
-
-        // CraftServer
-        Configuration configuration = new Configuration(new File("lilybukkit.cfg"));
-
-        // loadConfig
-        configuration.load();
-        configuration.getString("database.url", "jdbc:sqlite:{DIR}{NAME}.db");
-        configuration.getString("database.username", "bukkit");
-        configuration.getString("database.password", "walrus");
-        configuration.getString("database.driver", "org.sqlite.JDBC");
-        configuration.getString("database.isolation", "SERIALIZABLE");
-
-        configuration.getString("settings.update-folder", this.getUpdateFolder());
-        configuration.getInt("settings.spawn-radius", this.getSpawnRadius());
-
-        configuration.getString("settings.permissions-file", "permissions.yml");
-
-        if (configuration.getNode("aliases") == null) {
-            List<String> icanhasbukkit = new ArrayList<String>();
-            icanhasbukkit.add("version");
-            configuration.setProperty("aliases.icanhasbukkit", icanhasbukkit);
-        }
-        configuration.save();
-
-        // configureDbConfig
-        DataSourceConfig ds = new DataSourceConfig();
-        ds.setDriver(configuration.getString("database.driver"));
-        ds.setUrl(configuration.getString("database.url"));
-        ds.setUsername(configuration.getString("database.username"));
-        ds.setPassword(configuration.getString("database.password"));
-        ds.setIsolationLevel(TransactionIsolation.getLevel(configuration.getString("database.isolation")));
-
-        if (ds.getDriver().contains("sqlite")) {
-            config.setDatabasePlatform(new SQLitePlatform());
-            config.getDatabasePlatform().getDbDdlSyntax().setIdentity("");
-        }
-
-        config.setDataSourceConfig(ds);
-        // END OF CRAFTBUKKIT CODE \\
-    }
-
-    /**
      * Adds a recipe to the crafting manager.
      *
      * @param recipe The recipe to add.
@@ -538,7 +508,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public int getSpawnRadius() {
-        return this.mc.propertyManagerObj.getIntProperty(SPAWN_PROTECTION, 0);
+        return configuration.getInt("settings.spawn-radius", 16);
     }
 
     /**
@@ -548,7 +518,8 @@ public class LilyBukkit implements Server {
      */
     @Override
     public void setSpawnRadius(int value) {
-        this.mc.propertyManagerObj.getIntProperty(SPAWN_PROTECTION, value);
+        configuration.setProperty("settings.spawn-radius", value);
+        configuration.save();
     }
 
     /**
@@ -558,7 +529,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean getOnlineMode() {
-        return this.mc.propertyManagerObj.getBooleanProperty(ONLINE_MODE, true);
+        return this.mc.ULPPOnlineMode;
     }
 
     /**
@@ -580,5 +551,323 @@ public class LilyBukkit implements Server {
     @Override
     public boolean getPVPEnabled() {
         return this.mc.propertyManagerObj.getBooleanProperty(PVP_ENABLED, false);
+    }
+
+    // LilyBukkit API 1.0.5
+    @Override
+    public void reloadWhitelist() {
+        this.mc.configManager.disableWhitelist();
+        this.mc.configManager.enableWhitelist();
+    }
+
+    // ########################### \\
+    // CRAFTBUKKIT TERRITORY AHEAD \\
+    // ########################### \\
+
+    boolean spawnAnimals, pvpMode, allowFlight;
+    List<WorldServer> worlds = new ArrayList<>();
+    private final Yaml yaml = new Yaml(new SafeConstructor());
+
+    /**
+     * Reloads the server, refreshing settings and plugin information
+     */
+    @Override
+    public void reload() {
+        // CRAFTBUKKIT \\
+        loadConfig();
+        PropertyManager config = new PropertyManager(this.mc.options);
+
+        this.mc.propertyManagerObj = config;
+
+        boolean animals = config.getBooleanProperty("spawn-animals", this.spawnAnimals);
+        //boolean monsters = config.getBooleanProperty("spawn-monsters", this.worlds.get(0).spawnMonsters > 0);
+
+        this.mc.ULPPOnlineMode = config.getBooleanProperty("online-mode", this.mc.ULPPOnlineMode);
+        this.spawnAnimals = config.getBooleanProperty("spawn-animals", animals);
+        this.pvpMode = config.getBooleanProperty("pvp", this.pvpMode);
+        this.allowFlight = config.getBooleanProperty("allow-flight", this.allowFlight);
+
+        for (WorldServer world : this.worlds) {
+            /*world.spawnMonsters = monsters ? 1 : 0;
+            world.setSpawnFlags(monsters, animals);*/
+        }
+
+        this.pluginMngr.clearPlugins();
+        this.commandMap.clearCommands();
+
+        int pollCount = 0;
+
+        // Wait for at most 2.5 seconds for plugins to close their threads
+        while (pollCount < 50 && getScheduler().getActiveWorkers().size() > 0) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+            }
+            pollCount++;
+        }
+
+        List<BukkitWorker> overdueWorkers = getScheduler().getActiveWorkers();
+        for (BukkitWorker worker : overdueWorkers) {
+            Plugin plugin = worker.getOwner();
+            String author = "<NoAuthorGiven>";
+            if (plugin.getDescription().getAuthors().size() > 0) {
+                author = plugin.getDescription().getAuthors().get(0);
+            }
+            getLogger().log(Level.SEVERE, String.format(
+                    "Nag author: '%s' of '%s' about the following: %s",
+                    author,
+                    plugin.getDescription().getName(),
+                    "This plugin is not properly shutting down its async tasks when it is being reloaded.  This may cause conflicts with the newly loaded version of the plugin"
+            ));
+        }
+        loadPlugins();
+        enablePlugins(PluginLoadOrder.STARTUP);
+        enablePlugins(PluginLoadOrder.POSTWORLD);
+    }
+
+    /**
+     * Populates a given {@link ServerConfig} with values attributes to this server
+     *
+     * @param config ServerConfig to populate
+     */
+    @Override
+    public void configureDbConfig(ServerConfig config) {
+        // THE FOLLOWING CODE IS TAKEN FROM CRAFTBUKKIT `54bcd1c1f36691a714234e5ca2f30a20b3ad2816`\\
+
+        // configureDbConfig
+        DataSourceConfig ds = new DataSourceConfig();
+        ds.setDriver(configuration.getString("database.driver"));
+        ds.setUrl(configuration.getString("database.url"));
+        ds.setUsername(configuration.getString("database.username"));
+        ds.setPassword(configuration.getString("database.password"));
+        ds.setIsolationLevel(TransactionIsolation.getLevel(configuration.getString("database.isolation")));
+
+        if (ds.getDriver().contains("sqlite")) {
+            config.setDatabasePlatform(new SQLitePlatform());
+            config.getDatabasePlatform().getDbDdlSyntax().setIdentity("");
+        }
+
+        config.setDataSourceConfig(ds);
+        // END OF CRAFTBUKKIT CODE \\
+    }
+
+    public ConsoleReader getReader() {
+        return mc.reader;
+    }
+
+    private void loadConfig() {
+        configuration.load();
+        configuration.getString("database.url", "jdbc:sqlite:{DIR}{NAME}.db");
+        configuration.getString("database.username", "bukkit");
+        configuration.getString("database.password", "walrus");
+        configuration.getString("database.driver", "org.sqlite.JDBC");
+        configuration.getString("database.isolation", "SERIALIZABLE");
+
+        configuration.getString("settings.update-folder", "update");
+        configuration.getInt("settings.spawn-radius", 16);
+
+        configuration.getString("settings.permissions-file", "permissions.yml");
+
+        if (configuration.getNode("aliases") == null) {
+            List<String> icanhasbukkit = new ArrayList<>();
+            icanhasbukkit.add("version");
+            configuration.setProperty("aliases.icanhasbukkit", icanhasbukkit);
+        }
+        configuration.save();
+    }
+
+    public void loadPlugins() {
+        this.pluginMngr.registerInterface(JavaPluginLoader.class);
+        File pluginFolder = new File("plugins");
+        if (pluginFolder.exists()) {
+            Plugin[] plugins = this.pluginMngr.loadPlugins(pluginFolder);
+            for (Plugin plugin : plugins) {
+                plugin.onLoad();
+            }
+        } else {
+            if (pluginFolder.mkdir()) this.getLogger().info("Plugin directory created");
+        }
+    }
+
+    public void enablePlugins(PluginLoadOrder order) {
+        Plugin[] plugins = this.pluginMngr.getPlugins();
+
+        for (Plugin plugin : plugins) {
+            if ((!plugin.isEnabled()) && (plugin.getDescription().getLoad() == order)) {
+                loadPlugin(plugin);
+            }
+        }
+
+        if (order == PluginLoadOrder.POSTWORLD) {
+            commandMap.registerServerAliases();
+            loadCustomPermissions();
+            DefaultPermissions.registerCorePermissions();
+        }
+    }
+
+    private void loadPlugin(Plugin plugin) {
+        try {
+            this.pluginMngr.enablePlugin(plugin);
+
+            List<Permission> perms = plugin.getDescription().getPermissions();
+
+            for (Permission perm : perms) {
+                try {
+                    this.pluginMngr.addPermission(perm);
+                } catch (IllegalArgumentException ex) {
+                    getLogger().log(Level.WARNING, "Plugin " + plugin.getDescription().getFullName() + " tried to register permission '" + perm.getName() + "' but it's already registered", ex);
+                }
+            }
+        } catch (Throwable ex) {
+            Logger.getLogger(LilyBukkit.class.getName()).log(Level.SEVERE, ex.getMessage() + " loading " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+        }
+    }
+
+    private void loadCustomPermissions() {
+        File file = new File(configuration.getString("settings.permissions-file"));
+        FileInputStream stream;
+
+        try {
+            stream = new FileInputStream(file);
+        } catch (FileNotFoundException ex) {
+            try {
+                file.createNewFile();
+            } finally {
+                return;
+            }
+        }
+
+        Map<String, Map<String, Object>> perms;
+
+        try {
+            perms = (Map<String, Map<String, Object>>) yaml.load(stream);
+        } catch (MarkedYAMLException ex) {
+            getLogger().log(Level.WARNING, "Server permissions file " + file + " is not valid YAML: " + ex.toString());
+            return;
+        } catch (Throwable ex) {
+            getLogger().log(Level.WARNING, "Server permissions file " + file + " is not valid YAML.", ex);
+            return;
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException ex) {
+            }
+        }
+
+        if (perms == null) {
+            getLogger().log(Level.INFO, "Server permissions file " + file + " is empty, ignoring it");
+            return;
+        }
+
+        Set<String> keys = perms.keySet();
+
+        for (String name : keys) {
+            try {
+                this.pluginMngr.addPermission(Permission.loadPermission(name, perms.get(name)));
+            } catch (Throwable ex) {
+                Bukkit.getServer().getLogger().log(Level.SEVERE, "Permission node '" + name + "' in server config is invalid", ex);
+            }
+        }
+    }
+
+    // LilyBukkit API 1.0.5, but with CraftBukkit implementation
+    @Override
+    public void setWhitelist(boolean b) {
+        this.mc.configManager.whitelistEnabled = b;
+        this.mc.propertyManagerObj.getBooleanProperty("white-list", b);
+        this.mc.propertyManagerObj.saveProperties();
+    }
+
+    @Override
+    public Set<OfflinePlayer> getWhitelistedPlayers() {
+        Set<OfflinePlayer> result = new HashSet<OfflinePlayer>();
+        for (Object name : this.mc.configManager.getPlayerList().split(", ")) {
+            result.add(getOfflinePlayer((String) name));
+        }
+        return result;
+    }
+
+    @Override
+    public Player getPlayerExact(String s) {
+        String lname = s.toLowerCase();
+
+        for (Player player : getOnlinePlayers()) {
+            if (player.getName().equalsIgnoreCase(lname)) {
+                return player;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public World createWorld(WorldCreator worldCreator) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void shutdown() {
+        this.mc.stopRunning();
+    }
+
+    @Override
+    public int broadcast(String s, String s1) {
+        int count = 0;
+        Set<Permissible> permissibles = getPluginManager().getPermissionSubscriptions(s1);
+
+        for (Permissible permissible : permissibles) {
+            if (permissible instanceof CommandSender) {
+                CommandSender user = (CommandSender) permissible;
+                user.sendMessage(s);
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public OfflinePlayer getOfflinePlayer(String s) {
+        OfflinePlayer result = (OfflinePlayer) getPlayerExact(s);
+
+        if (result == null) {
+            result = new CraftOfflinePlayer(this, s);
+        }
+
+        return result;
+    }
+
+    @Override
+    public Set<String> getIPBans() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void banIP(String s) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void unbanIP(String s) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public Set<OfflinePlayer> getBannedPlayers() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public Set<OfflinePlayer> getOperators() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public ConsoleCommandSender getConsoleSender() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    public ServerConfigurationManager getHandle() {
+        return this.mc.configManager;
     }
 }
