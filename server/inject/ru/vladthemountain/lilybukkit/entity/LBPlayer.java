@@ -1,25 +1,24 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import ru.vladthemountain.lilybukkit.LBWorld;
+import ru.vladthemountain.lilybukkit.LilyBukkit;
 import ru.vladthemountain.lilybukkit.inventory.LBPlayerInventory;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * @author VladTheMountain
@@ -31,10 +30,9 @@ public class LBPlayer extends LBLivingEntity implements Player {
     Location spawnPoint;
     LBWorld world;
     LBPlayerInventory inventory;
-    boolean op;
     long playerTime;
 
-    List<PermissionAttachment> permissionList;
+    final PermissibleBase permissibleBase = new PermissibleBase(this);
 
     public LBPlayer(LBWorld w, EntityPlayerMP p) {
         super(w, p);
@@ -42,9 +40,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
         this.world = w;
         this.displayName = p.username;
         this.spawnPoint = new Location(this.world, p.mcServer.worldMngr.spawnX, p.mcServer.worldMngr.spawnY, p.mcServer.worldMngr.spawnZ);
-        this.permissionList = new ArrayList<>();
         this.inventory = new LBPlayerInventory(this.entity.inventory);
-        this.op = false;
         this.playerTime = this.world.getTime();
     }
 
@@ -55,7 +51,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isOnline() {
-        for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+        for (Player p : this.getServer().getOnlinePlayers()) {
             if (p.equals(this)) return true;
         }
         return false;
@@ -121,7 +117,8 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void sendRawMessage(String message) {
-        this.entity.playerNetServerHandler.handleChat(new Packet3Chat(message));
+        this.getServer().getLogger().log(Level.INFO, "[LilyBukkit] Sending a message "+message);
+        this.entity.playerNetServerHandler.sendPacket(new Packet3Chat(message));
     }
 
     /**
@@ -142,7 +139,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
     @Override
     public void chat(String msg) {
         if (msg.startsWith("/")) {
-            Bukkit.getServer().dispatchCommand(this, msg);
+            this.getServer().dispatchCommand(this, msg);
         } else {
             this.sendMessage(msg);
         }
@@ -156,7 +153,8 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean performCommand(String command) {
-        return Bukkit.getServer().dispatchCommand(this, command);
+        this.getServer().getLogger().info("org.bukkit.Server.dispatchCommand(" + this.getName() + "," + command + ")");
+        return this.getServer().dispatchCommand(this, command);
     }
 
     /**
@@ -308,7 +306,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void sendMessage(String message) {
-        this.entity.playerNetServerHandler.handleChat(new Packet3Chat(message));
+        this.sendRawMessage(message);
     }
 
     /**
@@ -360,12 +358,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isPermissionSet(String name) {
-        for (PermissionAttachment p : this.permissionList) {
-            if (p.getPermissions().containsKey(name)) {
-                return true;
-            }
-        }
-        return false;
+        return this.permissibleBase.isPermissionSet(name);
     }
 
     /**
@@ -376,7 +369,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isPermissionSet(Permission perm) {
-        return this.isPermissionSet(perm.getName());
+        return this.permissibleBase.isPermissionSet(perm);
     }
 
     /**
@@ -389,16 +382,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean hasPermission(String name) {
-        if (this.isPermissionSet(name)) {
-            for (PermissionAttachment p : this.permissionList) {
-                if (p.getPermissions().containsKey(name)) {
-                    return p.getPermissions().get(name);
-                }
-            }
-        } else {
-            return new Permission(name).getDefault().getValue(this.isOp());
-        }
-        return false;
+        return this.permissibleBase.hasPermission(name);
     }
 
     /**
@@ -411,7 +395,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean hasPermission(Permission perm) {
-        return this.hasPermission(perm.getName());
+        return this.permissibleBase.hasPermission(perm);
     }
 
     /**
@@ -424,9 +408,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value) {
-        PermissionAttachmentInfo attachment = new PermissionAttachmentInfo(this, name, new PermissionAttachment(plugin, this), value);
-        this.permissionList.add(attachment.getAttachment());
-        return attachment.getAttachment();
+        return this.permissibleBase.addAttachment(plugin, name, value);
     }
 
     /**
@@ -437,7 +419,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public PermissionAttachment addAttachment(Plugin plugin) {
-        return this.addAttachment(plugin, "", false);
+        return this.permissibleBase.addAttachment(plugin);
     }
 
     /**
@@ -451,9 +433,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value, int ticks) {
-        PermissionAttachment attachment = this.addAttachment(plugin, name, value);
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> removeAttachment(attachment));
-        return attachment;
+        return this.permissibleBase.addAttachment(plugin, name, value, ticks);
     }
 
     /**
@@ -465,7 +445,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, int ticks) {
-        return this.addAttachment(plugin, "", false, ticks);
+        return this.permissibleBase.addAttachment(plugin, ticks);
     }
 
     /**
@@ -476,7 +456,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void removeAttachment(PermissionAttachment attachment) {
-        this.permissionList.remove(attachment);
+        this.permissibleBase.removeAttachment(attachment);
     }
 
     /**
@@ -486,13 +466,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void recalculatePermissions() {
-        for (PermissionAttachment attachment : this.permissionList) {
-            for (String permission : attachment.getPermissions().keySet()) {
-                if (attachment.getPermissions().get(permission) == null) {
-                    attachment.getPermissions().put(permission, new Permission(permission).getDefault().getValue(this.isOp())); //What the hell is this
-                }
-            }
-        }
+        this.permissibleBase.recalculatePermissions();
     }
 
     /**
@@ -502,14 +476,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public Set<PermissionAttachmentInfo> getEffectivePermissions() {
-        Set<PermissionAttachmentInfo> perms = new HashSet<>();
-        for (PermissionAttachment p : this.permissionList) {
-            for (String key : p.getPermissions().keySet()) {
-                if (p.getPermissions().get(key))
-                    perms.add(new PermissionAttachmentInfo(p.getPermissible(), key, p, p.getPermissions().get(key)));
-            }
-        }
-        return perms;
+        return this.permissibleBase.getEffectivePermissions();
     }
 
     /**
@@ -519,7 +486,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean isOp() {
-        return this.op;
+        return ((LilyBukkit) this.getServer()).isOp(this.getName());
     }
 
     /**
@@ -529,6 +496,13 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void setOp(boolean value) {
-        this.op = value;
+        if (value == this.isOp()) return;
+        ((LilyBukkit) this.getServer()).setOp(this.getName(), value);
+        this.recalculatePermissions();
+    }
+
+    // Attempts at fixing stuff
+    public boolean isPlayer(){
+        return true;
     }
 }

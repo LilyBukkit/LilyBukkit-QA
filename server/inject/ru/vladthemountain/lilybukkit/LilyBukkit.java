@@ -11,20 +11,31 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.command.*;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.Recipe;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.ServicesManager;
-import org.bukkit.plugin.SimplePluginManager;
-import org.bukkit.plugin.SimpleServicesManager;
+import org.bukkit.permissions.Permission;
+import org.bukkit.plugin.*;
+import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.config.Configuration;
+import org.bukkit.util.config.ConfigurationNode;
+import org.bukkit.util.permissions.DefaultPermissions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -51,22 +62,33 @@ public class LilyBukkit implements Server {
     private final BukkitScheduler scheduler;
     private final ServicesManager servicesMngr;
     private final List<LBWorld> worldList;
-    private final List<Command> commandList;
-    private final List<PluginCommand> pluginCommandList;
     private final List<Recipe> recipeManager;
-    private final CommandMap commandMap;
+    private final SimpleCommandMap commandMap;
+    Configuration configuration = new Configuration(new File("config/lilybukkit.yml"));
 
     public LilyBukkit(MinecraftServer parent) {
         this.mc = parent;
-        this.pluginMngr = new SimplePluginManager(Bukkit.getServer(), null /*TODO*/);
         this.scheduler = new CraftScheduler(this);
         this.servicesMngr = new SimpleServicesManager();
         this.worldList = new ArrayList<>();
-        this.commandList = new ArrayList<>();
-        this.pluginCommandList = new ArrayList<>();
         this.recipeManager = new ArrayList<>();
         this.commandMap = new SimpleCommandMap(this);
-        MinecraftServer.logger.info("LilyBukkit initialized.");
+        this.pluginMngr = new SimplePluginManager(this, this.commandMap);
+        Bukkit.setServer(this);
+        MinecraftServer.logger.info("[LilyBukkit] LilyBukkit initialized.");
+        // Plugin handling
+        this.pluginMngr.registerInterface(JavaPluginLoader.class);
+        File pluginDir = new File("plugins");
+        if (pluginDir.exists()) {
+            for (Plugin plugin : this.pluginMngr.loadPlugins(pluginDir)) {
+                plugin.onLoad();
+            }
+        } else {
+            pluginDir.mkdir();
+        }
+        MinecraftServer.logger.info("[LilyBukkit] Plugins loaded");
+        enablePluginsInOrder(PluginLoadOrder.STARTUP);
+        MinecraftServer.logger.info("[LilyBukkit] Plugins enabled");
     }
 
     /**
@@ -429,11 +451,9 @@ public class LilyBukkit implements Server {
      */
     @Override
     public PluginCommand getPluginCommand(String name) {
-        for (PluginCommand pluginCmd :
-                this.pluginCommandList) {
-            if (pluginCmd.getName().equals(name)) return pluginCmd;
-        }
-        return null;
+        if (this.commandMap.getCommand(name) instanceof PluginCommand)
+            return (PluginCommand) this.commandMap.getCommand(name);
+        else return null;
     }
 
     /**
@@ -454,7 +474,9 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean dispatchCommand(CommandSender sender, String commandLine) {
-        return this.commandMap.dispatch(sender, commandLine);
+        if (this.commandMap.dispatch(sender, commandLine)) return true;
+        sender.sendMessage("[LilyBukkit] Couldn't process the command.\n The valid commands are: /reload, /plugins, /version \n Type \"help\" for vanilla commands.");
+        return false;
     }
 
     /**
@@ -465,10 +487,6 @@ public class LilyBukkit implements Server {
     @Override
     public void configureDbConfig(ServerConfig config) {
         // THE FOLLOWING CODE IS TAKEN FROM CRAFTBUKKIT `54bcd1c1f36691a714234e5ca2f30a20b3ad2816`\\
-
-        // CraftServer
-        Configuration configuration = new Configuration(new File("lilybukkit.cfg"));
-
         // loadConfig
         configuration.load();
         configuration.getString("database.url", "jdbc:sqlite:{DIR}{NAME}.db");
@@ -524,11 +542,26 @@ public class LilyBukkit implements Server {
      */
     @Override
     public Map<String, String[]> getCommandAliases() {
-        Map<String, String[]> commandAliases = new HashMap<>();
-        for (Command command : this.commandList) {
-            commandAliases.put(command.getName(), command.getAliases().toArray(new String[]{}));
+        //CraftBukkit start
+        ConfigurationNode node = configuration.getNode("aliases");
+        Map<String, String[]> commandAliases = new LinkedHashMap<>();
+
+        if (node != null) {
+            for (String key : node.getKeys()) {
+                List<String> commands = new ArrayList<>();
+
+                if (node.getProperty(key) instanceof List) {
+                    commands = node.getStringList(key, null);
+                } else {
+                    commands.add(node.getString(key));
+                }
+
+                commandAliases.put(key, commands.toArray(new String[0]));
+            }
         }
+
         return commandAliases;
+        //CraftBukkit end
     }
 
     /**
@@ -580,5 +613,87 @@ public class LilyBukkit implements Server {
     @Override
     public boolean getPVPEnabled() {
         return this.mc.propertyManagerObj.getBooleanProperty(PVP_ENABLED, false);
+    }
+
+    // Utility methods
+    public void enablePluginsInOrder(PluginLoadOrder order) {
+        for (Plugin p : this.pluginMngr.getPlugins()) {
+            if (!p.isEnabled() && p.getDescription().getLoad().equals(order)) {
+                this.pluginMngr.enablePlugin(p);
+                for (Permission perm : p.getDescription().getPermissions()) {
+                    this.pluginMngr.addPermission(perm);
+                }
+            }
+        }
+        MinecraftServer.logger.info("[LilyBukkit] Plugins enabled in order " + order.name());
+
+        if (order.equals(PluginLoadOrder.POSTWORLD)) {
+            //Loading custom permissions
+            CRAFTSERVER_loadCustomPermissions();
+            MinecraftServer.logger.info("[LilyBukkit] Custom permissions loaded");
+            //Loading default permissions
+            DefaultPermissions.registerCorePermissions();
+            MinecraftServer.logger.info("[LilyBukkit] Default permissions loaded");
+        }
+    }
+
+    private void CRAFTSERVER_loadCustomPermissions() {
+        File file = new File("permissions.yml");
+        FileInputStream stream = null;
+
+        try {
+            stream = new FileInputStream(file);
+        } catch (FileNotFoundException ex) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                getLogger().log(Level.SEVERE, "[CraftBukkit] Couldn't create file " + file, e);
+            }
+        }
+
+        Map<String, Map<String, Object>> perms;
+
+        try {
+            perms = (Map<String, Map<String, Object>>) new Yaml(new SafeConstructor()).load(stream);
+        } catch (MarkedYAMLException ex) {
+            getLogger().log(Level.WARNING, "[CraftBukkit] Server permissions file " + file + " is not valid YAML: " + ex.toString());
+            return;
+        } catch (Throwable ex) {
+            getLogger().log(Level.WARNING, "[CraftBukkit] Server permissions file " + file + " is not valid YAML.", ex);
+            return;
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException ex) {
+                getLogger().log(Level.SEVERE, "[CraftBukkit] Couldn't close the InputStream from file " + file, ex);
+            }
+        }
+
+        if (perms == null) {
+            getLogger().log(Level.INFO, "[CraftBukkit] Server permissions file " + file + " is empty, ignoring it");
+            return;
+        }
+
+        Set<String> keys = perms.keySet();
+
+        for (String name : keys) {
+            try {
+                this.pluginMngr.addPermission(Permission.loadPermission(name, perms.get(name)));
+            } catch (Throwable ex) {
+                getLogger().log(Level.SEVERE, "[CraftBukkit] Permission node '" + name + "' in server config is invalid", ex);
+            }
+        }
+    }
+
+    public boolean isOp(String nickname) {
+        return this.mc.configManager.isOp(nickname);
+    }
+
+    public void setOp(String name, boolean value) {
+        if (value) {
+            this.mc.configManager.opPlayer(name);
+        } else {
+            this.mc.configManager.deopPlayer(name);
+        }
     }
 }

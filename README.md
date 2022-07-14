@@ -16,10 +16,10 @@ This server core is based on [5GameMaker/Rosepad](https://github.com/5GameMaker/
 
 ## Development plan
 
-- [ ] Plugin support (`1.0.0`)
+- [x] Plugin support (`1.0.0`)
+- [x] Persmission support (`1.0.0`)
 - [ ] YAML Config support (`1.1.0`)
 - [ ] Multi-world support (`2.0.0`)
-- [ ] Persmission support (`2.1.0`)
 
 ## Installation
 
