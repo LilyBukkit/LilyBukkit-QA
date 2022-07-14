@@ -10,9 +10,9 @@ This server core is based on [5GameMaker/Rosepad](https://github.com/5GameMaker/
 * Rosepad version: `1.1.0.5-beta`
 * [LilyBukkit API](https://github.com/Vladg24YT/LilyBukkit-API) version: `1.0.4`
 
-*More info on the ARG can be found [here](https://alphaver.fandom.com/wiki).*
+You can discuss this project on the [Forum](https://github.com/Vladg24YT/LilyBukkit/discussions)
 
-*You can discuss the project on my Discord server: https://discord.gg/sVR3FeGV*
+*More info on the ARG can be found [here](https://alphaver.fandom.com/wiki).*
 
 ## Development plan
 
