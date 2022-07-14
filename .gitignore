@@ -1,6 +1,7 @@
 
 build
 .gradle
+.idea
 client/src/main/resources/*
 client/src/main/java/net/minecraft
 client/src/main/java/org
