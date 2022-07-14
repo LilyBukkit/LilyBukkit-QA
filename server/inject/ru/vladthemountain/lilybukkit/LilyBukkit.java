@@ -7,6 +7,8 @@ import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Server;
@@ -29,6 +31,7 @@ import org.bukkit.util.permissions.DefaultPermissions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
+import ru.vladthemountain.lilybukkit.entity.LBPlayer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,7 +64,7 @@ public class LilyBukkit implements Server {
     private final PluginManager pluginMngr;
     private final BukkitScheduler scheduler;
     private final ServicesManager servicesMngr;
-    private final List<LBWorld> worldList;
+    public final List<LBWorld> worldList;
     private final List<Recipe> recipeManager;
     private final SimpleCommandMap commandMap;
     Configuration configuration = new Configuration(new File("config/lilybukkit.yml"));
@@ -120,7 +123,7 @@ public class LilyBukkit implements Server {
     public Player[] getOnlinePlayers() {
         List<Player> playerList = new ArrayList<>();
         for (Entity player : this.mc.worldMngr.playerEntities) {
-            playerList.add(this.getPlayer(((EntityPlayer) player).username));
+            playerList.add(new LBPlayer((LBWorld) this.getWorld(this.mc.worldMngr.levelName),(EntityPlayerMP) player));
         }
         return playerList.toArray(new Player[]{});
     }
@@ -311,7 +314,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment) {
-        LBWorld newWorld = new LBWorld(name);
+        LBWorld newWorld = new LBWorld(new WorldServer(new File(name), name, true));
         this.worldList.add(newWorld);
         return newWorld;
     }
@@ -328,7 +331,9 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, long seed) {
-        LBWorld newWorld = new LBWorld(name, seed);
+        WorldServer nw = new WorldServer(new File(name), name, true);
+        nw.randomSeed = seed;
+        LBWorld newWorld = new LBWorld(nw);
         this.worldList.add(newWorld);
         return newWorld;
     }
@@ -345,7 +350,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, ChunkGenerator generator) {
-        LBWorld newWorld = new LBWorld(name, generator);
+        LBWorld newWorld = new LBWorld(new WorldServer(new File(name), name, true), generator);
         this.worldList.add(newWorld);
         return newWorld;
     }
@@ -363,7 +368,9 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, long seed, ChunkGenerator generator) {
-        LBWorld newWorld = new LBWorld(name, seed, generator);
+        WorldServer nw = new WorldServer(new File(name), name, true);
+        nw.randomSeed = seed;
+        LBWorld newWorld = new LBWorld(nw, generator);
         this.worldList.add(newWorld);
         return newWorld;
     }
@@ -475,7 +482,7 @@ public class LilyBukkit implements Server {
     @Override
     public boolean dispatchCommand(CommandSender sender, String commandLine) {
         if (this.commandMap.dispatch(sender, commandLine)) return true;
-        sender.sendMessage("[LilyBukkit] Couldn't process the command.\n The valid commands are: /reload, /plugins, /version \n Type \"help\" for vanilla commands.");
+        sender.sendMessage("[LilyBukkit] Couldn't process the command. The valid commands are: /reload, /plugins, /version. Type \"help\" for vanilla commands.");
         return false;
     }
 

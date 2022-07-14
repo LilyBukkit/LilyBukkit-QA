@@ -28,7 +28,7 @@ import java.util.UUID;
  */
 public class LBWorld implements World {
 
-    public final net.minecraft.src.WorldServer world;
+    public final WorldServer world;
     boolean allowMonsters;
     boolean allowAnimals;
 
@@ -38,7 +38,7 @@ public class LBWorld implements World {
     boolean spawnInMemory;
     boolean isPVPAllowed;
 
-    public LBWorld(String name) {
+    /*public LBWorld(String name) {
         this(name, new Random().nextLong());
     }
 
@@ -62,6 +62,31 @@ public class LBWorld implements World {
     public LBWorld(String name, long seed, ChunkGenerator chunkGen) {
         this(name, seed);
         this.chunkGen = chunkGen;
+    }*/
+
+    public LBWorld(WorldServer w, ChunkGenerator g){
+        this.chunkGen = g;
+        this.world = w;
+        this.loadedChunks = new ArrayList<>();
+        for (net.minecraft.src.Entity p : this.world.playerEntities) {
+            for (ChunkCoordIntPair c : ((EntityPlayerMP) p).loadedChunks) {
+                this.loadedChunks.add(this.getChunkAt(c.chunkXPos, c.chunkZPos));
+            }
+        }
+        this.blockPopulatorList = new ArrayList<>();
+        this.isPVPAllowed = Bukkit.getServer().getPVPEnabled();
+    }
+
+    public LBWorld(WorldServer w){
+        this.world = w;
+        this.loadedChunks = new ArrayList<>();
+        for (net.minecraft.src.Entity p : w.playerEntities) {
+            for (ChunkCoordIntPair c : ((EntityPlayerMP) p).loadedChunks) {
+                this.loadedChunks.add(this.getChunkAt(c.chunkXPos, c.chunkZPos));
+            }
+        }
+        this.blockPopulatorList = new ArrayList<>();
+        this.isPVPAllowed = Bukkit.getServer().getPVPEnabled();
     }
 
     /**

@@ -1,6 +1,6 @@
 --- MinecraftServer.java
 +++ MinecraftServer.java
-@@ -1,44 +1,25 @@
+@@ -1,44 +1,26 @@
  package net.minecraft.server;
  
 -import net.minecraft.src.ThreadServerApplication;
@@ -26,6 +26,7 @@
 +import org.bukkit.event.server.ServerCommandEvent;
 +import org.bukkit.event.world.WorldSaveEvent;
 +import org.bukkit.plugin.PluginLoadOrder;
++import ru.vladthemountain.lilybukkit.LBWorld;
 +import ru.vladthemountain.lilybukkit.LilyBukkit;
 +
 +import java.awt.*;
@@ -59,7 +60,7 @@
 +    public static HashMap<String, Integer> playerList;
      public NetworkListenThread networkServer;
      public PropertyManager propertyManagerObj;
-@@ -50,6 +31,6 @@
+@@ -50,6 +32,6 @@
      public String currentTask;
      public int percentDone;
 -    private List playersOnline;
@@ -68,7 +69,7 @@
 +    private List<ServerCommand> commands;
      public EntityTracker entityTracker;
      public boolean onlineMode;
-@@ -57,20 +38,41 @@
+@@ -57,20 +39,41 @@
      public String serverId;
      private static Random rand;
 -    
@@ -116,7 +117,7 @@
 +
      private boolean startServer() throws IOException {
          final ThreadCommandReader threadCommandReader1 = new ThreadCommandReader(this);
-@@ -78,5 +80,9 @@
+@@ -78,5 +81,9 @@
          threadCommandReader1.start();
          ConsoleLogManager.init();
 -        MinecraftServer.logger.info("Starting minecraft server version 0.2.1");
@@ -127,7 +128,7 @@
 +        MinecraftServer.logger.info("Starting minecraft server version " + getVersionString());
          if (Runtime.getRuntime().maxMemory() / 1024L / 1024L < 512L) {
              MinecraftServer.logger.warning("**** NOT ENOUGH RAM!");
-@@ -97,6 +103,5 @@
+@@ -97,6 +104,5 @@
          try {
              this.networkServer = new NetworkListenThread(this, inetAddress3, i4);
 -        }
@@ -135,7 +136,7 @@
 +        } catch (IOException iOException6) {
              MinecraftServer.logger.warning("**** FAILED TO BIND TO PORT!");
              MinecraftServer.logger.log(Level.WARNING, new StringBuilder("The exception was: ").append(iOException6.toString()).toString());
-@@ -108,6 +113,5 @@
+@@ -108,6 +114,5 @@
              MinecraftServer.logger.info("The server will authenticate usernames.");
              MinecraftServer.logger.info("Unauthenticated players may still join by default, and their abilities can be configured in the unauth.config file.");
 -        }
@@ -143,21 +144,23 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -123,5 +127,5 @@
+@@ -123,5 +128,5 @@
          return true;
      }
 -    
 +
      private void initWorld(final String worldName) {
          MinecraftServer.logger.info("Preparing start region");
-@@ -141,5 +145,5 @@
+@@ -140,6 +145,7 @@
+         }
          this.clearCurrentTask();
++        this.server.worldList.add(new LBWorld(this.worldMngr));
      }
 -    
 +
      private void outputPercentRemaining(final String currentTask, final int percent) {
          this.currentTask = currentTask;
-@@ -147,19 +151,34 @@
+@@ -147,19 +153,34 @@
          System.out.println(String.valueOf(currentTask) + ": " + percent + "%");
      }
 -    
@@ -195,7 +198,7 @@
 +            }
          }
          if (this.worldMngr != null) {
-@@ -167,9 +186,9 @@
+@@ -167,9 +188,9 @@
          }
      }
 -    
@@ -207,7 +210,7 @@
 +
      public void run() {
          try {
-@@ -196,32 +215,27 @@
+@@ -196,32 +217,27 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -246,7 +249,7 @@
 +        } finally {
              this.stop();
              this.serverStopped = true;
-@@ -232,13 +246,12 @@
+@@ -232,13 +248,12 @@
          System.exit(0);
      }
 -    
@@ -263,7 +266,7 @@
 +            } else {
                  arrayList1.add(string3);
              }
-@@ -254,5 +267,6 @@
+@@ -254,5 +269,6 @@
          }
          this.worldMngr.tick();
 -        while (this.worldMngr.updatingLighting()) {}
@@ -271,7 +274,7 @@
 +        }
          this.worldMngr.updateEntities();
          this.networkServer.handleNetworkListenThread();
-@@ -260,21 +274,23 @@
+@@ -260,21 +276,23 @@
          this.entityTracker.updateTrackedEntities();
          for (int i5 = 0; i5 < this.playersOnline.size(); ++i5) {
 -            ((IUpdatePlayerListBox)this.playersOnline.get(i5)).addAllPlayers();
@@ -302,7 +305,7 @@
 +
              String string2 = serverCommand1.command;
              final ICommandListener iCommandListener3 = serverCommand1.commandListener;
-@@ -283,45 +299,36 @@
+@@ -283,45 +301,36 @@
                  if (string2.toLowerCase().startsWith("list")) {
                      iCommandListener3.addHelpCommandMessage(new StringBuilder("Connected players: ").append(this.configManager.getPlayerList()).toString());
 -                }
@@ -357,7 +360,7 @@
 +                } else if (string2.toLowerCase().startsWith("ban ")) {
                      final String string4 = string2.substring(string2.indexOf(" ")).trim();
                      this.configManager.banPlayer(string4);
-@@ -332,15 +339,13 @@
+@@ -332,15 +341,13 @@
                      }
                      entityPlayerMP12.playerNetServerHandler.kickPlayer("Banned by admin");
 -                }
@@ -376,7 +379,7 @@
 +                        final EntityPlayerMP entityPlayerMP13 = (EntityPlayerMP) this.configManager.playerEntities.get(i13);
                          if (entityPlayerMP13.username.equalsIgnoreCase(string4)) {
                              entityPlayerMP12 = entityPlayerMP13;
-@@ -350,10 +355,8 @@
+@@ -350,10 +357,8 @@
                          entityPlayerMP12.playerNetServerHandler.kickPlayer("Kicked by admin");
                          this.print(string3, new StringBuilder("Kicking ").append(entityPlayerMP12.username).toString());
 -                    }
@@ -389,7 +392,7 @@
 +                } else if (string2.toLowerCase().startsWith("tp ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length == 3) {
-@@ -362,18 +365,14 @@
+@@ -362,18 +367,14 @@
                          if (entityPlayerMP12 == null) {
                              iCommandListener3.addHelpCommandMessage(new StringBuilder("Can't find user ").append(string5[1]).append(". No tp.").toString());
 -                        }
@@ -412,7 +415,7 @@
 +                } else if (string2.toLowerCase().startsWith("give ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length != 3 && string5.length != 4) {
-@@ -398,23 +397,18 @@
+@@ -398,23 +399,18 @@
                                  }
                                  entityPlayerMP14.dropPlayerItem(new ItemStack(i14, i15));
 -                            }
@@ -441,7 +444,7 @@
 +                } else if (string2.toLowerCase().startsWith("tell ")) {
                      final String[] string5 = string2.split(" ");
                      if (string5.length < 3) {
-@@ -431,10 +425,83 @@
+@@ -431,10 +427,84 @@
                      }
                      iCommandListener3.addHelpCommandMessage("There's no player by that name online.");
 +                } else if (string2.toLowerCase().startsWith("whitelist")) {
@@ -517,6 +520,7 @@
 +                            MinecraftServer.logger.info("Unknown console command. Type \"help\" for help.");
 +                        }
 +                    } else {
++                        MinecraftServer.logger.info("org.bukkit.Player.performCommand=true");
 +                        if (!(this.server.getPlayer(iCommandListener3.getUsername()).performCommand(serverCommand1.command))) {
 +                            MinecraftServer.logger.info("Unknown console command. Type \"help\" for help.");
 +                        }
@@ -530,7 +534,7 @@
 +            } else {
                  iCommandListener3.addHelpCommandMessage("To run the server without a gui, start it like this:");
                  iCommandListener3.addHelpCommandMessage("   java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui");
-@@ -457,8 +524,9 @@
+@@ -457,8 +527,9 @@
                  iCommandListener3.addHelpCommandMessage("   list                      lists all currently connected players");
                  iCommandListener3.addHelpCommandMessage("   say <message>             broadcasts a message to all players");
 +                iCommandListener3.addHelpCommandMessage("   whitelist                 manage server whitelist");
@@ -541,7 +545,7 @@
 +
      private void print(final String string1, final String string2) {
          final String string3 = String.valueOf(string1) + ": " + string2;
-@@ -466,18 +534,17 @@
+@@ -466,18 +537,17 @@
          MinecraftServer.logger.info(string3);
      }
 -    
@@ -564,7 +568,7 @@
 +
      public static void main(final String[] args) {
          try {
-@@ -487,24 +554,26 @@
+@@ -487,24 +557,26 @@
              }
              new ThreadServerApplication("Server thread", minecraftServer1).start();
 +        } catch (Exception exception2) {

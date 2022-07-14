@@ -1,0 +1,10 @@
+--- Packet3Chat.java
++++ Packet3Chat.java
+@@ -8,6 +8,5 @@
+     public String message;
+     
+-    public Packet3Chat() {
+-    }
++    public Packet3Chat() {}
+     
+     public Packet3Chat(final String message) {
