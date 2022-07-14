@@ -23,4 +23,4 @@ This server core is based on [5GameMaker/Rosepad](https://github.com/5GameMaker/
 
 ## Installation
 
-> The current version is not yet runnable, so no installation guide is provided.
+Just follow the guide [https://alphaver.fandom.com/wiki/Hosting_a_server#Hosting_a_Lilypad_server](https://alphaver.fandom.com/wiki/Hosting_a_server#Hosting_a_Lilypad_server) (replace `lilypad_server_v105.jar` with the name of the latest jar file).
