@@ -46,7 +46,7 @@ public class LBWorld implements World {
         world = new net.minecraft.src.WorldServer(new File(name), name, true);
         world.randomSeed = seed;
         this.loadedChunks = new ArrayList<>();
-        for (EntityPlayer p : this.world.playerEntities) {
+        for (net.minecraft.src.Entity p : this.world.playerEntities) {
             for (ChunkCoordIntPair c : ((EntityPlayerMP) p).loadedChunks) {
                 this.loadedChunks.add(this.getChunkAt(c.chunkXPos, c.chunkZPos));
             }

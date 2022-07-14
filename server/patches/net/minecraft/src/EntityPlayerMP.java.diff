@@ -1,9 +1,11 @@
 --- EntityPlayerMP.java
 +++ EntityPlayerMP.java
-@@ -13,5 +13,5 @@
+@@ -13,6 +13,6 @@
      public double managedPosX;
      public double managedPosZ;
 -    public List loadedChunks;
+-    public Set loadChunks;
 +    public List<ChunkCoordIntPair> loadedChunks;
-     public Set loadChunks;
++    public Set<ChunkCoordIntPair> loadChunks;
      public double managedPosY;
+     

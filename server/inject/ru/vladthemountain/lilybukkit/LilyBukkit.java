@@ -6,7 +6,7 @@ import com.avaje.ebean.config.dbplatform.SQLitePlatform;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Entity;
-import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Server;
@@ -98,7 +98,7 @@ public class LilyBukkit implements Server {
     public Player[] getOnlinePlayers() {
         List<Player> playerList = new ArrayList<>();
         for (Entity player : this.mc.worldMngr.playerEntities) {
-            playerList.add(this.getPlayer(((EntityPlayerMP) player).username));
+            playerList.add(this.getPlayer(((EntityPlayer) player).username));
         }
         return playerList.toArray(new Player[]{});
     }

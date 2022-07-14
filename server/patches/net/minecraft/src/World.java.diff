@@ -1,30 +1,42 @@
 --- World.java
 +++ World.java
-@@ -20,5 +20,5 @@
+@@ -19,10 +19,10 @@
+ 
  public class World implements IBlockAccess {
-     private List lightingToUpdate;
+-    private List lightingToUpdate;
 -    public List loadedEntityList;
+-    private List unloadedEntityList;
+-    private TreeSet scheduledTickTreeSet;
+-    private Set scheduledTickSet;
+-    public List loadedTileEntityList;
++    private List<MetadataChunkBlock> lightingToUpdate;
 +    public List<Entity> loadedEntityList;
-     private List unloadedEntityList;
-     private TreeSet scheduledTickTreeSet;
++    private List<Entity> unloadedEntityList;
++    private TreeSet<NextTickListEntry> scheduledTickTreeSet;
++    private Set<NextTickListEntry> scheduledTickSet;
++    public List<TileEntity> loadedTileEntityList;
+     public long worldTime;
+     public boolean snowCovered;
 @@ -37,5 +37,5 @@
      private final long lockTimestamp;
      protected int autosavePeriod;
 -    public List playerEntities;
-+    public List<EntityPlayer> playerEntities;
++    public List<Entity> playerEntities;
      public int difficultySetting;
      public Random rand;
-@@ -53,5 +53,5 @@
+@@ -44,5 +44,5 @@
+     public int spawnZ;
+     public boolean isNewWorld;
+-    protected List worldAccesses;
++    protected List<IWorldAccess> worldAccesses;
+     private IChunkProvider chunkProvider;
+     public File saveDirectory;
+@@ -52,6 +52,6 @@
+     public final String levelName;
      public boolean worldChunkLoadOverride;
-     private ArrayList collidingBoundingBoxes;
+-    private ArrayList collidingBoundingBoxes;
 -    private Set positionsToUpdate;
++    private ArrayList<AxisAlignedBB> collidingBoundingBoxes;
 +private Set<ChunkCoordIntPair> positionsToUpdate;
      private int soundCounter;
      private List entitiesWithinAABBExcludingEntity;
-@@ -783,5 +783,5 @@
-         }
-         if (entity instanceof EntityPlayer) {
--            this.playerEntities.add(entity);
-+            this.playerEntities.add((EntityPlayer) entity);
-             System.out.println(new StringBuilder("Player count: ").append(this.playerEntities.size()).toString());
-         }

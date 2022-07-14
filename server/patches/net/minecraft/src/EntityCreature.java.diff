@@ -4,6 +4,6 @@
  public class EntityCreature extends EntityLiving {
      private PathEntity pathToEntity;
 -    protected Entity entityToAttack;
-+    public Entity entityToAttack;
++    public Entity entityToAttack; //LilyBukkit - made public
      protected boolean hasAttacked;
      
