@@ -18,7 +18,7 @@ You can discuss this project on the [Forum](https://github.com/Vladg24YT/LilyBuk
 
 - [x] Plugin support (`1.0.0`)
 - [x] Persmission support (`1.0.0`)
-- [ ] YAML Config support (`1.1.0`)
+- [x] YAML Config support (`1.1.0`)
 - [ ] Multi-world support (`2.0.0`)
 
 ## Installation
