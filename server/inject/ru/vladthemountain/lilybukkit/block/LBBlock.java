@@ -16,10 +16,6 @@ public class LBBlock implements Block {
     final LBWorld world;
     final int posX, posY, posZ;
 
-    public LBBlock(LBWorld w, net.minecraft.src.Block b) {
-        this(w, b.blockID, b.minX, b.minY, b.minZ);
-    }
-
     // Because Alpha handles all this stuff differently
     public LBBlock(LBWorld w, int blockID, double x, double y, double z) {
         this.world = w;

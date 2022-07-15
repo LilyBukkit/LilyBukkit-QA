@@ -12,10 +12,8 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import ru.vladthemountain.lilybukkit.block.LBBlock;
 import ru.vladthemountain.lilybukkit.entity.*;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -64,7 +62,7 @@ public class LBWorld implements World {
         this.chunkGen = chunkGen;
     }*/
 
-    public LBWorld(WorldServer w, ChunkGenerator g){
+    public LBWorld(WorldServer w, ChunkGenerator g) {
         this.chunkGen = g;
         this.world = w;
         this.loadedChunks = new ArrayList<>();
@@ -77,7 +75,7 @@ public class LBWorld implements World {
         this.isPVPAllowed = Bukkit.getServer().getPVPEnabled();
     }
 
-    public LBWorld(WorldServer w){
+    public LBWorld(WorldServer w) {
         this.world = w;
         this.loadedChunks = new ArrayList<>();
         for (net.minecraft.src.Entity p : w.playerEntities) {
@@ -100,7 +98,7 @@ public class LBWorld implements World {
      */
     @Override
     public Block getBlockAt(int x, int y, int z) {
-        return this.getChunkAt(x,z).getBlock(x,y,z);
+        return this.getChunkAt(x, z).getBlock(x, y, z);
     }
 
     /**
@@ -997,5 +995,15 @@ public class LBWorld implements World {
     @Override
     public boolean isWinter() {
         return this.world.snowCovered;
+    }
+
+    @Override
+    public boolean getAutoSave() {
+        return this.world.levelSaving;
+    }
+
+    @Override
+    public void setAutoSave(boolean b) {
+        this.world.levelSaving = b;
     }
 }

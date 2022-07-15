@@ -1,0 +1,44 @@
+--- PropertyManager.java
++++ PropertyManager.java
+@@ -27,10 +27,10 @@
+             }
+             catch (Exception exception3) {
+-                PropertyManager.logger.log(Level.WARNING, new StringBuilder("Failed to load ").append(propertiesFile).toString(), (Throwable)exception3);
++                PropertyManager.logger.log(Level.WARNING, "Failed to load " + propertiesFile, (Throwable)exception3);
+                 this.generateAndSaveProperties();
+             }
+         }
+         else {
+-            PropertyManager.logger.log(Level.WARNING, new StringBuilder().append(propertiesFile).append(" does not exist").toString());
++            PropertyManager.logger.log(Level.WARNING, propertiesFile + " does not exist");
+             this.generateAndSaveProperties();
+         }
+@@ -47,5 +47,5 @@
+         }
+         catch (Exception exception2) {
+-            PropertyManager.logger.log(Level.WARNING, new StringBuilder("Failed to save ").append(this.propertiesFile).toString(), (Throwable)exception2);
++            PropertyManager.logger.log(Level.WARNING, "Failed to save " + this.propertiesFile, (Throwable)exception2);
+             this.generateAndSaveProperties();
+         }
+@@ -62,8 +62,8 @@
+     public int getIntProperty(final String key, final int value) {
+         try {
+-            return Integer.parseInt(this.getStringProperty(key, new StringBuilder().append(value).toString()));
++            return Integer.parseInt(this.getStringProperty(key, String.valueOf(value)));
+         }
+         catch (Exception exception4) {
+-            this.serverProperties.setProperty(key, new StringBuilder().append(value).toString());
++            this.serverProperties.setProperty(key, String.valueOf(value));
+             return value;
+         }
+@@ -72,8 +72,8 @@
+     public boolean getBooleanProperty(final String key, final boolean value) {
+         try {
+-            return Boolean.parseBoolean(this.getStringProperty(key, new StringBuilder().append(value).toString()));
++            return Boolean.parseBoolean(this.getStringProperty(key, String.valueOf(value)));
+         }
+         catch (Exception exception4) {
+-            this.serverProperties.setProperty(key, new StringBuilder().append(value).toString());
++            this.serverProperties.setProperty(key, String.valueOf(value));
+             return value;
+         }

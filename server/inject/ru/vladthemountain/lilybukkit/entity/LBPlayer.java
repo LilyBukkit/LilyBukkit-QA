@@ -12,6 +12,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
+import ru.vladthemountain.lilybukkit.LBOfflinePlayer;
 import ru.vladthemountain.lilybukkit.LBWorld;
 import ru.vladthemountain.lilybukkit.LilyBukkit;
 import ru.vladthemountain.lilybukkit.inventory.LBPlayerInventory;
@@ -117,7 +118,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void sendRawMessage(String message) {
-        this.getServer().getLogger().log(Level.INFO, "[LilyBukkit] Sending a message "+message);
         this.entity.playerNetServerHandler.sendPacket(new Packet3Chat(message));
     }
 

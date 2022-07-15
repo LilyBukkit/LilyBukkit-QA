@@ -65,7 +65,7 @@ public class LBInventory implements Inventory {
         net.minecraft.src.ItemStack vanillaItemStack = new net.minecraft.src.ItemStack(item.getTypeId(), item.getAmount());
         if (this.inventory instanceof TileEntityChest) {
             if (index > this.inventory.getSizeInventory() || index < 0) {
-                throw new IllegalArgumentException("Attempted to set an ItemStack to slot " + index + " which Chest " + this.inventory + " does not have.");
+                throw new IllegalArgumentException("[LilyBukkit] Attempted to set an ItemStack to slot " + index + " which Chest " + this.inventory + " does not have.");
             } else {
                 ((TileEntityChest) this.inventory).setInventorySlotContents(index, vanillaItemStack);
                 ((TileEntityChest) this.inventory).onInventoryChanged();
@@ -83,7 +83,7 @@ public class LBInventory implements Inventory {
                 furnaceContents.setTag("Items", newItemList);
                 ((TileEntityFurnace) this.inventory).onInventoryChanged();
             } else {
-                throw new IllegalArgumentException("Attempted to set an ItemStack to slot " + index + " which Furnace " + this.inventory + " does not have.");
+                throw new IllegalArgumentException("[LilyBukkit] Attempted to set an ItemStack to slot " + index + " which Furnace " + this.inventory + " does not have.");
             }
         }
     }
@@ -173,7 +173,7 @@ public class LBInventory implements Inventory {
     @Override
     public void setContents(ItemStack[] items) {
         if (items.length > this.getSize()) {
-            throw new IllegalArgumentException("ItemStack array too large");
+            throw new IllegalArgumentException("[LilyBukkit] ItemStack array too large");
         } else {
             for (int i = 0; i < items.length; i++) {
                 this.inventory.getStackInSlot(i).itemID = items[i].getTypeId();
