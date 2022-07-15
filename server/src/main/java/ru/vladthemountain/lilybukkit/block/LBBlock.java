@@ -14,14 +14,15 @@ public class LBBlock implements Block {
 
     final net.minecraft.src.Block block;
     final LBWorld world;
+    final int posX, posY, posZ;
 
-    public LBBlock(LBWorld w, net.minecraft.src.Block b) {
-        this(w, b.blockID);
-    }
-
-    public LBBlock(LBWorld w, int id) {
+    // Because Alpha handles all this stuff differently
+    public LBBlock(LBWorld w, int blockID, double x, double y, double z) {
         this.world = w;
-        this.block = net.minecraft.src.Block.blocksList[id];
+        this.block = net.minecraft.src.Block.blocksList[blockID];
+        this.posX = (int) x;
+        this.posY = (int) y;
+        this.posZ = (int) z;
     }
 
     /**
@@ -144,7 +145,7 @@ public class LBBlock implements Block {
      */
     @Override
     public int getX() {
-        return new Double(this.block.minX).intValue();
+        return this.posX;
     }
 
     /**
@@ -154,7 +155,7 @@ public class LBBlock implements Block {
      */
     @Override
     public int getY() {
-        return new Double(this.block.minY).intValue();
+        return this.posY;
     }
 
     /**
@@ -164,7 +165,7 @@ public class LBBlock implements Block {
      */
     @Override
     public int getZ() {
-        return new Double(this.block.minZ).intValue();
+        return this.posZ;
     }
 
     /**

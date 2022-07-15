@@ -49,7 +49,9 @@ public class LBInventory implements Inventory {
     public ItemStack getItem(int index) {
         if (index < 0 || index > this.getSize()) return null;
         net.minecraft.src.ItemStack vanillaItemStack = this.inventory.getStackInSlot(index);
-        return new ItemStack(vanillaItemStack.itemID, vanillaItemStack.stackSize, (short) vanillaItemStack.itemDmg);
+        if (vanillaItemStack != null)
+            return new ItemStack(vanillaItemStack.itemID, vanillaItemStack.stackSize, (short) vanillaItemStack.itemDmg);
+        else return new ItemStack(0, 0, (short) 0);
     }
 
     /**

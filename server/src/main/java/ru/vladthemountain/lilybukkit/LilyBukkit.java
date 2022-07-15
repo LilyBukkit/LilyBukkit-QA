@@ -6,8 +6,8 @@ import com.avaje.ebean.config.dbplatform.SQLitePlatform;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Entity;
-import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.PropertyManager;
 import net.minecraft.src.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -25,6 +25,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitWorker;
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
 import org.bukkit.util.permissions.DefaultPermissions;
@@ -80,15 +81,7 @@ public class LilyBukkit implements Server {
         Bukkit.setServer(this);
         MinecraftServer.logger.info("[LilyBukkit] LilyBukkit initialized.");
         // Plugin handling
-        this.pluginMngr.registerInterface(JavaPluginLoader.class);
-        File pluginDir = new File("plugins");
-        if (pluginDir.exists()) {
-            for (Plugin plugin : this.pluginMngr.loadPlugins(pluginDir)) {
-                plugin.onLoad();
-            }
-        } else {
-            pluginDir.mkdir();
-        }
+        this.CRAFTBUKKIT_loadPlugins();
         MinecraftServer.logger.info("[LilyBukkit] Plugins loaded");
         enablePluginsInOrder(PluginLoadOrder.STARTUP);
         MinecraftServer.logger.info("[LilyBukkit] Plugins enabled");
@@ -123,7 +116,7 @@ public class LilyBukkit implements Server {
     public Player[] getOnlinePlayers() {
         List<Player> playerList = new ArrayList<>();
         for (Entity player : this.mc.worldMngr.playerEntities) {
-            playerList.add(new LBPlayer((LBWorld) this.getWorld(this.mc.worldMngr.levelName),(EntityPlayerMP) player));
+            playerList.add(new LBPlayer((LBWorld) this.getWorld(this.mc.worldMngr.levelName), (EntityPlayerMP) player));
         }
         return playerList.toArray(new Player[]{});
     }
@@ -437,7 +430,48 @@ public class LilyBukkit implements Server {
      */
     @Override
     public void reload() {
-        Bukkit.setServer(new LilyBukkit(mc));
+        //Modified CraftBukkit implementation
+        //loadConfig();
+        PropertyManager config = new PropertyManager(new File("server.properties"));
+
+        this.mc.propertyManagerObj = config;
+
+        this.mc.ULPPOnlineMode = config.getBooleanProperty("online-mode", this.mc.ULPPOnlineMode);
+        this.mc.configManager.maxPlayers = config.getIntProperty("max-players", this.mc.configManager.maxPlayers);
+        this.mc.configManager.whitelistEnabled = config.getBooleanProperty("whitelist", this.mc.configManager.whitelistEnabled);
+        this.mc.configManager.enforceRosepad = config.getBooleanProperty("enforce-rosepad", this.mc.configManager.enforceRosepad);
+
+        this.pluginMngr.clearPlugins();
+        this.commandMap.clearCommands();
+
+        int pollCount = 0;
+
+        // Wait for at most 2.5 seconds for plugins to close their threads
+        while (pollCount < 50 && this.getScheduler().getActiveWorkers().size() > 0) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+            }
+            pollCount++;
+        }
+
+        List<BukkitWorker> overdueWorkers = this.getScheduler().getActiveWorkers();
+        for (BukkitWorker worker : overdueWorkers) {
+            Plugin plugin = worker.getOwner();
+            String author = "[CraftBukkit] <NoAuthorGiven>";
+            if (plugin.getDescription().getAuthors().size() > 0) {
+                author = plugin.getDescription().getAuthors().get(0);
+            }
+            this.getLogger().log(Level.SEVERE, String.format(
+                    "Nag author: '%s' of '%s' about the following: %s",
+                    author,
+                    plugin.getDescription().getName(),
+                    "This plugin is not properly shutting down its async tasks when it is being reloaded.  This may cause conflicts with the newly loaded version of the plugin"
+            ));
+        }
+        this.CRAFTBUKKIT_loadPlugins();
+        this.enablePluginsInOrder(PluginLoadOrder.STARTUP);
+        this.enablePluginsInOrder(PluginLoadOrder.POSTWORLD);
     }
 
     /**
@@ -636,7 +670,7 @@ public class LilyBukkit implements Server {
 
         if (order.equals(PluginLoadOrder.POSTWORLD)) {
             //Loading custom permissions
-            CRAFTSERVER_loadCustomPermissions();
+            CRAFTBUKKIT_loadCustomPermissions();
             MinecraftServer.logger.info("[LilyBukkit] Custom permissions loaded");
             //Loading default permissions
             DefaultPermissions.registerCorePermissions();
@@ -644,7 +678,7 @@ public class LilyBukkit implements Server {
         }
     }
 
-    private void CRAFTSERVER_loadCustomPermissions() {
+    private void CRAFTBUKKIT_loadCustomPermissions() {
         File file = new File("permissions.yml");
         FileInputStream stream = null;
 
@@ -701,6 +735,22 @@ public class LilyBukkit implements Server {
             this.mc.configManager.opPlayer(name);
         } else {
             this.mc.configManager.deopPlayer(name);
+        }
+    }
+
+    public boolean addExistingWorld(WorldServer w) {
+        return this.worldList.add(new LBWorld(w));
+    }
+
+    public void CRAFTBUKKIT_loadPlugins() {
+        this.pluginMngr.registerInterface(JavaPluginLoader.class);
+        File pluginDir = new File("plugins");
+        if (pluginDir.exists()) {
+            for (Plugin plugin : this.pluginMngr.loadPlugins(pluginDir)) {
+                plugin.onLoad();
+            }
+        } else {
+            pluginDir.mkdir();
         }
     }
 }
