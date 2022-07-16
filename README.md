@@ -6,7 +6,7 @@
 is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 
 * [Forum](https://github.com/Vladg24YT/LilyBukkit/discussions)
-* [Latest release]()
+* [Latest release](https://github.com/Vladg24YT/LilyBukkit/releases/latest)
 
 ## Features
 * **Extended YAML configuration** - If you think `server.properties` offers too few options to customize.
