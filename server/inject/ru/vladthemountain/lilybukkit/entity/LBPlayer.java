@@ -12,14 +12,12 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
-import ru.vladthemountain.lilybukkit.LBOfflinePlayer;
 import ru.vladthemountain.lilybukkit.LBWorld;
 import ru.vladthemountain.lilybukkit.LilyBukkit;
 import ru.vladthemountain.lilybukkit.inventory.LBPlayerInventory;
 
 import java.net.InetSocketAddress;
 import java.util.Set;
-import java.util.logging.Level;
 
 /**
  * @author VladTheMountain
@@ -319,6 +317,44 @@ public class LBPlayer extends LBLivingEntity implements Player {
         return this.entity.username;
     }
 
+    @Override
+    public boolean isBanned() {
+        return ((LilyBukkit) this.getServer()).getConfigManager().bannedPlayers.contains(this.getName());
+    }
+
+    @Override
+    public void setBanned(boolean b) {
+        if (b) ((LilyBukkit) this.getServer()).getConfigManager().banPlayer(this.getName());
+        else ((LilyBukkit) this.getServer()).getConfigManager().pardonPlayer(this.getName());
+    }
+
+    @Override
+    public boolean isWhitelisted() {
+        return ((LilyBukkit) this.getServer()).getConfigManager().whitelistedPlayers.contains(this.getName());
+    }
+
+    @Override
+    public void setWhitelisted(boolean b) {
+        if (b) ((LilyBukkit) this.getServer()).getConfigManager().whitelistPlayer(this.getName());
+        else ((LilyBukkit) this.getServer()).getConfigManager().unwhitelistPlayer(this.getName());
+    }
+
+    @Override
+    public boolean isIPWhitelisted() {
+        return ((LilyBukkit) this.getServer()).getConfigManager().whitelistedIPs.contains(this.getName());
+    }
+
+    @Override
+    public void setIPWhitelisted(boolean b) {
+        if (b) ((LilyBukkit) this.getServer()).getConfigManager().whitelistIP(this.getName());
+        else ((LilyBukkit) this.getServer()).getConfigManager().unwhitelistIP(this.getName());
+    }
+
+    @Override
+    public Player getPlayer() {
+        throw new UnsupportedOperationException("[LilyBukkit-API] Will not be implemented");
+    }
+
     /**
      * Get the player's inventory.
      *
@@ -502,7 +538,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
     }
 
     // Attempts at fixing stuff
-    public boolean isPlayer(){
+    public boolean isPlayer() {
         return true;
     }
 }

@@ -158,13 +158,14 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -118,12 +123,12 @@
+@@ -118,12 +123,13 @@
          this.entityTracker = new EntityTracker(this);
          final String string3 = this.propertyManagerObj.getStringProperty("level-name", "world");
 -        MinecraftServer.logger.info(new StringBuilder("Preparing level \"").append(string3).append("\"").toString());
 +        MinecraftServer.logger.info("Preparing level \"" + string3 + "\"");
          this.initWorld(string3);
          MinecraftServer.logger.info("Done! For help, type \"help\" or \"?\"");
++        this.lilyBukkit.reload(); // A temporary fix
          return true;
      }
 -    
@@ -174,7 +175,7 @@
 +        MinecraftServer.logger.info("[Minecraft] Preparing start region");
          (this.worldMngr = new WorldServer(new File("."), worldName, this.propertyManagerObj.getBooleanProperty("monsters", false))).addWorldAccess(new WorldManager(this));
          this.worldMngr.difficultySetting = 1;
-@@ -140,26 +145,44 @@
+@@ -140,26 +146,44 @@
          }
          this.clearCurrentTask();
 +        if (!this.lilyBukkit.addExistingWorld(this.worldMngr))
@@ -226,7 +227,7 @@
 +            }
          }
          if (this.worldMngr != null) {
-@@ -167,9 +190,9 @@
+@@ -167,9 +191,9 @@
          }
      }
 -    
@@ -238,7 +239,7 @@
 +
      public void run() {
          try {
-@@ -181,9 +204,9 @@
+@@ -181,9 +205,9 @@
                      long j4 = j3 - j1;
                      if (j4 > 2000L) {
 -                        MinecraftServer.logger.warning("Can't keep up! Did the system time change, or is the server overloaded?");
@@ -250,7 +251,7 @@
 +                        MinecraftServer.logger.warning("[Minecraft] Time ran backwards! Did the system time change?");
                          j4 = 0L;
                      }
-@@ -196,32 +219,27 @@
+@@ -196,32 +220,27 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -289,7 +290,7 @@
 +        } finally {
              this.stop();
              this.serverStopped = true;
-@@ -232,18 +250,17 @@
+@@ -232,18 +251,17 @@
          System.exit(0);
      }
 -    
@@ -314,7 +315,7 @@
 +            MinecraftServer.playerList.remove(o);
          }
          AxisAlignedBB.clearBoundingBoxPool();
-@@ -254,230 +271,54 @@
+@@ -254,230 +272,54 @@
          }
          this.worldMngr.tick();
 -        while (this.worldMngr.updatingLighting()) {}
@@ -567,7 +568,7 @@
 +
      public static void main(final String[] args) {
          try {
-@@ -487,24 +328,26 @@
+@@ -487,24 +329,26 @@
              }
              new ThreadServerApplication("Server thread", minecraftServer1).start();
 +        } catch (Exception exception2) {

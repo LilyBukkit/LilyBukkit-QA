@@ -150,7 +150,7 @@ sourceSets {
 }
 
 dependencies{
-    implementation group: "ru.vladthemountain", name: "lilybukkit", version: "1.0.7"
+    implementation group: "ru.vladthemountain", name: "lilybukkit", version: "1.0.8"
     //CraftBukkit
     implementation group: "net.sf.jopt-simple", name: "jopt-simple", version: "3.2"
     implementation group: "jline", name: "jline", version: "0.9.94"
