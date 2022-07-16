@@ -12,8 +12,6 @@ import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.permissions.Permissible;
@@ -103,7 +101,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getVersion() {
-        return "1.0.0.0";
+        return "Alpha 1.1.0.1";
     }
 
     /**
@@ -642,7 +640,7 @@ public class LilyBukkit implements Server {
     public Set<OfflinePlayer> getWhitelistedPlayers() {
         Set<OfflinePlayer> whitelisted = new HashSet<>();
         for (String username : this.mc.configManager.whitelistedPlayers) {
-            whitelisted.add(new LBOfflinePlayer(this.getPlayer(username)));
+            whitelisted.add(new LBOfflinePlayer(this, username));
         }
         return whitelisted;
     }
@@ -676,12 +674,10 @@ public class LilyBukkit implements Server {
 
     @Override
     public OfflinePlayer getOfflinePlayer(String s) {
-        LBOfflinePlayer player = null;
-        for (OfflinePlayer p : this.offlinePlayers) {
-            if (p.getName().equals(s)) player = new LBOfflinePlayer(p.getPlayer());
-        }
+        OfflinePlayer player = (OfflinePlayer) this.getPlayer(s);
+
         if (player == null) {
-            player = new LBOfflinePlayer(this.getPlayer(s));
+            player = new LBOfflinePlayer(this, s);
             this.offlinePlayers.add(player);
         }
         return player;
@@ -706,7 +702,7 @@ public class LilyBukkit implements Server {
     public Set<OfflinePlayer> getBannedPlayers() {
         Set<OfflinePlayer> players = new HashSet<>();
         for (String username : this.mc.configManager.bannedPlayers) {
-            players.add(new LBOfflinePlayer(this.getPlayer(username)));
+            players.add(new LBOfflinePlayer(this, username));
         }
         return players;
     }
@@ -715,7 +711,7 @@ public class LilyBukkit implements Server {
     public Set<OfflinePlayer> getOperators() {
         Set<OfflinePlayer> players = new HashSet<>();
         for (String username : this.mc.configManager.ops) {
-            players.add(new LBOfflinePlayer(this.getPlayer(username)));
+            players.add(new LBOfflinePlayer(this, username));
         }
         return players;
     }
@@ -846,14 +842,5 @@ public class LilyBukkit implements Server {
 
     public ServerConfigurationManager getConfigManager() {
         return this.mc.configManager;
-    }
-
-    /**
-     * Utility class for creating OfflinePlayers
-     */
-    public final class PlayerLogInHandler implements Listener {
-        public void onPlayerLogIn(PlayerJoinEvent event) {
-            offlinePlayers.add(new LBOfflinePlayer(event.getPlayer()));
-        }
     }
 }

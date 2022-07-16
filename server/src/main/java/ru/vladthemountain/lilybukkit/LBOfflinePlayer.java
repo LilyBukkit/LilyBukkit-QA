@@ -5,68 +5,71 @@ import org.bukkit.entity.Player;
 
 public class LBOfflinePlayer implements OfflinePlayer {
 
-    private final Player playerSnapshot;
+    private final LilyBukkit server;
+    private final String username;
 
-    public LBOfflinePlayer(Player p) {
-        this.playerSnapshot = p;
+    public LBOfflinePlayer(LilyBukkit s, String name) {
+        this.server = s;
+        this.username = name;
     }
 
     @Override
     public boolean isOnline() {
-        return this.playerSnapshot.isOnline();
+        return false;
     }
 
     @Override
     public String getName() {
-        return this.playerSnapshot.getName();
+        return this.username;
     }
 
     @Override
     public boolean isBanned() {
-        return ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().bannedPlayers.contains(this.getName());
+        return this.server.getConfigManager().bannedPlayers.contains(this.getName());
     }
 
     @Override
     public void setBanned(boolean b) {
-        if (b) ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().banPlayer(this.getName());
-        else ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().pardonPlayer(this.getName());
+        if (b) this.server.getConfigManager().banPlayer(this.getName());
+        else this.server.getConfigManager().pardonPlayer(this.getName());
     }
 
     @Override
     public boolean isWhitelisted() {
-        return ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().whitelistedPlayers.contains(this.getName());
+        return this.server.getConfigManager().whitelistedPlayers.contains(this.getName());
     }
 
     @Override
     public void setWhitelisted(boolean b) {
-        if (b) ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().whitelistPlayer(this.getName());
-        else ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().unwhitelistPlayer(this.getName());
+        if (b) this.server.getConfigManager().whitelistPlayer(this.getName());
+        else this.server.getConfigManager().unwhitelistPlayer(this.getName());
     }
 
     @Override
     public boolean isIPWhitelisted(){
-        return ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().whitelistedIPs.contains(this.getName());
+        return this.server.getConfigManager().whitelistedIPs.contains(this.getName());
     }
 
     @Override
     public void setIPWhitelisted(boolean b) {
-        if (b) ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().whitelistIP(this.getName());
-        else ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().unwhitelistIP(this.getName());
+        if (b) this.server.getConfigManager().whitelistIP(this.getName());
+        else this.server.getConfigManager().unwhitelistIP(this.getName());
     }
 
     @Override
     public Player getPlayer() {
-        return this.playerSnapshot;
+        throw new UnsupportedOperationException("[LilyBukkit-API] This method will be deleted soon");
     }
+
 
     @Override
     public boolean isOp() {
-        return ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().ops.contains(this.getName());
+        return this.server.getConfigManager().ops.contains(this.getName());
     }
 
     @Override
     public void setOp(boolean b) {
-        if (b) ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().opPlayer(this.getName());
-        else ((LilyBukkit) this.playerSnapshot.getServer()).getConfigManager().deopPlayer(this.getName());
+        if (b) this.server.getConfigManager().opPlayer(this.getName());
+        else this.server.getConfigManager().deopPlayer(this.getName());
     }
 }
