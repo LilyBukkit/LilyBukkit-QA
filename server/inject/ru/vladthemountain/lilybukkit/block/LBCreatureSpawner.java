@@ -12,7 +12,7 @@ public class LBCreatureSpawner extends LBBlockState implements CreatureSpawner {
 
     public LBCreatureSpawner(LBWorld w, Block b) {
         super(w, b);
-        this.entity = (TileEntityMobSpawner) w.world.getBlockTileEntity(b.getX(), b.getY(), b.getZ());
+        this.entity = (TileEntityMobSpawner) w.getWorldServer().getBlockTileEntity(b.getX(), b.getY(), b.getZ());
     }
 
     /**

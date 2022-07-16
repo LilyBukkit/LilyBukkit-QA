@@ -212,7 +212,7 @@ public class LBLivingEntity extends LBEntity implements LivingEntity {
      */
     @Override
     public void damage(int amount, Entity source) {
-        for (net.minecraft.src.Entity e : this.world.world.loadedEntityList) {
+        for (net.minecraft.src.Entity e : this.world.getWorldServer().loadedEntityList) {
             if (e.entityID == source.getEntityId()) this.entity.attackEntityFrom(e, amount);
         }
     }

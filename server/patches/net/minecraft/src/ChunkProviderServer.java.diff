@@ -1,0 +1,156 @@
+--- ChunkProviderServer.java
++++ ChunkProviderServer.java
+@@ -2,24 +2,19 @@
+ 
+ import java.io.IOException;
+-import java.util.ArrayList;
+-import java.util.HashMap;
+-import java.util.HashSet;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Set;
++import java.util.*;
+ 
+ public class ChunkProviderServer implements IChunkProvider {
+-    private Set droppedChunksSet;
++    private Set<ChunkCoordinates> droppedChunksSet;
+     private Chunk chunk;
+     private IChunkProvider serverChunkProvider;
+     private IChunkLoader serverChunkLoader;
+-    private Map id2ChunkMap;
+-    private List loadedChunks;
++    private Map<ChunkCoordinates, Chunk> id2ChunkMap;
++    public List<Chunk> loadedChunks; //LilyBukkit: private -> public
+     private WorldServer worldObj;
+-    
++
+     public ChunkProviderServer(final WorldServer worldServer, final IChunkLoader chunkLoader, final IChunkProvider chunkProvider) {
+-        this.droppedChunksSet = (Set)new HashSet();
+-        this.id2ChunkMap = (Map)new HashMap();
+-        this.loadedChunks = (List)new ArrayList();
++        this.droppedChunksSet = (Set) new HashSet();
++        this.id2ChunkMap = (Map) new HashMap();
++        this.loadedChunks = (List) new ArrayList();
+         this.chunk = new Chunk(worldServer, new byte[32768], 0, 0);
+         this.chunk.isChunkRendered = true;
+@@ -29,10 +24,10 @@
+         this.serverChunkProvider = chunkProvider;
+     }
+-    
++
+     public boolean chunkExists(final int x, final int z) {
+         final ChunkCoordinates chunkCoordinates3 = new ChunkCoordinates(x, z);
+         return this.id2ChunkMap.containsKey(chunkCoordinates3);
+     }
+-    
++
+     public void dropChunk(final int i1, final int i2) {
+         final int i3 = i1 * 16 + 8 - this.worldObj.spawnX;
+@@ -43,9 +38,9 @@
+         }
+     }
+-    
++
+     public Chunk loadChunk(final int x, final int z) {
+         final ChunkCoordinates chunkCoordinates3 = new ChunkCoordinates(x, z);
+         this.droppedChunksSet.remove(new ChunkCoordinates(x, z));
+-        Chunk chunk4 = (Chunk)this.id2ChunkMap.get(chunkCoordinates3);
++        Chunk chunk4 = (Chunk) this.id2ChunkMap.get(chunkCoordinates3);
+         if (chunk4 == null) {
+             chunk4 = this.loadAndSaveChunk(x, z);
+@@ -53,6 +48,5 @@
+                 if (this.serverChunkProvider == null) {
+                     chunk4 = this.chunk;
+-                }
+-                else {
++                } else {
+                     chunk4 = this.serverChunkProvider.provideChunk(x, z);
+                 }
+@@ -78,11 +72,11 @@
+         return chunk4;
+     }
+-    
++
+     public Chunk provideChunk(final int x, final int z) {
+         final ChunkCoordinates chunkCoordinates3 = new ChunkCoordinates(x, z);
+-        final Chunk chunk4 = (Chunk)this.id2ChunkMap.get(chunkCoordinates3);
++        final Chunk chunk4 = (Chunk) this.id2ChunkMap.get(chunkCoordinates3);
+         return (chunk4 == null) ? (this.worldObj.worldChunkLoadOverride ? this.loadChunk(x, z) : this.chunk) : chunk4;
+     }
+-    
++
+     private Chunk loadAndSaveChunk(final int x, final int z) {
+         if (this.serverChunkLoader == null) {
+@@ -95,22 +89,20 @@
+             }
+             return chunk3;
+-        }
+-        catch (Exception exception4) {
++        } catch (Exception exception4) {
+             exception4.printStackTrace();
+             return null;
+         }
+     }
+-    
++
+     private void saveExtraChunkData(final Chunk chunk) {
+         if (this.serverChunkLoader != null) {
+             try {
+                 this.serverChunkLoader.saveExtraChunkData(this.worldObj, chunk);
+-            }
+-            catch (Exception exception3) {
++            } catch (Exception exception3) {
+                 exception3.printStackTrace();
+             }
+         }
+     }
+-    
++
+     private void saveChunk(final Chunk chunk) {
+         if (this.serverChunkLoader != null) {
+@@ -118,11 +110,10 @@
+                 chunk.lastSaveTime = this.worldObj.worldTime;
+                 this.serverChunkLoader.saveChunk(this.worldObj, chunk);
+-            }
+-            catch (IOException iOException3) {
++            } catch (IOException iOException3) {
+                 iOException3.printStackTrace();
+             }
+         }
+     }
+-    
++
+     public void populate(final IChunkProvider chunkProvider, final int x, final int z) {
+         final Chunk chunk4 = this.provideChunk(x, z);
+@@ -135,9 +126,9 @@
+         }
+     }
+-    
++
+     public boolean saveChunks(final boolean flag, final IProgressUpdate progressUpdate) {
+         int i3 = 0;
+         for (int i4 = 0; i4 < this.loadedChunks.size(); ++i4) {
+-            final Chunk chunk5 = (Chunk)this.loadedChunks.get(i4);
++            final Chunk chunk5 = (Chunk) this.loadedChunks.get(i4);
+             if (flag && !chunk5.neverSave) {
+                 this.saveExtraChunkData(chunk5);
+@@ -159,10 +150,10 @@
+         return true;
+     }
+-    
++
+     public boolean unload100OldestChunks() {
+         if (!this.worldObj.levelSaving) {
+             for (int i1 = 0; i1 < 16; ++i1) {
+                 if (!this.droppedChunksSet.isEmpty()) {
+-                    final ChunkCoordinates chunkCoordinates2 = (ChunkCoordinates)this.droppedChunksSet.iterator().next();
++                    final ChunkCoordinates chunkCoordinates2 = (ChunkCoordinates) this.droppedChunksSet.iterator().next();
+                     final Chunk chunk3 = this.provideChunk(chunkCoordinates2.posX, chunkCoordinates2.posZ);
+                     chunk3.onChunkUnload();
+@@ -180,5 +171,5 @@
+         return this.serverChunkProvider.unload100OldestChunks();
+     }
+-    
++
+     public boolean canSave() {
+         return !this.worldObj.levelSaving;

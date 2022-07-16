@@ -18,7 +18,7 @@ public class LBBlockState implements BlockState {
     public LBBlockState(LBWorld w, Block b) {
         this.block = b;
         this.world = w;
-        this.tileEntity = w.world.getBlockTileEntity(b.getX(), b.getY(), b.getZ());
+        this.tileEntity = w.getWorldServer().getBlockTileEntity(b.getX(), b.getY(), b.getZ());
     }
 
     /**

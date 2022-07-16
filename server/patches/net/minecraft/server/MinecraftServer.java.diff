@@ -110,8 +110,8 @@
 +        this.playersOnline = new ArrayList<>();
 +        this.commands = Collections.synchronizedList(new ArrayList<>());
          new ThreadSleepForeverServer(this);
-+        this.server = new LilyBukkit(this);
-+        this.consoleCommandSender = new ConsoleCommandSender(this.server);
++        this.lilyBukkit = new LilyBukkit(this);
++        this.consoleCommandSender = new ConsoleCommandSender(this.lilyBukkit);
      }
 -    
 +
@@ -177,7 +177,7 @@
 @@ -140,26 +145,44 @@
          }
          this.clearCurrentTask();
-+        if (!this.server.addExistingWorld(this.worldMngr))
++        if (!this.lilyBukkit.addExistingWorld(this.worldMngr))
 +            MinecraftServer.logger.severe("[LilyBukkit] Couldn't get the current world, terminating to prevent bugs");
 +        this.stop();
      }
@@ -195,15 +195,15 @@
          this.currentTask = null;
          this.percentDone = 0;
 +
-+        this.server.enablePluginsInOrder(PluginLoadOrder.POSTWORLD); // LilyBukkit
++        this.lilyBukkit.enablePluginsInOrder(PluginLoadOrder.POSTWORLD); // LilyBukkit
      }
 -    
 +
      private void save() {
 -        MinecraftServer.logger.info("Saving chunks");
 +        MinecraftServer.logger.info("[Minecraft] Saving chunks");
-+        WorldSaveEvent event = new WorldSaveEvent(server.getWorld(worldMngr.levelName));
-+        this.server.getPluginManager().callEvent(event);
++        WorldSaveEvent event = new WorldSaveEvent(lilyBukkit.getWorld(worldMngr.levelName));
++        this.lilyBukkit.getPluginManager().callEvent(event);
          this.worldMngr.saveWorld(true, null);
      }
 -    
@@ -213,8 +213,8 @@
 +        MinecraftServer.logger.info("[Minecraft] Stopping server");
 +
 +        // CraftBukkit start
-+        if (this.server != null) {
-+            this.server.getPluginManager().disablePlugins();
++        if (this.lilyBukkit != null) {
++            this.lilyBukkit.getPluginManager().disablePlugins();
 +        }
 +        // CraftBukkit end
 +
@@ -531,11 +531,11 @@
 -            }
 +            final ServerCommand serverCommand1 = this.commands.remove(0);
 +
-+            this.server.getPluginManager().callEvent(new ServerCommandEvent(this.consoleCommandSender, serverCommand1.command));
++            this.lilyBukkit.getPluginManager().callEvent(new ServerCommandEvent(this.consoleCommandSender, serverCommand1.command));
 +
-+            if (this.server.getPlayer(serverCommand1.commandListener.getUsername()) != null)
-+                this.server.dispatchCommand(this.server.getPlayer(serverCommand1.commandListener.getUsername()), serverCommand1.command);
-+            else this.server.dispatchCommand(this.consoleCommandSender, serverCommand1.command);
++            if (this.lilyBukkit.getPlayer(serverCommand1.commandListener.getUsername()) != null)
++                this.lilyBukkit.dispatchCommand(this.lilyBukkit.getPlayer(serverCommand1.commandListener.getUsername()), serverCommand1.command);
++            else this.lilyBukkit.dispatchCommand(this.consoleCommandSender, serverCommand1.command);
          }
      }
 -    
@@ -598,6 +598,6 @@
          return mcServer.serverRunning;
      }
 +
-+    private LilyBukkit server; // LilyBukkit - added
++    public LilyBukkit lilyBukkit; // LilyBukkit - added
 +    public final ConsoleCommandSender consoleCommandSender;
  }

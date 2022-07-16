@@ -11,7 +11,7 @@ public class LBSign extends LBBlockState implements Sign {
 
     public LBSign(LBWorld w, Block b) {
         super(w, b);
-        this.entity = (TileEntitySign) w.world.getBlockTileEntity(b.getX(), b.getY(), b.getZ());
+        this.entity = (TileEntitySign) w.getWorldServer().getBlockTileEntity(b.getX(), b.getY(), b.getZ());
     }
 
     /**

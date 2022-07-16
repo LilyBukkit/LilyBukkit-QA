@@ -26,65 +26,27 @@ import java.util.UUID;
  */
 public class LBWorld implements World {
 
-    public final WorldServer world;
+    private final WorldServer world;
     boolean allowMonsters;
     boolean allowAnimals;
 
-    List<Chunk> loadedChunks;
     List<BlockPopulator> blockPopulatorList;
     ChunkGenerator chunkGen;
     boolean spawnInMemory;
     boolean isPVPAllowed;
 
-    /*public LBWorld(String name) {
-        this(name, new Random().nextLong());
-    }
-
-    public LBWorld(String name, long seed) {
-        world = new net.minecraft.src.WorldServer(new File(name), name, true);
-        world.randomSeed = seed;
-        this.loadedChunks = new ArrayList<>();
-        for (net.minecraft.src.Entity p : this.world.playerEntities) {
-            for (ChunkCoordIntPair c : ((EntityPlayerMP) p).loadedChunks) {
-                this.loadedChunks.add(this.getChunkAt(c.chunkXPos, c.chunkZPos));
-            }
-        }
-        this.blockPopulatorList = new ArrayList<>();
-        this.isPVPAllowed = Bukkit.getServer().getPVPEnabled();
-    }
-
-    public LBWorld(String name, ChunkGenerator chunkGen) {
-        this(name, new Random().nextLong(), chunkGen);
-    }
-
-    public LBWorld(String name, long seed, ChunkGenerator chunkGen) {
-        this(name, seed);
-        this.chunkGen = chunkGen;
-    }*/
+    int chunksToUnload;
 
     public LBWorld(WorldServer w, ChunkGenerator g) {
         this.chunkGen = g;
         this.world = w;
-        this.loadedChunks = new ArrayList<>();
-        for (net.minecraft.src.Entity p : this.world.playerEntities) {
-            for (ChunkCoordIntPair c : ((EntityPlayerMP) p).loadedChunks) {
-                this.loadedChunks.add(this.getChunkAt(c.chunkXPos, c.chunkZPos));
-            }
-        }
         this.blockPopulatorList = new ArrayList<>();
         this.isPVPAllowed = Bukkit.getServer().getPVPEnabled();
+        this.chunksToUnload = 0;
     }
 
     public LBWorld(WorldServer w) {
-        this.world = w;
-        this.loadedChunks = new ArrayList<>();
-        for (net.minecraft.src.Entity p : w.playerEntities) {
-            for (ChunkCoordIntPair c : ((EntityPlayerMP) p).loadedChunks) {
-                this.loadedChunks.add(this.getChunkAt(c.chunkXPos, c.chunkZPos));
-            }
-        }
-        this.blockPopulatorList = new ArrayList<>();
-        this.isPVPAllowed = Bukkit.getServer().getPVPEnabled();
+        this(w, null);
     }
 
     /**
@@ -240,21 +202,12 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk[] getLoadedChunks() {
-        /*
-            TODO:
-            Implement a solution that will go over all chunks beginning with the [1,1], [1,-1], [-1,1] and [-1,-1] in groups of 3x3 and check if they are loaded.
-            Since ChunkProviderServer and WorldServer do not provide useful functionality due to the Alpha level format,
-            a possible solution would be iteration until we stumble upon at least N unloaded chunks and exit the loop,
-            but this will cause the server to mark the far chunks as unloaded.
-            E.g. a player that has reached the Farlands would be considered by LilyBukkit to be in an unloaded chunk,
-            when in reality, it is loaded and is consuming resources (and MinecraftServer is probably aware of that, but I might be wrong).
-
-            Damn, I think I'll have to modify the sources...
-         */
-        /*
-        A bad solution, but whatever
-        */
-        return loadedChunks.toArray(new Chunk[]{});
+        List<net.minecraft.src.Chunk> loaded = this.getChunkProvider().loadedChunks;
+        List<Chunk> result = new ArrayList<>();
+        for (net.minecraft.src.Chunk chunk : loaded) {
+            result.add(new LBChunk(chunk));
+        }
+        return result.toArray(new Chunk[]{});
     }
 
     /**
@@ -264,7 +217,7 @@ public class LBWorld implements World {
      */
     @Override
     public void loadChunk(Chunk chunk) {
-        if (chunk.load()) this.loadedChunks.add(chunk);
+        chunk.load();
     }
 
     /**
@@ -303,9 +256,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean loadChunk(int x, int z, boolean generate) {
-        boolean flag = this.getChunkAt(x, z).load(generate);
-        if (flag) this.loadedChunks.add(this.getChunkAt(x, z));
-        return flag;
+        return this.getChunkAt(x, z).load(generate);
     }
 
     /**
@@ -361,9 +312,7 @@ public class LBWorld implements World {
      */
     @Override
     public boolean unloadChunk(int x, int z, boolean save, boolean safe) {
-        boolean flag = this.getChunkAt(x, z).unload(save, safe);
-        if (flag) this.loadedChunks.remove(this.getChunkAt(x, z));
-        return flag;
+        return this.getChunkAt(x, z).unload(save, safe);
     }
 
     /**
@@ -390,7 +339,11 @@ public class LBWorld implements World {
      */
     @Override
     public boolean unloadChunkRequest(int x, int z, boolean safe) {
-        return Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Bukkit.getServer().getPluginManager().getPlugin("Minecraft"), () -> unloadChunk(x, z, true, safe)) != -1;
+        this.chunksToUnload += 1;
+        if (chunksToUnload == 100) {
+            this.chunksToUnload = 0;
+            return this.getChunkProvider().unload100OldestChunks();
+        } else return true;
     }
 
     /**
@@ -626,7 +579,6 @@ public class LBWorld implements World {
         this.world.spawnX = x;
         this.world.spawnY = y;
         this.world.spawnZ = z;
-        //TODO: Add additional check
         return true;
     }
 
@@ -788,7 +740,6 @@ public class LBWorld implements World {
      */
     @Override
     public void save() {
-        //TODO: Make the thing output to chat
         this.world.saveWorld(false, null);
     }
 
@@ -1005,5 +956,15 @@ public class LBWorld implements World {
     @Override
     public void setAutoSave(boolean b) {
         this.world.levelSaving = b;
+    }
+
+    // UTILITY METHODS
+
+    public ChunkProviderServer getChunkProvider() {
+        return this.world.chunkProviderServer;
+    }
+
+    public WorldServer getWorldServer(){
+        return this.world;
     }
 }

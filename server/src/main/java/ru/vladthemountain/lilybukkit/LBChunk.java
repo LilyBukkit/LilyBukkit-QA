@@ -1,6 +1,7 @@
 package ru.vladthemountain.lilybukkit;
 
 import net.minecraft.src.AxisAlignedBB;
+import net.minecraft.src.EntityPlayerMP;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -69,7 +70,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public Block getBlock(int x, int y, int z) {
-        return new LBBlock(this.world, this.chunk.getBlockID(x,y,z), x, y, z);
+        return new LBBlock(this.world, this.chunk.getBlockID(x, y, z), x, y, z);
     }
 
     /**
@@ -133,8 +134,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean load(boolean generate) {
-        this.chunk.onChunkLoad();
-        return this.chunk.isChunkLoaded;
+        return this.world.getChunkProvider().loadChunk(this.getX(), this.getZ()).isChunkLoaded;
     }
 
     /**
@@ -144,7 +144,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean load() {
-        return this.load(false);
+        return this.load(true);
     }
 
     /**
@@ -156,7 +156,16 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean unload(boolean save, boolean safe) {
-        this.chunk.onChunkUnload();
+        if (save) this.world.getChunkProvider().saveChunks(safe, null);
+        if (safe) {
+            //Waiting until all players exit the chunk
+            List<EntityPlayerMP> playerEntities = new ArrayList<>();
+            this.chunk.getEntitiesOfTypeWithinAAAB(EntityPlayerMP.class, AxisAlignedBB.getBoundingBox(this.getX(), 0.0, this.getZ(), this.getX() + 16, this.chunk.height, this.getZ() + 16), playerEntities);
+            while (!playerEntities.isEmpty()) {
+                this.chunk.doNothing();
+            }
+        }
+        this.world.getChunkProvider().dropChunk(this.getX(), this.getZ());
         return this.chunk.isChunkLoaded;
     }
 
@@ -168,7 +177,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean unload(boolean save) {
-        return this.unload(save, true);
+        return this.unload(save, false);
     }
 
     /**
@@ -178,6 +187,6 @@ public class LBChunk implements Chunk {
      */
     @Override
     public boolean unload() {
-        return this.unload(true, true);
+        return this.unload(true, false);
     }
 }

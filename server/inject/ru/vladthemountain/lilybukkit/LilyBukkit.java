@@ -12,6 +12,8 @@ import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.permissions.Permissible;
@@ -62,6 +64,7 @@ public class LilyBukkit implements Server {
     public final List<LBWorld> worldList;
     private final List<Recipe> recipeManager;
     private final SimpleCommandMap commandMap;
+    private final Set<OfflinePlayer> offlinePlayers;
     Configuration configuration = new Configuration(new File("config" + File.separator + "lilybukkit.yml"));
 
     public LilyBukkit(MinecraftServer parent) {
@@ -72,6 +75,7 @@ public class LilyBukkit implements Server {
         this.recipeManager = new ArrayList<>();
         this.commandMap = new SimpleCommandMap(this);
         this.pluginMngr = new SimplePluginManager(this, this.commandMap);
+        this.offlinePlayers = new HashSet<>();
         Bukkit.setServer(this);
         MinecraftServer.logger.info("[LilyBukkit] LilyBukkit initialized.");
         // Plugin handling
@@ -441,6 +445,8 @@ public class LilyBukkit implements Server {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
+                this.getLogger().log(Level.SEVERE, "[CraftBukkit] " + e.getMessage());
+                e.printStackTrace();
             }
             pollCount++;
         }
@@ -670,7 +676,15 @@ public class LilyBukkit implements Server {
 
     @Override
     public OfflinePlayer getOfflinePlayer(String s) {
-        return new LBOfflinePlayer(this.getPlayer(s));
+        LBOfflinePlayer player = null;
+        for (OfflinePlayer p : this.offlinePlayers) {
+            if (p.getName().equals(s)) player = new LBOfflinePlayer(p.getPlayer());
+        }
+        if (player == null) {
+            player = new LBOfflinePlayer(this.getPlayer(s));
+            this.offlinePlayers.add(player);
+        }
+        return player;
     }
 
     @Override
@@ -832,5 +846,14 @@ public class LilyBukkit implements Server {
 
     public ServerConfigurationManager getConfigManager() {
         return this.mc.configManager;
+    }
+
+    /**
+     * Utility class for creating OfflinePlayers
+     */
+    public final class PlayerLogInHandler implements Listener {
+        public void onPlayerLogIn(PlayerJoinEvent event) {
+            offlinePlayers.add(new LBOfflinePlayer(event.getPlayer()));
+        }
     }
 }

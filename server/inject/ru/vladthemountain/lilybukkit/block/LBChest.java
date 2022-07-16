@@ -13,7 +13,7 @@ public class LBChest extends LBBlockState implements Chest {
 
     public LBChest(LBWorld w, Block b) {
         super(w, b);
-        this.entity = (TileEntityChest) w.world.getBlockTileEntity(b.getX(), b.getY(), b.getZ());
+        this.entity = (TileEntityChest) w.getWorldServer().getBlockTileEntity(b.getX(), b.getY(), b.getZ());
     }
 
     /**

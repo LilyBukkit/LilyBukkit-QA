@@ -32,7 +32,7 @@ public class LBBlock implements Block {
      */
     @Override
     public byte getData() {
-        return (byte) this.world.world.getBlockMetadata(this.getX(), this.getY(), this.getZ());
+        return (byte) this.world.getWorldServer().getBlockMetadata(this.getX(), this.getY(), this.getZ());
     }
 
     /**
@@ -125,7 +125,7 @@ public class LBBlock implements Block {
      */
     @Override
     public byte getLightLevel() {
-        return (byte) this.world.world.getBlockLightValue(this.getX(), this.getY(), this.getZ());
+        return (byte) this.world.getWorldServer().getBlockLightValue(this.getX(), this.getY(), this.getZ());
     }
 
     /**
@@ -200,8 +200,8 @@ public class LBBlock implements Block {
 
     @Override
     public void setData(byte data, boolean applyPhysics) {
-        if (applyPhysics) this.world.world.setBlockMetadataWithNotify(this.getX(), this.getY(), this.getZ(), data);
-        else this.world.world.setBlockMetadata(this.getX(), this.getY(), this.getZ(), data);
+        if (applyPhysics) this.world.getWorldServer().setBlockMetadataWithNotify(this.getX(), this.getY(), this.getZ(), data);
+        else this.world.getWorldServer().setBlockMetadata(this.getX(), this.getY(), this.getZ(), data);
     }
 
     /**
@@ -227,15 +227,15 @@ public class LBBlock implements Block {
 
     @Override
     public boolean setTypeId(int type, boolean applyPhysics) {
-        if (applyPhysics) return this.world.world.setBlockWithNotify(this.getX(), this.getY(), this.getZ(), type);
-        else return this.world.world.setBlock(this.getX(), this.getY(), this.getZ(), type);
+        if (applyPhysics) return this.world.getWorldServer().setBlockWithNotify(this.getX(), this.getY(), this.getZ(), type);
+        else return this.world.getWorldServer().setBlock(this.getX(), this.getY(), this.getZ(), type);
     }
 
     @Override
     public boolean setTypeIdAndData(int type, byte data, boolean applyPhysics) {
         if (applyPhysics)
-            return this.world.world.setBlockAndMetadataWithNotify(this.getX(), this.getY(), this.getZ(), type, data);
-        else return this.world.world.setBlockAndMetadata(this.getX(), this.getY(), this.getZ(), type, data);
+            return this.world.getWorldServer().setBlockAndMetadataWithNotify(this.getX(), this.getY(), this.getZ(), type, data);
+        else return this.world.getWorldServer().setBlockAndMetadata(this.getX(), this.getY(), this.getZ(), type, data);
     }
 
     /**
@@ -283,7 +283,7 @@ public class LBBlock implements Block {
      */
     @Override
     public boolean isBlockPowered() {
-        return this.world.world.isBlockGettingPowered(this.getX(), this.getY(), this.getZ());
+        return this.world.getWorldServer().isBlockGettingPowered(this.getX(), this.getY(), this.getZ());
     }
 
     /**
@@ -291,7 +291,7 @@ public class LBBlock implements Block {
      */
     @Override
     public boolean isBlockIndirectlyPowered() {
-        return this.world.world.isBlockIndirectlyGettingPowered(this.getX(), this.getY(), this.getZ());
+        return this.world.getWorldServer().isBlockIndirectlyGettingPowered(this.getX(), this.getY(), this.getZ());
     }
 
     /**
@@ -301,17 +301,17 @@ public class LBBlock implements Block {
     public boolean isBlockFacePowered(BlockFace face) {
         switch (face) {
             case DOWN:
-                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 0);
+                return this.world.getWorldServer().isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 0);
             case UP:
-                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 1);
+                return this.world.getWorldServer().isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 1);
             case EAST:
-                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 2);
+                return this.world.getWorldServer().isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 2);
             case WEST:
-                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 3);
+                return this.world.getWorldServer().isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 3);
             case NORTH:
-                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 4);
+                return this.world.getWorldServer().isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 4);
             case SOUTH:
-                return this.world.world.isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 5);
+                return this.world.getWorldServer().isBlockProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 5);
             default:
                 return false;
         }
@@ -324,17 +324,17 @@ public class LBBlock implements Block {
     public boolean isBlockFaceIndirectlyPowered(BlockFace face) {
         switch (face) {
             case DOWN:
-                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 0);
+                return this.world.getWorldServer().isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 0);
             case UP:
-                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 1);
+                return this.world.getWorldServer().isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 1);
             case EAST:
-                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 2);
+                return this.world.getWorldServer().isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 2);
             case WEST:
-                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 3);
+                return this.world.getWorldServer().isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 3);
             case NORTH:
-                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 4);
+                return this.world.getWorldServer().isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 4);
             case SOUTH:
-                return this.world.world.isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 5);
+                return this.world.getWorldServer().isBlockIndirectlyProvidingPowerTo(this.getX(), this.getY(), this.getZ(), 5);
             default:
                 return false;
         }
@@ -366,7 +366,7 @@ public class LBBlock implements Block {
     public int getBlockPower() {
         //As it's the only block that stores the power
         if (this.block instanceof BlockRedstoneWire) {
-            return this.world.world.getBlockMetadata(this.getX(), this.getY(), this.getZ());
+            return this.world.getWorldServer().getBlockMetadata(this.getX(), this.getY(), this.getZ());
         }
         return 0;
     }

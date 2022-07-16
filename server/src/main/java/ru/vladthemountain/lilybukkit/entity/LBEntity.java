@@ -196,7 +196,7 @@ public class LBEntity implements Entity {
     public boolean setPassenger(Entity passenger) {
         net.minecraft.src.Entity passengerEntity = null;
         if (passenger instanceof LBPlayer) {
-            passengerEntity = new EntityPlayer(this.world.world);
+            passengerEntity = new EntityPlayer(this.world.getWorldServer());
         }
         //TODO add other entities
         this.entity.riddenByEntity = passengerEntity;

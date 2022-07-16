@@ -15,7 +15,7 @@ public class LBFurnace extends LBBlockState implements Furnace {
 
     public LBFurnace(LBWorld w, Block b) {
         super(w, b);
-        this.entity = (TileEntityFurnace) w.world.getBlockTileEntity(b.getX(), b.getY(), b.getZ());
+        this.entity = (TileEntityFurnace) w.getWorldServer().getBlockTileEntity(b.getX(), b.getY(), b.getZ());
     }
 
     /**
@@ -65,6 +65,6 @@ public class LBFurnace extends LBBlockState implements Furnace {
      */
     @Override
     public Inventory getInventory() {
-        return new LBInventory((IInventory) world.world.getBlockTileEntity(this.getX(), this.getY(), this.getZ()));
+        return new LBInventory((IInventory) world.getWorldServer().getBlockTileEntity(this.getX(), this.getY(), this.getZ()));
     }
 }
