@@ -9,10 +9,3 @@
 +
  import java.util.List;
  
-@@ -66,4 +70,6 @@
-         }
-         this.players.add(entityPlayerMP);
-+        // LilyBukkit
-+        //this.mcServer.lilyBukkit.getPluginManager().callEvent(new PlayerJoinEvent(new LBPlayer((LBWorld) this.mcServer.lilyBukkit.getWorld(this.mcServer.worldMngr.levelName), entityPlayerMP), "§a" + entityPlayerMP.username + " joined the server"));
-     }
-     

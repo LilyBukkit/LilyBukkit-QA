@@ -10,14 +10,14 @@ import java.util.List;
 
 public class Packet130RosepadMeta extends Packet {
     public List<ULPPExtension> extensions = new ArrayList<>();
-    public String clientName = "Rosepad";
+    public String serverName = "LilyBukkit";
     public int[] version = MinecraftServer.getVersion();
     public String tag = MinecraftServer.getVersionTag();
     public long flags = 0;
 
     @Override
     public void readPacketData(DataInputStream dataInputStream) throws IOException {
-        clientName = dataInputStream.readUTF();
+        serverName = dataInputStream.readUTF();
         short verLen = dataInputStream.readShort();
         version = new int[verLen];
         for (short i = 0; i < verLen; i++)
@@ -36,7 +36,7 @@ public class Packet130RosepadMeta extends Packet {
 
     @Override
     public void writePacket(DataOutputStream dataOutputStream) throws IOException {
-        dataOutputStream.writeUTF(clientName);
+        dataOutputStream.writeUTF(serverName);
         dataOutputStream.writeShort(version.length);
         for (int i : version) {
             dataOutputStream.writeShort(i);
@@ -57,7 +57,7 @@ public class Packet130RosepadMeta extends Packet {
         this.version = MinecraftServer.getVersion();
         this.tag = MinecraftServer.getVersionString();
 
-        this.clientName = "Rosepad";
+        this.serverName = "Rosepad";
         this.flags = 0;
 
         return this;
@@ -70,7 +70,7 @@ public class Packet130RosepadMeta extends Packet {
 
     @Override
     public int getPacketSize() {
-        int len = 18 + clientName.length() + tag.length() + version.length * 2;
+        int len = 18 + serverName.length() + tag.length() + version.length * 2;
         for (ULPPExtension ext : extensions) {
             len += 6 + ext.getName().length();
         }
