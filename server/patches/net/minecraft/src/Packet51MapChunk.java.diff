@@ -1,0 +1,10 @@
+--- Packet51MapChunk.java
++++ Packet51MapChunk.java
+@@ -16,5 +16,6 @@
+     public int zSize;
+     public byte[] chunkData;
+-    private int tempLength;
++    public byte[] rawData; // LilyBukkit
++    public int tempLength; // CraftBukkit: private -> public
+     
+     public Packet51MapChunk() {

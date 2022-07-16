@@ -223,7 +223,7 @@
              this.configManager.savePlayerStates();
 +            // LilyBukkit - added
 +            while (!this.configManager.playerEntities.isEmpty()) {
-+                this.configManager.playerEntities.get(0).playerNetServerHandler.kickPlayer("Server stopped");
++                this.configManager.playerEntities.get(0).playerNetServerHandler.kickPlayer("Server closed");
 +            }
          }
          if (this.worldMngr != null) {
