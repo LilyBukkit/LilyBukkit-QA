@@ -10,6 +10,9 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.*;
 import org.bukkit.command.*;
+import org.bukkit.command.defaults.HomeCommand;
+import org.bukkit.command.defaults.IronCommand;
+import org.bukkit.command.defaults.WoodCommand;
 import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
@@ -75,13 +78,17 @@ public class LilyBukkit implements Server {
         this.pluginMngr = new SimplePluginManager(this, this.commandMap);
         this.offlinePlayers = new HashSet<>();
         Bukkit.setServer(this);
-        MinecraftServer.logger.info("[LilyBukkit] LilyBukkit initialized.");
+        MinecraftServer.logger.info("LilyBukkit initialized.");
         // Plugin handling
         this.CRAFTBUKKIT_loadConfig();
         this.CRAFTBUKKIT_loadPlugins();
-        MinecraftServer.logger.info("[LilyBukkit] Plugins loaded");
+        MinecraftServer.logger.info("Plugins loaded");
         enablePluginsInOrder(PluginLoadOrder.STARTUP);
-        MinecraftServer.logger.info("[LilyBukkit] Plugins enabled");
+        MinecraftServer.logger.info("Plugins enabled");
+        // Command addition
+        this.commandMap.register("minecraft",new HomeCommand());
+        this.commandMap.register("minecraft",new IronCommand());
+        this.commandMap.register("minecraft",new WoodCommand());
     }
 
     /**
@@ -101,7 +108,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getVersion() {
-        return "Alpha 1.1.0.1";
+        return "Alpha 1.1.0.2";
     }
 
     /**

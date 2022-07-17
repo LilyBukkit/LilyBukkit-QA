@@ -1,5 +1,19 @@
 --- NetServerHandler.java
 +++ NetServerHandler.java
+@@ -71,5 +71,5 @@
+                 if (d5 > 1.65 || d5 < 0.1) {
+                     this.kickPlayer("Illegal stance");
+-                    NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " had an illegal stance: " + d5);
++                    NetServerHandler.logger.warning(this.playerEntity.username + " had an illegal stance: " + d5);
+                 }
+                 this.playerEntity.managedPosY = packet.stance;
+@@ -98,5 +98,5 @@
+             if (d8 > 0.0625) {
+                 z18 = true;
+-                NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " moved wrongly!");
++                NetServerHandler.logger.warning(this.playerEntity.username + " moved wrongly!");
+             }
+             this.playerEntity.setPositionAndRotation(d2, d3, d4, f8, f9);
 @@ -151,10 +151,10 @@
          final int i20 = packet.zPosition;
          final int i21 = packet.face;
@@ -39,6 +53,20 @@
 +        else System.out.println("Denied block placement");
          this.playerEntity.playerNetServerHandler.sendPacket(new Packet53BlockChange(i3, i4, i5, this.mcServer.worldMngr));
          this.mcServer.worldMngr.disableSpawnProtection = false;
+@@ -209,5 +210,5 @@
+     @Override
+     public void handleErrorMessage(final String message) {
+-        NetServerHandler.logger.info(String.valueOf(this.playerEntity.username) + " lost connection: " + message);
++        NetServerHandler.logger.info(this.playerEntity.username + " lost connection: " + message);
+         this.mcServer.configManager.playerLoggedOut(this.playerEntity);
+         this.connectionClosed = true;
+@@ -216,5 +217,5 @@
+     @Override
+     public void registerPacket(final Packet packet) {
+-        NetServerHandler.logger.warning(new StringBuilder().append(this.getClass()).append(" wasn't prepared to deal with a ").append(packet.getClass()).toString());
++        NetServerHandler.logger.warning(this.getClass() + " wasn't prepared to deal with a " + packet.getClass());
+         this.kickPlayer("Protocol error, unexpected packet");
+     }
 @@ -269,5 +270,5 @@
              }
              else {

@@ -1,10 +1,41 @@
 --- Packet51MapChunk.java
 +++ Packet51MapChunk.java
-@@ -16,5 +16,6 @@
-     public int zSize;
+@@ -17,9 +17,9 @@
      public byte[] chunkData;
--    private int tempLength;
-+    public byte[] rawData; // LilyBukkit
-+    public int tempLength; // CraftBukkit: private -> public
-     
+     private int tempLength;
+-    
++
      public Packet51MapChunk() {
+         this.isChunkDataPacket = true;
+     }
+-    
++
+     public Packet51MapChunk(final int xPosition, final int yPosition, final int zPosition, final int xSize, final int ySize, final int zSize, final World world) {
+         this.isChunkDataPacket = true;
+@@ -43,5 +43,5 @@
+         deflater9.end();
+     }
+-    
++
+     @Override
+     public void readPacketData(final DataInputStream dataInputStream) throws IOException {
+@@ -69,5 +69,5 @@
+         inflater4.end();
+     }
+-    
++
+     @Override
+     public void writePacket(final DataOutputStream dataOutputStream) throws IOException {
+@@ -81,10 +81,10 @@
+         dataOutputStream.write(this.chunkData, 0, this.tempLength);
+     }
+-    
++
+     @Override
+     public void processPacket(final NetHandler netHandler) {
+         netHandler.handleMapChunk(this);
+     }
+-    
++
+     @Override
+     public int getPacketSize() {

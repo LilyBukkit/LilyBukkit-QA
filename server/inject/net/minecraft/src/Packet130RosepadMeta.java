@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import net.minecraft.server.MinecraftServer;
+import org.bukkit.Bukkit;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -55,9 +56,9 @@ public class Packet130RosepadMeta extends Packet {
         this.extensions.add(new ULPPExtension("ROSE", 1));
 
         this.version = MinecraftServer.getVersion();
-        this.tag = MinecraftServer.getVersionString();
+        this.tag = Bukkit.getBukkitVersion();
 
-        this.serverName = "Rosepad";
+        this.serverName = Bukkit.getServer().getName();
         this.flags = 0;
 
         return this;
