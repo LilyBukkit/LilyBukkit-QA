@@ -30,6 +30,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 import ru.vladthemountain.lilybukkit.entity.LBPlayer;
+import ru.vladthemountain.lilybukkit.util.UpdateChecker;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,7 +79,7 @@ public class LilyBukkit implements Server {
         this.pluginMngr = new SimplePluginManager(this, this.commandMap);
         this.offlinePlayers = new HashSet<>();
         Bukkit.setServer(this);
-        MinecraftServer.logger.info("LilyBukkit initialized.");
+        UpdateChecker.checkForUpdates();
         // Plugin handling
         this.CRAFTBUKKIT_loadConfig();
         this.CRAFTBUKKIT_loadPlugins();
@@ -89,6 +90,8 @@ public class LilyBukkit implements Server {
         this.commandMap.register("minecraft",new HomeCommand());
         this.commandMap.register("minecraft",new IronCommand());
         this.commandMap.register("minecraft",new WoodCommand());
+        //
+        MinecraftServer.logger.info("LilyBukkit initialized.");
     }
 
     /**

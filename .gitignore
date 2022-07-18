@@ -2,6 +2,7 @@
 build
 .gradle
 .idea
+client/run
 client/src/main/resources/*
 client/src/main/java/net/minecraft
 client/src/main/java/org
@@ -15,4 +16,4 @@ jars/*
 /client/bin
 /.metadata/
 
-org/bukkit/craftbukkit/*
+craftbukkit

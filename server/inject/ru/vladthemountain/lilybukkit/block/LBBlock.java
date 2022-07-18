@@ -200,7 +200,8 @@ public class LBBlock implements Block {
 
     @Override
     public void setData(byte data, boolean applyPhysics) {
-        if (applyPhysics) this.world.getWorldServer().setBlockMetadataWithNotify(this.getX(), this.getY(), this.getZ(), data);
+        if (applyPhysics)
+            this.world.getWorldServer().setBlockMetadataWithNotify(this.getX(), this.getY(), this.getZ(), data);
         else this.world.getWorldServer().setBlockMetadata(this.getX(), this.getY(), this.getZ(), data);
     }
 
@@ -227,7 +228,8 @@ public class LBBlock implements Block {
 
     @Override
     public boolean setTypeId(int type, boolean applyPhysics) {
-        if (applyPhysics) return this.world.getWorldServer().setBlockWithNotify(this.getX(), this.getY(), this.getZ(), type);
+        if (applyPhysics)
+            return this.world.getWorldServer().setBlockWithNotify(this.getX(), this.getY(), this.getZ(), type);
         else return this.world.getWorldServer().setBlock(this.getX(), this.getY(), this.getZ(), type);
     }
 
@@ -393,5 +395,58 @@ public class LBBlock implements Block {
     @Override
     public boolean isLiquid() {
         return this.getType().equals(Material.WATER) || this.getType().equals(Material.STATIONARY_WATER) || this.getType().equals(Material.LAVA) || this.getType().equals(Material.STATIONARY_LAVA);
+    }
+
+    /**
+     * Notch uses a 0-5 to mean DOWN, UP, EAST, WEST, NORTH, SOUTH
+     * in that order all over. This method is convenience to convert for us.
+     *
+     * @return BlockFace the BlockFace represented by this number
+     * @author CraftBukkit
+     */
+    public static BlockFace convertNotchToBlockFace(int notch) {
+        switch (notch) {
+            case 0:
+                return BlockFace.DOWN;
+            case 1:
+                return BlockFace.UP;
+            case 2:
+                return BlockFace.EAST;
+            case 3:
+                return BlockFace.WEST;
+            case 4:
+                return BlockFace.NORTH;
+            case 5:
+                return BlockFace.SOUTH;
+            default:
+                return BlockFace.SELF;
+        }
+    }
+
+    /**
+     * Notch uses a 0-5 to mean DOWN, UP, EAST, WEST, NORTH, SOUTH
+     * in that order all over. This method is convenience to convert for us.
+     *
+     * @param face BlockFace to convert
+     * @author CraftBukkit
+     * @return number that represents the BlockFace
+     */
+    public static int convertBlockFaceToNotch(BlockFace face) {
+        switch (face) {
+            case DOWN:
+                return 0;
+            case UP:
+                return 1;
+            case EAST:
+                return 2;
+            case WEST:
+                return 3;
+            case NORTH:
+                return 4;
+            case SOUTH:
+                return 5;
+            default:
+                return 7; // Good as anything here, but technically invalid
+        }
     }
 }
