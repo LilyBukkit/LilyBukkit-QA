@@ -5,11 +5,21 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.SQLitePlatform;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.*;
+import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.PropertyManager;
+import net.minecraft.src.ServerConfigurationManager;
+import net.minecraft.src.WorldServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.*;
-import org.bukkit.command.*;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.command.defaults.HomeCommand;
 import org.bukkit.command.defaults.IronCommand;
 import org.bukkit.command.defaults.WoodCommand;
@@ -19,7 +29,12 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
-import org.bukkit.plugin.*;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginLoadOrder;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.ServicesManager;
+import org.bukkit.plugin.SimplePluginManager;
+import org.bukkit.plugin.SimpleServicesManager;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitWorker;
@@ -32,11 +47,18 @@ import org.yaml.snakeyaml.error.MarkedYAMLException;
 import ru.vladthemountain.lilybukkit.entity.LBPlayer;
 import ru.vladthemountain.lilybukkit.util.UpdateChecker;
 
+import javax.swing.plaf.synth.SynthEditorPaneUI;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,9 +109,9 @@ public class LilyBukkit implements Server {
         enablePluginsInOrder(PluginLoadOrder.STARTUP);
         MinecraftServer.logger.info("Plugins enabled");
         // Command addition
-        this.commandMap.register("minecraft",new HomeCommand());
-        this.commandMap.register("minecraft",new IronCommand());
-        this.commandMap.register("minecraft",new WoodCommand());
+        this.commandMap.register("minecraft", new HomeCommand());
+        this.commandMap.register("minecraft", new IronCommand());
+        this.commandMap.register("minecraft", new WoodCommand());
         //
         MinecraftServer.logger.info("LilyBukkit initialized.");
     }
@@ -101,7 +123,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getName() {
-        return "LilyBukkit";
+        return "§2LilyBukkit";
     }
 
     /**
@@ -852,5 +874,20 @@ public class LilyBukkit implements Server {
 
     public ServerConfigurationManager getConfigManager() {
         return this.mc.configManager;
+    }
+
+    public int[] getRosepadVersion() {
+        int beginIndex = this.getVersion().indexOf(" ") + 1;
+        String ver = this.getVersion().substring(beginIndex);
+        String[] version = ver.split("\\.");
+        int[] result = new int[version.length];
+        for (int i = 0; i < version.length; i++) {
+            result[i] = Integer.parseInt(version[i]);
+        }
+        return result;
+    }
+
+    public String getRosepadVersionTag() {
+        return this.getVersion().substring(0, this.getVersion().indexOf(" ")).toLowerCase();
     }
 }

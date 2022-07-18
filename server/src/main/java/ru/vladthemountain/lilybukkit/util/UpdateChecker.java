@@ -16,12 +16,11 @@ public class UpdateChecker {
     public static void checkForUpdates() {
 
         String url = "https://api.github.com/repos/Vladg24YT/LilyBukkit/releases/latest";
-        String query = null /*String.format("param1=%s&param2=%s", URLEncoder.encode(""))*/;
         String charset = StandardCharsets.UTF_8.name();
 
         JSONObject responseBody;
         try {
-            URLConnection urlConnection = new URL(url /*+ "?" + query*/).openConnection();
+            URLConnection urlConnection = new URL(url).openConnection();
             urlConnection.setRequestProperty("Accept-Charset", charset);
             InputStream response;
             try {
