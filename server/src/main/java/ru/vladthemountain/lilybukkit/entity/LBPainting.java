@@ -40,7 +40,7 @@ public class LBPainting extends LBEntity implements Painting {
 
     @Override
     public BlockFace getAttachedFace() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @Override
