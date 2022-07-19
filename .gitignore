@@ -2,13 +2,15 @@
 build
 .gradle
 .idea
+client/inject
 client/run
 client/src/main/resources/*
 client/src/main/java/net/minecraft
 client/src/main/java/org
 client/src/main/java/adaptive
-server/src/main/java/net/minecraft
 client/src/orig
+server/inject
+server/src/main/java/net/minecraft
 server/src/orig
 jars/*
 /bin/
