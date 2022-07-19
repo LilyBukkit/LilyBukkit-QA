@@ -16,4 +16,4 @@ jars/*
 /client/bin
 /.metadata/
 
-craftbukkit
+craftbukkit/*

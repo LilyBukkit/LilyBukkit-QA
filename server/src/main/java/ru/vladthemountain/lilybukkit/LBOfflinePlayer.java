@@ -3,6 +3,8 @@ package ru.vladthemountain.lilybukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
+
 public class LBOfflinePlayer implements OfflinePlayer {
 
     private final LilyBukkit server;
@@ -56,11 +58,6 @@ public class LBOfflinePlayer implements OfflinePlayer {
         else this.server.getConfigManager().unwhitelistIP(this.getName());
     }
 
-    @Override
-    public Player getPlayer() {
-        throw new UnsupportedOperationException("[LilyBukkit-API] This method will be deleted soon");
-    }
-
 
     @Override
     public boolean isOp() {
@@ -71,5 +68,10 @@ public class LBOfflinePlayer implements OfflinePlayer {
     public void setOp(boolean b) {
         if (b) this.server.getConfigManager().opPlayer(this.getName());
         else this.server.getConfigManager().deopPlayer(this.getName());
+    }
+
+    @Override
+    public Map<String, Object> serialize() {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

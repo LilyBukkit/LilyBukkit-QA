@@ -1,18 +1,65 @@
 package ru.vladthemountain.lilybukkit;
 
-import net.minecraft.src.*;
+import net.minecraft.src.ChunkProviderServer;
+import net.minecraft.src.EntityArrow;
+import net.minecraft.src.EntityBoat;
+import net.minecraft.src.EntityChicken;
+import net.minecraft.src.EntityCow;
+import net.minecraft.src.EntityCreeper;
+import net.minecraft.src.EntityFallingSand;
+import net.minecraft.src.EntityGiantZombie;
+import net.minecraft.src.EntityItem;
+import net.minecraft.src.EntityMinecart;
+import net.minecraft.src.EntityPig;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.EntitySheep;
+import net.minecraft.src.EntitySkeleton;
+import net.minecraft.src.EntitySlime;
+import net.minecraft.src.EntitySnowball;
+import net.minecraft.src.EntitySpider;
+import net.minecraft.src.EntityTNTPrimed;
+import net.minecraft.src.EntityZombie;
+import net.minecraft.src.WorldGenTrees;
+import net.minecraft.src.WorldServer;
+import org.bukkit.BlockChangeDelegate;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
+import org.bukkit.Difficulty;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.TreeType;
 import org.bukkit.World;
-import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.*;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import ru.vladthemountain.lilybukkit.entity.*;
+import ru.vladthemountain.lilybukkit.entity.LBArrow;
+import ru.vladthemountain.lilybukkit.entity.LBBoat;
+import ru.vladthemountain.lilybukkit.entity.LBChicken;
+import ru.vladthemountain.lilybukkit.entity.LBCow;
+import ru.vladthemountain.lilybukkit.entity.LBCreeper;
+import ru.vladthemountain.lilybukkit.entity.LBFallingSand;
+import ru.vladthemountain.lilybukkit.entity.LBGiant;
+import ru.vladthemountain.lilybukkit.entity.LBItem;
+import ru.vladthemountain.lilybukkit.entity.LBMinecart;
+import ru.vladthemountain.lilybukkit.entity.LBPig;
+import ru.vladthemountain.lilybukkit.entity.LBPlayer;
+import ru.vladthemountain.lilybukkit.entity.LBSheep;
+import ru.vladthemountain.lilybukkit.entity.LBSkeleton;
+import ru.vladthemountain.lilybukkit.entity.LBSlime;
+import ru.vladthemountain.lilybukkit.entity.LBSnowball;
+import ru.vladthemountain.lilybukkit.entity.LBSpider;
+import ru.vladthemountain.lilybukkit.entity.LBTNTPrimed;
+import ru.vladthemountain.lilybukkit.entity.LBZombie;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +88,7 @@ public class LBWorld implements World {
         this.chunkGen = g;
         this.world = w;
         this.blockPopulatorList = new ArrayList<>();
-        this.isPVPAllowed = Bukkit.getServer().getPVPEnabled();
+        this.isPVPAllowed = false;
         this.chunksToUnload = 0;
     }
 
@@ -923,6 +970,11 @@ public class LBWorld implements World {
         return 128;
     }
 
+    @Override
+    public int getSeaLevel() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
     /**
      * Gets whether the world's spawn area should be kept loaded into memory or not.
      *
@@ -944,18 +996,28 @@ public class LBWorld implements World {
     }
 
     @Override
+    public boolean isAutoSave() {
+        return this.world.levelSaving;
+    }
+
+    @Override
     public boolean isWinter() {
         return this.world.snowCovered;
     }
 
     @Override
-    public boolean getAutoSave() {
-        return this.world.levelSaving;
+    public void setAutoSave(boolean b) {
+        this.world.levelSaving = b;
     }
 
     @Override
-    public void setAutoSave(boolean b) {
-        this.world.levelSaving = b;
+    public void setDifficulty(Difficulty difficulty) {
+        this.world.difficultySetting = difficulty.getValue();
+    }
+
+    @Override
+    public Difficulty getDifficulty() {
+        return Difficulty.getByValue(this.world.difficultySetting);
     }
 
     // UTILITY METHODS
@@ -964,7 +1026,7 @@ public class LBWorld implements World {
         return this.world.chunkProviderServer;
     }
 
-    public WorldServer getWorldServer(){
+    public WorldServer getWorldServer() {
         return this.world;
     }
 }

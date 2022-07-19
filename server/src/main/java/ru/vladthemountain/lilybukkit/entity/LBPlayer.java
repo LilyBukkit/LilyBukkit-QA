@@ -17,6 +17,7 @@ import ru.vladthemountain.lilybukkit.LilyBukkit;
 import ru.vladthemountain.lilybukkit.inventory.LBPlayerInventory;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -78,6 +79,16 @@ public class LBPlayer extends LBLivingEntity implements Player {
     @Override
     public void setDisplayName(String name) {
         this.displayName = name;
+    }
+
+    @Override
+    public String getPlayerListName() {
+        return this.displayName;
+    }
+
+    @Override
+    public void setPlayerListName(String s) {
+        this.displayName = s;
     }
 
     /**
@@ -350,11 +361,6 @@ public class LBPlayer extends LBLivingEntity implements Player {
         else ((LilyBukkit) this.getServer()).getConfigManager().unwhitelistIP(this.getName());
     }
 
-    @Override
-    public Player getPlayer() {
-        throw new UnsupportedOperationException("[LilyBukkit-API] Will not be implemented");
-    }
-
     /**
      * Get the player's inventory.
      *
@@ -540,5 +546,10 @@ public class LBPlayer extends LBLivingEntity implements Player {
     // Attempts at fixing stuff
     public boolean isPlayer() {
         return true;
+    }
+
+    @Override
+    public Map<String, Object> serialize() {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

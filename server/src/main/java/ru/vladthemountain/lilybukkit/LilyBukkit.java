@@ -15,6 +15,7 @@ import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -44,10 +45,10 @@ import org.bukkit.util.permissions.DefaultPermissions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
+import ru.vladthemountain.lilybukkit.command.ColouredConsoleSender;
 import ru.vladthemountain.lilybukkit.entity.LBPlayer;
 import ru.vladthemountain.lilybukkit.util.UpdateChecker;
 
-import javax.swing.plaf.synth.SynthEditorPaneUI;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -243,6 +244,11 @@ public class LilyBukkit implements Server {
         return this.configuration.getString("settings.update-folder", "update");
     }
 
+    @Override
+    public File getUpdateFolderFile() {
+        return new File(this.getUpdateFolder());
+    }
+
     /**
      * Gets a player object by the given username
      * <p>
@@ -257,6 +263,21 @@ public class LilyBukkit implements Server {
             if (p.getName().equals(name)) return p;
         }
         return null;
+    }
+
+    @Override
+    public Player getPlayerExact(String s) {
+        //CraftBukkit begin
+        String lname = s.toLowerCase();
+
+        for (Player player : getOnlinePlayers()) {
+            if (player.getName().equalsIgnoreCase(lname)) {
+                return player;
+            }
+        }
+
+        return null;
+        //CraftBukkit end
     }
 
     /**
@@ -390,6 +411,11 @@ public class LilyBukkit implements Server {
         LBWorld newWorld = new LBWorld(nw, generator);
         this.worldList.add(newWorld);
         return newWorld;
+    }
+
+    @Override
+    public World createWorld(WorldCreator worldCreator) {
+        return worldCreator.createWorld();
     }
 
     /**
@@ -651,17 +677,6 @@ public class LilyBukkit implements Server {
         return this.mc.propertyManagerObj.getBooleanProperty(ALLOW_FLIGHT, false);
     }
 
-    /**
-     * I don't remember if it existed.<br>
-     * Gets whether this server allows PVP or not.
-     *
-     * @return whether this server allows PVP or not
-     */
-    @Override
-    public boolean getPVPEnabled() {
-        return this.mc.propertyManagerObj.getBooleanProperty(PVP_ENABLED, false);
-    }
-
     @Override
     public void setWhitelist(boolean b) {
         if (b) this.mc.configManager.enableWhitelist();
@@ -750,7 +765,7 @@ public class LilyBukkit implements Server {
 
     @Override
     public ConsoleCommandSender getConsoleSender() {
-        return this.mc.consoleCommandSender;
+        return new ColouredConsoleSender(this);
     }
 
     // Utility methods

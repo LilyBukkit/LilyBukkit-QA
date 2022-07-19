@@ -34,4 +34,34 @@ public class LBBoat extends LBVehicle implements Boat {
     public void setMaxSpeed(double speed) {
         this.maxSpeed = speed;
     }
+
+    @Override
+    public double getOccupiedDeceleration() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void setOccupiedDeceleration(double v) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public double getUnoccupiedDeceleration() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void setUnoccupiedDeceleration(double v) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public boolean getWorkOnLand() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void setWorkOnLand(boolean b) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }

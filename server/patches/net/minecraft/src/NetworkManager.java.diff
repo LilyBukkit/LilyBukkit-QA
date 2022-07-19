@@ -58,3 +58,9 @@
 -            // monitorexit(this.sendQueueLock)
          }
      }
+@@ -166,4 +164,5 @@
+         if (this.readPackets.isEmpty()) {
+             if (this.timeSinceLastRead++ == 1200) {
++                this.netHandler.handleKickDisconnect(new Packet255KickDisconnect("You have timed out"));
+                 this.networkShutdown("Timed out");
+             }
