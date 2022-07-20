@@ -12,7 +12,7 @@ is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 * **Extended YAML configuration** - If you think `server.properties` offers too few options to customize.
 * **Offline player management** - You want to whitelist a player that has never been on the server? Just run the `/whitelist` command like usual!
 * **Permissions** - Control what every single player can do on your server.
-* **Plugins** - Install Bukkit plugins that add new features to the game: commands, items, world editing etc. Recommended versions are `CB 1204` and lower.
+* **Plugins** - Install Bukkit plugins that add new features to the game: commands, items, world editing etc. It's recommended to install versions made for `CB 1060`.
 
 ## Development plan
 
