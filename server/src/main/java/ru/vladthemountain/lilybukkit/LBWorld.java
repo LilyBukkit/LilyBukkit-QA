@@ -970,11 +970,6 @@ public class LBWorld implements World {
         return 128;
     }
 
-    @Override
-    public int getSeaLevel() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
     /**
      * Gets whether the world's spawn area should be kept loaded into memory or not.
      *

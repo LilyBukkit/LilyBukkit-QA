@@ -547,9 +547,4 @@ public class LBPlayer extends LBLivingEntity implements Player {
     public boolean isPlayer() {
         return true;
     }
-
-    @Override
-    public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
 }

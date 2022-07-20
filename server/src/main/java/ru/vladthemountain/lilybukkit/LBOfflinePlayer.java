@@ -69,9 +69,4 @@ public class LBOfflinePlayer implements OfflinePlayer {
         if (b) this.server.getConfigManager().opPlayer(this.getName());
         else this.server.getConfigManager().deopPlayer(this.getName());
     }
-
-    @Override
-    public Map<String, Object> serialize() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
 }

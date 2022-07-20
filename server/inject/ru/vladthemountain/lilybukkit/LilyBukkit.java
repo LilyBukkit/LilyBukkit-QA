@@ -15,7 +15,6 @@ import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -411,11 +410,6 @@ public class LilyBukkit implements Server {
         LBWorld newWorld = new LBWorld(nw, generator);
         this.worldList.add(newWorld);
         return newWorld;
-    }
-
-    @Override
-    public World createWorld(WorldCreator worldCreator) {
-        return worldCreator.createWorld();
     }
 
     /**
