@@ -459,14 +459,14 @@ abstract class ObfuscateTask extends DefaultTask {
                 "official",
                 "named",
         )
-        Utils.tiny(
+        /*Utils.tiny(
                 Paths.get(project.rootDir.toString(), "tools", "tiny-remapper.jar"),
                 Paths.get(project.rootDir.toString(), "client/build/libs/client-1.1-SNAPSHOT-all.jar"),
                 Paths.get(project.rootDir.toString(), "build/RosepadClient.jar"),
                 Paths.get(project.rootDir.toString(), "mappings/client.tiny2"),
                 "named",
                 "intermediary"
-        )
+        )*/
     }
 }
 
