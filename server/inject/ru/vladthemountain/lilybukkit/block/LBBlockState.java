@@ -28,7 +28,7 @@ public class LBBlockState implements BlockState {
      */
     @Override
     public Block getBlock() {
-        return this.getWorld().getBlockAt(this.tileEntity.xCoord, this.tileEntity.yCoord, this.tileEntity.zCoord);
+        return tileEntity == null ? this.getWorld().getBlockAt(this.block.getLocation()) : this.getWorld().getBlockAt(this.tileEntity.xCoord, this.tileEntity.yCoord, this.tileEntity.zCoord);
     }
 
     /**

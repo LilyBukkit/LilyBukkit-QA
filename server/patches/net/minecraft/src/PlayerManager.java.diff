@@ -1,11 +1,26 @@
 --- PlayerManager.java
 +++ PlayerManager.java
-@@ -4,4 +4,8 @@
+@@ -4,4 +4,9 @@
  import java.util.ArrayList;
  import net.minecraft.server.MinecraftServer;
++import org.bukkit.Bukkit;
 +import org.bukkit.event.player.PlayerJoinEvent;
 +import ru.vladthemountain.lilybukkit.LBWorld;
 +import ru.vladthemountain.lilybukkit.entity.LBPlayer;
 +
  import java.util.List;
  
+@@ -55,5 +60,5 @@
+     
+     public void addPlayer(final EntityPlayerMP entityPlayerMP) {
+-        this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("§e").append(entityPlayerMP.username).append(" joined the game.").toString()));
++        this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat("§e" + entityPlayerMP.username + " joined the game."));
+         final int i2 = (int)entityPlayerMP.posX >> 4;
+         final int i3 = (int)entityPlayerMP.posZ >> 4;
+@@ -69,5 +74,5 @@
+     
+     public void removePlayer(final EntityPlayerMP entityPlayerMP) {
+-        this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("§e").append(entityPlayerMP.username).append(" left the game.").toString()));
++        this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat("§e" +entityPlayerMP.username + " left the game.")); //LilyBukkit: replace 'this.playerEntity.username' with own code
+         final int i2 = (int)entityPlayerMP.posX >> 4;
+         final int i3 = (int)entityPlayerMP.posZ >> 4;

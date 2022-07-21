@@ -1,0 +1,155 @@
+--- BlockPressurePlate.java
++++ BlockPressurePlate.java
+@@ -1,4 +1,12 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.Cancellable;
++import org.bukkit.event.block.Action;
++import org.bukkit.event.block.BlockGreenstoneEvent;
++import org.bukkit.event.entity.EntityInteractEvent;
++import org.bukkit.plugin.PluginManager;
++
+ import java.util.List;
+ import java.util.Random;
+@@ -6,5 +14,5 @@
+ public class BlockPressurePlate extends Block {
+     private EnumMobType triggerMobType;
+-    
++
+     protected BlockPressurePlate(final int id, final int blockIndex, final EnumMobType triggerMobType) {
+         super(id, blockIndex, Material.rock);
+@@ -14,29 +22,29 @@
+         this.setBlockBounds(f4, 0.0f, f4, 1.0f - f4, 0.03125f, 1.0f - f4);
+     }
+-    
++
+     @Override
+     public int tickRate() {
+         return 20;
+     }
+-    
++
+     @Override
+     public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+         return null;
+     }
+-    
++
+     @Override
+     public boolean isOpaqueCube() {
+         return false;
+     }
+-    
++
+     @Override
+     public boolean canPlaceBlockAt(final World world, final int x, final int y, final int z) {
+         return world.isBlockNormalCube(x, y - 1, z);
+     }
+-    
++
+     @Override
+     public void onBlockAdded(final World world, final int x, final int y, final int z) {
+     }
+-    
++
+     @Override
+     public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final int flag) {
+@@ -50,5 +58,5 @@
+         }
+     }
+-    
++
+     @Override
+     public void updateTick(final World world, final int x, final int y, final int z, final Random random) {
+@@ -57,5 +65,5 @@
+         }
+     }
+-    
++
+     @Override
+     public void onEntityCollidedWithBlock(final World world, final int x, final int y, final int z, final Entity entity) {
+@@ -64,7 +72,7 @@
+         }
+     }
+-    
++
+     private void setStateIfMobInteractsWithPlate(final World world, final int x, final int y, final int z) {
+-        final boolean z2 = world.getBlockMetadata(x, y, z) == 1;
++        boolean z2 = world.getBlockMetadata(x, y, z) == 1; //LilyBukkit: make not final
+         boolean z3 = false;
+         final float f7 = 0.125f;
+@@ -82,4 +90,33 @@
+             z3 = true;
+         }
++
++        //CraftBukkit begin
++        org.bukkit.World bukkitWorld = Bukkit.getWorld(world.levelName);
++        PluginManager pluginManager = Bukkit.getPluginManager();
++
++        if (z2 != z3 && z3) {
++            for (Object object : list8) {
++                if (object != null) {
++                    Cancellable cancellable;
++
++                    if (object instanceof EntityPlayer) {
++                        cancellable = CraftEventFactory.callPlayerInteractEvent((EntityPlayerMP) object, Action.PHYSICAL, x, y, z, -1, null);
++                    } else if (object instanceof Entity) {
++                        cancellable = new EntityInteractEvent((org.bukkit.entity.Entity) object, bukkitWorld.getBlockAt(x, y, z));
++                        pluginManager.callEvent((EntityInteractEvent) cancellable);
++                    } else {
++                        continue;
++                    }
++                    if (cancellable.isCancelled()) return;
++                }
++            }
++
++            BlockGreenstoneEvent eventGreenstone = new BlockGreenstoneEvent(bukkitWorld.getBlockAt(x, y, z), z2 ? 1 : 0, z3 ? 1 : 0);
++            pluginManager.callEvent(eventGreenstone);
++
++            z2 = eventGreenstone.getNewCurrent() > 0;
++        }
++        //CraftBukkit end
++
+         if (z3 && !z2) {
+             world.setBlockMetadataWithNotify(x, y, z, 1);
+@@ -100,5 +137,5 @@
+         }
+     }
+-    
++
+     @Override
+     public void onBlockRemoval(final World world, final int x, final int y, final int z) {
+@@ -110,5 +147,5 @@
+         super.onBlockRemoval(world, x, y, z);
+     }
+-    
++
+     @Override
+     public void setBlockBoundsBasedOnState(final IBlockAccess blockAccess, final int x, final int y, final int z) {
+@@ -117,20 +154,19 @@
+         if (z2) {
+             this.setBlockBounds(f6, 0.0f, f6, 1.0f - f6, 0.03125f, 1.0f - f6);
+-        }
+-        else {
++        } else {
+             this.setBlockBounds(f6, 0.0f, f6, 1.0f - f6, 0.0625f, 1.0f - f6);
+         }
+     }
+-    
++
+     @Override
+     public boolean isPoweringTo(final IBlockAccess blockAccess, final int x, final int y, final int z, final int unused) {
+         return blockAccess.getBlockMetadata(x, y, z) > 0;
+     }
+-    
++
+     @Override
+     public boolean isIndirectlyPoweringTo(final World world, final int x, final int y, final int z, final int flag) {
+         return world.getBlockMetadata(x, y, z) != 0 && flag == 1;
+     }
+-    
++
+     @Override
+     public boolean canProvidePower() {

@@ -1,0 +1,73 @@
+--- BlockSnow.java
++++ BlockSnow.java
+@@ -1,4 +1,7 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++
+ import java.util.Random;
+ 
+@@ -9,15 +12,15 @@
+         this.setTickOnLoad(true);
+     }
+-    
++
+     @Override
+     public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+         return null;
+     }
+-    
++
+     @Override
+     public boolean isOpaqueCube() {
+         return false;
+     }
+-    
++
+     @Override
+     public boolean canPlaceBlockAt(final World world, final int x, final int y, final int z) {
+@@ -25,10 +28,10 @@
+         return i5 != 0 && Block.blocksList[i5].isOpaqueCube() && world.getBlockMaterial(x, y - 1, z).getIsSolid();
+     }
+-    
++
+     @Override
+     public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final int flag) {
+         this.canSnowStay(world, x, y, z);
+     }
+-    
++
+     private boolean canSnowStay(final World world, final int x, final int y, final int z) {
+         if (!this.canPlaceBlockAt(world, x, y, z)) {
+@@ -39,23 +42,26 @@
+         return true;
+     }
+-    
++
+     @Override
+     public int idDropped(final int count, final Random random) {
+         return Item.snowball.shiftedIndex;
+     }
+-    
++
+     @Override
+     public int quantityDropped(final Random random) {
+         return 0;
+     }
+-    
++
+     @Override
+     public void updateTick(final World world, final int x, final int y, final int z, final Random random) {
+         if (world.getSavedLightValue(EnumSkyBlock.Block, x, y, z) > 11) {
++            if (CraftEventFactory.callBlockFadeEvent(Bukkit.getWorld(world.levelName).getBlockAt(x, y, z), 0).isCancelled())
++                return; //LilyBukkit
++
+             this.dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z));
+             world.setBlockWithNotify(x, y, z, 0);
+         }
+     }
+-    
++
+     @Override
+     public boolean shouldSideBeRendered(final IBlockAccess blockAccess, final int x, final int y, final int z, final int side) {

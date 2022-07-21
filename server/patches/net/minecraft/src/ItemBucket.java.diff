@@ -1,0 +1,35 @@
+--- ItemBucket.java
++++ ItemBucket.java
+@@ -1,7 +1,11 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.player.PlayerBucketEmptyEvent;
++import org.bukkit.event.player.PlayerBucketFillEvent;
++
+ public class ItemBucket extends Item {
+     private int isFull;
+-    
++
+     public ItemBucket(final int itemID, final int isFull) {
+         super(itemID);
+@@ -10,3 +14,19 @@
+         this.isFull = isFull;
+     }
++
++    @Override
++    public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer entityPlayer) {
++        /*switch (isFull) {
++            case 0:
++                PlayerBucketFillEvent eventFill = CraftEventFactory.callPlayerBucketFillEvent(entityPlayer, x, y, z, -1, itemStack, Item.bucketWater);
++                if (eventFill.isCancelled()) return itemStack;
++            case 1:
++            case 2:
++                PlayerBucketEmptyEvent eventEmpty = CraftEventFactory.callPlayerBucketEmptyEvent(entityPlayer, x, y, z, -1, itemStack);
++                if (eventEmpty.isCancelled()) return itemStack;
++            default:
++                // bruh
++        }*/
++        return itemStack;
++    }
+ }

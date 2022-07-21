@@ -1,6 +1,17 @@
 --- ItemDoor.java
 +++ ItemDoor.java
-@@ -42,6 +42,6 @@
+@@ -1,4 +1,10 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.block.BlockPlaceEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.block.LBBlockState;
++
+ public class ItemDoor extends Item {
+     private Material material;
+@@ -42,6 +48,6 @@
              b10 = 1;
          }
 -        final int i9 = (world.isBlockNormalCube(x - b10, y, z - b11) + world.isBlockNormalCube(x - b10, y + 1, z - b11)) ? 1 : 0;
@@ -9,3 +20,18 @@
 +final int i10 = (world.isBlockNormalCube(x + b10, y, z + b11) && world.isBlockNormalCube(x + b10, y + 1, z + b11)) ? 1 : 0;
          final boolean z2 = world.getBlockId(x - b10, y, z - b11) == block8.blockID || world.getBlockId(x - b10, y + 1, z - b11) == block8.blockID;
          final boolean z3 = world.getBlockId(x + b10, y, z + b11) == block8.blockID || world.getBlockId(x + b10, y + 1, z + b11) == block8.blockID;
+@@ -57,6 +63,14 @@
+             i8 += 4;
+         }
++
+         world.setBlockWithNotify(x, y, z, block8.blockID);
+         world.setBlockMetadataWithNotify(x, y, z, i8);
++        LBBlockState blockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x,y,z));
++        BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, x, y, z, this.material==Material.wood?Block.doorWood:Block.doorSteel);
++
++        if (event.isCancelled() || !event.canBuild()) {
++            event.getBlockPlaced().setTypeIdAndData(blockState.getTypeId(), blockState.getRawData(), false);
++            return false;
++        }
+         world.setBlockWithNotify(x, y + 1, z, block8.blockID);
+         world.setBlockMetadataWithNotify(x, y + 1, z, i8 + 8);

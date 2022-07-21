@@ -1,0 +1,77 @@
+--- ItemBlock.java
++++ ItemBlock.java
+@@ -1,4 +1,10 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.block.BlockPlaceEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.block.LBBlockState;
++
+ public class ItemBlock extends Item {
+     private int blockID;
+@@ -12,4 +18,6 @@
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, int x, int y, int z, int i7) {
++        int clickedX = x, clickedY = y, clickedZ = z; // CraftBukkit
++
+         if (world.getBlockId(x, y, z) == Block.snow.blockID) {
+             i7 = 0;
+@@ -40,5 +48,55 @@
+         if (world.canBlockBePlacedAt(this.blockID, x, y, z, false)) {
+             final Block block8 = Block.blocksList[this.blockID];
+-            if (world.setBlockWithNotify(x, y, z, this.blockID)) {
++            // CraftBukkit start - This executes the placement of the block
++            LBBlockState replacedBlockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y, z));
++
++            // There are like 30 combinations you can mix and match steps and double steps
++            // of different materials, so there are a lot of different cases of what
++            // would happen if you place x step onto another y step, so let's just keep
++            // track of the entire state
++            LBBlockState blockStateBelow = null;
++            // Toggles whether the normal or the block below is used for the place event
++            boolean eventUseBlockBelow = false;
++            if ((world.getBlockId(x, y - 1, z) == Block.stairDouble.blockID || world.getBlockId(x, y - 1, z) == Block.stairDouble.blockID)
++                    && (stack.itemID == Block.stairDouble.blockID || stack.itemID == Block.stairSingle.blockID)) {
++                blockStateBelow = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y - 1, z));
++                // Step is placed on step, forms a doublestep replacing the original step, so we need the lower block
++                eventUseBlockBelow = stack.itemID == Block.stairSingle.blockID && blockStateBelow.getTypeId() == Block.stairSingle.blockID;
++            }
++
++            /**
++             * @see net.minecraft.server.World#setTypeIdAndData(int i, int j, int k, int l, int i1)
++             *
++             * This replaces world.setTypeIdAndData(IIIII), we're doing this because we need to
++             * hook between the 'placement' and the informing to 'world' so we can
++             * sanely undo this.
++             *
++             * Whenever the call to 'world.setTypeIdAndData' changes we need to figure out again what to
++             * replace this with.
++             */
++            if (world.setBlockAndMetadata(x, y, z, this.blockID, stack.itemDmg)) { // <-- world.setTypeIdAndData does this to place the block
++                BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, eventUseBlockBelow ? blockStateBelow : replacedBlockState, clickedX, clickedY, clickedZ, i7);
++
++                if (event.isCancelled() || !event.canBuild()) {
++                    if (blockStateBelow != null) { // Used for steps
++                        world.setBlockAndMetadata(x, y, z, replacedBlockState.getTypeId(), replacedBlockState.getRawData());
++                        world.setBlockAndMetadata(x, y - 1, z, blockStateBelow.getTypeId(), blockStateBelow.getRawData());
++
++                    } else {
++
++                        if (this.blockID == Block.ice.blockID) {
++                            // Ice will explode if we set straight to 0
++                            world.setBlock(x, y, z, 20);
++                        }
++
++                        world.setBlockAndMetadata(x, y, z, replacedBlockState.getTypeId(), replacedBlockState.getRawData());
++                    }
++                    return true;
++
++                }
++                world.markBlockNeedsUpdate(x, y, z); // <-- world.setTypeIdAndData does this on success (tell the world)
++
++                // CraftBukkit end
++            //if (world.setBlockWithNotify(x, y, z, this.blockID)) {
+                 Block.blocksList[this.blockID].onBlockPlaced(world, x, y, z, i7);
+                 world.playSoundEffect(x + 0.5f, y + 0.5f, z + 0.5f, block8.stepSound.getStepSound(), (block8.stepSound.getVolume() + 1.0f) / 2.0f, block8.stepSound.getPitch() * 0.8f);

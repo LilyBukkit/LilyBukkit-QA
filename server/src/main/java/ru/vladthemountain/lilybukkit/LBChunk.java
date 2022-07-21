@@ -70,7 +70,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public Block getBlock(int x, int y, int z) {
-        return new LBBlock(this.world, this.chunk.getBlockID(x, y, z), x, y, z);
+        return new LBBlock(this.world, this.world.getBlockTypeIdAt(x, y, z), x, y, z);
     }
 
     /**

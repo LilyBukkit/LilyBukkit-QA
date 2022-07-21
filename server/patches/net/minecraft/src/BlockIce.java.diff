@@ -1,0 +1,16 @@
+--- BlockIce.java
++++ BlockIce.java
+@@ -1,4 +1,7 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++
+ import java.util.Random;
+ 
+@@ -31,4 +34,5 @@
+     public void updateTick(final World world, final int x, final int y, final int z, final Random random) {
+         if (world.getSavedLightValue(EnumSkyBlock.Block, x, y, z) > 11 - Block.lightOpacity[this.blockID]) {
++            if (CraftEventFactory.callBlockFadeEvent(Bukkit.getWorld(world.levelName).getBlockAt(x,y,z), Block.waterStill.blockID).isCancelled()) return; //LilyBukkit
+             this.dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z));
+             world.setBlockWithNotify(x, y, z, Block.waterStill.blockID);

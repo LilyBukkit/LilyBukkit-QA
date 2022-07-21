@@ -32,7 +32,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
     LBPlayerInventory inventory;
     long playerTime;
 
-    final PermissibleBase permissibleBase = new PermissibleBase(this);
+    final PermissibleBase permissibleBase;
 
     public LBPlayer(LBWorld w, EntityPlayerMP p) {
         super(w, p);
@@ -42,6 +42,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
         this.spawnPoint = new Location(this.world, p.mcServer.worldMngr.spawnX, p.mcServer.worldMngr.spawnY, p.mcServer.worldMngr.spawnZ);
         this.inventory = new LBPlayerInventory(this.entity.inventory);
         this.playerTime = this.world.getTime();
+        this.permissibleBase = new PermissibleBase(this);
     }
 
     /**
