@@ -53,6 +53,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -88,7 +89,6 @@ public class LilyBukkit implements Server {
     public final List<LBWorld> worldList;
     private final List<Recipe> recipeManager;
     private final SimpleCommandMap commandMap;
-    private final Set<OfflinePlayer> offlinePlayers;
     Configuration configuration = new Configuration(new File("config" + File.separator + "lilybukkit.yml"));
 
     public LilyBukkit(MinecraftServer parent) {
@@ -99,7 +99,6 @@ public class LilyBukkit implements Server {
         this.recipeManager = new ArrayList<>();
         this.commandMap = new SimpleCommandMap(this);
         this.pluginMngr = new SimplePluginManager(this, this.commandMap);
-        this.offlinePlayers = new HashSet<>();
         Bukkit.setServer(this);
         UpdateChecker.checkForUpdates();
         // Plugin handling
@@ -715,11 +714,10 @@ public class LilyBukkit implements Server {
 
     @Override
     public OfflinePlayer getOfflinePlayer(String s) {
-        OfflinePlayer player = (OfflinePlayer) this.getPlayer(s);
+        OfflinePlayer player = this.getPlayer(s);
 
         if (player == null) {
             player = new LBOfflinePlayer(this, s);
-            this.offlinePlayers.add(player);
         }
         return player;
     }
@@ -799,18 +797,26 @@ public class LilyBukkit implements Server {
         }
 
         Map<String, Map<String, Object>> perms;
+        Object yamlContents = new Yaml(new SafeConstructor()).load(stream);
 
         try {
-            perms = (Map<String, Map<String, Object>>) new Yaml(new SafeConstructor()).load(stream);
+            perms = (Map<String, Map<String, Object>>) yamlContents;
         } catch (MarkedYAMLException ex) {
             getLogger().log(Level.WARNING, "[CraftBukkit] Server permissions file " + file + " is not valid YAML: " + ex.toString());
+            return;
+        } catch (ClassCastException ex) {
+            this.getLogger().log(Level.SEVERE, "[CraftBukkit] Couldn't cast YAML file contents to a Map<String, Map<String,Object>>", ex);
             return;
         } catch (Throwable ex) {
             getLogger().log(Level.WARNING, "[CraftBukkit] Server permissions file " + file + " is not valid YAML.", ex);
             return;
         } finally {
             try {
-                stream.close();
+                if (stream != null) {
+                    stream.close();
+                } else {
+                    this.getLogger().log(Level.SEVERE, "[CraftBukkit] Couldn't close the FileInputStream because the stream is null");
+                }
             } catch (IOException ex) {
                 getLogger().log(Level.SEVERE, "[CraftBukkit] Couldn't close the InputStream from file " + file, ex);
             }
