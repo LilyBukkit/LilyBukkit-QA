@@ -1,0 +1,16 @@
+--- EntityMinecart.java
++++ EntityMinecart.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ import java.util.List;
+ 
+@@ -113,5 +115,5 @@
+                     entityItem7.motionY = (float)this.rand.nextGaussian() * f6 + 0.2f;
+                     entityItem7.motionZ = (float)this.rand.nextGaussian() * f6;
+-                    this.worldObj.spawnEntityInWorld(entityItem7);
++                    this.worldObj.spawnEntityInWorld(entityItem7, SpawnReason.NATURAL);
+                 }
+             }

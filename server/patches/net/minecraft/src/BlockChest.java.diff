@@ -1,0 +1,16 @@
+--- BlockChest.java
++++ BlockChest.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ import java.util.Random;
+ 
+@@ -60,5 +62,5 @@
+                     entityItem12.motionY = (float)this.random.nextGaussian() * f11 + 0.2f;
+                     entityItem12.motionZ = (float)this.random.nextGaussian() * f11;
+-                    world.spawnEntityInWorld(entityItem12);
++                    world.spawnEntityInWorld(entityItem12, SpawnReason.NATURAL);
+                 }
+             }

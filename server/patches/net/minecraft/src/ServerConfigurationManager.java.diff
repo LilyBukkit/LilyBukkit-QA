@@ -6,16 +6,17 @@
 -import java.util.Iterator;
  import java.io.Writer;
  import java.io.PrintWriter;
-@@ -14,4 +13,8 @@
+@@ -14,4 +13,9 @@
  import java.util.Set;
  import net.minecraft.server.MinecraftServer;
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 +import org.bukkit.event.player.PlayerJoinEvent;
 +import ru.vladthemountain.lilybukkit.LBWorld;
 +import ru.vladthemountain.lilybukkit.entity.LBPlayer;
 +
  import java.util.List;
  import java.util.logging.Logger;
-@@ -19,16 +22,22 @@
+@@ -19,16 +23,22 @@
  public class ServerConfigurationManager {
      public static Logger logger;
 -    public List playerEntities;
@@ -43,7 +44,7 @@
 +    private File whitelistIPsFile;
      private PlayerNBTManager playerNBTManagerObj;
      
-@@ -38,9 +47,12 @@
+@@ -38,9 +48,12 @@
      
      public ServerConfigurationManager(final MinecraftServer minecraftServer) {
 -        this.playerEntities = (List)new ArrayList();
@@ -61,7 +62,7 @@
 +        this.whitelistEnabled = false;
          this.mcServer = minecraftServer;
          this.bannedPlayersFile = minecraftServer.getFile("banned-players.txt");
-@@ -48,14 +60,22 @@
+@@ -48,14 +61,22 @@
          this.opFile = minecraftServer.getFile("ops.txt");
          this.authFile = minecraftServer.getFile("authed-players.txt");
 +        this.whitelistFile = minecraftServer.getFile("whitelist.txt");
@@ -84,14 +85,21 @@
 +        this.saveWhitelistedIPs();
      }
      
-@@ -91,5 +111,5 @@
+@@ -75,5 +96,5 @@
+             entityPlayerMP1.setPosition(entityPlayerMP1.posX, entityPlayerMP1.posY + 1.0, entityPlayerMP1.posZ);
+         }
+-        this.mcServer.worldMngr.spawnEntityInWorld(entityPlayerMP1);
++        this.mcServer.worldMngr.spawnEntityInWorld(entityPlayerMP1, SpawnReason.NATURAL);
+         this.playerManagerObj.addPlayer(entityPlayerMP1);
+     }
+@@ -91,5 +112,5 @@
      
      private static boolean isValidName(final String username) {
 -        return username.matches("[a-zA-Z0-9_ \\u0107 \\u015b]*");
 +        return username.matches("[a-zA-Z0-9_ \\u0107 \\u015b]{2,32}");
      }
      
-@@ -99,11 +119,19 @@
+@@ -99,11 +120,19 @@
              return null;
          }
 -        String string4 = netLoginHandler1.netManager.getRemoteAddress().toString();
@@ -115,7 +123,7 @@
 +        }
          if (this.playerEntities.size() >= this.maxPlayers) {
              netLoginHandler1.kickUser("The server is full!");
-@@ -114,10 +142,27 @@
+@@ -114,10 +143,27 @@
              return null;
          }
 +        {
@@ -145,20 +153,20 @@
 +            final EntityPlayerMP entityPlayerMP6 = this.playerEntities.get(i5);
              if (entityPlayerMP6.username.equals(username)) {
                  if (!this.mcServer.ULPPOnlineMode) {
-@@ -131,4 +176,5 @@
+@@ -131,4 +177,5 @@
              this.authPlayer(username);
          }
 +        netLoginHandler1.netManager.addToSendQueue(new Packet130RosepadMeta().Default());
          return new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
      }
-@@ -173,5 +219,5 @@
+@@ -173,5 +220,5 @@
          try {
              this.bannedPlayers.clear();
 -            final BufferedReader bufferedReader1 = new BufferedReader((Reader)new FileReader(this.bannedPlayersFile));
 +            BufferedReader bufferedReader1 = new BufferedReader((Reader)new FileReader(this.bannedPlayersFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -198,4 +244,88 @@
+@@ -198,4 +245,88 @@
      }
      
 +    private void loadWhitelistedPlayers() {

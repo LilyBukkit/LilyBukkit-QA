@@ -1,0 +1,16 @@
+--- EntityPlayer.java
++++ EntityPlayer.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ import java.util.List;
+ import java.util.Random;
+@@ -175,5 +177,5 @@
+     
+     protected void joinEntityItemWithWorld(final EntityItem entityItem) {
+-        this.worldObj.spawnEntityInWorld(entityItem);
++        this.worldObj.spawnEntityInWorld(entityItem, SpawnReason.NATURAL);
+     }
+     

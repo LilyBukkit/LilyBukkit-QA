@@ -1,0 +1,55 @@
+--- ItemFlintAndSteel.java
++++ ItemFlintAndSteel.java
+@@ -1,4 +1,12 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.entity.Player;
++import org.bukkit.event.block.BlockIgniteEvent;
++import org.bukkit.event.block.BlockPlaceEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.block.LBBlockState;
++
+ public class ItemFlintAndSteel extends Item {
+     public ItemFlintAndSteel(final int itemID) {
+@@ -7,7 +15,8 @@
+         this.maxDamage = 64;
+     }
+-    
++
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, int x, int y, int z, final int i7) {
++        int clickedX = x, clickedY = y, clickedZ = z; // CraftBukkit
+         if (i7 == 0) {
+             --y;
+@@ -30,6 +39,29 @@
+         final int i8 = world.getBlockId(x, y, z);
+         if (i8 == 0) {
++            // CraftBukkit start - store the clicked block
++            org.bukkit.block.Block blockClicked = Bukkit.getWorld(world.levelName).getBlockAt(x, y, z);
++            Player thePlayer = Bukkit.getPlayer(entityPlayer.username);
++
++            BlockIgniteEvent eventIgnite = new BlockIgniteEvent(blockClicked, BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL, thePlayer);
++            Bukkit.getPluginManager().callEvent(eventIgnite);
++
++            if (eventIgnite.isCancelled()) {
++                stack.damageItem(1);
++                return false;
++            }
++
++            LBBlockState blockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y, z));
++            // CraftBukkit end
++
+             world.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, "fire.ignite", 1.0f, ItemFlintAndSteel.rand.nextFloat() * 0.4f + 0.8f);
+             world.setBlockWithNotify(x, y, z, Block.fire.blockID);
++
++            //LilyBukkit start
++            BlockPlaceEvent placeEvent = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, Block.fire.blockID);
++            if (placeEvent.isCancelled() || !placeEvent.canBuild()) {
++                placeEvent.getBlockPlaced().setTypeIdAndData(0, (byte) 0, false);
++                return false;
++            }
++            //LilyBukkit end
+         }
+         stack.damageItem(1);

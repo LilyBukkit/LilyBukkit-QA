@@ -1,0 +1,16 @@
+--- ItemPainting.java
++++ ItemPainting.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ public class ItemPainting extends Item {
+     public ItemPainting(final int itemID) {
+@@ -27,5 +29,5 @@
+         final EntityPainting entityPainting9 = new EntityPainting(world, x, y, z, b8);
+         if (entityPainting9.onValidSurface()) {
+-            world.spawnEntityInWorld(entityPainting9);
++            world.spawnEntityInWorld(entityPainting9, SpawnReason.NATURAL);
+             --stack.stackSize;
+         }

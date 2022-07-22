@@ -1,0 +1,38 @@
+--- ItemMinecart.java
++++ ItemMinecart.java
+@@ -1,7 +1,12 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.block.Action;
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++import org.bukkit.event.player.PlayerInteractEvent;
++
+ public class ItemMinecart extends Item {
+     public int minecartType;
+-    
++
+     public ItemMinecart(final int itemID, final int minecartType) {
+         super(itemID);
+@@ -9,10 +14,19 @@
+         this.minecartType = minecartType;
+     }
+-    
++
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, final int y, final int z, final int i7) {
+         final int i8 = world.getBlockId(x, y, z);
+         if (i8 == Block.minecartTrack.blockID) {
+-            world.spawnEntityInWorld(new EntityMinecart(world, x + 0.5f, y + 0.5f, z + 0.5f, this.minecartType));
++
++            // CraftBukkit start - Minecarts
++            PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent((EntityPlayerMP) entityPlayer, Action.RIGHT_CLICK_BLOCK, x, y, z, i7, stack);
++
++            if (event.isCancelled()) {
++                return false;
++            }
++            // CraftBukkit end
++
++            world.spawnEntityInWorld(new EntityMinecart(world, x + 0.5f, y + 0.5f, z + 0.5f, this.minecartType), SpawnReason.NATURAL);
+             --stack.stackSize;
+             return true;

@@ -1,0 +1,52 @@
+--- ItemSign.java
++++ ItemSign.java
+@@ -1,4 +1,10 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.block.BlockPlaceEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.block.LBBlockState;
++
+ public class ItemSign extends Item {
+     public ItemSign(final int itemID) {
+@@ -7,5 +13,5 @@
+         this.maxStackSize = 1;
+     }
+-    
++
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, int x, int y, int z, final int i7) {
+@@ -16,4 +22,5 @@
+             return false;
+         }
++        int clickedX = x, clickedY = y, clickedZ = z; // CraftBukkit
+         if (i7 == 1) {
+             ++y;
+@@ -34,12 +41,22 @@
+             return false;
+         }
++        LBBlockState blockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y, z)); //LilyBukkit
+         if (i7 == 1) {
+             world.setBlockAndMetadataWithNotify(x, y, z, Block.signStanding.blockID, MathHelper.floor_double((entityPlayer.rotationYaw + 180.0f) * 16.0f / 360.0f + 0.5) & 0xF);
+-        }
+-        else {
++        } else {
+             world.setBlockAndMetadataWithNotify(x, y, z, Block.signWall.blockID, i7);
+         }
++
++        // CraftBukkit start - sign
++        BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, i7 == 1 ? Block.signStanding : Block.signWall);
++
++        if (event.isCancelled() || !event.canBuild()) {
++            event.getBlockPlaced().setTypeIdAndData(blockState.getTypeId(), blockState.getRawData(), false);
++            return false;
++        }
++        // CraftBukkit end
++
+         --stack.stackSize;
+-        entityPlayer.displayGUIEditSign((TileEntitySign)world.getBlockTileEntity(x, y, z));
++        entityPlayer.displayGUIEditSign((TileEntitySign) world.getBlockTileEntity(x, y, z));
+         return true;
+     }

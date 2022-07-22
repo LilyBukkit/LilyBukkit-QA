@@ -1,0 +1,16 @@
+--- EntitySkeleton.java
++++ EntitySkeleton.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ public class EntitySkeleton extends EntityMob {
+     public EntitySkeleton(final World world) {
+@@ -45,5 +47,5 @@
+                 final float f10 = MathHelper.sqrt_double(d3 * d3 + d4 * d4) * 0.2f;
+                 this.worldObj.playSoundAtEntity((Entity)this, "random.bow", 1.0f, 1.0f / (this.rand.nextFloat() * 0.4f + 0.8f));
+-                this.worldObj.spawnEntityInWorld(entityArrow7);
++                this.worldObj.spawnEntityInWorld(entityArrow7, SpawnReason.NATURAL);
+                 entityArrow7.setArrowHeading(d3, d5 + f10, d4, 0.6f, 12.0f);
+                 this.attackTime = 30;

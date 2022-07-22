@@ -1,0 +1,153 @@
+--- ItemInWorldManager.java
++++ ItemInWorldManager.java
+@@ -1,4 +1,10 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.Event;
++import org.bukkit.event.block.Action;
++import org.bukkit.event.block.BlockDamageEvent;
++import org.bukkit.event.player.PlayerInteractEvent;
++
+ public class ItemInWorldManager {
+     private World worldObj;
+@@ -11,5 +17,5 @@
+     private int posY;
+     private int posZ;
+-    
++
+     public ItemInWorldManager(final World world) {
+         this.removeProgress = 0.0f;
+@@ -18,5 +24,5 @@
+         this.worldObj = world;
+     }
+-    
++
+     public void onBlockClicked(final int i1, final int i2, final int i3) {
+         final int i4 = this.worldObj.getBlockId(i1, i2, i3);
+@@ -28,21 +34,59 @@
+         }
+     }
+-    
++
+     public void blockRemoving() {
+         this.removeProgress = 0.0f;
+         this.curBlockDurability = 0;
+     }
+-    
++
+     public void updateBlockRemoving(final int i1, final int i2, final int i3, final int i4) {
+         if (this.curBlockDurability > 0) {
+             --this.curBlockDurability;
+-        }
+-        else if (i1 == this.posX && i2 == this.posY && i3 == this.posZ) {
++        } else if (i1 == this.posX && i2 == this.posY && i3 == this.posZ) {
+             final int i5 = this.worldObj.getBlockId(i1, i2, i3);
+             if (i5 == 0) {
+                 return;
+             }
+-            final Block block6 = Block.blocksList[i5];
+-            this.removeProgress += block6.blockStrength(this.thisPlayer);
++
++            //CraftBukkit start
++            PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent((EntityPlayerMP) this.thisPlayer, Action.LEFT_CLICK_BLOCK, i1, i2, i3, i4, this.thisPlayer.inventory.getCurrentItem());
++
++            if (event.useInteractedBlock() == Event.Result.DENY) {
++                // If we denied a door from opening, we need to send a correcting update to the client, as it already opened the door.
++                if (i1 == Block.wood.blockID) {
++                    // For some reason *BOTH* the bottom/top part have to be marked updated.
++                    boolean bottom = (this.worldObj.getBlockMetadata(i1, i2, i3) & 8) == 0;
++                    ((EntityPlayerMP) this.thisPlayer).playerNetServerHandler.sendPacket(new Packet53BlockChange(i1, i2, i3, this.worldObj));
++                    ((EntityPlayerMP) this.thisPlayer).playerNetServerHandler.sendPacket(new Packet53BlockChange(i1, i2 + (bottom ? 1 : -1), i3, this.worldObj));
++                }
++            } else {
++                Block.blocksList[i1].blockActivated(this.worldObj, i1, i2, i3, this.thisPlayer);
++                // Allow fire punching to be blocked
++                //this.worldObj.douseFire((EntityMob) null, i1, i2, i3, i4);
++            }
++
++            // Handle hitting a block
++            float toolDamage = Block.blocksList[i1].blockStrength(this.thisPlayer);
++            if (event.useItemInHand() == Event.Result.DENY) {
++                // If we 'insta destroyed' then the client needs to be informed.
++                if (toolDamage > 1.0f) {
++                    ((EntityPlayerMP) this.thisPlayer).playerNetServerHandler.sendPacket(new Packet53BlockChange(i1, i2, i3, this.worldObj));
++                }
++                return;
++            }
++            BlockDamageEvent blockEvent = CraftEventFactory.callBlockDamageEvent((EntityPlayerMP) this.thisPlayer, i1, i2, i3, this.thisPlayer.inventory.getCurrentItem(), toolDamage >= 1.0f);
++
++            if (blockEvent.isCancelled()) {
++                return;
++            }
++
++            if (blockEvent.getInstaBreak()) {
++                toolDamage = 2.0f;
++            }
++            this.removeProgress = toolDamage;
++            //CraftBukkit end
++
++            /*final Block block6 = Block.blocksList[i5]; //LilyBukkit
++            this.removeProgress += block6.blockStrength(this.thisPlayer);*/
+             ++this.curblockDamage;
+             if (this.removeProgress >= 1.0f) {
+@@ -53,6 +97,5 @@
+                 this.curBlockDurability = 5;
+             }
+-        }
+-        else {
++        } else {
+             this.removeProgress = 0.0f;
+             this.removeProgressUnused = 0.0f;
+@@ -63,5 +106,5 @@
+         }
+     }
+-    
++
+     public boolean removeBlock(final int i1, final int i2, final int i3) {
+         final Block block4 = Block.blocksList[this.worldObj.getBlockId(i1, i2, i3)];
+@@ -73,5 +116,5 @@
+         return z6;
+     }
+-    
++
+     public boolean tryHarvestBlock(final int i1, final int i2, final int i3) {
+         final int i4 = this.worldObj.getBlockId(i1, i2, i3);
+@@ -91,8 +134,35 @@
+         return z6;
+     }
+-    
++
+     public boolean activeBlockOrUseItem(final EntityPlayer entityPlayer1, final World world2, final ItemStack itemStack3, final int i4, final int i5, final int i6, final int i7) {
+         final int i8 = world2.getBlockId(i4, i5, i6);
+-        return (i8 > 0 && Block.blocksList[i8].blockActivated(world2, i4, i5, i6, entityPlayer1)) || (itemStack3 != null && itemStack3.useItem(entityPlayer1, world2, i4, i5, i6, i7));
++        //return (i8 > 0 && Block.blocksList[i8].blockActivated(world2, i4, i5, i6, entityPlayer1)) || (itemStack3 != null && itemStack3.useItem(entityPlayer1, world2, i4, i5, i6, i7)); //LilyBukkit
++
++        // CraftBukkit start - Interact
++        boolean result = false;
++        if (i8 > 0) {
++            PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent((EntityPlayerMP) entityPlayer1, Action.RIGHT_CLICK_BLOCK, i4, i5, i6, i7, itemStack3);
++            if (event.useInteractedBlock() == Event.Result.DENY) {
++                // If we denied a door from opening, we need to send a correcting update to the client, as it already opened the door.
++                if (i8 == Block.doorWood.blockID) {
++                    boolean bottom = (world2.getBlockMetadata(i4, i5, i6) & 8) == 0;
++                    ((EntityPlayerMP) entityPlayer1).playerNetServerHandler.sendPacket(new Packet53BlockChange(i4, i5 + (bottom ? 1 : -1), i6, world2));
++                }
++                result = (event.useItemInHand() != Event.Result.ALLOW);
++            } else {
++                result = Block.blocksList[i8].blockActivated(world2, i4, i5, i6, entityPlayer1);
++            }
++
++            if (itemStack3 != null && !result) {
++                result = itemStack3.useItem(entityPlayer1, world2, i4, i5, i6, i7);
++            }
++
++            // If we have 'true' and no explicit deny *or* an explicit allow -- run the item part of the hook
++            if (itemStack3 != null && ((!result && event.useItemInHand() != Event.Result.DENY) || event.useItemInHand() == Event.Result.ALLOW)) {
++                itemStack3.getItem().onItemRightClick(itemStack3, world2, entityPlayer1); //LilyBukkit: replace `this.useItem()` with `itemStack3.getItem().onItemRightClick()` as it's the only more-or-less suitable method call here
++            }
++        }
++        return result;
++        // CraftBukkit end
+     }
+ }

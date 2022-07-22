@@ -1,16 +1,20 @@
 --- NetServerHandler.java
 +++ NetServerHandler.java
-@@ -1,6 +1,8 @@
+@@ -1,6 +1,12 @@
  package net.minecraft.src;
  
 -import java.io.IOException;
  import net.minecraft.server.MinecraftServer;
 +import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.block.Action;
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++import org.bukkit.event.player.PlayerAnimationEvent;
 +
 +import java.io.IOException;
  import java.util.logging.Logger;
  
-@@ -17,9 +19,9 @@
+@@ -17,9 +23,9 @@
      protected boolean hasMoved;
      protected ItemStack heldItem;
 -    
@@ -22,56 +26,56 @@
 +
      public NetServerHandler(final MinecraftServer minecraftServer1, final NetworkManager networkManager2, final EntityPlayerMP entityPlayerMP3) {
          this.connectionClosed = false;
-@@ -32,5 +34,5 @@
+@@ -32,5 +38,5 @@
          entityPlayerMP3.playerNetServerHandler = this;
      }
 -    
 +
      public void handlePackets() throws IOException {
          this.netManager.processReadPackets();
-@@ -39,5 +41,5 @@
+@@ -39,5 +45,5 @@
          }
      }
 -    
 +
      public void kickPlayer(final String string1) {
          this.netManager.addToSendQueue(new Packet255KickDisconnect(string1));
-@@ -46,5 +48,5 @@
+@@ -46,5 +52,5 @@
          this.connectionClosed = true;
      }
 -    
 +
      @Override
      public void handleFlying(final Packet10Flying packet) {
-@@ -71,5 +73,5 @@
+@@ -71,5 +77,5 @@
                  if (d5 > 1.65 || d5 < 0.1) {
                      this.kickPlayer("Illegal stance");
 -                    NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " had an illegal stance: " + d5);
 +                    NetServerHandler.logger.warning(this.playerEntity.username + " had an illegal stance: " + d5);
                  }
                  this.playerEntity.managedPosY = packet.stance;
-@@ -98,5 +100,5 @@
+@@ -98,5 +104,5 @@
              if (d8 > 0.0625) {
                  z18 = true;
 -                NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " moved wrongly!");
 +                NetServerHandler.logger.warning(this.playerEntity.username + " moved wrongly!");
              }
              this.playerEntity.setPositionAndRotation(d2, d3, d4, f8, f9);
-@@ -110,5 +112,5 @@
+@@ -110,5 +116,5 @@
          }
      }
 -    
 +
      public void teleportTo(final double d1, final double d3, final double d5, final float f7, final float f8) {
          this.hasMoved = false;
-@@ -119,5 +121,5 @@
+@@ -119,5 +125,5 @@
          this.playerEntity.playerNetServerHandler.sendPacket(new Packet13PlayerLookMove(d1, d3 + 1.6200000047683716, d3, d5, f7, f8, false));
      }
 -    
 +
      @Override
      public void handleBlockDig(final Packet14BlockDig packet) {
-@@ -128,11 +130,5 @@
+@@ -128,11 +134,5 @@
          final boolean isOP = op;
          final boolean isAuthed = this.mcServer.configManager.isAuthed(this.playerEntity.username);
 -        boolean z3 = false;
@@ -84,7 +88,7 @@
 +        boolean z3 = (packet.status == 0 || packet.status == 1);
          if (z3) {
              final double d4 = this.playerEntity.posY;
-@@ -151,24 +147,21 @@
+@@ -151,24 +151,21 @@
          final int i20 = packet.zPosition;
          final int i21 = packet.face;
 -        final int maxDistX = (int)MathHelper.abs((float)(i18 - this.mcServer.worldMngr.spawnX));
@@ -118,14 +122,14 @@
 +        } else if (packet.status == 3) {
              final double d5 = this.playerEntity.posX - (i18 + 0.5);
              final double d6 = this.playerEntity.posY - (i19 + 0.5);
-@@ -181,5 +174,5 @@
+@@ -181,5 +178,5 @@
          this.mcServer.worldMngr.disableSpawnProtection = false;
      }
 -    
 +
      @Override
      public void handlePlace(final Packet15Place packet) {
-@@ -193,35 +186,35 @@
+@@ -193,35 +190,35 @@
          final int i5 = packet.zPosition;
          final int i6 = packet.direction;
 -        final int maxDistX = (int)MathHelper.abs((float)(i3 - this.mcServer.worldMngr.spawnX));
@@ -174,7 +178,7 @@
 +
      @Override
      public void handleBlockItemSwitch(final Packet16BlockItemSwitch packet) {
-@@ -230,6 +223,5 @@
+@@ -230,6 +227,5 @@
          if (i2 == 0) {
              this.heldItem = null;
 -        }
@@ -182,21 +186,24 @@
 +        } else {
              this.heldItem = new ItemStack(i2);
          }
-@@ -237,5 +229,5 @@
+@@ -237,5 +233,5 @@
          this.mcServer.entityTracker.sendPacketToTrackedPlayers(this.playerEntity, new Packet16BlockItemSwitch(this.playerEntity.entityID, i2));
      }
 -    
 +
      @Override
      public void handlePickupSpawn(final Packet21PickupSpawn packet) {
-@@ -250,5 +242,5 @@
-         this.mcServer.worldMngr.spawnEntityInWorld(entityItem8);
+@@ -248,7 +244,7 @@
+         entityItem8.motionZ = packet.roll / 128.0;
+         entityItem8.delayBeforeCanPickup = 10;
+-        this.mcServer.worldMngr.spawnEntityInWorld(entityItem8);
++        this.mcServer.worldMngr.spawnEntityInWorld(entityItem8, SpawnReason.NATURAL);
      }
 -    
 +
      @Override
      public void handleChat(final Packet3Chat packet) {
-@@ -256,9 +248,8 @@
+@@ -256,9 +252,8 @@
          if (string2.length() > 100) {
              this.kickPlayer("Chat message too long");
 -        }
@@ -208,7 +215,7 @@
 +                if (" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'abcdefghijklmnopqrstuvwxyz{|}~\u2302\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8£\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1ªº¿®¬½¼¡«»".indexOf((int) string2.charAt(i3)) < 0) {
                      this.kickPlayer("Illegal characters in chat");
                      return;
-@@ -267,7 +258,6 @@
+@@ -267,7 +262,6 @@
              if (string2.startsWith("/")) {
                  this.handleSlashCommand(string2);
 -            }
@@ -218,7 +225,7 @@
 +                string2 = "<" + /*Bukkit.getPlayer(*/this.playerEntity.username/*).getDisplayName()*/ + "> " + string2; //LilyBukkit: replace 'this.playerEntity.username' with own code
                  NetServerHandler.logger.info(string2);
                  this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(string2));
-@@ -275,18 +265,17 @@
+@@ -275,18 +269,17 @@
          }
      }
 -    
@@ -242,7 +249,7 @@
 +                NetServerHandler.logger.info(string1 + " to " + string2[1]);
                  if (!this.mcServer.configManager.sendPacketToPlayer(string2[1], new Packet3Chat(string1))) {
                      this.sendPacket(new Packet3Chat("§cThere's no player by that name online."));
-@@ -294,46 +283,17 @@
+@@ -294,72 +287,74 @@
              }
          }
 -        else if (string1.toLowerCase().equalsIgnoreCase("/home")) {
@@ -296,7 +303,39 @@
 +
      @Override
      public void handleArmAnimation(final Packet18ArmAnimation packet) {
-@@ -342,24 +302,24 @@
+         if (packet.animate == 1) {
++
++            // CraftBukkit start - raytrace to look for 'rogue armswings'
++            float f = 1.0F;
++            float f1 = this.playerEntity.prevCameraPitch + (this.playerEntity.cameraPitch - this.playerEntity.prevCameraPitch) * f;
++            float f2 = this.playerEntity.prevCameraYaw + (this.playerEntity.cameraYaw - this.playerEntity.prevCameraYaw) * f;
++            double d0 = this.playerEntity.prevPosX + (this.playerEntity.posX - this.playerEntity.prevPosX) * (double) f;
++            double d1 = this.playerEntity.prevPosY + (this.playerEntity.posY - this.playerEntity.prevPosY) * (double) f + 1.62D - (double) this.playerEntity.height;
++            double d2 = this.playerEntity.prevPosZ + (this.playerEntity.posZ - this.playerEntity.prevPosZ) * (double) f;
++            Vec3D vec3d = Vec3D.createVector(d0, d1, d2);
++
++            float f3 = MathHelper.cos(-f2 * 0.017453292F - 3.1415927F);
++            float f4 = MathHelper.sin(-f2 * 0.017453292F - 3.1415927F);
++            float f5 = -MathHelper.cos(-f1 * 0.017453292F);
++            float f6 = MathHelper.sin(-f1 * 0.017453292F);
++            float f7 = f4 * f5;
++            float f8 = f3 * f5;
++            double d3 = 5.0D;
++            Vec3D vec3d1 = vec3d.addVector((double) f7 * d3, (double) f6 * d3, (double) f8 * d3);
++            MovingObjectPosition movingobjectposition = this.playerEntity.worldObj.rayTraceBlocks_do(vec3d, vec3d1, true);
++
++            if (movingobjectposition == null || movingobjectposition.typeOfHit != 0) {
++                CraftEventFactory.callPlayerInteractEvent(this.playerEntity, Action.LEFT_CLICK_AIR, this.playerEntity.inventory.getCurrentItem());
++            }
++
++            // Arm swing animation
++            PlayerAnimationEvent event = new PlayerAnimationEvent(Bukkit.getPlayer(this.playerEntity.username));
++            Bukkit.getPluginManager().callEvent(event);
++
++            if (event.isCancelled()) return;
++            // CraftBukkit end
++
+             this.playerEntity.swingItem();
          }
      }
 -    
@@ -327,14 +366,14 @@
 +
      @Override
      public void handlePlayerInventory(final Packet5PlayerInventory packet) {
-@@ -374,5 +334,5 @@
+@@ -374,5 +369,5 @@
          }
      }
 -    
 +
      public void sendInventoryPackets() {
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-1, this.playerEntity.inventory.mainInventory));
-@@ -380,5 +340,5 @@
+@@ -380,5 +375,5 @@
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-3, this.playerEntity.inventory.armorInventory));
      }
 -    

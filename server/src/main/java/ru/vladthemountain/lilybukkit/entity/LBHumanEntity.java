@@ -1,6 +1,5 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMob;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
@@ -16,15 +15,17 @@ import java.util.Set;
 public class LBHumanEntity extends LBLivingEntity implements HumanEntity {
 
     final EntityMob entity;
+    boolean op;
 
     public LBHumanEntity(LBWorld w, EntityMob e) {
         super(w, e);
         this.entity = e;
+        this.op = false;
     }
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return "EntityMob_" + this.entity.entityID;
     }
 
     @Override
@@ -99,11 +100,11 @@ public class LBHumanEntity extends LBLivingEntity implements HumanEntity {
 
     @Override
     public boolean isOp() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return this.op;
     }
 
     @Override
     public void setOp(boolean b) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.op = b;
     }
 }

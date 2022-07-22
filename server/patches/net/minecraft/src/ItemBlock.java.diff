@@ -69,7 +69,7 @@
 +                    return true;
 +
 +                }
-+                world.markBlockNeedsUpdate(x, y, z); // <-- world.setTypeIdAndData does this on success (tell the world)
++                world.notifyBlocksOfNeighborChange(x, y, z, this.blockID); // <-- world.setTypeIdAndData does this on success (tell the world)
 +
 +                // CraftBukkit end
 +            //if (world.setBlockWithNotify(x, y, z, this.blockID)) {

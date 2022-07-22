@@ -1,0 +1,16 @@
+--- EntitySlime.java
++++ EntitySlime.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ public class EntitySlime extends EntityLiving implements IMobs {
+     public float squishFactor;
+@@ -96,5 +98,5 @@
+                 entitySlime4.setSlimeSize(this.size / 2);
+                 entitySlime4.setLocationAndAngles(this.posX + f2, this.posY + 0.5, this.posZ + f3, this.rand.nextFloat() * 360.0f, 0.0f);
+-                this.worldObj.spawnEntityInWorld(entitySlime4);
++                this.worldObj.spawnEntityInWorld(entitySlime4, SpawnReason.NATURAL);
+             }
+         }

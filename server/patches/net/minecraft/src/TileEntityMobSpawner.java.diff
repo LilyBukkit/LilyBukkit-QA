@@ -1,0 +1,72 @@
+--- TileEntityMobSpawner.java
++++ TileEntityMobSpawner.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ public class TileEntityMobSpawner extends TileEntity {
+     public int delay;
+@@ -6,5 +8,5 @@
+     public double yaw;
+     public double prevYaw;
+-    
++
+     public TileEntityMobSpawner() {
+         this.delay = -1;
+@@ -13,9 +15,9 @@
+         this.delay = 20;
+     }
+-    
++
+     public boolean anyPlayerInRange() {
+         return this.worldObj.getClosestPlayer(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5, 16.0) != null;
+     }
+-    
++
+     @Override
+     public void updateEntity() {
+@@ -37,9 +39,8 @@
+             if (this.delay > 0) {
+                 --this.delay;
+-            }
+-            else {
++            } else {
+                 final byte b7 = 4;
+                 for (int i8 = 0; i8 < b7; ++i8) {
+-                    final EntityLiving entityLiving9 = (EntityLiving)EntityList.createEntityByName(this.mobID, this.worldObj);
++                    final EntityLiving entityLiving9 = (EntityLiving) EntityList.createEntityByName(this.mobID, this.worldObj);
+                     if (entityLiving9 == null) {
+                         return;
+@@ -56,5 +57,5 @@
+                         entityLiving9.setLocationAndAngles(d4, d5, d6, this.worldObj.rand.nextFloat() * 360.0f, 0.0f);
+                         if (entityLiving9.getCanSpawnHere()) {
+-                            this.worldObj.spawnEntityInWorld(entityLiving9);
++                            this.worldObj.spawnEntityInWorld(entityLiving9, SpawnReason.SPAWNER);
+                             for (int i10 = 0; i10 < 20; ++i10) {
+                                 d1 = this.xCoord + 0.5 + (this.worldObj.rand.nextFloat() - 0.5) * 2.0;
+@@ -73,9 +74,9 @@
+         }
+     }
+-    
++
+     private void updateDelay() {
+         this.delay = 200 + this.worldObj.rand.nextInt(600);
+     }
+-    
++
+     @Override
+     public void readFromNBT(final NBTTagCompound nbttagcompound) {
+@@ -84,10 +85,10 @@
+         this.delay = nbttagcompound.getShort("Delay");
+     }
+-    
++
+     @Override
+     public void writeToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeToNBT(nbttagcompound);
+         nbttagcompound.setString("EntityId", this.mobID);
+-        nbttagcompound.setShort("Delay", (short)this.delay);
++        nbttagcompound.setShort("Delay", (short) this.delay);
+     }
+ }

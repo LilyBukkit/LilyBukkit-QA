@@ -1,0 +1,47 @@
+--- ItemHoe.java
++++ ItemHoe.java
+@@ -1,4 +1,11 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.block.BlockPlaceEvent;
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.block.LBBlockState;
++
+ public class ItemHoe extends Item {
+     public ItemHoe(final int itemID, final int maxDamage) {
+@@ -7,5 +14,5 @@
+         this.maxDamage = 32 << maxDamage;
+     }
+-    
++
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, final int y, final int z, final int i7) {
+@@ -17,5 +24,18 @@
+         final Block block10 = Block.tilledField;
+         world.playSoundEffect(x + 0.5f, y + 0.5f, z + 0.5f, block10.stepSound.getStepSound(), (block10.stepSound.getVolume() + 1.0f) / 2.0f, block10.stepSound.getPitch() * 0.8f);
++
++        LBBlockState blockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y, z)); // LilyBukkit
++
+         world.setBlockWithNotify(x, y, z, block10.blockID);
++
++        // CraftBukkit start - Hoes - blockface -1 for 'SELF'
++        BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, x, y, z, block10);
++
++        if (event.isCancelled() || !event.canBuild()) {
++            event.getBlockPlaced().setTypeId(blockState.getTypeId());
++            return false;
++        }
++        // CraftBukkit end
++
+         stack.damageItem(1);
+         if (world.rand.nextInt(8) == 0 && i8 == Block.grass.blockID) {
+@@ -28,5 +48,5 @@
+                 final EntityItem entityItem17 = new EntityItem(world, x + f14, y + f15, z + f16, new ItemStack(Item.seeds));
+                 entityItem17.delayBeforeCanPickup = 10;
+-                world.spawnEntityInWorld(entityItem17);
++                world.spawnEntityInWorld(entityItem17, SpawnReason.NATURAL);
+             }
+         }

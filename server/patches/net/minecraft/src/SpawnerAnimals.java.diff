@@ -1,9 +1,28 @@
 --- SpawnerAnimals.java
 +++ SpawnerAnimals.java
-@@ -9,5 +9,5 @@
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ import java.util.Iterator;
+ import java.util.HashSet;
+@@ -9,5 +11,5 @@
      private Class entityType;
      private Class[] entities;
 -    private Set eligibleChunksForSpawning;
 +private Set<ChunkCoordIntPair> eligibleChunksForSpawning;
      
      public SpawnerAnimals(final int i1, final Class class2, final Class[] class3) {
+@@ -91,9 +93,9 @@
+                                     if (entityLiving29.getCanSpawnHere()) {
+                                         ++i3;
+-                                        world1.spawnEntityInWorld(entityLiving29);
++                                        world1.spawnEntityInWorld(entityLiving29, SpawnReason.SPAWNER);
+                                         if (entityLiving29 instanceof EntitySpider && world1.rand.nextInt(100) == 0) {
+                                             final EntitySkeleton entitySkeleton30 = new EntitySkeleton(world1);
+                                             entitySkeleton30.setLocationAndAngles(f18, f19, f20, entityLiving29.rotationYaw, 0.0f);
+-                                            world1.spawnEntityInWorld(entitySkeleton30);
++                                            world1.spawnEntityInWorld(entitySkeleton30, SpawnReason.SPAWNER);
+                                             entitySkeleton30.mountEntity(entityLiving29);
+                                         }

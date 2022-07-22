@@ -1,0 +1,16 @@
+--- BlockCrops.java
++++ BlockCrops.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ import java.util.Random;
+ 
+@@ -83,5 +85,5 @@
+                 final EntityItem entityItem11 = new EntityItem(world, x + f8, y + f9, z + f10, new ItemStack(Item.seeds));
+                 entityItem11.delayBeforeCanPickup = 10;
+-                world.spawnEntityInWorld(entityItem11);
++                world.spawnEntityInWorld(entityItem11, SpawnReason.NATURAL);
+             }
+         }

@@ -38,6 +38,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
@@ -439,7 +440,7 @@ public class LBWorld implements World {
     @Override
     public Item dropItemNaturally(Location location, ItemStack item) {
         EntityItem i = new EntityItem(this.world, new Integer(location.getBlockX()).doubleValue(), new Integer(location.getBlockY()).doubleValue(), new Integer(location.getBlockZ()).doubleValue(), new net.minecraft.src.ItemStack(item.getTypeId(), item.getAmount(), item.getData().getData()));
-        if (this.world.spawnEntityInWorld(i)) return new LBItem(this, i);
+        if (this.world.spawnEntityInWorld(i, SpawnReason.NATURAL)) return new LBItem(this, i);
         return null;
     }
 
@@ -457,7 +458,7 @@ public class LBWorld implements World {
         EntityArrow e = new EntityArrow(this.world);
         e.setPosition(new Integer(location.getBlockX()).doubleValue(), new Integer(location.getBlockY()).doubleValue(), new Integer(location.getBlockZ()).doubleValue());
         e.setArrowHeading(velocity.getX(), velocity.getY(), velocity.getZ(), velocity.angle(new Vector(0, velocity.getY(), 0)), velocity.angle(new Vector(velocity.getX(), 0, 0)));
-        if (this.world.spawnEntityInWorld(e)) return new LBArrow(this, e);
+        if (this.world.spawnEntityInWorld(e, SpawnReason.CUSTOM)) return new LBArrow(this, e);
         return null;
     }
 
@@ -840,11 +841,11 @@ public class LBWorld implements World {
             entityToSpawn = new EntityGiantZombie(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
             entityToReturn = new LBGiant(this, (EntityGiantZombie) entityToSpawn);
-        }/* else if (clazz.equals(LBItem.class)) {
+        } else if (clazz.equals(LBItem.class)) {
             entityToSpawn = new EntityItem(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
             entityToReturn = new LBItem(this, (EntityItem) entityToSpawn);
-        }*/ else if (clazz.equals(LBMinecart.class)) {
+        } else if (clazz.equals(LBMinecart.class)) {
             entityToSpawn = new EntityMinecart(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
             entityToReturn = new LBMinecart(this, (EntityMinecart) entityToSpawn);
@@ -881,7 +882,7 @@ public class LBWorld implements World {
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
             entityToReturn = new LBZombie(this, (EntityZombie) entityToSpawn);
         }
-        if (entityToSpawn != null && this.world.spawnEntityInWorld(entityToSpawn)) return (T) entityToReturn;
+        if (entityToSpawn != null && this.world.spawnEntityInWorld(entityToSpawn, SpawnReason.CUSTOM)) return (T) entityToReturn;
         else throw new IllegalArgumentException("Can't spawn entity");
     }
 

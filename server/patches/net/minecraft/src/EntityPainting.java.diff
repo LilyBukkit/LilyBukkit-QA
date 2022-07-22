@@ -1,0 +1,23 @@
+--- EntityPainting.java
++++ EntityPainting.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ import java.util.List;
+ import java.util.ArrayList;
+@@ -99,5 +101,5 @@
+             this.tickCounter = 0;
+             this.setEntityDead();
+-            this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)));
++            this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)), SpawnReason.NATURAL);
+         }
+     }
+@@ -156,5 +158,5 @@
+     public boolean attackEntityFrom(final Entity entity, final int damage) {
+         this.setEntityDead();
+-        this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)));
++        this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)), SpawnReason.NATURAL);
+         return true;
+     }

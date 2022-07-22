@@ -1,0 +1,16 @@
+--- Entity.java
++++ Entity.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ import java.util.List;
+ import java.util.Random;
+@@ -671,5 +673,5 @@
+         final EntityItem entityItem4 = new EntityItem(this.worldObj, this.posX, this.posY + velocity, this.posZ, new ItemStack(itemID, count));
+         entityItem4.delayBeforeCanPickup = 10;
+-        this.worldObj.spawnEntityInWorld(entityItem4);
++        this.worldObj.spawnEntityInWorld(entityItem4, SpawnReason.NATURAL);
+         return entityItem4;
+     }

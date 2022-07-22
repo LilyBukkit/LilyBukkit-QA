@@ -1,0 +1,52 @@
+--- ItemReed.java
++++ ItemReed.java
+@@ -1,4 +1,10 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.block.BlockPlaceEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.block.LBBlockState;
++
+ public class ItemReed extends Item {
+     private int spawnID;
+@@ -11,4 +17,7 @@
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, int x, int y, int z, int i7) {
++
++        int clickedX = x, clickedY = y, clickedZ = z; // CraftBukkit
++
+         if (world.getBlockId(x, y, z) == Block.snow.blockID) {
+             i7 = 0;
+@@ -39,5 +48,29 @@
+         if (world.canBlockBePlacedAt(this.spawnID, x, y, z, false)) {
+             final Block block8 = Block.blocksList[this.spawnID];
+-            if (world.setBlockWithNotify(x, y, z, this.spawnID)) {
++            // CraftBukkit start - This executes the placement of the block
++            LBBlockState replacedBlockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y, z)); // CraftBukkit
++            /**
++             * @see net.minecraft.server.World#setTypeId(int i, int j, int k, int l)
++             *
++             * This replaces world.setTypeId(IIII), we're doing this because we need to
++             * hook between the 'placement' and the informing to 'world' so we can
++             * sanely undo this.
++             *
++             * Whenever the call to 'world.setTypeId' changes we need to figure out again what to
++             * replace this with.
++             */
++            if (world.setBlock(x, y, z, this.spawnID)) { // <-- world.e does this to place the block
++                BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, replacedBlockState, clickedX, clickedY, clickedZ, block8);
++
++                if (event.isCancelled() || !event.canBuild()) {
++                    // CraftBukkit - undo; this only has reed, repeater and pie blocks
++                    world.setBlockAndMetadata(x, y, z, replacedBlockState.getTypeId(), replacedBlockState.getRawData());
++
++                    return true;
++                }
++
++                world.notifyBlocksOfNeighborChange(x, y, z, this.spawnID); // <-- world.setTypeId does this on success (tell the world)
++                // CraftBukkit end
++
+                 Block.blocksList[this.spawnID].onBlockPlaced(world, x, y, z, i7);
+                 world.playSoundEffect(x + 0.5f, y + 0.5f, z + 0.5f, block8.stepSound.getStepSound(), (block8.stepSound.getVolume() + 1.0f) / 2.0f, block8.stepSound.getPitch() * 0.8f);

@@ -1,0 +1,16 @@
+--- BlockJukeBox.java
++++ BlockJukeBox.java
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ public class BlockJukeBox extends Block {
+     protected BlockJukeBox(final int id, final int blockIndex) {
+@@ -31,5 +33,5 @@
+         final EntityItem entityItem14 = new EntityItem(world, x + d8, y + d9, z + d10, new ItemStack(i6));
+         entityItem14.delayBeforeCanPickup = 10;
+-        world.spawnEntityInWorld(entityItem14);
++        world.spawnEntityInWorld(entityItem14, SpawnReason.NATURAL);
+     }
+     

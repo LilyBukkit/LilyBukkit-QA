@@ -1,6 +1,13 @@
 --- Block.java
 +++ Block.java
-@@ -379,5 +379,6 @@
+@@ -1,4 +1,6 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++
+ import java.util.Random;
+ import java.util.ArrayList;
+@@ -379,5 +381,6 @@
      }
      
 -    public void getCollidingBoundingBoxes(final World world, final int x, final int y, final int z, final AxisAlignedBB aabb, final ArrayList arrayList) {
@@ -8,7 +15,14 @@
 +        final AxisAlignedBB aabb, final ArrayList<AxisAlignedBB> arrayList) {
          final AxisAlignedBB axisAlignedBB7 = this.getCollisionBoundingBoxFromPool(world, x, y, z);
          if (axisAlignedBB7 != null && aabb.intersectsWith(axisAlignedBB7)) {
-@@ -544,13 +545,16 @@
+@@ -460,5 +463,5 @@
+                         final EntityItem entityItem17 = new EntityItem(world, x + d11, y + d12, z + d13, new ItemStack(i8));
+                         entityItem17.delayBeforeCanPickup = 10;
+-                        world.spawnEntityInWorld(entityItem17);
++                        world.spawnEntityInWorld(entityItem17, SpawnReason.NATURAL);
+                     }
+                 }
+@@ -544,13 +547,16 @@
      
      private boolean isVecInsideYZBounds(final Vec3D vector) {
 -        return vector != null && (vector.yCoord >= this.minY && vector.yCoord <= this.maxY && vector.zCoord >= this.minZ && vector.zCoord <= this.maxZ);
