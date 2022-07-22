@@ -782,7 +782,7 @@ public class LilyBukkit implements Server {
         }
     }
 
-    private void CRAFTBUKKIT_loadCustomPermissions() {
+    protected void CRAFTBUKKIT_loadCustomPermissions() {
         File file = new File(configuration.getString("settings.permissions-file"));
         FileInputStream stream = null;
 
@@ -866,7 +866,7 @@ public class LilyBukkit implements Server {
         }
     }
 
-    private void CRAFTBUKKIT_loadConfig() {
+    protected void CRAFTBUKKIT_loadConfig() {
         configuration.load();
         configuration.getString("database.url", "jdbc:sqlite:{DIR}{NAME}.db");
         configuration.getString("database.username", "bukkit");
