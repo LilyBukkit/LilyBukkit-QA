@@ -1,0 +1,39 @@
+--- BlockStationary.java
++++ BlockStationary.java
+@@ -1,4 +1,7 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.block.BlockIgniteEvent;
++
+ import java.util.Random;
+ 
+@@ -32,4 +35,10 @@
+     public void updateTick(final World world, int x, int y, int z, final Random random) {
+         if (this.material == Material.lava) {
++
++            // CraftBukkit start - prevent lava putting something on fire.
++            org.bukkit.World bworld = Bukkit.getWorld(world.levelName);
++            BlockIgniteEvent.IgniteCause igniteCause = BlockIgniteEvent.IgniteCause.LAVA;
++            // CraftBukkit end
++
+             for (int i6 = random.nextInt(3), i7 = 0; i7 < i6; ++i7) {
+                 x += random.nextInt(3) - 1;
+@@ -39,4 +48,17 @@
+                 if (i8 == 0) {
+                     if (this.isFlammable(world, x - 1, y, z) || this.isFlammable(world, x + 1, y, z) || this.isFlammable(world, x, y, z - 1) || this.isFlammable(world, x, y, z + 1) || this.isFlammable(world, x, y - 1, z) || this.isFlammable(world, x, y + 1, z)) {
++                        // CraftBukkit start - prevent lava putting something on fire.
++                        org.bukkit.block.Block block = bworld.getBlockAt(x, y, z);
++
++                        if (block.getTypeId() != Block.fire.blockID) {
++                            BlockIgniteEvent event = new BlockIgniteEvent(block, igniteCause, null);
++                            Bukkit.getServer().getPluginManager().callEvent(event);
++
++                            if (event.isCancelled()) {
++                                continue;
++                            }
++                        }
++                        // CraftBukkit end
++
+                         world.setBlockWithNotify(x, y, z, Block.fire.blockID);
+                         return;

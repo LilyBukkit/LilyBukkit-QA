@@ -1,0 +1,46 @@
+--- BlockMushroom.java
++++ BlockMushroom.java
+@@ -1,4 +1,9 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.block.BlockSpreadEvent;
++
++import java.util.Random;
++
+ public class BlockMushroom extends BlockFlower {
+     protected BlockMushroom(final int id, final int blockIndex) {
+@@ -17,3 +22,33 @@
+         return world.getBlockLightValue(x, y, z) <= 13 && this.canThisPlantGrowOnThisBlockID(world.getBlockId(x, y - 1, z));
+     }
++
++    @Override
++    public void updateTick(World world, int x, int y, int z, Random random) {
++        //super.updateTick(world, x, y, z, random);
++        if (random.nextInt(100) == 0) {
++            int l = x + random.nextInt(3) - 1;
++            int i1 = y + random.nextInt(2) - random.nextInt(2);
++            int j1 = z + random.nextInt(3) - 1;
++
++            if (!world.blockExists(l, i1, j1) && this.canBlockStay(world, l, i1, j1)) {
++                int k1 = x + (random.nextInt(3) - 1);
++
++                k1 = z + (random.nextInt(3) - 1);
++                if (!world.blockExists(l, i1, j1) && this.canBlockStay(world, l, i1, j1)) {
++                    // CraftBukkit start
++                    org.bukkit.World bworld = Bukkit.getWorld(world.levelName);
++                    org.bukkit.block.BlockState blockState = bworld.getBlockAt(l, i1, j1).getState();
++                    blockState.setTypeId(this.blockID);
++
++                    BlockSpreadEvent event = new BlockSpreadEvent(blockState.getBlock(), bworld.getBlockAt(x, y, z), blockState);
++                    Bukkit.getServer().getPluginManager().callEvent(event);
++
++                    if (!event.isCancelled()) {
++                        blockState.update(true);
++                    }
++                    // CraftBukkit end
++                }
++            }
++        }
++    }
+ }
