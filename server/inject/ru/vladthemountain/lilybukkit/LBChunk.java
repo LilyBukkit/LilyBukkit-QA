@@ -22,8 +22,8 @@ import java.util.List;
  */
 public class LBChunk implements Chunk {
 
-    private net.minecraft.src.Chunk chunk;
-    private LBWorld world;
+    protected net.minecraft.src.Chunk chunk;
+    protected LBWorld world;
 
     public LBChunk(net.minecraft.src.Chunk chunk) {
         this.chunk = chunk;

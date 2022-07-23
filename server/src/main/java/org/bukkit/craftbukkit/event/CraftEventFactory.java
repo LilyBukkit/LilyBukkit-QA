@@ -141,7 +141,7 @@ public class CraftEventFactory {
 
     public static PlayerInteractEvent callPlayerInteractEvent(EntityPlayerMP who, Action action, int clickedX, int clickedY, int clickedZ, int clickedFace, net.minecraft.src.ItemStack itemStack) {
         Player player = who == null ? null : new LBPlayer((LBWorld) Bukkit.getServer().getWorld(who.mcServer.worldMngr.levelName), who);
-        ItemStack itemInHand = new ItemStack(itemStack.itemID, itemStack.stackSize, (short) itemStack.itemDmg);
+        ItemStack itemInHand = itemStack == null ? new ItemStack(0, 0, (short) 0) : new ItemStack(itemStack.itemID, itemStack.stackSize, (short) itemStack.itemDmg);
 
         LBWorld craftWorld = (LBWorld) player.getWorld();
         LilyBukkit server = (LilyBukkit) player.getServer();

@@ -53,7 +53,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -89,7 +88,7 @@ public class LilyBukkit implements Server {
     public final List<LBWorld> worldList;
     private final List<Recipe> recipeManager;
     private final SimpleCommandMap commandMap;
-    Configuration configuration = new Configuration(new File("config" + File.separator + "lilybukkit.yml"));
+    Configuration configuration = new Configuration(new File("config/lilybukkit.yml"));
 
     public LilyBukkit(MinecraftServer parent) {
         this.mc = parent;
@@ -782,7 +781,7 @@ public class LilyBukkit implements Server {
         }
     }
 
-    private void CRAFTBUKKIT_loadCustomPermissions() {
+    protected void CRAFTBUKKIT_loadCustomPermissions() {
         File file = new File(configuration.getString("settings.permissions-file"));
         FileInputStream stream = null;
 
@@ -866,7 +865,7 @@ public class LilyBukkit implements Server {
         }
     }
 
-    private void CRAFTBUKKIT_loadConfig() {
+    protected void CRAFTBUKKIT_loadConfig() {
         configuration.load();
         configuration.getString("database.url", "jdbc:sqlite:{DIR}{NAME}.db");
         configuration.getString("database.username", "bukkit");
@@ -878,6 +877,10 @@ public class LilyBukkit implements Server {
         configuration.getInt("settings.spawn-radius", 16);
 
         configuration.getString("settings.permissions-file", "permissions.yml");
+
+        //LilyBukkit start
+        configuration.getBoolean("lilybukkit.vanilla-help", false);
+        //LilyBukkit end
 
         if (configuration.getNode("aliases") == null) {
             List<String> icanhasbukkit = new ArrayList<String>();

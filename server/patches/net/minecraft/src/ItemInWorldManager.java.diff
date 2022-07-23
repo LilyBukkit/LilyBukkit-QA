@@ -54,20 +54,20 @@
 +
 +            if (event.useInteractedBlock() == Event.Result.DENY) {
 +                // If we denied a door from opening, we need to send a correcting update to the client, as it already opened the door.
-+                if (i1 == Block.wood.blockID) {
++                if (i5 == Block.wood.blockID) {
 +                    // For some reason *BOTH* the bottom/top part have to be marked updated.
 +                    boolean bottom = (this.worldObj.getBlockMetadata(i1, i2, i3) & 8) == 0;
 +                    ((EntityPlayerMP) this.thisPlayer).playerNetServerHandler.sendPacket(new Packet53BlockChange(i1, i2, i3, this.worldObj));
 +                    ((EntityPlayerMP) this.thisPlayer).playerNetServerHandler.sendPacket(new Packet53BlockChange(i1, i2 + (bottom ? 1 : -1), i3, this.worldObj));
 +                }
 +            } else {
-+                Block.blocksList[i1].blockActivated(this.worldObj, i1, i2, i3, this.thisPlayer);
++                Block.blocksList[i5].blockActivated(this.worldObj, i1, i2, i3, this.thisPlayer);
 +                // Allow fire punching to be blocked
 +                //this.worldObj.douseFire((EntityMob) null, i1, i2, i3, i4);
 +            }
 +
 +            // Handle hitting a block
-+            float toolDamage = Block.blocksList[i1].blockStrength(this.thisPlayer);
++            float toolDamage = Block.blocksList[i5].blockStrength(this.thisPlayer);
 +            if (event.useItemInHand() == Event.Result.DENY) {
 +                // If we 'insta destroyed' then the client needs to be informed.
 +                if (toolDamage > 1.0f) {
