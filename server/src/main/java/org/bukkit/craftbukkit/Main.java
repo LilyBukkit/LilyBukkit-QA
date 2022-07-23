@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit;
 
+import ru.vladthemountain.lilybukkit.NewMain;
+
 @Deprecated
-public class Main {
-    public static boolean useJline = /*true*/ false;
+public class Main extends NewMain {
 }

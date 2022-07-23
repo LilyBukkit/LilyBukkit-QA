@@ -10,19 +10,18 @@ import java.text.SimpleDateFormat;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
-@Deprecated
 public class ShortConsoleLogFormatter extends Formatter {
     private final SimpleDateFormat date;
 
     public ShortConsoleLogFormatter(MinecraftServer server) {
-        OptionSet options = null/*server.options*/;
+        OptionSet options = server.options;
         SimpleDateFormat date = null;
 
         if (options.has("date-format")) {
             try {
                 Object object = options.valueOf("date-format");
 
-                if ((object != null) && (object instanceof SimpleDateFormat)) {
+                if (object instanceof SimpleDateFormat) {
                     date = (SimpleDateFormat) object;
                 }
             } catch (OptionException ex) {

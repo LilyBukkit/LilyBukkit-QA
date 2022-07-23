@@ -1,6 +1,6 @@
 --- MinecraftServer.java
 +++ MinecraftServer.java
-@@ -1,44 +1,26 @@
+@@ -1,44 +1,46 @@
  package net.minecraft.server;
  
 -import net.minecraft.src.ThreadServerApplication;
@@ -12,24 +12,37 @@
 -import net.minecraft.src.EntityPlayerMP;
 -import net.minecraft.src.ServerCommand;
 -import java.util.Iterator;
--import net.minecraft.src.IUpdatePlayerListBox;
++import jline.ConsoleReader;
++import joptsimple.OptionSet;
++import net.minecraft.src.AxisAlignedBB;
++import net.minecraft.src.ConsoleLogManager;
++import net.minecraft.src.EntityTracker;
++import net.minecraft.src.ICommandListener;
+ import net.minecraft.src.IUpdatePlayerListBox;
 -import net.minecraft.src.Packet;
--import net.minecraft.src.Packet4UpdateTime;
--import net.minecraft.src.Vec3D;
++import net.minecraft.src.NetworkListenThread;
+ import net.minecraft.src.Packet4UpdateTime;
++import net.minecraft.src.PropertyManager;
++import net.minecraft.src.ServerCommand;
++import net.minecraft.src.ServerConfigurationManager;
++import net.minecraft.src.ServerGUI;
++import net.minecraft.src.ThreadCommandReader;
++import net.minecraft.src.ThreadServerApplication;
++import net.minecraft.src.ThreadSleepForeverServer;
+ import net.minecraft.src.Vec3D;
 -import net.minecraft.src.AxisAlignedBB;
 -import net.minecraft.src.IProgressUpdate;
 -import net.minecraft.src.IWorldAccess;
--import net.minecraft.src.WorldManager;
-+import jline.ConsoleReader;
-+import net.minecraft.src.*;
+ import net.minecraft.src.WorldManager;
++import net.minecraft.src.WorldServer;
 +import org.bukkit.command.ConsoleCommandSender;
 +import org.bukkit.craftbukkit.LoggerOutputStream;
++import org.bukkit.craftbukkit.util.ServerShutdownThread;
 +import org.bukkit.event.server.ServerCommandEvent;
 +import org.bukkit.event.world.WorldSaveEvent;
 +import org.bukkit.plugin.PluginLoadOrder;
 +import ru.vladthemountain.lilybukkit.LilyBukkit;
 +
-+import java.awt.*;
 +import java.io.File;
  import java.io.IOException;
 -import java.util.logging.Level;
@@ -40,16 +53,18 @@
 -import net.minecraft.src.ThreadCommandReader;
 -import net.minecraft.src.ThreadSleepForeverServer;
 -import java.util.Collections;
--import java.util.ArrayList;
+ import java.util.ArrayList;
 -import java.util.Random;
 -import net.minecraft.src.EntityTracker;
- import java.util.List;
+-import java.util.List;
 -import net.minecraft.src.ServerConfigurationManager;
 -import net.minecraft.src.WorldServer;
 -import net.minecraft.src.PropertyManager;
 -import net.minecraft.src.NetworkListenThread;
--import java.util.HashMap;
-+import java.util.*;
++import java.util.Collections;
+ import java.util.HashMap;
++import java.util.List;
++import java.util.Random;
 +import java.util.logging.Level;
  import java.util.logging.Logger;
 -import net.minecraft.src.ICommandListener;
@@ -60,7 +75,7 @@
 +    public static HashMap<String, Integer> playerList;
      public NetworkListenThread networkServer;
      public PropertyManager propertyManagerObj;
-@@ -50,6 +32,6 @@
+@@ -50,6 +52,6 @@
      public String currentTask;
      public int percentDone;
 -    private List playersOnline;
@@ -69,7 +84,7 @@
 +    private List<ServerCommand> commands;
      public EntityTracker entityTracker;
      public boolean onlineMode;
-@@ -57,20 +39,47 @@
+@@ -57,32 +59,68 @@
      public String serverId;
      private static Random rand;
 -    
@@ -101,8 +116,9 @@
          MinecraftServer.rand = new Random(System.currentTimeMillis());
      }
 -    
+-    public MinecraftServer() {
 +
-     public MinecraftServer() {
++    public MinecraftServer(OptionSet opts) {
          this.serverRunning = true;
          this.serverStopped = false;
          this.deathTime = 0;
@@ -110,7 +126,11 @@
 -        this.commands = Collections.synchronizedList((List)new ArrayList());
 +        this.playersOnline = new ArrayList<>();
 +        this.commands = Collections.synchronizedList(new ArrayList<>());
++        // CraftBukkit start
++        this.options = opts;
++        // CraftBukkit end
          new ThreadSleepForeverServer(this);
++        // LilyBukkit start
 +        this.lilyBukkit = new LilyBukkit(this);
 +        this.consoleCommandSender = this.lilyBukkit.getConsoleSender();
 +        try {
@@ -118,15 +138,17 @@
 +        } catch (IOException ex) {
 +            Logger.getLogger(MinecraftServer.class.getName()).log(Level.SEVERE, null, ex);
 +        }
++        Runtime.getRuntime().addShutdownHook(new ServerShutdownThread(this));
      }
 -    
 +
      private boolean startServer() throws IOException {
          final ThreadCommandReader threadCommandReader1 = new ThreadCommandReader(this);
-@@ -78,10 +87,14 @@
+         threadCommandReader1.setDaemon(true);
          threadCommandReader1.start();
-         ConsoleLogManager.init();
+-        ConsoleLogManager.init();
 -        MinecraftServer.logger.info("Starting minecraft server version 0.2.1");
++        ConsoleLogManager.init(this);
 +        // CraftBukkit start
 +        System.setOut(new PrintStream(new LoggerOutputStream(logger, Level.INFO), true));
 +        System.setErr(new PrintStream(new LoggerOutputStream(logger, Level.SEVERE), true));
@@ -137,10 +159,12 @@
              MinecraftServer.logger.warning("To start the server with more ram, launch it as \"java -Xmx1024M -Xms1024M -jar minecraft_server.jar\"");
          }
 -        MinecraftServer.logger.info("Loading properties");
+-        this.propertyManagerObj = new PropertyManager(new File("server.properties"));
 +        MinecraftServer.logger.info("[Minecraft] Loading properties");
-         this.propertyManagerObj = new PropertyManager(new File("server.properties"));
++        this.propertyManagerObj = new PropertyManager(this.options); // CraftBukkit
          final String string2 = this.propertyManagerObj.getStringProperty("server-ip", "");
-@@ -93,12 +106,11 @@
+         this.onlineMode = false;
+@@ -93,12 +131,11 @@
          }
          final int i4 = this.propertyManagerObj.getIntProperty("server-port", 25565);
 -        MinecraftServer.logger.info(new StringBuilder("Starting Minecraft server on ").append((string2.length() == 0) ? "*" : string2).append(":").append(i4).toString());
@@ -156,7 +180,7 @@
 +            MinecraftServer.logger.log(Level.WARNING, "The exception was: " + iOException6);
              MinecraftServer.logger.warning("Perhaps a server is already running on that port?");
              return false;
-@@ -108,6 +120,5 @@
+@@ -108,6 +145,5 @@
              MinecraftServer.logger.info("The server will authenticate usernames.");
              MinecraftServer.logger.info("Unauthenticated players may still join by default, and their abilities can be configured in the unauth.config file.");
 -        }
@@ -164,7 +188,7 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -118,12 +129,13 @@
+@@ -118,12 +154,13 @@
          this.entityTracker = new EntityTracker(this);
          final String string3 = this.propertyManagerObj.getStringProperty("level-name", "world");
 -        MinecraftServer.logger.info(new StringBuilder("Preparing level \"").append(string3).append("\"").toString());
@@ -181,7 +205,7 @@
 +        MinecraftServer.logger.info("[Minecraft] Preparing start region");
          (this.worldMngr = new WorldServer(new File("."), worldName, this.propertyManagerObj.getBooleanProperty("monsters", false))).addWorldAccess(new WorldManager(this));
          this.worldMngr.difficultySetting = 1;
-@@ -140,26 +152,44 @@
+@@ -140,26 +177,44 @@
          }
          this.clearCurrentTask();
 +        if (!this.lilyBukkit.addExistingWorld(this.worldMngr))
@@ -233,7 +257,7 @@
 +            }
          }
          if (this.worldMngr != null) {
-@@ -167,9 +197,9 @@
+@@ -167,9 +222,9 @@
          }
      }
 -    
@@ -245,7 +269,7 @@
 +
      public void run() {
          try {
-@@ -181,9 +211,9 @@
+@@ -181,9 +236,9 @@
                      long j4 = j3 - j1;
                      if (j4 > 2000L) {
 -                        MinecraftServer.logger.warning("Can't keep up! Did the system time change, or is the server overloaded?");
@@ -257,7 +281,7 @@
 +                        MinecraftServer.logger.warning("[Minecraft] Time ran backwards! Did the system time change?");
                          j4 = 0L;
                      }
-@@ -196,32 +226,27 @@
+@@ -196,32 +251,27 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -296,7 +320,7 @@
 +        } finally {
              this.stop();
              this.serverStopped = true;
-@@ -232,18 +257,17 @@
+@@ -232,18 +282,17 @@
          System.exit(0);
      }
 -    
@@ -321,7 +345,7 @@
 +            MinecraftServer.playerList.remove(o);
          }
          AxisAlignedBB.clearBoundingBoxPool();
-@@ -254,230 +278,54 @@
+@@ -254,257 +303,85 @@
          }
          this.worldMngr.tick();
 -        while (this.worldMngr.updatingLighting()) {}
@@ -571,11 +595,18 @@
          this.playersOnline.add(playerListBox);
      }
 -    
+-    public static void main(final String[] args) {
 +
-     public static void main(final String[] args) {
++    public static void main(final OptionSet options/*String[] args*/) {
          try {
-@@ -487,24 +335,27 @@
-             }
+-            final MinecraftServer minecraftServer1 = new MinecraftServer();
+-            if (!GraphicsEnvironment.isHeadless() && (args.length <= 0 || !args[0].equals("nogui"))) {
+-                ServerGUI.initGui(minecraftServer1);
+-            }
++            final MinecraftServer minecraftServer1 = new MinecraftServer(options);
++            //if (!GraphicsEnvironment.isHeadless() && (args.length <= 0 || !args[0].equals("nogui"))) {
++            ServerGUI.initGui(minecraftServer1);
++            //}
              new ThreadServerApplication("Server thread", minecraftServer1).start();
 +        } catch (Exception exception2) {
 +            MinecraftServer.logger.log(Level.SEVERE, "Failed to start the minecraft server", exception2);
@@ -608,4 +639,5 @@
 +    public LilyBukkit lilyBukkit; // LilyBukkit - added
 +    public final ConsoleCommandSender consoleCommandSender;
 +    public ConsoleReader reader;
++    public OptionSet options; //CraftBukkit
  }

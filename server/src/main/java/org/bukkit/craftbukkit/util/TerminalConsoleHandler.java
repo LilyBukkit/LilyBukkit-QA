@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import jline.ConsoleReader;
 import org.bukkit.craftbukkit.Main;
 
-@Deprecated
 public class TerminalConsoleHandler extends ConsoleHandler {
     private final ConsoleReader reader;
 

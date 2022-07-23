@@ -88,7 +88,7 @@ public class LilyBukkit implements Server {
     public final List<LBWorld> worldList;
     private final List<Recipe> recipeManager;
     private final SimpleCommandMap commandMap;
-    Configuration configuration = new Configuration(new File("config/lilybukkit.yml"));
+    Configuration configuration;
 
     public LilyBukkit(MinecraftServer parent) {
         this.mc = parent;
@@ -99,6 +99,7 @@ public class LilyBukkit implements Server {
         this.commandMap = new SimpleCommandMap(this);
         this.pluginMngr = new SimplePluginManager(this, this.commandMap);
         Bukkit.setServer(this);
+        configuration = new Configuration((File) this.mc.options.valueOf("bukkit-settings")); // CraftBukkit
         UpdateChecker.checkForUpdates();
         // Plugin handling
         this.CRAFTBUKKIT_loadConfig();
@@ -474,7 +475,7 @@ public class LilyBukkit implements Server {
     public void reload() {
         //Modified CraftBukkit implementation
         this.CRAFTBUKKIT_loadConfig();
-        PropertyManager config = new PropertyManager(new File("server.properties"));
+        PropertyManager config = new PropertyManager(this.mc.options);
 
         this.mc.propertyManagerObj = config;
 
@@ -855,7 +856,7 @@ public class LilyBukkit implements Server {
 
     public void CRAFTBUKKIT_loadPlugins() {
         this.pluginMngr.registerInterface(JavaPluginLoader.class);
-        File pluginDir = new File("plugins");
+        File pluginDir = (File) this.mc.options.valueOf("plugins"); //CraftBukkit
         if (pluginDir.exists()) {
             for (Plugin plugin : this.pluginMngr.loadPlugins(pluginDir)) {
                 plugin.onLoad();
@@ -877,10 +878,6 @@ public class LilyBukkit implements Server {
         configuration.getInt("settings.spawn-radius", 16);
 
         configuration.getString("settings.permissions-file", "permissions.yml");
-
-        //LilyBukkit start
-        configuration.getBoolean("lilybukkit.vanilla-help", false);
-        //LilyBukkit end
 
         if (configuration.getNode("aliases") == null) {
             List<String> icanhasbukkit = new ArrayList<String>();

@@ -1,0 +1,60 @@
+--- ConsoleLogManager.java
++++ ConsoleLogManager.java
+@@ -1,4 +1,9 @@
+ package net.minecraft.src;
+ 
++import net.minecraft.server.MinecraftServer;
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.util.ShortConsoleLogFormatter;
++import org.bukkit.craftbukkit.util.TerminalConsoleHandler;
++
+ import java.util.logging.Level;
+ import java.util.logging.FileHandler;
+@@ -10,22 +15,39 @@
+ public class ConsoleLogManager {
+     public static Logger logger;
++    public static Logger global;
+     
+     static {
+         ConsoleLogManager.logger = Logger.getLogger("Minecraft");
++        ConsoleLogManager.global = Logger.getLogger(""); // CraftBukkit
+     }
+     
+-    public static void init() {
++    public static void init(MinecraftServer server) {
+         final ConsoleLogFormatter consoleLogFormatter0 = new ConsoleLogFormatter();
+         ConsoleLogManager.logger.setUseParentHandlers(false);
+-        final ConsoleHandler consoleHandler1 = new ConsoleHandler();
+-        consoleHandler1.setFormatter((Formatter)consoleLogFormatter0);
+-        ConsoleLogManager.logger.addHandler((Handler)consoleHandler1);
++        // CraftBukkit start
++        ConsoleHandler consoleHandler1 = new TerminalConsoleHandler(server.reader);
++
++        for (Handler handler: global.getHandlers()) {
++            global.removeHandler(handler);
++        }
++
++        consoleHandler1.setFormatter(new ShortConsoleLogFormatter(server));
++        global.addHandler(consoleHandler1);
++        // CraftBukkit end
++        ConsoleLogManager.logger.addHandler(consoleHandler1);
+         try {
+-            final FileHandler fileHandler2 = new FileHandler("server.log");
+-            fileHandler2.setFormatter((Formatter)consoleLogFormatter0);
+-            ConsoleLogManager.logger.addHandler((Handler)fileHandler2);
++            // CraftBukkit start
++            String pattern = (String)server.options.valueOf("log-pattern");
++            int limit = (Integer) server.options.valueOf("log-limit");
++            int count = (Integer) server.options.valueOf("log-count");
++            boolean append = (Boolean) server.options.valueOf("log-append");
++            FileHandler fileHandler2 = new FileHandler(pattern, limit, count, append);
++            // CraftBukkit end
++
++            fileHandler2.setFormatter(consoleLogFormatter0);
++            ConsoleLogManager.logger.addHandler(fileHandler2);
+         }
+         catch (Exception exception3) {
+-            ConsoleLogManager.logger.log(Level.WARNING, "Failed to log to server.log", (Throwable)exception3);
++            ConsoleLogManager.logger.log(Level.WARNING, "Failed to log to server.log", exception3);
+         }
+     }
