@@ -1,0 +1,53 @@
+--- ThreadCommandReader.java
++++ ThreadCommandReader.java
+@@ -1,29 +1,40 @@
+ package net.minecraft.src;
+ 
+-import java.io.IOException;
+-import java.io.Reader;
+-import java.io.BufferedReader;
+-import java.io.InputStreamReader;
++import jline.ConsoleReader;
+ import net.minecraft.server.MinecraftServer;
+ 
++import java.io.IOException;
++
+ public class ThreadCommandReader extends Thread {
+     final MinecraftServer mcServer;
+-    
++
+     public ThreadCommandReader(final MinecraftServer minecraftServer1) {
+         this.mcServer = minecraftServer1;
+     }
+-    
++
+     public void run() {
+-        final BufferedReader bufferedReader1 = new BufferedReader((Reader)new InputStreamReader(System.in));
++        //final BufferedReader bufferedReader1 = new BufferedReader((Reader)new InputStreamReader(System.in));
++        ConsoleReader bufferedReader1 = this.mcServer.reader; // CraftBukkit
+         String string2 = null;
+         try {
+-            while (!this.mcServer.serverStopped && MinecraftServer.isServerRunning(this.mcServer)) {
++            /*while (!this.mcServer.serverStopped && MinecraftServer.isServerRunning(this.mcServer)) {
+                 if ((string2 = bufferedReader1.readLine()) == null) {
+                     break;
+                 }
+                 this.mcServer.addCommand(string2, this.mcServer);
++            }*/
++            // CraftBukkit start - JLine disabling compatibility
++            while (!this.mcServer.serverStopped && MinecraftServer.isServerRunning(this.mcServer)) {
++                if (org.bukkit.craftbukkit.Main.useJline) {
++                    string2 = bufferedReader1.readLine(">", null);
++                } else {
++                    string2 = bufferedReader1.readLine();
++                }
++                if (string2 != null) {
++                    this.mcServer.addCommand(string2, this.mcServer);
++                }
++                // CraftBukkit end
+             }
+-        }
+-        catch (IOException iOException4) {
++        } catch (IOException iOException4) {
+             iOException4.printStackTrace();
+         }

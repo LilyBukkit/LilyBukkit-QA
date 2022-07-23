@@ -1,10 +1,11 @@
 --- World.java
 +++ World.java
-@@ -1,28 +1,31 @@
+@@ -1,28 +1,32 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.block.BlockCanBuildEvent;
 +import org.bukkit.event.entity.CreatureSpawnEvent;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 +import org.bukkit.event.entity.ItemSpawnEvent;
@@ -47,21 +48,21 @@
 +    public List<TileEntity> loadedTileEntityList;
      public long worldTime;
      public boolean snowCovered;
-@@ -37,5 +40,5 @@
+@@ -37,5 +41,5 @@
      private final long lockTimestamp;
      protected int autosavePeriod;
 -    public List playerEntities;
 +    public List<Entity> playerEntities;
      public int difficultySetting;
      public Random rand;
-@@ -44,5 +47,5 @@
+@@ -44,5 +48,5 @@
      public int spawnZ;
      public boolean isNewWorld;
 -    protected List worldAccesses;
 +    protected List<IWorldAccess> worldAccesses;
      private IChunkProvider chunkProvider;
      public File saveDirectory;
-@@ -52,6 +55,6 @@
+@@ -52,6 +56,6 @@
      public final String levelName;
      public boolean worldChunkLoadOverride;
 -    private ArrayList collidingBoundingBoxes;
@@ -70,14 +71,14 @@
 +    private Set<ChunkCoordIntPair> positionsToUpdate;
      private int soundCounter;
      private List entitiesWithinAABBExcludingEntity;
-@@ -66,5 +69,5 @@
+@@ -66,5 +70,5 @@
      public long bossPeriod;
      private int numLightingUpdates;
 -    
 +
      static {
          World.lightBrightnessTable = new float[16];
-@@ -75,19 +78,19 @@
+@@ -75,19 +79,19 @@
          }
      }
 -    
@@ -103,7 +104,7 @@
 +
      public World(final String levelName) {
          this.milestone = 0L;
-@@ -100,10 +103,10 @@
+@@ -100,10 +104,10 @@
          this.bossPeriod = 10L;
          this.numLightingUpdates = 0;
 -        this.lightingToUpdate = (List)new ArrayList();
@@ -119,7 +120,7 @@
 +        this.loadedTileEntityList = (List) new ArrayList();
          this.worldTime = 0L;
          this.snowCovered = false;
-@@ -117,14 +120,14 @@
+@@ -117,14 +121,14 @@
          this.lockTimestamp = System.currentTimeMillis();
          this.autosavePeriod = 40;
 -        this.playerEntities = (List)new ArrayList();
@@ -138,14 +139,14 @@
 +        this.entitiesWithinAABBExcludingEntity = new ArrayList();
          this.multiplayerWorld = false;
          this.levelName = levelName;
-@@ -132,5 +135,5 @@
+@@ -132,5 +136,5 @@
          this.calculateInitialSkylight();
      }
 -    
 +
      public World(final File baseDir, final String levelName, final long randomSeed) {
          this.milestone = 0L;
-@@ -143,10 +146,10 @@
+@@ -143,10 +147,10 @@
          this.bossPeriod = 10L;
          this.numLightingUpdates = 0;
 -        this.lightingToUpdate = (List)new ArrayList();
@@ -161,7 +162,7 @@
 +        this.loadedTileEntityList = (List) new ArrayList();
          this.worldTime = 0L;
          this.snowCovered = false;
-@@ -160,14 +163,14 @@
+@@ -160,14 +164,14 @@
          this.lockTimestamp = System.currentTimeMillis();
          this.autosavePeriod = 40;
 -        this.playerEntities = (List)new ArrayList();
@@ -180,7 +181,7 @@
 +        this.entitiesWithinAABBExcludingEntity = new ArrayList();
          this.multiplayerWorld = false;
          this.levelName = levelName;
-@@ -176,14 +179,12 @@
+@@ -176,14 +180,12 @@
          try {
              final File file5 = new File(this.saveDirectory, "session.lock");
 -            final DataOutputStream dataOutputStream6 = new DataOutputStream((OutputStream)new FileOutputStream(file5));
@@ -198,14 +199,14 @@
 +        } catch (IOException iOException13) {
              throw new RuntimeException("Failed to check session lock, aborting");
          }
-@@ -192,5 +193,5 @@
+@@ -192,5 +194,5 @@
          if (file5.exists()) {
              try {
 -                final NBTTagCompound nBTTagCompound14 = CompressedStreamTools.readCompressed((InputStream)new FileInputStream(file5));
 +                final NBTTagCompound nBTTagCompound14 = CompressedStreamTools.readCompressed(new FileInputStream(file5));
                  final NBTTagCompound nBTTagCompound15 = nBTTagCompound14.getCompoundTag("Data");
                  this.randomSeed = nBTTagCompound15.getLong("RandomSeed");
-@@ -206,11 +207,9 @@
+@@ -206,11 +208,9 @@
                  this.milestone = nBTTagCompound15.getLong("Milestones");
                  this.exclFrailMode = nBTTagCompound15.getBoolean("ExclusivelyFrail");
 -                System.out.println(new StringBuilder("Current milestone: ").append(this.milestone).toString());
@@ -220,7 +221,7 @@
 +        } else {
              this.snowCovered = (this.rand.nextInt(4) == 0);
          }
-@@ -234,20 +233,21 @@
+@@ -234,20 +234,21 @@
          this.calculateInitialSkylight();
      }
 -    
@@ -247,21 +248,21 @@
 +
      public void saveWorld(final boolean flag, final IProgressUpdate progressUpdate) {
          if (this.chunkProvider.canSave()) {
-@@ -262,5 +262,5 @@
+@@ -262,5 +263,5 @@
          }
      }
 -    
 +
      private void saveLevel() {
          this.checkSessionLock();
-@@ -278,5 +278,5 @@
+@@ -278,5 +279,5 @@
          EntityPlayer entityPlayer2 = null;
          if (this.playerEntities.size() > 0) {
 -            entityPlayer2 = (EntityPlayer)this.playerEntities.get(0);
 +            entityPlayer2 = (EntityPlayer) this.playerEntities.get(0);
          }
          if (entityPlayer2 != null) {
-@@ -286,10 +286,10 @@
+@@ -286,10 +287,10 @@
          }
          final NBTTagCompound nBTTagCompound2 = new NBTTagCompound();
 -        nBTTagCompound2.setTag("Data", (NBTBase)nBTTagCompound1);
@@ -274,7 +275,7 @@
 +            CompressedStreamTools.writeCompressed(nBTTagCompound2, new FileOutputStream(file4));
              if (file5.exists()) {
                  file5.delete();
-@@ -303,18 +303,17 @@
+@@ -303,18 +304,17 @@
                  file4.delete();
              }
 -        }
@@ -297,7 +298,7 @@
 +
      public boolean checkChunksExist(int i1, int i2, int i3, int i4, int i5, int i6) {
          if (i5 >= 0 && i2 < 128) {
-@@ -336,17 +335,17 @@
+@@ -336,17 +336,17 @@
          return false;
      }
 -    
@@ -319,14 +320,14 @@
 +
      public boolean setBlockAndMetadata(final int x, final int y, final int z, final int i4, final int i5) {
          if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
-@@ -362,5 +361,5 @@
+@@ -362,5 +362,5 @@
          return chunk6.setBlockIDWithMetadata(x & 0xF, y, z & 0xF, i4, i5);
      }
 -    
 +
      public boolean setBlock(final int x, final int y, final int z, final int i4) {
          if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
-@@ -376,10 +375,10 @@
+@@ -376,10 +376,10 @@
          return chunk5.setBlockID(x & 0xF, y, z & 0xF, i4);
      }
 -    
@@ -339,7 +340,7 @@
 +
      public int getBlockMetadata(int x, final int y, int z) {
          if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
-@@ -397,9 +396,9 @@
+@@ -397,9 +397,9 @@
          return chunk4.getBlockMetadata(x, y, z);
      }
 -    
@@ -351,21 +352,21 @@
 +
      public boolean setBlockMetadata(int x, final int y, int z, final int i4) {
          if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
-@@ -418,5 +417,5 @@
+@@ -418,5 +418,5 @@
          return true;
      }
 -    
 +
      public boolean setBlockWithNotify(final int x, final int y, final int z, final int i4) {
          if (this.setBlock(x, y, z, i4)) {
-@@ -426,5 +425,5 @@
+@@ -426,5 +426,5 @@
          return false;
      }
 -    
 +
      public boolean setBlockAndMetadataWithNotify(final int x, final int y, final int z, final int i4, final int i5) {
          if (this.setBlockAndMetadata(x, y, z, i4, i5)) {
-@@ -434,16 +433,16 @@
+@@ -434,16 +434,16 @@
          return false;
      }
 -    
@@ -386,7 +387,7 @@
 +
      public void markBlocksDirtyVertical(final int x, final int z, int y, int i4) {
          if (y > i4) {
-@@ -454,11 +453,11 @@
+@@ -454,11 +454,11 @@
          this.markBlocksDirty(x, y, z, x, i4, z);
      }
 -    
@@ -401,14 +402,14 @@
 +
      public void notifyBlocksOfNeighborChange(final int x, final int y, final int z, final int i4) {
          this.notifyBlockOfNeighborChange(x - 1, y, z, i4);
-@@ -469,5 +468,5 @@
+@@ -469,5 +469,5 @@
          this.notifyBlockOfNeighborChange(x, y, z + 1, i4);
      }
 -    
 +
      private void notifyBlockOfNeighborChange(final int x, final int y, final int z, final int i4) {
          if (!this.editingBlocks && !this.multiplayerWorld) {
-@@ -478,13 +477,13 @@
+@@ -478,13 +478,13 @@
          }
      }
 -    
@@ -425,28 +426,28 @@
 +
      public int getBlockLightValue_do(int x, final int y, int z, final boolean z4) {
          if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
-@@ -529,5 +528,5 @@
+@@ -529,5 +529,5 @@
          return chunk11.getBlockLightValue(x, y, z, this.skylightSubtracted);
      }
 -    
 +
      public boolean canExistingBlockSeeTheSky(int x, final int y, int z) {
          if (x < -32000000 || z < -32000000 || x >= 32000000 || z > 32000000) {
-@@ -548,5 +547,5 @@
+@@ -548,5 +548,5 @@
          return chunk4.canBlockSeeTheSky(x, y, z);
      }
 -    
 +
      public int getHeightValue(final int blockX, final int blockZ) {
          if (blockX < -32000000 || blockZ < -32000000 || blockX >= 32000000 || blockZ > 32000000) {
-@@ -559,5 +558,5 @@
+@@ -559,5 +559,5 @@
          return chunk3.getHeightValue(blockX & 0xF, blockZ & 0xF);
      }
 -    
 +
      public void neighborLightPropagationChanged(final EnumSkyBlock skyBlock, final int x, final int y, final int z, int i5) {
          if (this.blockExists(x, y, z)) {
-@@ -566,6 +565,5 @@
+@@ -566,6 +566,5 @@
                      i5 = 15;
                  }
 -            }
@@ -454,21 +455,21 @@
 +            } else if (skyBlock == EnumSkyBlock.Block) {
                  final int i6 = this.getBlockId(x, y, z);
                  if (Block.lightValue[i6] > i5) {
-@@ -578,5 +576,5 @@
+@@ -578,5 +577,5 @@
          }
      }
 -    
 +
      public int getSavedLightValue(final EnumSkyBlock skyBlock, final int blockX, final int blockY, final int blockZ) {
          if (blockY < 0 || blockY >= 128 || blockX < -32000000 || blockZ < -32000000 || blockX >= 32000000 || blockZ > 32000000) {
-@@ -591,5 +589,5 @@
+@@ -591,5 +590,5 @@
          return chunk7.getSavedLightValue(skyBlock, blockX & 0xF, blockY, blockZ & 0xF);
      }
 -    
 +
      public void setLightValue(final EnumSkyBlock skyBlock, final int blockX, final int blockY, final int blockZ, final int i5) {
          if (blockX >= -32000000 && blockZ >= -32000000 && blockX < 32000000 && blockZ <= 32000000 && blockY >= 0 && blockY < 128 && this.chunkExists(blockX >> 4, blockZ >> 4)) {
-@@ -597,21 +595,21 @@
+@@ -597,21 +596,21 @@
              chunk6.setLightValue(skyBlock, blockX & 0xF, blockY, blockZ & 0xF, i5);
              for (int i6 = 0; i6 < this.worldAccesses.size(); ++i6) {
 -                ((IWorldAccess)this.worldAccesses.get(i6)).markBlockAndNeighborsNeedsUpdate(blockX, blockY, blockZ);
@@ -495,7 +496,7 @@
 +
      public MovingObjectPosition rayTraceBlocks_do(final Vec3D vector1, final Vec3D vector2, final boolean z3) {
          if (Double.isNaN(vector1.xCoord) || Double.isNaN(vector1.yCoord) || Double.isNaN(vector1.zCoord)) {
-@@ -674,6 +672,5 @@
+@@ -674,6 +673,5 @@
                      if (i4 > i7) {
                          b35 = 4;
 -                    }
@@ -503,7 +504,7 @@
 +                    } else {
                          b35 = 5;
                      }
-@@ -681,10 +678,8 @@
+@@ -681,10 +679,8 @@
                      vector1.yCoord += d18 * d14;
                      vector1.zCoord += d19 * d14;
 -                }
@@ -516,7 +517,7 @@
 +                    } else {
                          b35 = 1;
                      }
-@@ -692,10 +687,8 @@
+@@ -692,10 +688,8 @@
                      vector1.yCoord = d12;
                      vector1.zCoord += d19 * d15;
 -                }
@@ -529,28 +530,28 @@
 +                    } else {
                          b35 = 3;
                      }
-@@ -708,5 +701,5 @@
+@@ -708,5 +702,5 @@
                  final double xCoord = MathHelper.floor_double(vector1.xCoord);
                  vector3.xCoord = xCoord;
 -                i7 = (int)xCoord;
 +                i7 = (int) xCoord;
                  if (b35 == 5) {
                      --i7;
-@@ -717,5 +710,5 @@
+@@ -717,5 +711,5 @@
                  final double yCoord = MathHelper.floor_double(vector1.yCoord);
                  vec3D32.yCoord = yCoord;
 -                i8 = (int)yCoord;
 +                i8 = (int) yCoord;
                  if (b35 == 1) {
                      --i8;
-@@ -726,5 +719,5 @@
+@@ -726,5 +720,5 @@
                  final double zCoord = MathHelper.floor_double(vector1.zCoord);
                  vec3D34.zCoord = zCoord;
 -                i9 = (int)zCoord;
 +                i9 = (int) zCoord;
                  if (b35 == 3) {
                      --i9;
-@@ -747,36 +740,49 @@
+@@ -747,36 +741,49 @@
          return null;
      }
 -    
@@ -613,14 +614,14 @@
 +
          if (!z4 && !this.chunkExists(i2, i3)) {
              return false;
-@@ -784,5 +790,5 @@
+@@ -784,5 +791,5 @@
          if (entity instanceof EntityPlayer) {
              this.playerEntities.add(entity);
 -            System.out.println(new StringBuilder("Player count: ").append(this.playerEntities.size()).toString());
 +            System.out.println("Player count: " + this.playerEntities.size());
          }
          this.getChunkFromChunkCoords(i2, i3).addEntity(entity);
-@@ -791,29 +797,29 @@
+@@ -791,29 +798,29 @@
          return true;
      }
 -    
@@ -658,7 +659,7 @@
 +
      public List getCollidingBoundingBoxes(final Entity entity, final AxisAlignedBB aabb) {
          this.collidingBoundingBoxes.clear();
-@@ -839,16 +845,16 @@
+@@ -839,16 +846,16 @@
          final List list15 = this.getEntitiesWithinAABBExcludingEntity(entity, aabb.expand(d14, d14, d14));
          for (int i12 = 0; i12 < list15.size(); ++i12) {
 -            AxisAlignedBB axisAlignedBB13 = ((Entity)list15.get(i12)).getBoundingBox();
@@ -679,7 +680,7 @@
 +
      public int calculateSkylightSubtracted(final float f1) {
          final float f2 = this.getCelestialAngle(f1);
-@@ -860,9 +866,9 @@
+@@ -860,9 +867,9 @@
              f3 = 1.0f;
          }
 -        return (int)(f3 * 11.0f);
@@ -692,7 +693,7 @@
 +        final int i2 = (int) (this.worldTime % 24000L);
          float f2 = (i2 + f1) / 24000.0f - 0.25f;
          if (f2 < 0.0f) {
-@@ -873,9 +879,9 @@
+@@ -873,9 +880,9 @@
          }
          final float f3 = f2;
 -        f2 = 1.0f - (float)((Math.cos(f2 * 3.141592653589793) + 1.0) / 2.0);
@@ -704,14 +705,14 @@
 +
      public int getTopSolidOrLiquidBlock(int x, int z) {
          final Chunk chunk3 = this.getChunkFromBlockCoords(x, z);
-@@ -892,5 +898,5 @@
+@@ -892,5 +899,5 @@
          return -1;
      }
 -    
 +
      public void scheduleBlockUpdate(final int i1, final int i2, final int i3, final int i4) {
          final NextTickListEntry nextTickListEntry5 = new NextTickListEntry(i1, i2, i3, i4);
-@@ -906,9 +912,9 @@
+@@ -906,9 +913,9 @@
          }
      }
 -    
@@ -724,7 +725,7 @@
 +            final Entity entity2 = this.unloadedEntityList.get(i1);
              final int i2 = entity2.chunkCoordX;
              final int i3 = entity2.chunkCoordZ;
-@@ -918,9 +924,9 @@
+@@ -918,9 +925,9 @@
          }
          for (int i1 = 0; i1 < this.unloadedEntityList.size(); ++i1) {
 -            this.releaseEntitySkin((Entity)this.unloadedEntityList.get(i1));
@@ -736,7 +737,7 @@
 +            final Entity entity2 = this.loadedEntityList.get(i1);
              if (entity2.ridingEntity != null) {
                  if (!entity2.ridingEntity.isDead && entity2.ridingEntity.riddenByEntity == entity2) {
-@@ -944,9 +950,9 @@
+@@ -944,9 +951,9 @@
          }
          for (int i1 = 0; i1 < this.loadedTileEntityList.size(); ++i1) {
 -            final TileEntity tileEntity5 = (TileEntity)this.loadedTileEntityList.get(i1);
@@ -748,7 +749,7 @@
 +
      protected void updateEntity(final Entity entity) {
          final int i2 = MathHelper.floor_double(entity.posX);
-@@ -961,6 +967,5 @@
+@@ -961,6 +968,5 @@
              if (entity.ridingEntity != null) {
                  entity.updateRidden();
 -            }
@@ -756,7 +757,7 @@
 +            } else {
                  entity.onUpdate();
              }
-@@ -974,6 +979,5 @@
+@@ -974,6 +980,5 @@
                  if (this.chunkExists(i4, i6)) {
                      this.getChunkFromChunkCoords(i4, i6).addEntity(entity);
 -                }
@@ -764,7 +765,7 @@
 +                } else {
                      entity.addedToChunk = false;
                      System.out.println("Removing entity because it's not in a chunk!!");
-@@ -984,6 +988,5 @@
+@@ -984,6 +989,5 @@
                  if (!entity.riddenByEntity.isDead && entity.riddenByEntity.ridingEntity == entity) {
                      this.updateEntity(entity.riddenByEntity);
 -                }
@@ -772,7 +773,7 @@
 +                } else {
                      entity.riddenByEntity.ridingEntity = null;
                      entity.riddenByEntity = null;
-@@ -999,17 +1002,17 @@
+@@ -999,17 +1003,17 @@
                  entity.posZ = entity.lastTickPosZ;
              }
 -            if (Double.isNaN((double)entity.rotationPitch) || Double.isInfinite((double)entity.rotationPitch)) {
@@ -794,42 +795,42 @@
 +            final Entity entity4 = (Entity) list2.get(i3);
              if (!entity4.isDead && entity4.preventEntitySpawning) {
                  return false;
-@@ -1018,5 +1021,5 @@
+@@ -1018,5 +1022,5 @@
          return true;
      }
 -    
 +
      public boolean getIsAnyLiquid(final AxisAlignedBB aabb) {
          int i2 = MathHelper.floor_double(aabb.minX);
-@@ -1047,5 +1050,5 @@
+@@ -1047,5 +1051,5 @@
          return false;
      }
 -    
 +
      public boolean isBoundingBoxBurning(final AxisAlignedBB aabb) {
          final int i2 = MathHelper.floor_double(aabb.minX);
-@@ -1067,5 +1070,5 @@
+@@ -1067,5 +1071,5 @@
          return false;
      }
 -    
 +
      public boolean handleMaterialAcceleration(final AxisAlignedBB aabb, final Material material, final Entity entity) {
          final int i4 = MathHelper.floor_double(aabb.minX);
-@@ -1100,5 +1103,5 @@
+@@ -1100,5 +1104,5 @@
          return z10;
      }
 -    
 +
      public boolean isMaterialInBB(final AxisAlignedBB aabb, final Material material) {
          final int i3 = MathHelper.floor_double(aabb.minX);
-@@ -1120,5 +1123,5 @@
+@@ -1120,5 +1124,5 @@
          return false;
      }
 -    
 +
      public boolean isAABBInMaterial(final AxisAlignedBB aabb, final Material material) {
          final int i3 = MathHelper.floor_double(aabb.minX);
-@@ -1147,9 +1150,9 @@
+@@ -1147,9 +1151,9 @@
          return false;
      }
 -    
@@ -841,7 +842,7 @@
 +
      public float getBlockDensity(final Vec3D vector, final AxisAlignedBB aabb) {
          final double d3 = 1.0 / ((aabb.maxX - aabb.minX) * 2.0 + 1.0);
-@@ -1158,7 +1161,7 @@
+@@ -1158,7 +1162,7 @@
          int i9 = 0;
          int i10 = 0;
 -        for (float f11 = 0.0f; f11 <= 1.0f; f11 += (float)d3) {
@@ -852,7 +853,7 @@
 +                for (float f13 = 0.0f; f13 <= 1.0f; f13 += (float) d5) {
                      final double d6 = aabb.minX + (aabb.maxX - aabb.minX) * f11;
                      final double d7 = aabb.minY + (aabb.maxY - aabb.minY) * f12;
-@@ -1171,12 +1174,12 @@
+@@ -1171,12 +1175,12 @@
              }
          }
 -        return i9 / (float)i10;
@@ -868,14 +869,14 @@
 +
      public void setBlockTileEntity(final int x, final int y, final int z, final TileEntity tileEntity) {
          final Chunk chunk5 = this.getChunkFromChunkCoords(x >> 4, z >> 4);
-@@ -1185,5 +1188,5 @@
+@@ -1185,5 +1189,5 @@
          }
      }
 -    
 +
      public void removeBlockTileEntity(final int x, final int y, final int z) {
          final Chunk chunk4 = this.getChunkFromChunkCoords(x >> 4, z >> 4);
-@@ -1192,10 +1195,10 @@
+@@ -1192,10 +1196,10 @@
          }
      }
 -    
@@ -888,7 +889,7 @@
 +
      public boolean updatingLighting() {
          ++this.numLightingUpdates;
-@@ -1210,13 +1213,13 @@
+@@ -1210,13 +1214,13 @@
                  return true;
              }
 -            ((MetadataChunkBlock)this.lightingToUpdate.remove(this.lightingToUpdate.size() - 1)).updateLight(this);
@@ -905,42 +906,42 @@
 +
      public void scheduleLightingUpdate_do(final EnumSkyBlock skyBlock, final int i2, final int i3, final int i4, final int i5, final int i6, final int i7, final boolean z8) {
          final int i8 = (i5 + i2) / 2;
-@@ -1230,5 +1233,5 @@
+@@ -1230,5 +1234,5 @@
                  }
                  for (int i12 = 0; i12 < i11; ++i12) {
 -                    final MetadataChunkBlock metadataChunkBlock14 = (MetadataChunkBlock)this.lightingToUpdate.get(this.lightingToUpdate.size() - i12 - 1);
 +                    final MetadataChunkBlock metadataChunkBlock14 = this.lightingToUpdate.get(this.lightingToUpdate.size() - i12 - 1);
                      if (metadataChunkBlock14.skyBlock == skyBlock && metadataChunkBlock14.getLightUpdated(i2, i3, i4, i5, i6, i7)) {
                          return;
-@@ -1244,5 +1247,5 @@
+@@ -1244,5 +1248,5 @@
          }
      }
 -    
 +
      public void calculateInitialSkylight() {
          final int i1 = this.calculateSkylightSubtracted(1.0f);
-@@ -1251,5 +1254,5 @@
+@@ -1251,5 +1255,5 @@
          }
      }
 -    
 +
      public void tick() {
          this.numLightingUpdates = 0;
-@@ -1259,5 +1262,5 @@
+@@ -1259,5 +1263,5 @@
              this.skylightSubtracted = i1;
              for (int i2 = 0; i2 < this.worldAccesses.size(); ++i2) {
 -                ((IWorldAccess)this.worldAccesses.get(i2)).updateAllRenderers();
 +                this.worldAccesses.get(i2).updateAllRenderers();
              }
          }
-@@ -1277,5 +1280,5 @@
+@@ -1277,5 +1281,5 @@
          if (this.worldTime % 23000L == 0L) {
              ++this.milestone;
 -            System.out.println(new StringBuilder("Milestone ").append(this.milestone).append(this.exclFrailMode ? "*" : "").append(" reached.").toString());
 +            System.out.println("Milestone " + this.milestone + (this.exclFrailMode ? "*" : "") + " reached.");
          }
          if (this.worldTime % this.autosavePeriod == 0L) {
-@@ -1285,9 +1288,9 @@
+@@ -1285,9 +1289,9 @@
          this.updateBlocksAndPlayCaveSounds();
      }
 -    
@@ -952,35 +953,35 @@
 +            final EntityPlayer entityPlayer2 = (EntityPlayer) this.playerEntities.get(i1);
              final int i2 = MathHelper.floor_double(entityPlayer2.posX / 16.0);
              final int i3 = MathHelper.floor_double(entityPlayer2.posZ / 16.0);
-@@ -1352,5 +1355,5 @@
+@@ -1352,5 +1356,5 @@
          }
      }
 -    
 +
      public boolean tickUpdates(final boolean z1) {
          int i2 = this.scheduledTickTreeSet.size();
-@@ -1362,5 +1365,5 @@
+@@ -1362,5 +1366,5 @@
          }
          for (int i3 = 0; i3 < i2; ++i3) {
 -            final NextTickListEntry nextTickListEntry4 = (NextTickListEntry)this.scheduledTickTreeSet.first();
 +            final NextTickListEntry nextTickListEntry4 = this.scheduledTickTreeSet.first();
              if (!z1 && nextTickListEntry4.scheduledTime > this.worldTime) {
                  break;
-@@ -1378,5 +1381,5 @@
+@@ -1378,5 +1382,5 @@
          return this.scheduledTickTreeSet.size() != 0;
      }
 -    
 +
      public List getEntitiesWithinAABBExcludingEntity(final Entity entity, final AxisAlignedBB aabb) {
          this.entitiesWithinAABBExcludingEntity.clear();
-@@ -1394,5 +1397,5 @@
+@@ -1394,5 +1398,5 @@
          return this.entitiesWithinAABBExcludingEntity;
      }
 -    
 +
      public List getEntitiesWithinAABB(final Class clazz, final AxisAlignedBB aabb) {
          final int i3 = MathHelper.floor_double((aabb.minX - 2.0) / 16.0);
-@@ -1404,11 +1407,11 @@
+@@ -1404,11 +1408,11 @@
              for (int i8 = i5; i8 <= i6; ++i8) {
                  if (this.chunkExists(i7, i8)) {
 -                    this.getChunkFromChunkCoords(i7, i8).getEntitiesOfTypeWithinAAAB(clazz, aabb, (List)arrayList7);
@@ -995,7 +996,7 @@
 +
      public void updateTileEntityChunkAndDoNothing(final int x, final int y, final int z, final TileEntity tileEntity) {
          if (this.blockExists(x, y, z)) {
-@@ -1416,12 +1419,12 @@
+@@ -1416,12 +1420,12 @@
          }
          for (int i5 = 0; i5 < this.worldAccesses.size(); ++i5) {
 -            ((IWorldAccess)this.worldAccesses.get(i5)).doNothingWithTileEntity(x, y, z, tileEntity);
@@ -1011,7 +1012,7 @@
 +            final Entity entity4 = this.loadedEntityList.get(i3);
              if (clazz.isAssignableFrom(entity4.getClass())) {
                  ++i2;
-@@ -1430,16 +1433,16 @@
+@@ -1430,19 +1434,19 @@
          return i2;
      }
 -    
@@ -1034,8 +1035,35 @@
 +
      public boolean canBlockBePlacedAt(final int blockID, final int x, final int y, final int z, final boolean z5) {
          final int i6 = this.getBlockId(x, y, z);
-@@ -1452,10 +1455,10 @@
-         return (axisAlignedBB9 == null || this.checkIfAABBIsClear(axisAlignedBB9)) && (block7 == Block.waterMoving || block7 == Block.waterStill || block7 == Block.lavaMoving || block7 == Block.lavaStill || block7 == Block.fire || block7 == Block.snow || (blockID > 0 && block7 == null && block8.canPlaceBlockAt(this, x, y, z)));
+-        final Block block7 = Block.blocksList[i6];
++        Block block7 = Block.blocksList[i6];
+         final Block block8 = Block.blocksList[blockID];
+         AxisAlignedBB axisAlignedBB9 = block8.getCollisionBoundingBoxFromPool(this, x, y, z);
+@@ -1450,12 +1454,32 @@
+             axisAlignedBB9 = null;
+         }
+-        return (axisAlignedBB9 == null || this.checkIfAABBIsClear(axisAlignedBB9)) && (block7 == Block.waterMoving || block7 == Block.waterStill || block7 == Block.lavaMoving || block7 == Block.lavaStill || block7 == Block.fire || block7 == Block.snow || (blockID > 0 && block7 == null && block8.canPlaceBlockAt(this, x, y, z)));
++
++        boolean defaultReturn; // CraftBukkit - store the default action
++
++        if (axisAlignedBB9 != null && this.getEntitiesWithinAABB(Entity.class, axisAlignedBB9).isEmpty()) {
++            defaultReturn = false; // CraftBukkit
++        } else {
++            if (block7 == Block.waterMoving || block7 == Block.waterStill || block7 == Block.lavaMoving || block7 == Block.lavaStill || block7 == Block.fire || block7 == Block.snow) {
++                block7 = null;
++            }
++
++            defaultReturn = blockID > 0 && block7 == null && block8.canPlaceBlockAt(this, x, y, z/*, z5*/); // CraftBukkit
++        }
++
++        // CraftBukkit start
++        BlockCanBuildEvent event = new BlockCanBuildEvent(Bukkit.getWorld(this.levelName).getBlockAt(x, y, z), blockID, defaultReturn);
++        Bukkit.getServer().getPluginManager().callEvent(event);
++
++        return event.isBuildable();
++        // CraftBukkit end
++
++        //return (axisAlignedBB9 == null || this.checkIfAABBIsClear(axisAlignedBB9)) && (block7 == Block.waterMoving || block7 == Block.waterStill || block7 == Block.lavaMoving || block7 == Block.lavaStill || block7 == Block.fire || block7 == Block.snow || (blockID > 0 && block7 == null && block8.canPlaceBlockAt(this, x, y, z)));
      }
 -    
 +
@@ -1047,7 +1075,7 @@
 +        final int i7 = (int) (f3 + 16.0f);
          final int i8 = i4 - i7;
          final int i9 = i5 - i7;
-@@ -1467,10 +1470,10 @@
+@@ -1467,10 +1491,10 @@
          return new Pathfinder(chunkCache14).createEntityPathTo(entity1, entity2, f3);
      }
 -    
@@ -1060,7 +1088,7 @@
 +        final int i9 = (int) (f5 + 8.0f);
          final int i10 = i6 - i9;
          final int i11 = i7 - i9;
-@@ -1482,14 +1485,14 @@
+@@ -1482,14 +1506,14 @@
          return new Pathfinder(chunkCache16).createEntityPathTo(entity, x, y, z, f5);
      }
 -    
@@ -1078,7 +1106,7 @@
 +
      public boolean isBlockIndirectlyProvidingPowerTo(final int x, final int y, final int z, final int i4) {
          if (this.isBlockNormalCube(x, y, z)) {
-@@ -1499,18 +1502,18 @@
+@@ -1499,18 +1523,18 @@
          return i5 != 0 && Block.blocksList[i5].isPoweringTo(this, x, y, z, i4);
      }
 -    
@@ -1101,14 +1129,14 @@
 +            final EntityPlayer entityPlayer12 = (EntityPlayer) this.playerEntities.get(i12);
              final double d9 = entityPlayer12.getDistanceSq(d1, d3, d5);
              if ((d7 < 0.0 || d9 < d7 * d7) && (d8 == -1.0 || d9 < d8)) {
-@@ -1521,5 +1524,5 @@
+@@ -1521,5 +1545,5 @@
          return entityPlayer11;
      }
 -    
 +
      public byte[] getChunkData(final int i1, final int i2, final int i3, final int x, final int y, final int z) {
          final byte[] b7 = new byte[x * y * z * 5 / 2];
-@@ -1560,20 +1563,18 @@
+@@ -1560,20 +1584,18 @@
          return b7;
      }
 -    

@@ -1,0 +1,8 @@
+--- EntityCow.java
++++ EntityCow.java
+@@ -45,3 +45,5 @@
+         return Item.leather.shiftedIndex;
+     }
++
++
+ }

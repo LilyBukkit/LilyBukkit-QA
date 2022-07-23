@@ -1,0 +1,25 @@
+--- BlockFire.java
++++ BlockFire.java
+@@ -1,4 +1,7 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.block.BlockBurnEvent;
++
+ import java.util.Random;
+ 
+@@ -95,4 +98,14 @@
+         if (random.nextInt(chance) < i7) {
+             final boolean z2 = world.getBlockId(x, y, z) == Block.tnt.blockID;
++            // CraftBukkit start
++            org.bukkit.block.Block theBlock = Bukkit.getWorld(world.levelName).getBlockAt(x, y, z);
++
++            BlockBurnEvent event = new BlockBurnEvent(theBlock);
++            Bukkit.getServer().getPluginManager().callEvent(event);
++
++            if (event.isCancelled()) {
++                return;
++            }
++            // CraftBukkit end
+             if (random.nextInt(2) == 0) {
+                 world.setBlockWithNotify(x, y, z, this.blockID);

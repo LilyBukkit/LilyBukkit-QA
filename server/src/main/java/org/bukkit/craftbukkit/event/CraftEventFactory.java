@@ -176,7 +176,7 @@ public class CraftEventFactory {
      */
     public static BlockDamageEvent callBlockDamageEvent(EntityPlayerMP who, int x, int y, int z, net.minecraft.src.ItemStack itemStack, boolean instaBreak) {
         Player player = who == null ? null : new LBPlayer((LBWorld) Bukkit.getServer().getWorld(who.mcServer.worldMngr.levelName), who);
-        ItemStack itemInHand = new ItemStack(itemStack.itemID, itemStack.stackSize, (short) itemStack.itemDmg);
+        ItemStack itemInHand = itemStack == null ? new ItemStack(0, 0, (short) 0) : new ItemStack(itemStack.itemID, itemStack.stackSize, (short) itemStack.itemDmg);
 
         LBWorld world = (LBWorld) player.getWorld();
         LilyBukkit server = (LilyBukkit) player.getServer();

@@ -1,9 +1,12 @@
 --- ItemBucket.java
 +++ ItemBucket.java
-@@ -1,7 +1,11 @@
+@@ -1,7 +1,14 @@
  package net.minecraft.src;
  
++import org.bukkit.Bukkit;
++import org.bukkit.Location;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.craftbukkit.inventory.CraftItemStack;
 +import org.bukkit.event.player.PlayerBucketEmptyEvent;
 +import org.bukkit.event.player.PlayerBucketFillEvent;
 +
@@ -13,23 +16,161 @@
 +
      public ItemBucket(final int itemID, final int isFull) {
          super(itemID);
-@@ -10,3 +14,19 @@
+@@ -10,3 +17,157 @@
          this.isFull = isFull;
      }
 +
 +    @Override
-+    public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer entityPlayer) {
-+        /*switch (isFull) {
-+            case 0:
-+                PlayerBucketFillEvent eventFill = CraftEventFactory.callPlayerBucketFillEvent(entityPlayer, x, y, z, -1, itemStack, Item.bucketWater);
-+                if (eventFill.isCancelled()) return itemStack;
-+            case 1:
-+            case 2:
-+                PlayerBucketEmptyEvent eventEmpty = CraftEventFactory.callPlayerBucketEmptyEvent(entityPlayer, x, y, z, -1, itemStack);
-+                if (eventEmpty.isCancelled()) return itemStack;
-+            default:
-+                // bruh
-+        }*/
-+        return itemStack;
++    public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityhuman) {
++        //return itemStack;
++        //CraftBukkit start
++        float f = 1.0F;
++        float f1 = entityhuman.prevCameraPitch + (entityhuman.cameraPitch - entityhuman.prevCameraPitch) * f;
++        float f2 = entityhuman.prevCameraYaw + (entityhuman.cameraYaw - entityhuman.prevCameraYaw) * f;
++        double d0 = entityhuman.prevPosX + (entityhuman.posX - entityhuman.prevPosX) * (double) f;
++        double d1 = entityhuman.prevPosY + (entityhuman.posY - entityhuman.prevPosY) * (double) f + 1.62D - (double) entityhuman.height;
++        double d2 = entityhuman.prevPosZ + (entityhuman.posZ - entityhuman.prevPosZ) * (double) f;
++        Vec3D vec3d = Vec3D.createVector(d0, d1, d2);
++        float f3 = MathHelper.cos(-f2 * 0.017453292F - 3.1415927F);
++        float f4 = MathHelper.sin(-f2 * 0.017453292F - 3.1415927F);
++        float f5 = -MathHelper.cos(-f1 * 0.017453292F);
++        float f6 = MathHelper.sin(-f1 * 0.017453292F);
++        float f7 = f4 * f5;
++        float f8 = f3 * f5;
++        double d3 = 5.0D;
++        Vec3D vec3d1 = vec3d.addVector((double) f7 * d3, (double) f6 * d3, (double) f8 * d3);
++        MovingObjectPosition movingobjectposition = world.rayTraceBlocks_do(vec3d, vec3d1, this.isFull == 0);
++
++        if (movingobjectposition == null) {
++            return itemstack;
++        } else {
++            if (movingobjectposition.typeOfHit == 0) {
++                int x = movingobjectposition.blockX;
++                int y = movingobjectposition.blockY;
++                int z = movingobjectposition.blockZ;
++
++                /* DISABLED DUE TO METHOD NOT EXISTING
++                if (!world.a(entityhuman, x, y, z)) {
++                    return itemstack;
++                }*/
++
++                if (this.isFull == 0) {
++                    if (world.getBlockMaterial(x, y, z) == Material.water && world.getBlockMetadata(x, y, z) == 0) {
++                        // CraftBukkit start
++                        PlayerBucketFillEvent event = CraftEventFactory.callPlayerBucketFillEvent((EntityPlayerMP) entityhuman, x, y, z, -1, itemstack, Item.bucketWater);
++
++                        if (event.isCancelled()) {
++                            return itemstack;
++                        }
++
++                        org.bukkit.inventory.ItemStack itemInHand = event.getItemStack();
++                        byte data = itemInHand.getData() == null ? (byte) 0 : itemInHand.getData().getData();
++                        // CraftBukkit end
++
++                        world.setBlock(x, y, z, 0);
++                        return new ItemStack(itemInHand.getTypeId(), itemInHand.getAmount(), data); // CraftBukkit
++                    }
++
++                    if (world.getBlockMaterial(x, y, z) == Material.lava && world.getBlockMetadata(x, y, z) == 0) {
++                        // CraftBukkit start
++                        PlayerBucketFillEvent event = CraftEventFactory.callPlayerBucketFillEvent((EntityPlayerMP) entityhuman, x, y, z, -1, itemstack, Item.bucketLava);
++
++                        if (event.isCancelled()) {
++                            return itemstack;
++                        }
++
++                        CraftItemStack itemInHand = (CraftItemStack) event.getItemStack();
++                        byte data = itemInHand.getData() == null ? (byte) 0 : itemInHand.getData().getData();
++                        // CraftBukkit end
++
++                        world.setBlock(x, y, z, 0);
++                        return new ItemStack(itemInHand.getTypeId(), itemInHand.getAmount(), data); // CraftBukkit
++                    }
++                } else {
++                    if (this.isFull < 0) {
++                        // CraftBukkit start
++                        PlayerBucketEmptyEvent event = CraftEventFactory.callPlayerBucketEmptyEvent((EntityPlayerMP) entityhuman, x, y, z, movingobjectposition.sideHit, itemstack);
++
++                        if (event.isCancelled()) {
++                            return itemstack;
++                        }
++
++                        org.bukkit.inventory.ItemStack itemInHand = event.getItemStack();
++                        byte data = itemInHand.getData() == null ? (byte) 0 : itemInHand.getData().getData();
++                        return new ItemStack(itemInHand.getTypeId(), itemInHand.getAmount(), data);
++                    }
++
++                    int clickedX = x, clickedY = y, clickedZ = z;
++                    // CraftBukkit end
++
++                    if (movingobjectposition.sideHit == 0) {
++                        --y;
++                    }
++
++                    if (movingobjectposition.sideHit == 1) {
++                        ++y;
++                    }
++
++                    if (movingobjectposition.sideHit == 2) {
++                        --z;
++                    }
++
++                    if (movingobjectposition.sideHit == 3) {
++                        ++z;
++                    }
++
++                    if (movingobjectposition.sideHit == 4) {
++                        --x;
++                    }
++
++                    if (movingobjectposition.sideHit == 5) {
++                        ++x;
++                    }
++
++                    if ((!world.blockExists(x, y, z)) || !world.getBlockMaterial(x, y, z).isSolid()) {
++                        // CraftBukkit start
++                        PlayerBucketEmptyEvent event = CraftEventFactory.callPlayerBucketEmptyEvent((EntityPlayerMP) entityhuman, clickedX, clickedY, clickedZ, movingobjectposition.sideHit, itemstack);
++
++                        if (event.isCancelled()) {
++                            return itemstack;
++                        }
++                        // CraftBukkit end
++
++                        if (world.canBlockBePlacedAt(Block.waterStill.blockID, x, y, z, false) && this.isFull == Block.waterStill.blockID) {
++                            world.playSoundEffect(d0 + 0.5D, d1 + 0.5D, d2 + 0.5D, "random.fizz", 0.5F, 2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);
++
++                            for (int l = 0; l < 8; ++l) {
++                                world.spawnParticle("largesmoke", (double) x + Math.random(), (double) y + Math.random(), (double) z + Math.random(), 0.0D, 0.0D, 0.0D);
++                            }
++                        } else {
++                            world.setBlockAndMetadata(x, y, z, this.isFull, 0);
++                        }
++
++                        // CraftBukkit start
++                        org.bukkit.inventory.ItemStack itemInHand = event.getItemStack();
++                        byte data = itemInHand.getData() == null ? (byte) 0 : itemInHand.getData().getData();
++
++                        return new ItemStack(itemInHand.getTypeId(), itemInHand.getAmount(), data);
++                        // CraftBukkit end
++                    }
++                }
++            } else if (this.isFull == 0 && movingobjectposition.entityHit instanceof EntityCow) {
++                // CraftBukkit start - This codepath seems to be *NEVER* called
++                Location loc = new Location(Bukkit.getWorld(movingobjectposition.entityHit.worldObj.levelName), movingobjectposition.entityHit.posX, movingobjectposition.entityHit.posY, movingobjectposition.entityHit.posZ);
++                PlayerBucketFillEvent event = CraftEventFactory.callPlayerBucketFillEvent((EntityPlayerMP) entityhuman, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), -1, itemstack, Item.bucketMilk);
++
++                if (event.isCancelled()) {
++                    return itemstack;
++                }
++
++                org.bukkit.inventory.ItemStack itemInHand = event.getItemStack();
++                byte data = itemInHand.getData() == null ? (byte) 0 : itemInHand.getData().getData();
++                return new ItemStack(itemInHand.getTypeId(), itemInHand.getAmount(), data);
++                // CraftBukkit end
++            }
++
++            return itemstack;
++        }
++        //CraftBukkit end
 +    }
  }
