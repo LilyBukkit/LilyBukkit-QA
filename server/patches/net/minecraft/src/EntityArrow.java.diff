@@ -1,0 +1,196 @@
+--- EntityArrow.java
++++ EntityArrow.java
+@@ -1,4 +1,14 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.entity.Projectile;
++import org.bukkit.event.entity.EntityDamageByEntityEvent;
++import org.bukkit.event.entity.EntityDamageEvent;
++import org.bukkit.event.entity.ProjectileHitEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.entity.LBLivingEntity;
++import ru.vladthemountain.lilybukkit.entity.LBProjectile;
++
+ import java.util.List;
+ 
+@@ -13,5 +23,5 @@
+     private int ticksInGround;
+     private int ticksInAir;
+-    
++
+     public EntityArrow(final World world) {
+         super(world);
+@@ -25,5 +35,5 @@
+         this.setSize(0.5f, 0.5f);
+     }
+-    
++
+     public EntityArrow(final World world, final EntityLiving entityLiving) {
+         super(world);
+@@ -48,5 +58,5 @@
+         this.setArrowHeading(this.motionX, this.motionY, this.motionZ, 1.5f, 1.0f);
+     }
+-    
++
+     public void setArrowHeading(double motionX, double motionY, double motionZ, final float offsetY, final float offsetX) {
+         final float f9 = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
+@@ -64,13 +74,13 @@
+         this.motionZ = motionZ;
+         final float f10 = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
+-        final float n = (float)(Math.atan2(motionX, motionZ) * 180.0 / 3.1415927410125732);
++        final float n = (float) (Math.atan2(motionX, motionZ) * 180.0 / 3.1415927410125732);
+         this.rotationYaw = n;
+         this.prevRotationYaw = n;
+-        final float n2 = (float)(Math.atan2(motionY, (double)f10) * 180.0 / 3.1415927410125732);
++        final float n2 = (float) (Math.atan2(motionY, f10) * 180.0 / 3.1415927410125732);
+         this.rotationPitch = n2;
+         this.prevRotationPitch = n2;
+         this.ticksInGround = 0;
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -94,6 +104,5 @@
+             this.ticksInGround = 0;
+             this.ticksInAir = 0;
+-        }
+-        else {
++        } else {
+             ++this.ticksInAir;
+         }
+@@ -110,5 +119,5 @@
+         double d6 = 0.0;
+         for (int i2 = 0; i2 < list5.size(); ++i2) {
+-            final Entity entity5 = (Entity)list5.get(i2);
++            final Entity entity5 = (Entity) list5.get(i2);
+             if (entity5.canBeCollidedWith() && (entity5 != this.shootingEntity || this.ticksInAir >= 5)) {
+                 final float f10 = 0.3f;
+@@ -127,11 +136,53 @@
+             movingObjectPosition3 = new MovingObjectPosition(entity4);
+         }
++        // CraftBukkit start
++        ProjectileHitEvent phe = new ProjectileHitEvent(new LBProjectile((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++        Bukkit.getServer().getPluginManager().callEvent(phe);
++        // CraftBukkit end
+         if (movingObjectPosition3 != null) {
+             if (movingObjectPosition3.entityHit != null) {
+-                if (movingObjectPosition3.entityHit.attackEntityFrom(this.shootingEntity, 4)) {
+-                    this.worldObj.playSoundAtEntity((Entity)this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
+-                    this.setEntityDead();
++                // CraftBukkit start
++                boolean stick;
++                if (entity4 instanceof EntityLiving) {
++                    org.bukkit.Server server = Bukkit.getServer();
++
++                    // TODO decide if we should create DamageCause.ARROW, DamageCause.PROJECTILE
++                    // or leave as DamageCause.ENTITY_ATTACK
++                    org.bukkit.entity.Entity damagee = new LBEntity((LBWorld) server.getWorld(this.worldObj.levelName), movingObjectPosition3.entityHit);
++                    Projectile projectile = new LBProjectile((LBWorld) server.getWorld(this.worldObj.levelName), this);
++                    // TODO deal with arrows being fired from a non-entity
++
++                    EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(projectile, damagee, EntityDamageEvent.DamageCause.PROJECTILE, 4);
++                    server.getPluginManager().callEvent(event);
++                    // LilyBukkit start
++                    EntityLiving shooter = null;
++                    if (projectile.getShooter() == null) {
++                        shooter = new EntityLiving(this.worldObj);
++                        LBLivingEntity lb_shooter = (LBLivingEntity) projectile.getShooter();
++                        shooter.posX = lb_shooter.getLocation().getX();
++                        shooter.posY = lb_shooter.getLocation().getY();
++                        shooter.posZ = lb_shooter.getLocation().getZ();
++                        shooter.entityID = lb_shooter.getEntityId();
++                        shooter.health = lb_shooter.getHealth();
++                        // TODO: Bruh
++                    }
++                    // LilyBukkit end
++                    this.shootingEntity = shooter;
++
++                    if (event.isCancelled()) {
++                        stick = !projectile.doesBounce();
++                    } else {
++                        // this function returns if the arrow should stick in or not, i.e. !bounce
++                        stick = movingObjectPosition3.entityHit.attackEntityFrom(this, event.getDamage());
++                    }
++                } else {
++                    stick = movingObjectPosition3.entityHit.attackEntityFrom(this.shootingEntity, 4);
+                 }
+-                else {
++                if (stick) {
++                    // CraftBukkit end
++                    //if (movingObjectPosition3.entityHit.attackEntityFrom(this.shootingEntity, 4)) {
++                    this.worldObj.playSoundAtEntity(this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
++                    this.setEntityDead();
++                } else {
+                     this.motionX *= -0.10000000149011612;
+                     this.motionY *= -0.10000000149011612;
+@@ -141,18 +192,17 @@
+                     this.ticksInAir = 0;
+                 }
+-            }
+-            else {
++            } else {
+                 this.xTile = movingObjectPosition3.blockX;
+                 this.yTile = movingObjectPosition3.blockY;
+                 this.zTile = movingObjectPosition3.blockZ;
+                 this.inTile = this.worldObj.getBlockId(this.xTile, this.yTile, this.zTile);
+-                this.motionX = (float)(movingObjectPosition3.hitVec.xCoord - this.posX);
+-                this.motionY = (float)(movingObjectPosition3.hitVec.yCoord - this.posY);
+-                this.motionZ = (float)(movingObjectPosition3.hitVec.zCoord - this.posZ);
++                this.motionX = (float) (movingObjectPosition3.hitVec.xCoord - this.posX);
++                this.motionY = (float) (movingObjectPosition3.hitVec.yCoord - this.posY);
++                this.motionZ = (float) (movingObjectPosition3.hitVec.zCoord - this.posZ);
+                 final float f11 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+                 this.posX -= this.motionX / f11 * 0.05000000074505806;
+                 this.posY -= this.motionY / f11 * 0.05000000074505806;
+                 this.posZ -= this.motionZ / f11 * 0.05000000074505806;
+-                this.worldObj.playSoundAtEntity((Entity)this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
++                this.worldObj.playSoundAtEntity(this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
+                 this.inData = true;
+                 this.arrowShake = 7;
+@@ -163,6 +213,6 @@
+         this.posZ += this.motionZ;
+         final float f11 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+-        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0 / 3.1415927410125732);
+-        this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f11) * 180.0 / 3.1415927410125732);
++        this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0 / 3.1415927410125732);
++        this.rotationPitch = (float) (Math.atan2(this.motionY, f11) * 180.0 / 3.1415927410125732);
+         while (this.rotationPitch - this.prevRotationPitch < -180.0f) {
+             this.prevRotationPitch -= 360.0f;
+@@ -194,14 +244,14 @@
+         this.setPosition(this.posX, this.posY, this.posZ);
+     }
+-    
++
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+-        nbttagcompound.setShort("xTile", (short)this.xTile);
+-        nbttagcompound.setShort("yTile", (short)this.yTile);
+-        nbttagcompound.setShort("zTile", (short)this.zTile);
+-        nbttagcompound.setByte("inTile", (byte)this.inTile);
+-        nbttagcompound.setByte("shake", (byte)this.arrowShake);
+-        nbttagcompound.setByte("inGround", (byte)(byte)(this.inData ? 1 : 0));
++        nbttagcompound.setShort("xTile", (short) this.xTile);
++        nbttagcompound.setShort("yTile", (short) this.yTile);
++        nbttagcompound.setShort("zTile", (short) this.zTile);
++        nbttagcompound.setByte("inTile", (byte) this.inTile);
++        nbttagcompound.setByte("shake", (byte) this.arrowShake);
++        nbttagcompound.setByte("inGround", (byte) (this.inData ? 1 : 0));
+     }
+-    
++
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         this.xTile = nbttagcompound.getShort("xTile");
+@@ -212,9 +262,9 @@
+         this.inData = (nbttagcompound.getByte("inGround") == 1);
+     }
+-    
++
+     @Override
+     public void onCollideWithPlayer(final EntityPlayer entityPlayer) {
+         if (this.inData && this.shootingEntity == entityPlayer && this.arrowShake <= 0 && entityPlayer.inventory.addItemStackToInventory(new ItemStack(Item.arrow.shiftedIndex, 1))) {
+-            this.worldObj.playSoundAtEntity((Entity)this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
++            this.worldObj.playSoundAtEntity(this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
+             entityPlayer.onItemPickup(this, 1);
+             this.setEntityDead();

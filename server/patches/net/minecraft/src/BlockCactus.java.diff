@@ -1,0 +1,33 @@
+--- BlockCactus.java
++++ BlockCactus.java
+@@ -1,4 +1,10 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.entity.EntityDamageByBlockEvent;
++import org.bukkit.event.entity.EntityDamageEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
++
+ import java.util.Random;
+ 
+@@ -81,4 +87,19 @@
+     @Override
+     public void onEntityCollidedWithBlock(final World world, final int x, final int y, final int z, final Entity entity) {
++        // CraftBukkit start - ENTITY_DAMAGEBY_BLOCK event
++        if (entity instanceof EntityLiving) {
++            org.bukkit.block.Block damager = Bukkit.getWorld(world.levelName).getBlockAt(x, y, z);
++            org.bukkit.entity.Entity damagee = new LBEntity((LBWorld) Bukkit.getWorld(world.levelName), entity);
++
++            EntityDamageByBlockEvent event = new EntityDamageByBlockEvent(damager, damagee, EntityDamageEvent.DamageCause.CONTACT, 1);
++            Bukkit.getServer().getPluginManager().callEvent(event);
++
++            if (!event.isCancelled()) {
++                entity.attackEntityFrom(null, event.getDamage());
++            }
++            return;
++        }
++        // CraftBukkit end
++
+         entity.attackEntityFrom(null, 1);
+     }

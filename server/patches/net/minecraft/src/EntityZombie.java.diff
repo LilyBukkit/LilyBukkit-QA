@@ -1,0 +1,57 @@
+--- EntityZombie.java
++++ EntityZombie.java
+@@ -1,4 +1,9 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.entity.EntityCombustEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
++
+ public class EntityZombie extends EntityMob {
+     public EntityZombie(final World world) {
+@@ -8,5 +13,5 @@
+         this.attackStrength = 5;
+     }
+-    
++
+     @Override
+     public void onLivingUpdate() {
+@@ -14,25 +19,32 @@
+             final float f1 = this.getBrightness(1.0f);
+             if (f1 > 0.5f && this.worldObj.canBlockSeeTheSky(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) && this.rand.nextFloat() * 30.0f < (f1 - 0.4f) * 2.0f) {
+-                this.fire = 300;
++                // CraftBukkit start
++                EntityCombustEvent event = new EntityCombustEvent(new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++                Bukkit.getServer().getPluginManager().callEvent(event);
++
++                if (!event.isCancelled()) {
++                    this.fire = 300;
++                }
++                // CraftBukkit end
+             }
+         }
+         super.onLivingUpdate();
+     }
+-    
++
+     @Override
+     protected String getLivingSound() {
+         return "mob.zombie";
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.zombiehurt";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "mob.zombiedeath";
+     }
+-    
++
+     @Override
+     protected int getDropItemId() {

@@ -1,0 +1,139 @@
+--- EntitySnowball.java
++++ EntitySnowball.java
+@@ -1,4 +1,14 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.entity.Projectile;
++import org.bukkit.event.entity.EntityDamageByEntityEvent;
++import org.bukkit.event.entity.EntityDamageEvent;
++import org.bukkit.event.entity.ProjectileHitEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.entity.LBLivingEntity;
++import ru.vladthemountain.lilybukkit.entity.LBSnowball;
++
+ import java.util.List;
+ 
+@@ -13,5 +23,5 @@
+     private int ticksInGround;
+     private int ticksInAir;
+-    
++
+     public EntitySnowball(final World world) {
+         super(world);
+@@ -25,5 +35,5 @@
+         this.setSize(0.25f, 0.25f);
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -47,6 +57,5 @@
+             this.ticksInGround = 0;
+             this.ticksInAir = 0;
+-        }
+-        else {
++        } else {
+             ++this.ticksInAir;
+         }
+@@ -63,5 +72,5 @@
+         double d6 = 0.0;
+         for (int i2 = 0; i2 < list5.size(); ++i2) {
+-            final Entity entity5 = (Entity)list5.get(i2);
++            final Entity entity5 = (Entity) list5.get(i2);
+             if (entity5.canBeCollidedWith() && (entity5 != this.thrower || this.ticksInAir >= 5)) {
+                 final float f10 = 0.3f;
+@@ -81,5 +90,47 @@
+         }
+         if (movingObjectPosition3 != null) {
+-            if (movingObjectPosition3.entityHit == null || movingObjectPosition3.entityHit.attackEntityFrom(this.thrower, 0)) {}
++            // CraftBukkit start
++            ProjectileHitEvent phe = new ProjectileHitEvent(new LBSnowball((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++            Bukkit.getServer().getPluginManager().callEvent(phe);
++
++            if (movingObjectPosition3.entityHit != null) {
++                boolean stick;
++                if (movingObjectPosition3.entityHit instanceof EntityLiving) {
++                    org.bukkit.entity.Entity damagee = new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName),movingObjectPosition3.entityHit);
++                    Projectile projectile = new LBSnowball((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this);
++
++                    // TODO @see EntityArrow#162
++                    EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(projectile, damagee, EntityDamageEvent.DamageCause.PROJECTILE, 0);
++                    Bukkit.getServer().getPluginManager().callEvent(event);
++                    // LilyBukkit start
++                    EntityLiving shooter = null;
++                    if (projectile.getShooter() == null) {
++                        shooter = new EntityLiving(this.worldObj);
++                        LBLivingEntity lb_shooter = (LBLivingEntity) projectile.getShooter();
++                        shooter.posX = lb_shooter.getLocation().getX();
++                        shooter.posY = lb_shooter.getLocation().getY();
++                        shooter.posZ = lb_shooter.getLocation().getZ();
++                        shooter.entityID = lb_shooter.getEntityId();
++                        shooter.health = lb_shooter.getHealth();
++                        // TODO: Bruh
++                    }
++                    // LilyBukkit end
++                    this.thrower = shooter;
++
++                    if (event.isCancelled()) {
++                        stick = !projectile.doesBounce();
++                    } else {
++                        // this function returns if the snowball should stick in or not, i.e. !bounce
++                        stick = movingObjectPosition3.entityHit.attackEntityFrom(this, event.getDamage());
++                    }
++                } else {
++                    stick = movingObjectPosition3.entityHit.attackEntityFrom(this.thrower, 0);
++                }
++                if (stick) {
++                    ;
++                }
++            }
++            // CraftBukkit end
++            //if (movingObjectPosition3.entityHit == null || movingObjectPosition3.entityHit.attackEntityFrom(this.thrower, 0)) {}
+             for (int i2 = 0; i2 < 8; ++i2) {
+                 this.worldObj.spawnParticle("snowballpoof", this.posX, this.posY, this.posZ, 0.0, 0.0, 0.0);
+@@ -91,6 +142,6 @@
+         this.posZ += this.motionZ;
+         final float f11 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+-        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0 / 3.1415927410125732);
+-        this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f11) * 180.0 / 3.1415927410125732);
++        this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0 / 3.1415927410125732);
++        this.rotationPitch = (float) (Math.atan2(this.motionY, (double) f11) * 180.0 / 3.1415927410125732);
+         while (this.rotationPitch - this.prevRotationPitch < -180.0f) {
+             this.prevRotationPitch -= 360.0f;
+@@ -122,14 +173,14 @@
+         this.setPosition(this.posX, this.posY, this.posZ);
+     }
+-    
++
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+-        nbttagcompound.setShort("xTile", (short)this.xTile);
+-        nbttagcompound.setShort("yTile", (short)this.yTile);
+-        nbttagcompound.setShort("zTile", (short)this.zTile);
+-        nbttagcompound.setByte("inTile", (byte)this.inTile);
+-        nbttagcompound.setByte("shake", (byte)this.throwableShake);
+-        nbttagcompound.setByte("inGround", (byte)(byte)(this.inGround ? 1 : 0));
++        nbttagcompound.setShort("xTile", (short) this.xTile);
++        nbttagcompound.setShort("yTile", (short) this.yTile);
++        nbttagcompound.setShort("zTile", (short) this.zTile);
++        nbttagcompound.setByte("inTile", (byte) this.inTile);
++        nbttagcompound.setByte("shake", (byte) this.throwableShake);
++        nbttagcompound.setByte("inGround", (byte) (byte) (this.inGround ? 1 : 0));
+     }
+-    
++
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         this.xTile = nbttagcompound.getShort("xTile");
+@@ -140,9 +191,9 @@
+         this.inGround = (nbttagcompound.getByte("inGround") == 1);
+     }
+-    
++
+     @Override
+     public void onCollideWithPlayer(final EntityPlayer entityPlayer) {
+         if (this.inGround && this.thrower == entityPlayer && this.throwableShake <= 0 && entityPlayer.inventory.addItemStackToInventory(new ItemStack(Item.arrow.shiftedIndex, 1))) {
+-            this.worldObj.playSoundAtEntity((Entity)this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
++            this.worldObj.playSoundAtEntity((Entity) this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
+             entityPlayer.onItemPickup(this, 1);
+             this.setEntityDead();

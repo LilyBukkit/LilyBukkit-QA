@@ -1,0 +1,118 @@
+--- EntityMob.java
++++ EntityMob.java
+@@ -1,7 +1,15 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.entity.EntityDamageByEntityEvent;
++import org.bukkit.event.entity.EntityDamageEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.entity.LBHumanEntity;
++import ru.vladthemountain.lilybukkit.entity.LBMonster;
++
+ public class EntityMob extends EntityCreature implements IMobs {
+     protected int attackStrength;
+-    
++
+     public EntityMob(final World world) {
+         super(world);
+@@ -9,5 +17,5 @@
+         this.health = 20;
+     }
+-    
++
+     @Override
+     public void onLivingUpdate() {
+@@ -18,5 +26,5 @@
+         super.onLivingUpdate();
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -26,5 +34,5 @@
+         }
+     }
+-    
++
+     @Override
+     protected Entity findPlayerToAttack() {
+@@ -32,7 +40,26 @@
+         return (entityPlayer1 != null && this.canEntityBeSeen(entityPlayer1)) ? entityPlayer1 : null;
+     }
+-    
++
+     @Override
+-    public boolean attackEntityFrom(final Entity entity, final int damage) {
++    public boolean attackEntityFrom(final Entity entity, int damage) {
++        // LilyBukkit start
++        if (entity instanceof EntityLiving) {
++            // CraftBukkit start - this is here instead of EntityMonster because EntityLiving(s) that aren't monsters
++            // also damage the player in this way. For example, EntitySlime.
++
++            org.bukkit.entity.Entity damager = new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), entity);
++            org.bukkit.entity.Entity damagee = new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this);
++
++            EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(damager, damagee, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage);
++            Bukkit.getServer().getPluginManager().callEvent(event);
++
++            if (event.isCancelled() || event.getDamage() == 0) {
++                return false;
++            }
++
++            damage = event.getDamage();
++            // CraftBukkit end
++        }
++        // LilyBukkit end
+         if (!super.attackEntityFrom(entity, damage)) {
+             return false;
+@@ -46,28 +73,43 @@
+         return true;
+     }
+-    
++
+     @Override
+     protected void attackEntity(final Entity entity, final float damage) {
+         if (damage < 2.5 && entity.boundingBox.maxY > this.boundingBox.minY && entity.boundingBox.minY < this.boundingBox.maxY) {
+             this.attackTime = 20;
++            // CraftBukkit start - this is still duplicated here and EntityHuman because it's possible for lastDamage EntityMonster
++            // to damage another EntityMonster, and we want to catch those events.
++            // This does not fire events for slime attacks, av they're not lastDamage EntityMonster.
++            if (entity instanceof EntityLiving && !(entity instanceof EntityMob)) {
++                org.bukkit.entity.Entity damagee = (entity == null) ? null : new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName),entity);
++
++                EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(new LBMonster((LBWorld) Bukkit.getWorld(this.worldObj.levelName),this), damagee, EntityDamageEvent.DamageCause.ENTITY_ATTACK, this.attackStrength);
++                Bukkit.getServer().getPluginManager().callEvent(event);
++
++                if (!event.isCancelled()) {
++                    entity.attackEntityFrom(this, event.getDamage());
++                }
++                return;
++            }
++            // CraftBukkit end
+             entity.attackEntityFrom(this, this.attackStrength);
+         }
+     }
+-    
++
+     @Override
+     protected float getBlockPathWeight(final int x, final int y, final int z) {
+         return 0.5f - this.worldObj.getBrightness(x, y, z);
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public boolean getCanSpawnHere() {

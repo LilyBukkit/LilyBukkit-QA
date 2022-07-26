@@ -1,16 +1,89 @@
 --- EntitySkeleton.java
 +++ EntitySkeleton.java
-@@ -1,4 +1,6 @@
+@@ -1,4 +1,10 @@
  package net.minecraft.src;
  
++import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++import org.bukkit.event.entity.EntityCombustEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
 +
  public class EntitySkeleton extends EntityMob {
      public EntitySkeleton(final World world) {
-@@ -45,5 +47,5 @@
+@@ -6,20 +12,20 @@
+         this.texture = "/mob/skeleton.png";
+     }
+-    
++
+     @Override
+     protected String getLivingSound() {
+         return "mob.skeleton";
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.skeletonhurt";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "mob.skeletonhurt";
+     }
+-    
++
+     @Override
+     public void onLivingUpdate() {
+@@ -27,10 +33,17 @@
+             final float f1 = this.getBrightness(1.0f);
+             if (f1 > 0.5f && this.worldObj.canBlockSeeTheSky(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) && this.rand.nextFloat() * 30.0f < (f1 - 0.4f) * 2.0f) {
+-                this.fire = 300;
++                // CraftBukkit start
++                EntityCombustEvent event = new EntityCombustEvent(new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++                Bukkit.getServer().getPluginManager().callEvent(event);
++
++                if (!event.isCancelled()) {
++                    this.fire = 300;
++                }
++                // CraftBukkit end
+             }
+         }
+         super.onLivingUpdate();
+     }
+-    
++
+     @Override
+     protected void attackEntity(final Entity entity, final float damage) {
+@@ -44,24 +57,24 @@
+                 final double d5 = entity.posY - 0.20000000298023224 - entityArrow7.posY;
                  final float f10 = MathHelper.sqrt_double(d3 * d3 + d4 * d4) * 0.2f;
-                 this.worldObj.playSoundAtEntity((Entity)this, "random.bow", 1.0f, 1.0f / (this.rand.nextFloat() * 0.4f + 0.8f));
+-                this.worldObj.playSoundAtEntity((Entity)this, "random.bow", 1.0f, 1.0f / (this.rand.nextFloat() * 0.4f + 0.8f));
 -                this.worldObj.spawnEntityInWorld(entityArrow7);
++                this.worldObj.playSoundAtEntity((Entity) this, "random.bow", 1.0f, 1.0f / (this.rand.nextFloat() * 0.4f + 0.8f));
 +                this.worldObj.spawnEntityInWorld(entityArrow7, SpawnReason.NATURAL);
                  entityArrow7.setArrowHeading(d3, d5 + f10, d4, 0.6f, 12.0f);
                  this.attackTime = 30;
+             }
+-            this.rotationYaw = (float)(Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - 90.0f;
++            this.rotationYaw = (float) (Math.atan2(d4, d3) * 180.0 / 3.1415927410125732) - 90.0f;
+             this.hasAttacked = true;
+         }
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     protected int getDropItemId() {
