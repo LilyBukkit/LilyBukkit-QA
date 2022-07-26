@@ -1,31 +1,32 @@
 --- Explosion.java
 +++ Explosion.java
-@@ -1,8 +1,15 @@
+@@ -1,8 +1,16 @@
  package net.minecraft.src;
  
 -import java.util.List;
 -import java.util.Collection;
 +import org.bukkit.Bukkit;
++import org.bukkit.Location;
 +import org.bukkit.event.entity.EntityDamageByBlockEvent;
 +import org.bukkit.event.entity.EntityDamageByEntityEvent;
 +import org.bukkit.event.entity.EntityDamageEvent;
++import org.bukkit.event.entity.EntityExplodeEvent;
 +import ru.vladthemountain.lilybukkit.LBWorld;
 +import ru.vladthemountain.lilybukkit.entity.LBEntity;
 +
  import java.util.ArrayList;
-+import java.util.Collection;
  import java.util.HashSet;
 +import java.util.List;
  
  public class Explosion {
-@@ -56,5 +63,5 @@
+@@ -56,5 +64,5 @@
          final Vec3D vec3D47 = Vec3D.createVector(x, y, z);
          for (int i23 = 0; i23 < list19.size(); ++i23) {
 -            final Entity entity2 = (Entity)list19.get(i23);
 +            final Entity entity2 = (Entity) list19.get(i23);
              final double d23 = entity2.getDistance(x, y, z) / power;
              if (d23 <= 1.0) {
-@@ -68,5 +75,37 @@
+@@ -68,5 +76,37 @@
                  final double d25 = world.getBlockDensity(vec3D47, entity2.boundingBox);
                  final double d26 = (1.0 - d23) * d25;
 -                entity2.attackEntityFrom(entity, (int)((d26 * d26 + d26) / 2.0 * 8.0 * power + 1.0));
@@ -64,7 +65,7 @@
 +                /*entity2.attackEntityFrom(entity, (int)((d26 * d26 + d26) / 2.0 * 8.0 * power + 1.0));
                  final Entity entity3 = entity2;
                  entity3.motionX += d20 * d26;
-@@ -74,12 +113,12 @@
+@@ -74,12 +114,35 @@
                  entity4.motionY += d21 * d26;
                  final Entity entity5 = entity2;
 -                entity5.motionZ += d22 * d26;
@@ -74,7 +75,30 @@
          power = f11;
          final ArrayList arrayList48 = new ArrayList();
 -        arrayList48.addAll((Collection)hashSet10);
-+        arrayList48.addAll((Collection) hashSet10);
++        arrayList48.addAll(hashSet10);
++
++        // CraftBukkit start
++        org.bukkit.World bworld = Bukkit.getWorld(world.levelName);
++        org.bukkit.entity.Entity explode = entity == null ? null : new LBEntity((LBWorld) bworld, entity);
++        Location location = new Location(bworld, x, y, z);
++
++        List<org.bukkit.block.Block> blockList = new ArrayList<>();
++        for (int j = arrayList48.size() - 1; j >= 0; j--) {
++            ChunkPosition cpos = (ChunkPosition) arrayList48.get(j);
++            org.bukkit.block.Block block = bworld.getBlockAt(cpos.x, cpos.y, cpos.z);
++            if (block.getType() != org.bukkit.Material.AIR) {
++                blockList.add(block);
++            }
++        }
++
++        EntityExplodeEvent event = new EntityExplodeEvent(explode, location, blockList);
++        Bukkit.getPluginManager().callEvent(event);
++
++        if (event.isCancelled()) {
++            return;
++        }
++        // CraftBukkit end
++
          for (int i24 = arrayList48.size() - 1; i24 >= 0; --i24) {
 -            final ChunkPosition chunkPosition51 = (ChunkPosition)arrayList48.get(i24);
 +            final ChunkPosition chunkPosition51 = (ChunkPosition) arrayList48.get(i24);
