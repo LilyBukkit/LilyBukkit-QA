@@ -1,11 +1,12 @@
 --- EntityMob.java
 +++ EntityMob.java
-@@ -1,7 +1,15 @@
+@@ -1,7 +1,16 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.EntityDamageByEntityEvent;
 +import org.bukkit.event.entity.EntityDamageEvent;
++import org.bukkit.event.entity.EntityTargetEvent;
 +import ru.vladthemountain.lilybukkit.LBWorld;
 +import ru.vladthemountain.lilybukkit.entity.LBEntity;
 +import ru.vladthemountain.lilybukkit.entity.LBHumanEntity;
@@ -17,28 +18,28 @@
 +
      public EntityMob(final World world) {
          super(world);
-@@ -9,5 +17,5 @@
+@@ -9,5 +18,5 @@
          this.health = 20;
      }
 -    
 +
      @Override
      public void onLivingUpdate() {
-@@ -18,5 +26,5 @@
+@@ -18,5 +27,5 @@
          super.onLivingUpdate();
      }
 -    
 +
      @Override
      public void onUpdate() {
-@@ -26,5 +34,5 @@
+@@ -26,5 +35,5 @@
          }
      }
 -    
 +
      @Override
      protected Entity findPlayerToAttack() {
-@@ -32,7 +40,26 @@
+@@ -32,7 +41,26 @@
          return (entityPlayer1 != null && this.canEntityBeSeen(entityPlayer1)) ? entityPlayer1 : null;
      }
 -    
@@ -67,7 +68,37 @@
 +        // LilyBukkit end
          if (!super.attackEntityFrom(entity, damage)) {
              return false;
-@@ -46,28 +73,43 @@
+@@ -40,5 +68,28 @@
+         if (this.riddenByEntity != entity && this.ridingEntity != entity) {
+             if (entity != this) {
+-                this.entityToAttack = entity;
++                // CraftBukkit start
++                org.bukkit.entity.Entity bukkitTarget = entity == null ? null : new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), entity);
++
++                EntityTargetEvent event = new EntityTargetEvent(new LBHumanEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this), bukkitTarget, EntityTargetEvent.TargetReason.TARGET_ATTACKED_ENTITY);
++                Bukkit.getServer().getPluginManager().callEvent(event);
++
++                if (!event.isCancelled()) {
++                    if (event.getTarget() == null) {
++                        this.entityToAttack = null;
++                    } else {
++                        // LilyBukkit start
++                        LBEntity lb_targetEntity = (LBEntity) event.getTarget();
++                        EntityLiving targetEntity = new EntityLiving(this.worldObj);
++                        targetEntity.posX = lb_targetEntity.getLocation().getX();
++                        targetEntity.posY = lb_targetEntity.getLocation().getY();
++                        targetEntity.posZ = lb_targetEntity.getLocation().getZ();
++                        targetEntity.entityID = lb_targetEntity.getEntityId();
++                        //bruh
++                        this.entityToAttack = targetEntity;
++                        // LilyBukkit end
++                    }
++                }
++                // CraftBukkit end
++                //this.entityToAttack = entity;
+             }
+             return true;
+@@ -46,28 +97,43 @@
          return true;
      }
 -    
@@ -80,9 +111,9 @@
 +            // to damage another EntityMonster, and we want to catch those events.
 +            // This does not fire events for slime attacks, av they're not lastDamage EntityMonster.
 +            if (entity instanceof EntityLiving && !(entity instanceof EntityMob)) {
-+                org.bukkit.entity.Entity damagee = (entity == null) ? null : new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName),entity);
++                org.bukkit.entity.Entity damagee = (entity == null) ? null : new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), entity);
 +
-+                EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(new LBMonster((LBWorld) Bukkit.getWorld(this.worldObj.levelName),this), damagee, EntityDamageEvent.DamageCause.ENTITY_ATTACK, this.attackStrength);
++                EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(new LBMonster((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this), damagee, EntityDamageEvent.DamageCause.ENTITY_ATTACK, this.attackStrength);
 +                Bukkit.getServer().getPluginManager().callEvent(event);
 +
 +                if (!event.isCancelled()) {

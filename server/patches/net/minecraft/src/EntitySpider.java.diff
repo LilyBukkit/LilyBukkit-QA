@@ -1,0 +1,43 @@
+--- EntitySpider.java
++++ EntitySpider.java
+@@ -1,4 +1,12 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.entity.EntityTargetEvent;
++import org.bukkit.event.entity.EntityTargetEvent.TargetReason;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBCreature;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.entity.LBSpider;
++
+ public class EntitySpider extends EntityMob {
+     public EntitySpider(final World world) {
+@@ -42,5 +50,26 @@
+         final float f3 = this.getBrightness(1.0f);
+         if (f3 > 0.5f && this.rand.nextInt(100) == 0) {
+-            this.entityToAttack = null;
++            // CraftBukkit start
++            EntityTargetEvent event = new EntityTargetEvent(new LBSpider((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this), null, TargetReason.FORGOT_TARGET);
++            Bukkit.getServer().getPluginManager().callEvent(event);
++
++            if (!event.isCancelled()) {
++                if (event.getTarget() == null) {
++                    this.entityToAttack = null;
++                } else {
++                    // LilyBukkit start
++                    LBEntity lb_targetEntity = (LBEntity) event.getTarget();
++                    EntityLiving targetEntity = new EntityLiving(this.worldObj);
++                    targetEntity.posX = lb_targetEntity.getLocation().getX();
++                    targetEntity.posY = lb_targetEntity.getLocation().getY();
++                    targetEntity.posZ = lb_targetEntity.getLocation().getZ();
++                    targetEntity.entityID = lb_targetEntity.getEntityId();
++                    //bruh
++                    this.entityToAttack = targetEntity;
++                    // LilyBukkit end
++                }
++            }
++            // CraftBukkit end
++            //this.entityToAttack = null;
+         }
+         else if (damage > 2.0f && damage < 6.0f && this.rand.nextInt(10) == 0) {
