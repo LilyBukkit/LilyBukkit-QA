@@ -26,5 +26,5 @@ is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 Just follow [the guide](https://alphaver.fandom.com/wiki/Hosting_a_server#Hosting_a_Lilypad_server) (replace `RosepadServer.jar` with the name of the latest jar file).
 
 -----
-*This server core is developed on top of [5GameMaker/Rosepad](https://github.com/5GameMaker/Rosepad).*  
-*More info on the ARG can be found at the [AlphaVer Wikia](https://alphaver.fandom.com/wiki).*
+*This server core is developed on top of [RosepadMC/Rosepad](https://github.com/RosepadMC/Rosepad) `v1.1.0.5-beta`.*  
+*More info on the ARG can be found at the [AlphaVer Wiki](https://alphaver.fandom.com/wiki).*
