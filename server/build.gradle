@@ -129,14 +129,6 @@ jar {
 
 repositories{
     mavenCentral()
-    // No more fuckery with GitHub Packages
-    /*maven {
-        url = uri("https://maven.pkg.github.com/Vladg24YT/LilyBukkit-API")
-        credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-        }
-    }*/
 }
 
 sourceSets {
@@ -151,7 +143,7 @@ sourceSets {
 }
 
 dependencies{
-    implementation files('lib/lilybukkit-1.1.1.jar')
+    implementation files('lib/lilybukkit-api-1.1.1.jar')
     //CraftBukkit
     implementation group: "net.sf.jopt-simple", name: "jopt-simple", version: "3.2"
     implementation group: "jline", name: "jline", version: "0.9.94"

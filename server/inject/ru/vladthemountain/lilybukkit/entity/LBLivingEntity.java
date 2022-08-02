@@ -216,4 +216,24 @@ public class LBLivingEntity extends LBEntity implements LivingEntity {
             if (e.entityID == source.getEntityId()) this.entity.attackEntityFrom(e, amount);
         }
     }
+
+    @Override
+    public int getMaximumNoDamageTicks() {
+        return this.entity.heartsHalvesLife;
+    }
+
+    @Override
+    public void setMaximumNoDamageTicks(int i) {
+        this.entity.heartsHalvesLife = i;
+    }
+
+    @Override
+    public int getNoDamageTicks() {
+        return this.entity.heartsLife;
+    }
+
+    @Override
+    public void setNoDamageTicks(int i) {
+        this.entity.heartsLife = i;
+    }
 }
