@@ -13,6 +13,13 @@
 +
  import java.util.List;
  import java.util.Random;
+@@ -11,5 +19,5 @@
+     public Entity riddenByEntity;
+     public Entity ridingEntity;
+-    protected World worldObj;
++    public World worldObj; // LilyBukkit - private -> public
+     public double prevPosX;
+     public double prevPosY;
 @@ -63,9 +71,9 @@
      public int chunkCoordY;
      public int chunkCoordZ;

@@ -1,6 +1,5 @@
 package net.minecraft.src;
 
-import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import ru.vladthemountain.lilybukkit.LilyBukkit;
 
@@ -12,7 +11,7 @@ import java.util.List;
 
 public class Packet130RosepadMeta extends Packet {
     public List<ULPPExtension> extensions = new ArrayList<>();
-    public String serverName = Bukkit.getServer().getName();
+    public String serverName = "§2" + Bukkit.getServer().getName();
     public int[] version = ((LilyBukkit) Bukkit.getServer()).getRosepadVersion();
     public String tag = ((LilyBukkit) Bukkit.getServer()).getRosepadVersionTag();
     public long flags = 0;
@@ -59,7 +58,7 @@ public class Packet130RosepadMeta extends Packet {
         this.version = ((LilyBukkit) Bukkit.getServer()).getRosepadVersion();
         this.tag = ((LilyBukkit) Bukkit.getServer()).getRosepadVersionTag();
 
-        this.serverName = Bukkit.getServer().getName();
+        this.serverName = "§2" + Bukkit.getServer().getName();
         this.flags = 0;
 
         return this;

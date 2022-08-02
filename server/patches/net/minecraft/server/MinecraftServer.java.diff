@@ -188,14 +188,13 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -118,12 +154,13 @@
+@@ -118,12 +154,12 @@
          this.entityTracker = new EntityTracker(this);
          final String string3 = this.propertyManagerObj.getStringProperty("level-name", "world");
 -        MinecraftServer.logger.info(new StringBuilder("Preparing level \"").append(string3).append("\"").toString());
 +        MinecraftServer.logger.info("Preparing level \"" + string3 + "\"");
          this.initWorld(string3);
          MinecraftServer.logger.info("Done! For help, type \"help\" or \"?\"");
-+        this.lilyBukkit.reload(); // A temporary fix
          return true;
      }
 -    
@@ -205,12 +204,13 @@
 +        MinecraftServer.logger.info("[Minecraft] Preparing start region");
          (this.worldMngr = new WorldServer(new File("."), worldName, this.propertyManagerObj.getBooleanProperty("monsters", false))).addWorldAccess(new WorldManager(this));
          this.worldMngr.difficultySetting = 1;
-@@ -140,26 +177,44 @@
+@@ -140,26 +176,45 @@
          }
          this.clearCurrentTask();
-+        if (!this.lilyBukkit.addExistingWorld(this.worldMngr))
++        if (!this.lilyBukkit.addExistingWorld(this.worldMngr)) {
 +            MinecraftServer.logger.severe("[LilyBukkit] Couldn't get the current world, terminating to prevent bugs");
-+        this.stop();
++            this.stop();
++        }
      }
 -    
 +

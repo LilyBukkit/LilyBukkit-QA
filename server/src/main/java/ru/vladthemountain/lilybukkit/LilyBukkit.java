@@ -122,7 +122,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getName() {
-        return "§2LilyBukkit";
+        return "LilyBukkit";
     }
 
     /**
@@ -132,7 +132,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getVersion() {
-        return "Alpha 1.1.0.2";
+        return "Alpha 1.2.0.0";
     }
 
     /**

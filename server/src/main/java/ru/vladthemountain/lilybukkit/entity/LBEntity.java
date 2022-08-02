@@ -23,8 +23,8 @@ public class LBEntity implements Entity {
     net.minecraft.src.Entity entity;
     EntityDamageEvent lastDamageCause;
 
-    public LBEntity(LBWorld w, net.minecraft.src.Entity e) {
-        this.world = w;
+    public LBEntity(World w, net.minecraft.src.Entity e) {
+        this.world = (LBWorld) w;
         this.entity = e;
     }
 
