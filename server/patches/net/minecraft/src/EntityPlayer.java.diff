@@ -1,38 +1,41 @@
 --- EntityPlayer.java
 +++ EntityPlayer.java
-@@ -1,4 +1,10 @@
+@@ -1,4 +1,13 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
++import org.bukkit.entity.Player;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 +import org.bukkit.event.entity.EntityDeathEvent;
++import org.bukkit.event.player.PlayerDropItemEvent;
 +import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBItem;
 +
 +import java.util.ArrayList;
  import java.util.List;
  import java.util.Random;
-@@ -15,5 +21,5 @@
+@@ -15,5 +24,5 @@
      private int damageRemainder;
      public Random playerRand;
 -    
 +
      public EntityPlayer(final World world) {
          super(world);
-@@ -33,5 +39,5 @@
+@@ -33,5 +42,5 @@
          this.playerRand = new Random();
      }
 -    
 +
      @Override
      public void updateRidden() {
-@@ -40,5 +46,5 @@
+@@ -40,5 +49,5 @@
          this.cameraYaw = 0.0f;
      }
 -    
 +
      @Override
      protected void updateEntityActionState() {
-@@ -49,11 +55,10 @@
+@@ -49,11 +58,10 @@
                  this.isSwinging = false;
              }
 -        }
@@ -46,21 +49,21 @@
 +
      @Override
      public void onLivingUpdate() {
-@@ -65,5 +70,5 @@
+@@ -65,5 +73,5 @@
          super.onLivingUpdate();
          float f1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
 -        float f2 = (float)Math.atan(-this.motionY * 0.20000000298023224) * 15.0f;
 +        float f2 = (float) Math.atan(-this.motionY * 0.20000000298023224) * 15.0f;
          if (f1 > 0.1f) {
              f1 = 0.1f;
-@@ -81,5 +86,5 @@
+@@ -81,5 +89,5 @@
              if (list3 != null) {
                  for (int i4 = 0; i4 < list3.size(); ++i4) {
 -                    this.collideWithPlayer((Entity)list3.get(i4));
 +                    this.collideWithPlayer((Entity) list3.get(i4));
                  }
              }
-@@ -90,10 +95,9 @@
+@@ -90,10 +98,9 @@
              int n3 = 0;
              while (n2 != 0) {
 -                final int n4 = this.worldObj.getBlockId((int)this.posX, n2, (int)this.posZ);
@@ -73,7 +76,7 @@
 +                } else {
                      if (n3 != 0) {
                          ++n2;
-@@ -108,9 +112,9 @@
+@@ -108,9 +115,9 @@
          }
      }
 -    
@@ -85,7 +88,7 @@
 +
      @Override
      public void onDeath(final Entity entity) {
-@@ -121,10 +125,29 @@
+@@ -121,10 +128,29 @@
              this.dropPlayerItemWithRandomChoice(new ItemStack(Item.appleRed, 1), true);
          }
 -        this.inventory.dropAllItems();
@@ -118,7 +121,7 @@
 +        } else {
              final double n = 0.0;
              this.motionZ = n;
-@@ -133,14 +156,14 @@
+@@ -133,14 +159,14 @@
          this.yOffset = 0.1f;
      }
 -    
@@ -136,7 +139,7 @@
 +
      public void dropPlayerItemWithRandomChoice(final ItemStack stack, final boolean z2) {
          if (stack != null) {
-@@ -154,6 +177,5 @@
+@@ -154,6 +180,5 @@
                  entityItem3.motionZ = MathHelper.cos(f6) * f5;
                  entityItem3.motionY = 0.20000000298023224;
 -            }
@@ -144,7 +147,7 @@
 +            } else {
                  f4 = 0.3f;
                  entityItem3.motionX = -MathHelper.sin(this.rotationYaw / 180.0f * 3.1415927f) * MathHelper.cos(this.rotationPitch / 180.0f * 3.1415927f) * f4;
-@@ -164,18 +186,18 @@
+@@ -164,18 +189,32 @@
                  f4 *= this.rand.nextFloat();
                  final EntityItem entityItem4 = entityItem3;
 -                entityItem4.motionX += Math.cos((double)f5) * f4;
@@ -155,6 +158,20 @@
 -                entityItem6.motionZ += Math.sin((double)f5) * f4;
 +                entityItem6.motionZ += Math.sin((double) f5) * f4;
              }
++
++            // CraftBukkit start
++            Player player = Bukkit.getPlayer(this.username);
++            LBItem drop = new LBItem(Bukkit.getServer().getWorld(this.worldObj.levelName), entityItem3);
++
++            PlayerDropItemEvent event = new PlayerDropItemEvent(player, drop);
++            Bukkit.getServer().getPluginManager().callEvent(event);
++
++            if (event.isCancelled()) {
++                player.getInventory().addItem(drop.getItemStack());
++                return;
++            }
++            // CraftBukkit end
++
              this.joinEntityItemWithWorld(entityItem3);
          }
      }
@@ -168,7 +185,7 @@
 +
      public float getCurrentPlayerStrVsBlock(final Block block) {
          float f2 = this.inventory.getStrVsBlock(block);
-@@ -188,9 +210,9 @@
+@@ -188,9 +227,9 @@
          return f2;
      }
 -    
@@ -180,7 +197,7 @@
 +
      @Override
      public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
-@@ -199,25 +221,25 @@
+@@ -199,25 +238,25 @@
          this.inventory.readFromNBT(nBTTagList2);
      }
 -    
@@ -213,7 +230,7 @@
 +
      @Override
      public boolean attackEntityFrom(final Entity entity, int damage) {
-@@ -247,24 +269,24 @@
+@@ -247,24 +286,24 @@
          return damage != 0 && super.attackEntityFrom(entity, damage);
      }
 -    

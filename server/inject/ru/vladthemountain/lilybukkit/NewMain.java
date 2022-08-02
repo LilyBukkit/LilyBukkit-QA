@@ -3,7 +3,6 @@ package ru.vladthemountain.lilybukkit;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import net.minecraft.server.MinecraftServer;
-import ru.vladthemountain.lilybukkit.LilyBukkit;
 
 import java.io.File;
 import java.io.IOException;

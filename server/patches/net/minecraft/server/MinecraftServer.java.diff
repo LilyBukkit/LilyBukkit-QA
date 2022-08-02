@@ -94,7 +94,7 @@
 +    }
 +
 +    public static String getVersionTag() {
-+        return "dev";
++        return "alpha";
 +    }
 +
 +    public static String getVersionString() {

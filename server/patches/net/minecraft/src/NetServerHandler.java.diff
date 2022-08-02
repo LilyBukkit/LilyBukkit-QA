@@ -1,20 +1,29 @@
 --- NetServerHandler.java
 +++ NetServerHandler.java
-@@ -1,6 +1,12 @@
+@@ -1,6 +1,21 @@
  package net.minecraft.src;
  
 -import java.io.IOException;
  import net.minecraft.server.MinecraftServer;
 +import org.bukkit.Bukkit;
++import org.bukkit.ChatColor;
++import org.bukkit.Location;
++import org.bukkit.command.CommandException;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.entity.Player;
 +import org.bukkit.event.block.Action;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 +import org.bukkit.event.player.PlayerAnimationEvent;
++import org.bukkit.event.player.PlayerChatEvent;
++import org.bukkit.event.player.PlayerCommandPreprocessEvent;
++import org.bukkit.event.player.PlayerItemHeldEvent;
++import org.bukkit.event.player.PlayerKickEvent;
++import org.bukkit.event.player.PlayerMoveEvent;
 +
 +import java.io.IOException;
  import java.util.logging.Logger;
  
-@@ -17,9 +23,9 @@
+@@ -17,9 +32,9 @@
      protected boolean hasMoved;
      protected ItemStack heldItem;
 -    
@@ -26,56 +35,151 @@
 +
      public NetServerHandler(final MinecraftServer minecraftServer1, final NetworkManager networkManager2, final EntityPlayerMP entityPlayerMP3) {
          this.connectionClosed = false;
-@@ -32,5 +38,5 @@
+@@ -32,5 +47,5 @@
          entityPlayerMP3.playerNetServerHandler = this;
      }
 -    
 +
      public void handlePackets() throws IOException {
          this.netManager.processReadPackets();
-@@ -39,5 +45,5 @@
+@@ -39,12 +54,34 @@
          }
      }
 -    
+-    public void kickPlayer(final String string1) {
 +
-     public void kickPlayer(final String string1) {
++    public void kickPlayer(String string1) {
++        // CraftBukkit start
++        String leaveMessage = "\u00A7e" + this.playerEntity.username + " left the game.";
++
++        PlayerKickEvent event = new PlayerKickEvent(Bukkit.getServer().getPlayer(this.playerEntity.username), string1, leaveMessage);
++        Bukkit.getServer().getPluginManager().callEvent(event);
++
++        if (event.isCancelled()) {
++            // Do not kick the player
++            return;
++        }
++        // Send the possibly modified leave message
++        string1 = event.getReason();
++        // CraftBukkit end
++
          this.netManager.addToSendQueue(new Packet255KickDisconnect(string1));
-@@ -46,5 +52,5 @@
+         this.netManager.serverShutdown();
++
++        // CraftBukkit start
++        leaveMessage = event.getLeaveMessage();
++        if (leaveMessage != null) {
++            this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(leaveMessage));
++        }
++        // CraftBukkit end
++
+         this.mcServer.configManager.playerLoggedOut(this.playerEntity);
          this.connectionClosed = true;
      }
 -    
 +
      @Override
      public void handleFlying(final Packet10Flying packet) {
-@@ -71,5 +77,5 @@
+@@ -55,5 +92,69 @@
+             }
+         }
+-        if (this.hasMoved) {
++
++        // CraftBukkit start
++        Player player = Bukkit.getPlayer(this.playerEntity.username);
++        Location from = new Location(player.getWorld(), lastPosX, lastPosY, lastPosZ, this.playerEntity.prevCameraYaw, this.playerEntity.prevCameraPitch); // Get the Players previous Event location.
++        Location to = player.getLocation().clone(); // Start off the To location as the Players current location.
++
++        // If the packet contains movement information then we update the To location with the correct XYZ.
++        if (packet.moving && !(packet.moving && packet.yPosition == -999.0D && packet.stance == -999.0D)) {
++            to.setX(packet.xPosition);
++            to.setY(packet.yPosition);
++            to.setZ(packet.zPosition);
++            // LilyBukkit - connect the two as there's no separate setting to check if the packet sends pitch and yaw
++            to.setYaw(packet.yaw);
++            to.setPitch(packet.pitch);
++        }
++
++        // Prevent 40 event-calls for less than a single pixel of movement >.>
++        double delta = Math.pow(this.lastPosX - to.getX(), 2) + Math.pow(this.lastPosY - to.getY(), 2) + Math.pow(this.lastPosZ - to.getZ(), 2);
++        float deltaAngle = Math.abs(this.playerEntity.prevCameraYaw - to.getYaw()) + Math.abs(this.playerEntity.prevCameraPitch - to.getPitch());
++
++        if ((delta > 1f / 256 || deltaAngle > 10f) && (this.hasMoved && !this.playerEntity.dead)) {
++            this.lastPosX = to.getX();
++            this.lastPosY = to.getY();
++            this.lastPosZ = to.getZ();
++            this.playerEntity.prevCameraYaw = to.getYaw();
++            this.playerEntity.prevCameraPitch = to.getPitch();
++
++            // Skip the first time we do this
++            if (from.getX() != Double.MAX_VALUE) {
++                PlayerMoveEvent event = new PlayerMoveEvent(player, from, to);
++                Bukkit.getPluginManager().callEvent(event);
++
++                // If the event is cancelled we move the player back to their old location.
++                if (event.isCancelled()) {
++                    this.playerEntity.playerNetServerHandler.sendPacket(new Packet13PlayerLookMove(from.getX(), from.getY() + 1.6200000047683716D, from.getY(), from.getZ(), from.getYaw(), from.getPitch(), false));
++                    return;
++                }
++
++                /* If a Plugin has changed the To destination then we teleport the Player
++                   there to avoid any 'Moved wrongly' or 'Moved too quickly' errors.
++                   We only do this if the Event was not cancelled. */
++                if (!to.equals(event.getTo()) && !event.isCancelled()) {
++                    Bukkit.getPlayer(this.playerEntity.username).teleport(event.getTo());
++                    return;
++                }
++
++                /* Check to see if the Players Location has some how changed during the call of the event.
++                   This can happen due to a plugin teleporting the player instead of using .setTo() */
++                if (!from.equals(Bukkit.getPlayer(this.playerEntity.username).getLocation()) && this.justTeleported) {
++                    this.justTeleported = false;
++                    return;
++                }
++            }
++        }
++
++        if (Double.isNaN(packet.xPosition) || Double.isNaN(packet.yPosition) || Double.isNaN(packet.zPosition) || Double.isNaN(packet.stance)) {
++            player.teleport(player.getWorld().getSpawnLocation());
++            System.err.println(player.getName() + " was caught trying to crash the server with an invalid position.");
++            player.kickPlayer("Nope!");
++            return;
++        }
++
++        if (this.hasMoved && !this.playerEntity.dead) {
++            // CraftBukkit end
++
+             this.lastPosX = this.playerEntity.posX;
+             this.lastPosY = this.playerEntity.posY;
+@@ -71,5 +172,5 @@
                  if (d5 > 1.65 || d5 < 0.1) {
                      this.kickPlayer("Illegal stance");
 -                    NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " had an illegal stance: " + d5);
 +                    NetServerHandler.logger.warning(this.playerEntity.username + " had an illegal stance: " + d5);
                  }
                  this.playerEntity.managedPosY = packet.stance;
-@@ -98,5 +104,5 @@
+@@ -98,5 +199,5 @@
              if (d8 > 0.0625) {
                  z18 = true;
 -                NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " moved wrongly!");
 +                NetServerHandler.logger.warning(this.playerEntity.username + " moved wrongly!");
              }
              this.playerEntity.setPositionAndRotation(d2, d3, d4, f8, f9);
-@@ -110,5 +116,5 @@
+@@ -110,5 +211,5 @@
          }
      }
 -    
 +
      public void teleportTo(final double d1, final double d3, final double d5, final float f7, final float f8) {
          this.hasMoved = false;
-@@ -119,5 +125,5 @@
+@@ -119,5 +220,5 @@
          this.playerEntity.playerNetServerHandler.sendPacket(new Packet13PlayerLookMove(d1, d3 + 1.6200000047683716, d3, d5, f7, f8, false));
      }
 -    
 +
      @Override
      public void handleBlockDig(final Packet14BlockDig packet) {
-@@ -128,11 +134,5 @@
+@@ -128,11 +229,5 @@
          final boolean isOP = op;
          final boolean isAuthed = this.mcServer.configManager.isAuthed(this.playerEntity.username);
 -        boolean z3 = false;
@@ -88,7 +192,7 @@
 +        boolean z3 = (packet.status == 0 || packet.status == 1);
          if (z3) {
              final double d4 = this.playerEntity.posY;
-@@ -151,24 +151,21 @@
+@@ -151,24 +246,21 @@
          final int i20 = packet.zPosition;
          final int i21 = packet.face;
 -        final int maxDistX = (int)MathHelper.abs((float)(i18 - this.mcServer.worldMngr.spawnX));
@@ -122,14 +226,14 @@
 +        } else if (packet.status == 3) {
              final double d5 = this.playerEntity.posX - (i18 + 0.5);
              final double d6 = this.playerEntity.posY - (i19 + 0.5);
-@@ -181,5 +178,5 @@
+@@ -181,5 +273,5 @@
          this.mcServer.worldMngr.disableSpawnProtection = false;
      }
 -    
 +
      @Override
      public void handlePlace(final Packet15Place packet) {
-@@ -193,35 +190,35 @@
+@@ -193,49 +285,54 @@
          final int i5 = packet.zPosition;
          final int i6 = packet.direction;
 -        final int maxDistX = (int)MathHelper.abs((float)(i3 - this.mcServer.worldMngr.spawnX));
@@ -178,7 +282,10 @@
 +
      @Override
      public void handleBlockItemSwitch(final Packet16BlockItemSwitch packet) {
-@@ -230,6 +227,5 @@
++        if (this.playerEntity.dead) return; // CraftBukkit
++
+         final int i2 = packet.id;
+         this.playerEntity.inventory.currentItem = this.playerEntity.inventory.mainInventory.length - 1;
          if (i2 == 0) {
              this.heldItem = null;
 -        }
@@ -186,14 +293,18 @@
 +        } else {
              this.heldItem = new ItemStack(i2);
          }
-@@ -237,5 +233,5 @@
++        // CraftBukkit start
++        PlayerItemHeldEvent event = new PlayerItemHeldEvent(Bukkit.getPlayer(this.playerEntity.username), this.playerEntity.inventory.currentItem, i2);
++        Bukkit.getServer().getPluginManager().callEvent(event);
++        // CraftBukkit end
+         this.playerEntity.inventory.mainInventory[this.playerEntity.inventory.currentItem] = this.heldItem;
          this.mcServer.entityTracker.sendPacketToTrackedPlayers(this.playerEntity, new Packet16BlockItemSwitch(this.playerEntity.entityID, i2));
      }
 -    
 +
      @Override
      public void handlePickupSpawn(final Packet21PickupSpawn packet) {
-@@ -248,7 +244,7 @@
+@@ -248,7 +345,7 @@
          entityItem8.motionZ = packet.roll / 128.0;
          entityItem8.delayBeforeCanPickup = 10;
 -        this.mcServer.worldMngr.spawnEntityInWorld(entityItem8);
@@ -203,7 +314,7 @@
 +
      @Override
      public void handleChat(final Packet3Chat packet) {
-@@ -256,9 +252,8 @@
+@@ -256,9 +353,8 @@
          if (string2.length() > 100) {
              this.kickPlayer("Chat message too long");
 -        }
@@ -215,25 +326,54 @@
 +                if (" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'abcdefghijklmnopqrstuvwxyz{|}~\u2302\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8£\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1ªº¿®¬½¼¡«»".indexOf((int) string2.charAt(i3)) < 0) {
                      this.kickPlayer("Illegal characters in chat");
                      return;
-@@ -267,7 +262,6 @@
+@@ -267,7 +363,15 @@
              if (string2.startsWith("/")) {
                  this.handleSlashCommand(string2);
 -            }
 -            else {
 -                string2 = new StringBuilder("<").append(this.playerEntity.username).append("> ").append(string2).toString();
 +            } else {
-+                string2 = "<" + /*Bukkit.getPlayer(*/this.playerEntity.username/*).getDisplayName()*/ + "> " + string2; //LilyBukkit: replace 'this.playerEntity.username' with own code
++                // LilyBukkit start
++                Player player = Bukkit.getPlayer(this.playerEntity.username);
++                PlayerChatEvent playerChatEvent = new PlayerChatEvent(player, string2);
++
++                Bukkit.getServer().getPluginManager().callEvent(playerChatEvent);
++                if (playerChatEvent.isCancelled()) return;
++
++                string2 = String.format(playerChatEvent.getFormat(), playerChatEvent.getPlayer().getDisplayName(), playerChatEvent.getMessage());
++                // LilyBukkit end
++                //string2 = "<" + /*Bukkit.getPlayer(*/this.playerEntity.username/*).getDisplayName()*/ + "> " + string2; //LilyBukkit: replace 'this.playerEntity.username' with own code
                  NetServerHandler.logger.info(string2);
                  this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(string2));
-@@ -275,18 +269,17 @@
+@@ -275,18 +379,37 @@
          }
      }
 -    
 +
      private void handleSlashCommand(String string1) {
++        // LilyBukkit start
++        Player player = Bukkit.getPlayer(this.playerEntity.username);
++
++        PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(player, string1);
++        Bukkit.getServer().getPluginManager().callEvent(event);
++
++        if (event.isCancelled()) return;
++
++        try {
++            if (!(Bukkit.getServer().dispatchCommand(player, string1.substring(1)))) {
++                Logger.getLogger(NetServerHandler.class.getName()).warning("Command " + string1 + " returned `false`");
++            }
++        } catch (CommandException ex) {
++            player.sendMessage(ChatColor.RED + "An internal error occurred while attempting to perform this command");
++            Logger.getLogger(NetServerHandler.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
++        }
++        // LilyBukkit end
++
++        // Commented, because now dispatchCommand handles everything
++        /*
          if (string1.toLowerCase().startsWith("/me ")) {
 -            string1 = new StringBuilder("* ").append(this.playerEntity.username).append(" ").append(string1.substring(string1.indexOf(" ")).trim()).toString();
-+            string1 = "* " + /*Bukkit.getPlayer(*/this.playerEntity.username/*).getDisplayName()*/ + " " + string1.substring(string1.indexOf(" ")).trim(); //LilyBukkit: replace 'this.playerEntity.username' with own code
++            string1 = "* " + this.playerEntity.username + " " + string1.substring(string1.indexOf(" ")).trim(); //LilyBukkit: replace 'this.playerEntity.username' with own code
              NetServerHandler.logger.info(string1);
              this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(string1));
 -        }
@@ -245,11 +385,11 @@
                  string1 = string1.substring(string1.indexOf(" ")).trim();
 -                string1 = new StringBuilder("§7").append(this.playerEntity.username).append(" whispers ").append(string1).toString();
 -                NetServerHandler.logger.info(String.valueOf(string1) + " to " + string2[1]);
-+                string1 = "§7" + /*Bukkit.getPlayer(*/this.playerEntity.username/*).getDisplayName()*/ + " whispers " + string1; //LilyBukkit: replace 'this.playerEntity.username' with own code
++                string1 = "§7" + this.playerEntity.username + " whispers " + string1; //LilyBukkit: replace 'this.playerEntity.username' with own code
 +                NetServerHandler.logger.info(string1 + " to " + string2[1]);
                  if (!this.mcServer.configManager.sendPacketToPlayer(string2[1], new Packet3Chat(string1))) {
                      this.sendPacket(new Packet3Chat("§cThere's no player by that name online."));
-@@ -294,72 +287,74 @@
+@@ -294,72 +417,74 @@
              }
          }
 -        else if (string1.toLowerCase().equalsIgnoreCase("/home")) {
@@ -296,8 +436,9 @@
 +        } else {
              final String string3 = string1.substring(1);
 -            NetServerHandler.logger.info(String.valueOf(this.playerEntity.username) + " tried command: " + string3);
+-        }
 +            NetServerHandler.logger.info(this.playerEntity.username + " tried command: " + string3);
-         }
++        }*/
      }
 -    
 +
@@ -366,17 +507,25 @@
 +
      @Override
      public void handlePlayerInventory(final Packet5PlayerInventory packet) {
-@@ -374,5 +369,5 @@
+@@ -374,5 +499,5 @@
          }
      }
 -    
 +
      public void sendInventoryPackets() {
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-1, this.playerEntity.inventory.mainInventory));
-@@ -380,5 +375,5 @@
+@@ -380,5 +505,5 @@
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-3, this.playerEntity.inventory.armorInventory));
      }
 -    
 +
      @Override
      public void handleComplexEntity(final Packet59ComplexEntity packet) {
+@@ -389,3 +514,7 @@
+         }
+     }
++
++    // LilyBukkit start
++    private boolean justTeleported = false;
++    // LilyBukkit end
+ }

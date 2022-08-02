@@ -1,6 +1,7 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityItem;
+import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import ru.vladthemountain.lilybukkit.LBWorld;
@@ -12,7 +13,7 @@ public class LBItem extends LBEntity implements Item {
 
     EntityItem entity;
 
-    public LBItem(LBWorld w, EntityItem e) {
+    public LBItem(World w, EntityItem e) {
         super(w, e);
         this.entity = e;
     }
