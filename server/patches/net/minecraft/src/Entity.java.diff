@@ -110,7 +110,7 @@
 -                this.attackEntityFrom(null, 1);
 +                // CraftBukkit start - TODO: this event spams!
 +                if (this instanceof EntityLiving) {
-+                    EntityDamageEvent event = new EntityDamageEvent(new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this), EntityDamageEvent.DamageCause.FIRE_TICK, 1);
++                    EntityDamageEvent event = new EntityDamageEvent(new LBEntity(Bukkit.getWorld(this.worldObj.levelName), this), EntityDamageEvent.DamageCause.FIRE_TICK, 1);
 +                    Bukkit.getServer().getPluginManager().callEvent(event);
 +
 +                    if (!event.isCancelled()) {

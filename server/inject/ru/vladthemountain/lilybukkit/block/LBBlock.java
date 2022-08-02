@@ -115,7 +115,7 @@ public class LBBlock implements Block {
      */
     @Override
     public int getTypeId() {
-        return this.block.blockID;
+        return (this.block != null) ? this.block.blockID : 0;
     }
 
     /**
@@ -428,8 +428,8 @@ public class LBBlock implements Block {
      * in that order all over. This method is convenience to convert for us.
      *
      * @param face BlockFace to convert
-     * @author CraftBukkit
      * @return number that represents the BlockFace
+     * @author CraftBukkit
      */
     public static int convertBlockFaceToNotch(BlockFace face) {
         switch (face) {
