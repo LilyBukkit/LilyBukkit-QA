@@ -1,16 +1,42 @@
 --- ItemPainting.java
 +++ ItemPainting.java
-@@ -1,4 +1,6 @@
+@@ -1,4 +1,14 @@
  package net.minecraft.src;
  
++import org.bukkit.Bukkit;
++import org.bukkit.block.Block;
++import org.bukkit.block.BlockFace;
++import org.bukkit.entity.Player;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++import org.bukkit.event.painting.PaintingPlaceEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.block.LBBlock;
++import ru.vladthemountain.lilybukkit.entity.LBPainting;
 +
  public class ItemPainting extends Item {
      public ItemPainting(final int itemID) {
-@@ -27,5 +29,5 @@
+@@ -6,5 +16,5 @@
+         this.maxDamage = 64;
+     }
+-    
++
+     @Override
+     public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, final int y, final int z, final int i7) {
+@@ -27,5 +37,16 @@
          final EntityPainting entityPainting9 = new EntityPainting(world, x, y, z, b8);
          if (entityPainting9.onValidSurface()) {
 -            world.spawnEntityInWorld(entityPainting9);
++            // LilyBukkit start
++            Player placer = (entityPlayer != null) ? Bukkit.getPlayer(entityPlayer.username) : null;
++
++            Block blockClicked = Bukkit.getWorld(world.levelName).getBlockAt(x, y, z);
++            BlockFace blockFace = LBBlock.convertNotchToBlockFace(i7);
++
++            PaintingPlaceEvent paintingPlaceEvent = new PaintingPlaceEvent(new LBPainting((LBWorld) Bukkit.getWorld(world.levelName), entityPainting9), placer, blockClicked, blockFace);
++            Bukkit.getServer().getPluginManager().callEvent(paintingPlaceEvent);
++
++            if (paintingPlaceEvent.isCancelled()) return false;
++            // LilyBukkit end
 +            world.spawnEntityInWorld(entityPainting9, SpawnReason.NATURAL);
              --stack.stackSize;
          }

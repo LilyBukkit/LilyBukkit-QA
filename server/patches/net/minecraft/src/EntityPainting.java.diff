@@ -1,21 +1,41 @@
 --- EntityPainting.java
 +++ EntityPainting.java
-@@ -1,4 +1,6 @@
+@@ -1,4 +1,12 @@
  package net.minecraft.src;
  
++import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++import org.bukkit.event.painting.PaintingBreakByEntityEvent;
++import org.bukkit.event.painting.PaintingBreakByWorldEvent;
++import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.entity.LBPainting;
 +
  import java.util.List;
  import java.util.ArrayList;
-@@ -99,5 +101,5 @@
+@@ -98,6 +106,12 @@
+         if (this.tickCounter++ == 100 && !this.onValidSurface()) {
              this.tickCounter = 0;
++            // LilyBukkit start
++            PaintingBreakByWorldEvent paintingBreakByWorldEvent = new PaintingBreakByWorldEvent(new LBPainting((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++            Bukkit.getServer().getPluginManager().callEvent(paintingBreakByWorldEvent);
++
++            if (paintingBreakByWorldEvent.isCancelled()) return;
++            // LilyBukkit end
              this.setEntityDead();
 -            this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)));
 +            this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)), SpawnReason.NATURAL);
          }
      }
-@@ -156,5 +158,5 @@
+@@ -155,6 +169,12 @@
+     @Override
      public boolean attackEntityFrom(final Entity entity, final int damage) {
++        // LilyBukkit start
++        PaintingBreakByEntityEvent paintingBreakByEntityEvent = new PaintingBreakByEntityEvent(new LBPainting((LBWorld) Bukkit.getWorld(this.worldObj.levelName),this), new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName),entity));
++        Bukkit.getServer().getPluginManager().callEvent(paintingBreakByEntityEvent);
++
++        if (paintingBreakByEntityEvent.isCancelled()) return true;
++        // LilyBukkit end
          this.setEntityDead();
 -        this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)));
 +        this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)), SpawnReason.NATURAL);
