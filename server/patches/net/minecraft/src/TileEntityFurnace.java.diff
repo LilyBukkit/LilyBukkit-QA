@@ -1,0 +1,186 @@
+--- TileEntityFurnace.java
++++ TileEntityFurnace.java
+@@ -1,4 +1,8 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.inventory.FurnaceBurnEvent;
++import org.bukkit.event.inventory.FurnaceSmeltEvent;
++
+ public class TileEntityFurnace extends TileEntity implements IInventory {
+     private ItemStack[] furnaceItemStacks;
+@@ -6,5 +10,5 @@
+     private int currentItemBurnTime;
+     private int furnaceCookTime;
+-    
++
+     public TileEntityFurnace() {
+         this.furnaceItemStacks = new ItemStack[3];
+@@ -13,15 +17,15 @@
+         this.furnaceCookTime = 0;
+     }
+-    
++
+     @Override
+     public int getSizeInventory() {
+         return this.furnaceItemStacks.length;
+     }
+-    
++
+     @Override
+     public ItemStack getStackInSlot(final int slot) {
+         return this.furnaceItemStacks[slot];
+     }
+-    
++
+     @Override
+     public void readFromNBT(final NBTTagCompound nbttagcompound) {
+@@ -30,5 +34,5 @@
+         this.furnaceItemStacks = new ItemStack[this.getSizeInventory()];
+         for (int i = 0; i < nBTTagList.tagCount(); ++i) {
+-            final NBTTagCompound nBTTagCompound2 = (NBTTagCompound)nBTTagList.tagAt(i);
++            final NBTTagCompound nBTTagCompound2 = (NBTTagCompound) nBTTagList.tagAt(i);
+             final byte by = nBTTagCompound2.getByte("Slot");
+             if (by >= 0) {
+@@ -42,26 +46,26 @@
+         this.currentItemBurnTime = this.getItemBurnTime(this.furnaceItemStacks[1]);
+     }
+-    
++
+     @Override
+     public void writeToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeToNBT(nbttagcompound);
+-        nbttagcompound.setShort("BurnTime", (short)this.furnaceBurnTime);
+-        nbttagcompound.setShort("CookTime", (short)this.furnaceCookTime);
++        nbttagcompound.setShort("BurnTime", (short) this.furnaceBurnTime);
++        nbttagcompound.setShort("CookTime", (short) this.furnaceCookTime);
+         final NBTTagList nBTTagList = new NBTTagList();
+         for (int i = 0; i < this.furnaceItemStacks.length; ++i) {
+             if (this.furnaceItemStacks[i] != null) {
+                 final NBTTagCompound nBTTagCompound2 = new NBTTagCompound();
+-                nBTTagCompound2.setByte("Slot", (byte)i);
++                nBTTagCompound2.setByte("Slot", (byte) i);
+                 this.furnaceItemStacks[i].writeToNBT(nBTTagCompound2);
+                 nBTTagList.setTag(nBTTagCompound2);
+             }
+         }
+-        nbttagcompound.setTag("Items", (NBTBase)nBTTagList);
++        nbttagcompound.setTag("Items", nBTTagList);
+     }
+-    
++
+     public int getCookProgressScaled(final int n) {
+         return this.furnaceCookTime * n / 200;
+     }
+-    
++
+     public int getBurnTimeRemainingScaled(final int n) {
+         if (this.currentItemBurnTime == 0) {
+@@ -70,9 +74,9 @@
+         return this.furnaceBurnTime * n / this.currentItemBurnTime;
+     }
+-    
++
+     public boolean isBurning() {
+         return this.furnaceBurnTime > 0;
+     }
+-    
++
+     @Override
+     public void updateEntity() {
+@@ -83,11 +87,19 @@
+         }
+         if (this.furnaceBurnTime == 0 && this.canSmelt()) {
+-            final int n = this.furnaceBurnTime = this.getItemBurnTime(this.furnaceItemStacks[1]);
+-            this.currentItemBurnTime = n;
+-            if (this.furnaceBurnTime > 0) {
++            // LilyBukkit start
++            org.bukkit.inventory.ItemStack fuel = new org.bukkit.inventory.ItemStack(this.furnaceItemStacks[1].itemID, this.furnaceItemStacks[1].stackSize, (short) this.furnaceItemStacks[1].itemDmg);
++            FurnaceBurnEvent furnaceBurnEvent = new FurnaceBurnEvent(Bukkit.getWorld(this.worldObj.levelName).getBlockAt(this.xCoord, this.yCoord, this.zCoord), fuel, this.getItemBurnTime(this.furnaceItemStacks[1]));
++            Bukkit.getServer().getPluginManager().callEvent(furnaceBurnEvent);
++
++            if (furnaceBurnEvent.isCancelled()) return;
++
++            this.currentItemBurnTime = furnaceBurnEvent.getBurnTime(); // LilyBukkit - remove redundant constant `n`
++            this.furnaceBurnTime += this.currentItemBurnTime;
++
++            if (this.furnaceBurnTime > 0 && furnaceBurnEvent.isBurning()) {
++                // LilyBukkit end
+                 bl2 = true;
+                 if (this.furnaceItemStacks[1] != null) {
+-                    final ItemStack itemStack2;
+-                    final ItemStack itemStack = itemStack2 = this.furnaceItemStacks[1];
++                    final ItemStack itemStack2 = this.furnaceItemStacks[1]; // LilyBukkit - remove extra unused constant `itemStack`
+                     --itemStack2.stackSize;
+                     if (this.furnaceItemStacks[1].stackSize == 0) {
+@@ -104,6 +116,5 @@
+                 bl2 = true;
+             }
+-        }
+-        else {
++        } else {
+             this.furnaceCookTime = 0;
+         }
+@@ -116,5 +127,5 @@
+         }
+     }
+-    
++
+     private boolean canSmelt() {
+         if (this.furnaceItemStacks[0] == null) {
+@@ -124,26 +135,36 @@
+         return n >= 0 && (this.furnaceItemStacks[2] == null || (this.furnaceItemStacks[2].itemID == n && (this.furnaceItemStacks[2].stackSize < this.furnaceItemStacks[2].getMaxStackSize() || this.furnaceItemStacks[2].stackSize < Item.itemsList[n].getItemStackLimit())));
+     }
+-    
++
+     public void smeltItem() {
+         if (!this.canSmelt()) {
+             return;
+         }
+-        final int n = this.getCookedItem(this.furnaceItemStacks[0].getItem().shiftedIndex);
++        //final int n = this.getCookedItem(this.furnaceItemStacks[0].getItem().shiftedIndex);
++        // LilyBukkit start
++        ItemStack itemStack = new ItemStack(this.getCookedItem(this.furnaceItemStacks[0].getItem().shiftedIndex));
++
++        org.bukkit.inventory.ItemStack source = new org.bukkit.inventory.ItemStack(this.furnaceItemStacks[0].itemID, this.furnaceItemStacks[0].stackSize, (short) this.furnaceItemStacks[0].itemDmg);
++        org.bukkit.inventory.ItemStack result = new org.bukkit.inventory.ItemStack(itemStack.itemID);
++
++        FurnaceSmeltEvent furnaceSmeltEvent = new FurnaceSmeltEvent(Bukkit.getWorld(this.worldObj.levelName).getBlockAt(this.xCoord, this.yCoord, this.zCoord), source, result);
++        Bukkit.getServer().getPluginManager().callEvent(furnaceSmeltEvent);
++
++        if (furnaceSmeltEvent.isCancelled()) return;
++
++        org.bukkit.inventory.ItemStack oldResult = furnaceSmeltEvent.getResult();
++        ItemStack newResult = new ItemStack(oldResult.getTypeId(), oldResult.getAmount(), oldResult.getDurability());
++        itemStack = newResult;
++        // LilyBukkit end
+         if (this.furnaceItemStacks[2] == null) {
+-            this.furnaceItemStacks[2] = new ItemStack(n, 1);
++            this.furnaceItemStacks[2] = itemStack.copy(); // LilyBukkit - replace creation of a new ItemStack with a clone of an existing one
++        } else if (this.furnaceItemStacks[2].itemID == itemStack.itemID) {
++            this.furnaceItemStacks[2].stackSize += itemStack.stackSize; // LilyBukkit - replace constant creation with a direct variable call
+         }
+-        else if (this.furnaceItemStacks[2].itemID == n) {
+-            final ItemStack itemStack2;
+-            final ItemStack itemStack = itemStack2 = this.furnaceItemStacks[2];
+-            ++itemStack2.stackSize;
+-        }
+-        final ItemStack itemStack3;
+-        final ItemStack itemStack = itemStack3 = this.furnaceItemStacks[0];
+-        --itemStack3.stackSize;
++        --this.furnaceItemStacks[0].stackSize;  // LilyBukkit - replace constant creation with a direct variable call
+         if (this.furnaceItemStacks[0].stackSize <= 0) {
+             this.furnaceItemStacks[0] = null;
+         }
+     }
+-    
++
+     private int getCookedItem(final int blockID) {
+         if (blockID == Block.oreIron.blockID) {
+@@ -188,5 +209,5 @@
+         return -1;
+     }
+-    
++
+     private int getItemBurnTime(final ItemStack stack) {
+         if (stack == null) {
