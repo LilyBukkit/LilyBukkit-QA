@@ -1,0 +1,130 @@
+--- EntityItem.java
++++ EntityItem.java
+@@ -1,4 +1,8 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.player.PlayerPickupItemEvent;
++import ru.vladthemountain.lilybukkit.entity.LBItem;
++
+ public class EntityItem extends Entity {
+     public ItemStack item;
+@@ -8,30 +12,30 @@
+     private int health;
+     public float hoverStart;
+-    
++
+     public EntityItem(final World world, final double x, final double y, final double z, final ItemStack item) {
+         super(world);
+         this.age = 0;
+         this.health = 5;
+-        this.hoverStart = (float)(Math.random() * 3.141592653589793 * 2.0);
++        this.hoverStart = (float) (Math.random() * 3.141592653589793 * 2.0);
+         this.setSize(0.25f, 0.25f);
+         this.yOffset = this.height / 2.0f;
+         this.setPosition(x, y, z);
+         this.item = item;
+-        this.rotationYaw = (float)(Math.random() * 360.0);
+-        this.motionX = (float)(Math.random() * 0.20000000298023224 - 0.10000000149011612);
++        this.rotationYaw = (float) (Math.random() * 360.0);
++        this.motionX = (float) (Math.random() * 0.20000000298023224 - 0.10000000149011612);
+         this.motionY = 0.20000000298023224;
+-        this.motionZ = (float)(Math.random() * 0.20000000298023224 - 0.10000000149011612);
++        this.motionZ = (float) (Math.random() * 0.20000000298023224 - 0.10000000149011612);
+         this.canTriggerWalking = false;
+     }
+-    
++
+     public EntityItem(final World world) {
+         super(world);
+         this.age = 0;
+         this.health = 5;
+-        this.hoverStart = (float)(Math.random() * 3.141592653589793 * 2.0);
++        this.hoverStart = (float) (Math.random() * 3.141592653589793 * 2.0);
+         this.setSize(0.25f, 0.25f);
+         this.yOffset = this.height / 2.0f;
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -48,5 +52,5 @@
+             this.motionX = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f;
+             this.motionZ = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f;
+-            this.worldObj.playSoundAtEntity((Entity)this, "random.fizz", 0.4f, 2.0f + this.rand.nextFloat() * 0.4f);
++            this.worldObj.playSoundAtEntity(this, "random.fizz", 0.4f, 2.0f + this.rand.nextFloat() * 0.4f);
+         }
+         this.pushOutOfBlocks(this.posX, this.posY, this.posZ);
+@@ -73,10 +77,10 @@
+         }
+     }
+-    
++
+     @Override
+     public boolean handleWaterMovement() {
+         return this.worldObj.handleMaterialAcceleration(this.boundingBox, Material.water, this);
+     }
+-    
++
+     private boolean pushOutOfBlocks(final double x, final double y, final double z) {
+         final int i7 = MathHelper.floor_double(x);
+@@ -141,10 +145,10 @@
+         return false;
+     }
+-    
++
+     @Override
+     protected void dealFireDamage(final int fireDamage) {
+         this.attackEntityFrom(null, fireDamage);
+     }
+-    
++
+     @Override
+     public boolean attackEntityFrom(final Entity entity, final int damage) {
+@@ -155,11 +159,11 @@
+         return false;
+     }
+-    
++
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+-        nbttagcompound.setShort("Health", (short)(byte)this.health);
+-        nbttagcompound.setShort("Age", (short)this.age);
++        nbttagcompound.setShort("Health", (byte) this.health);
++        nbttagcompound.setShort("Age", (short) this.age);
+         nbttagcompound.setCompoundTag("Item", this.item.writeToNBT(new NBTTagCompound()));
+     }
+-    
++
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         this.health = (nbttagcompound.getShort("Health") & 0xFF);
+@@ -168,11 +172,28 @@
+         this.item = new ItemStack(nBTTagCompound2);
+     }
+-    
++
+     @Override
+     public void onCollideWithPlayer(final EntityPlayer entityPlayer) {
+         if (!this.worldObj.multiplayerWorld) {
+             final int i2 = this.item.stackSize;
++
++            // CraftBukkit start
++            int canHold = entityPlayer.inventory.canHold(this.item);
++            int remaining = this.item.stackSize - canHold;
++            if (this.delayBeforeCanPickup <= 0 && canHold > 0) {
++                this.item.stackSize = canHold;
++                PlayerPickupItemEvent event = new PlayerPickupItemEvent(Bukkit.getPlayer(entityPlayer.username), new LBItem(Bukkit.getWorld(this.worldObj.levelName), this), remaining);
++                Bukkit.getServer().getPluginManager().callEvent(event);
++                this.item.stackSize = canHold + remaining;
++
++                if (event.isCancelled()) return;
++
++                // Possibly < 0; fix here, so we do not have to modify code below
++                this.delayBeforeCanPickup = 0;
++            }
++            // CraftBukkit end
++
+             if (this.delayBeforeCanPickup == 0 && entityPlayer.inventory.addItemStackToInventory(this.item)) {
+-                this.worldObj.playSoundAtEntity((Entity)this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
++                this.worldObj.playSoundAtEntity(this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
+                 entityPlayer.onItemPickup(this, i2);
+                 this.setEntityDead();

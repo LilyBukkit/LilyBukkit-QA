@@ -8,7 +8,7 @@
 -    private DataInputStream socketInputStream;
 -    private DataOutputStream socketOutputStream;
 +    private final Object sendQueueLock;
-+    private final Socket networkSocket;
++    protected final Socket networkSocket;
 +    private final DataInputStream socketInputStream;
 +    private final DataOutputStream socketOutputStream;
      private boolean isRunning;

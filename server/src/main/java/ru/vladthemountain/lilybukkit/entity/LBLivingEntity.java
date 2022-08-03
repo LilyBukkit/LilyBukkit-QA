@@ -5,6 +5,7 @@ import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityMinecart;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.util.BlockIterator;
@@ -23,7 +24,7 @@ public class LBLivingEntity extends LBEntity implements LivingEntity {
     EntityLiving entity;
     int entityHealth;
 
-    public LBLivingEntity(LBWorld w, EntityLiving e) {
+    public LBLivingEntity(World w, EntityLiving e) {
         super(w, e);
         this.entity = e;
     }

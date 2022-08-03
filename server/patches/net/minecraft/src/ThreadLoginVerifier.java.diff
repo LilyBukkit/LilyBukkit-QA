@@ -1,0 +1,38 @@
+--- ThreadLoginVerifier.java
++++ ThreadLoginVerifier.java
+@@ -1,4 +1,7 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.event.player.PlayerPreLoginEvent;
++
+ import java.io.Reader;
+ import java.io.BufferedReader;
+@@ -18,10 +21,24 @@
+         try {
+             final String string1 = NetLoginHandler.getServerId(this.loginHandler);
+-            final URL uRL2 = new URL(new StringBuilder("http://www.minecraft.net/game/checkserver.jsp?user=").append(this.loginPacket.username).append("&serverId=").append(string1).toString());
+-            final BufferedReader bufferedReader3 = new BufferedReader((Reader)new InputStreamReader(uRL2.openStream()));
++            final URL uRL2 = new URL("http://www.minecraft.net/game/checkserver.jsp?user=" + this.loginPacket.username + "&serverId=" + string1);
++            final BufferedReader bufferedReader3 = new BufferedReader(new InputStreamReader(uRL2.openStream()));
+             final String string2 = bufferedReader3.readLine();
+             bufferedReader3.close();
+-            System.out.println(new StringBuilder("THE REPLY IS ").append(string2).toString());
++            System.out.println("THE REPLY IS " + string2);
+             if (string2.equals("YES")) {
++                // CraftBukkit start
++                if (this.loginHandler.netManager.networkSocket == null) {
++                    return;
++                }
++
++                PlayerPreLoginEvent event = new PlayerPreLoginEvent(this.loginPacket.username, this.loginHandler.netManager.networkSocket.getInetAddress());
++                Bukkit.getServer().getPluginManager().callEvent(event);
++
++                if (event.getResult() != PlayerPreLoginEvent.Result.ALLOWED) {
++                    this.loginHandler.kickUser(event.getKickMessage());
++                    return;
++                }
++                // CraftBukkit end
++
+                 NetLoginHandler.setLoginPacket(this.loginHandler, this.loginPacket);
+             }

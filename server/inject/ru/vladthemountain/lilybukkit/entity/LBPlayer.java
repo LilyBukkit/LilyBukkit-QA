@@ -1,9 +1,16 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.*;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
+import net.minecraft.src.Packet3Chat;
+import net.minecraft.src.Packet4UpdateTime;
+import net.minecraft.src.Packet51MapChunk;
+import net.minecraft.src.Packet53BlockChange;
+import net.minecraft.src.Packet5PlayerInventory;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -28,18 +35,18 @@ public class LBPlayer extends LBLivingEntity implements Player {
     EntityPlayerMP entity;
     String displayName;
     Location spawnPoint;
-    LBWorld world;
+    World world;
     LBPlayerInventory inventory;
     long playerTime;
 
     final PermissibleBase permissibleBase;
 
-    public LBPlayer(LBWorld w, EntityPlayerMP p) {
+    public LBPlayer(World w, EntityPlayerMP p) {
         super(w, p);
         this.entity = p;
         this.world = w;
         this.displayName = p.username;
-        this.spawnPoint = new Location(this.world, p.mcServer.worldMngr.spawnX, p.mcServer.worldMngr.spawnY, p.mcServer.worldMngr.spawnZ);
+        this.spawnPoint = new Location(this.world, p.worldObj.spawnX, p.worldObj.spawnY, p.worldObj.spawnZ);
         this.inventory = new LBPlayerInventory(this.entity.inventory);
         this.playerTime = this.world.getTime();
         this.permissibleBase = new PermissibleBase(this);
