@@ -86,7 +86,7 @@
 +            if (blockEvent.getInstaBreak()) {
 +                toolDamage = 2.0f;
 +            }
-+            this.removeProgress = toolDamage;
++            this.removeProgress += toolDamage;
 +            //CraftBukkit end
 +
 +            /*final Block block6 = Block.blocksList[i5]; //LilyBukkit
