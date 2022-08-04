@@ -49,13 +49,13 @@
 +             * Whenever the call to 'world.setTypeIdAndData' changes we need to figure out again what to
 +             * replace this with.
 +             */
-+            if (world.setBlockAndMetadataWithNotify(x, y, z, this.blockID, stack.itemDmg)) { // <-- world.setTypeIdAndData does this to place the block
++            if (world.setBlockAndMetadata(x, y, z, this.blockID, stack.itemDmg)) { // <-- world.setTypeIdAndData does this to place the block
 +                BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, eventUseBlockBelow ? blockStateBelow : replacedBlockState, clickedX, clickedY, clickedZ, i7);
 +
 +                if (event.isCancelled() || !event.canBuild()) {
 +                    if (blockStateBelow != null) { // Used for steps
-+                        world.setBlockAndMetadataWithNotify(x, y, z, replacedBlockState.getTypeId(), replacedBlockState.getRawData());
-+                        world.setBlockAndMetadataWithNotify(x, y - 1, z, blockStateBelow.getTypeId(), blockStateBelow.getRawData());
++                        world.setBlockAndMetadata(x, y, z, replacedBlockState.getTypeId(), replacedBlockState.getRawData());
++                        world.setBlockAndMetadata(x, y - 1, z, blockStateBelow.getTypeId(), blockStateBelow.getRawData());
 +
 +                    } else {
 +
@@ -64,12 +64,12 @@
 +                            world.setBlock(x, y, z, 20);
 +                        }
 +
-+                        world.setBlockAndMetadataWithNotify(x, y, z, replacedBlockState.getTypeId(), replacedBlockState.getRawData());
++                        world.setBlockAndMetadata(x, y, z, replacedBlockState.getTypeId(), replacedBlockState.getRawData());
 +                    }
 +                    return true;
 +
 +                }
-+                world.notifyBlocksOfNeighborChange(x, y, z, this.blockID); // <-- world.setTypeIdAndData does this on success (tell the world)
++                world.markBlockNeedsUpdate(x, y, z/*, this.blockID*/); // <-- world.setTypeIdAndData does this on success (tell the world)
 +
 +                // CraftBukkit end
 +            //if (world.setBlockWithNotify(x, y, z, this.blockID)) {
