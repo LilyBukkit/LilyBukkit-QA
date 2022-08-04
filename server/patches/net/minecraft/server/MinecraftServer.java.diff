@@ -1,6 +1,6 @@
 --- MinecraftServer.java
 +++ MinecraftServer.java
-@@ -1,44 +1,46 @@
+@@ -1,44 +1,48 @@
  package net.minecraft.server;
  
 -import net.minecraft.src.ThreadServerApplication;
@@ -35,6 +35,7 @@
 -import net.minecraft.src.IWorldAccess;
  import net.minecraft.src.WorldManager;
 +import net.minecraft.src.WorldServer;
++import org.bukkit.Bukkit;
 +import org.bukkit.command.ConsoleCommandSender;
 +import org.bukkit.craftbukkit.LoggerOutputStream;
 +import org.bukkit.craftbukkit.util.ServerShutdownThread;
@@ -43,6 +44,7 @@
 +import org.bukkit.plugin.PluginLoadOrder;
 +import ru.vladthemountain.lilybukkit.LilyBukkit;
 +
++import java.awt.GraphicsEnvironment;
 +import java.io.File;
  import java.io.IOException;
 -import java.util.logging.Level;
@@ -75,7 +77,7 @@
 +    public static HashMap<String, Integer> playerList;
      public NetworkListenThread networkServer;
      public PropertyManager propertyManagerObj;
-@@ -50,6 +52,6 @@
+@@ -50,6 +54,6 @@
      public String currentTask;
      public int percentDone;
 -    private List playersOnline;
@@ -84,7 +86,7 @@
 +    private List<ServerCommand> commands;
      public EntityTracker entityTracker;
      public boolean onlineMode;
-@@ -57,32 +59,68 @@
+@@ -57,26 +61,62 @@
      public String serverId;
      private static Random rand;
 -    
@@ -94,7 +96,7 @@
 +    }
 +
 +    public static String getVersionTag() {
-+        return "alpha";
++        return "beta";
 +    }
 +
 +    public static String getVersionString() {
@@ -153,22 +155,21 @@
 +        System.setOut(new PrintStream(new LoggerOutputStream(logger, Level.INFO), true));
 +        System.setErr(new PrintStream(new LoggerOutputStream(logger, Level.SEVERE), true));
 +        // CraftBukkit end
-+        MinecraftServer.logger.info("[Minecraft] Starting minecraft server version " + getVersionString());
++        MinecraftServer.logger.info("[Minecraft] Starting Rosepad server version " + getVersionString() + ", running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " API version " + Bukkit.getBukkitVersion());
          if (Runtime.getRuntime().maxMemory() / 1024L / 1024L < 512L) {
              MinecraftServer.logger.warning("**** NOT ENOUGH RAM!");
-             MinecraftServer.logger.warning("To start the server with more ram, launch it as \"java -Xmx1024M -Xms1024M -jar minecraft_server.jar\"");
+@@ -84,5 +124,5 @@
          }
--        MinecraftServer.logger.info("Loading properties");
+         MinecraftServer.logger.info("Loading properties");
 -        this.propertyManagerObj = new PropertyManager(new File("server.properties"));
-+        MinecraftServer.logger.info("[Minecraft] Loading properties");
 +        this.propertyManagerObj = new PropertyManager(this.options); // CraftBukkit
          final String string2 = this.propertyManagerObj.getStringProperty("server-ip", "");
          this.onlineMode = false;
-@@ -93,12 +131,11 @@
+@@ -93,12 +133,11 @@
          }
          final int i4 = this.propertyManagerObj.getIntProperty("server-port", 25565);
 -        MinecraftServer.logger.info(new StringBuilder("Starting Minecraft server on ").append((string2.length() == 0) ? "*" : string2).append(":").append(i4).toString());
-+        MinecraftServer.logger.info("[Minecraft] Starting Minecraft server on " + ((string2.length() == 0) ? "*" : string2) + ":" + i4);
++        MinecraftServer.logger.info("Starting Minecraft server on " + ((string2.length() == 0) ? "*" : string2) + ":" + i4);
          this.serverId = Long.toHexString(MinecraftServer.rand.nextLong());
          try {
              this.networkServer = new NetworkListenThread(this, inetAddress3, i4);
@@ -180,7 +181,7 @@
 +            MinecraftServer.logger.log(Level.WARNING, "The exception was: " + iOException6);
              MinecraftServer.logger.warning("Perhaps a server is already running on that port?");
              return false;
-@@ -108,6 +145,5 @@
+@@ -108,6 +147,5 @@
              MinecraftServer.logger.info("The server will authenticate usernames.");
              MinecraftServer.logger.info("Unauthenticated players may still join by default, and their abilities can be configured in the unauth.config file.");
 -        }
@@ -188,7 +189,7 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -118,12 +154,12 @@
+@@ -118,10 +156,10 @@
          this.entityTracker = new EntityTracker(this);
          final String string3 = this.propertyManagerObj.getStringProperty("level-name", "world");
 -        MinecraftServer.logger.info(new StringBuilder("Preparing level \"").append(string3).append("\"").toString());
@@ -200,11 +201,8 @@
 -    
 +
      private void initWorld(final String worldName) {
--        MinecraftServer.logger.info("Preparing start region");
-+        MinecraftServer.logger.info("[Minecraft] Preparing start region");
-         (this.worldMngr = new WorldServer(new File("."), worldName, this.propertyManagerObj.getBooleanProperty("monsters", false))).addWorldAccess(new WorldManager(this));
-         this.worldMngr.difficultySetting = 1;
-@@ -140,26 +176,45 @@
+         MinecraftServer.logger.info("Preparing start region");
+@@ -140,26 +178,45 @@
          }
          this.clearCurrentTask();
 +        if (!this.lilyBukkit.addExistingWorld(this.worldMngr)) {
@@ -231,8 +229,7 @@
 -    
 +
      private void save() {
--        MinecraftServer.logger.info("Saving chunks");
-+        MinecraftServer.logger.info("[Minecraft] Saving chunks");
+         MinecraftServer.logger.info("Saving chunks");
 +        WorldSaveEvent event = new WorldSaveEvent(lilyBukkit.getWorld(worldMngr.levelName));
 +        this.lilyBukkit.getPluginManager().callEvent(event);
          this.worldMngr.saveWorld(true, null);
@@ -240,8 +237,7 @@
 -    
 +
      private void stop() {
--        MinecraftServer.logger.info("Stopping server");
-+        MinecraftServer.logger.info("[Minecraft] Stopping server");
+         MinecraftServer.logger.info("Stopping server");
 +
 +        // CraftBukkit start
 +        if (this.lilyBukkit != null) {
@@ -257,7 +253,7 @@
 +            }
          }
          if (this.worldMngr != null) {
-@@ -167,9 +222,9 @@
+@@ -167,9 +224,9 @@
          }
      }
 -    
@@ -269,19 +265,7 @@
 +
      public void run() {
          try {
-@@ -181,9 +236,9 @@
-                     long j4 = j3 - j1;
-                     if (j4 > 2000L) {
--                        MinecraftServer.logger.warning("Can't keep up! Did the system time change, or is the server overloaded?");
-+                        MinecraftServer.logger.warning("[Minecraft] Can't keep up! Did the system time change, or is the server overloaded?");
-                         j4 = 2000L;
-                     }
-                     if (j4 < 0L) {
--                        MinecraftServer.logger.warning("Time ran backwards! Did the system time change?");
-+                        MinecraftServer.logger.warning("[Minecraft] Time ran backwards! Did the system time change?");
-                         j4 = 0L;
-                     }
-@@ -196,32 +251,27 @@
+@@ -196,32 +253,27 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -320,7 +304,7 @@
 +        } finally {
              this.stop();
              this.serverStopped = true;
-@@ -232,18 +282,17 @@
+@@ -232,18 +284,17 @@
          System.exit(0);
      }
 -    
@@ -345,7 +329,7 @@
 +            MinecraftServer.playerList.remove(o);
          }
          AxisAlignedBB.clearBoundingBoxPool();
-@@ -254,257 +303,85 @@
+@@ -254,257 +305,85 @@
          }
          this.worldMngr.tick();
 -        while (this.worldMngr.updatingLighting()) {}
@@ -601,12 +585,10 @@
          try {
 -            final MinecraftServer minecraftServer1 = new MinecraftServer();
 -            if (!GraphicsEnvironment.isHeadless() && (args.length <= 0 || !args[0].equals("nogui"))) {
--                ServerGUI.initGui(minecraftServer1);
--            }
 +            final MinecraftServer minecraftServer1 = new MinecraftServer(options);
-+            //if (!GraphicsEnvironment.isHeadless() && (args.length <= 0 || !args[0].equals("nogui"))) {
-+            ServerGUI.initGui(minecraftServer1);
-+            //}
++            if (!GraphicsEnvironment.isHeadless() && !options.has("nogui")) {
+                 ServerGUI.initGui(minecraftServer1);
+             }
              new ThreadServerApplication("Server thread", minecraftServer1).start();
 +        } catch (Exception exception2) {
 +            MinecraftServer.logger.log(Level.SEVERE, "Failed to start the minecraft server", exception2);

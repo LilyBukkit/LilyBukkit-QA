@@ -129,7 +129,7 @@
 +
          final int i4 = this.worldObj.getBlockId(i1, i2, i3);
          final int i5 = this.worldObj.getBlockMetadata(i1, i2, i3);
-@@ -91,8 +149,37 @@
+@@ -91,8 +149,35 @@
          return z6;
      }
 -    
@@ -160,10 +160,8 @@
 +
 +            // If we have 'true' and no explicit deny *or* an explicit allow -- run the item part of the hook
 +            if (itemStack3 != null && ((!result && event.useItemInHand() != Event.Result.DENY) || event.useItemInHand() == Event.Result.ALLOW)) {
-+                //itemStack3.getItem().onItemRightClick(itemStack3, world2, entityPlayer1); //LilyBukkit: replace `this.useItem()` with `itemStack3.getItem().onItemRightClick()` as it's the only more-or-less suitable method call here
 +                itemStack3.useItem(entityPlayer1, world2, i4, i5, i6, i7);
 +            }
-+            world2.notifyBlocksOfNeighborChange(i4, i5, i6, i8);
 +        }
 +        return result;
 +        // CraftBukkit end
