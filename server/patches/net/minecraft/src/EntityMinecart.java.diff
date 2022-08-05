@@ -1,16 +1,429 @@
 --- EntityMinecart.java
 +++ EntityMinecart.java
-@@ -1,4 +1,6 @@
+@@ -1,4 +1,19 @@
  package net.minecraft.src;
  
++import org.bukkit.Bukkit;
++import org.bukkit.Location;
++import org.bukkit.entity.Vehicle;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++import org.bukkit.event.vehicle.VehicleCreateEvent;
++import org.bukkit.event.vehicle.VehicleDamageEvent;
++import org.bukkit.event.vehicle.VehicleDestroyEvent;
++import org.bukkit.event.vehicle.VehicleEnterEvent;
++import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
++import org.bukkit.event.vehicle.VehicleMoveEvent;
++import org.bukkit.event.vehicle.VehicleUpdateEvent;
++import ru.vladthemountain.lilybukkit.entity.LBBoat;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.entity.LBMinecart;
 +
  import java.util.List;
  
-@@ -113,5 +115,5 @@
-                     entityItem7.motionY = (float)this.rand.nextGaussian() * f6 + 0.2f;
-                     entityItem7.motionZ = (float)this.rand.nextGaussian() * f6;
+@@ -20,9 +35,9 @@
+     private double minecartYaw;
+     private double minecartPitch;
+-    
++
+     static {
+-        matrix = new int[][][] { { { 0, 0, -1 }, { 0, 0, 1 } }, { { -1, 0, 0 }, { 1, 0, 0 } }, { { -1, -1, 0 }, { 1, 0, 0 } }, { { -1, 0, 0 }, { 1, -1, 0 } }, { { 0, 0, -1 }, { 0, -1, 1 } }, { { 0, -1, -1 }, { 0, 0, 1 } }, { { 0, 0, 1 }, { 1, 0, 0 } }, { { 0, 0, 1 }, { -1, 0, 0 } }, { { 0, 0, -1 }, { -1, 0, 0 } }, { { 0, 0, -1 }, { 1, 0, 0 } } };
++        matrix = new int[][][]{{{0, 0, -1}, {0, 0, 1}}, {{-1, 0, 0}, {1, 0, 0}}, {{-1, -1, 0}, {1, 0, 0}}, {{-1, 0, 0}, {1, -1, 0}}, {{0, 0, -1}, {0, -1, 1}}, {{0, -1, -1}, {0, 0, 1}}, {{0, 0, 1}, {1, 0, 0}}, {{0, 0, 1}, {-1, 0, 0}}, {{0, 0, -1}, {-1, 0, 0}}, {{0, 0, -1}, {1, 0, 0}}};
+     }
+-    
++
+     public EntityMinecart(final World world) {
+         super(world);
+@@ -36,21 +51,23 @@
+         this.yOffset = this.height / 2.0f;
+         this.canTriggerWalking = false;
++
++        Bukkit.getServer().getPluginManager().callEvent(new VehicleCreateEvent(new LBMinecart(Bukkit.getWorld(this.worldObj.levelName), this))); // CraftBukkit
+     }
+-    
++
+     @Override
+     public AxisAlignedBB getCollisionBox(final Entity entity) {
+         return entity.boundingBox;
+     }
+-    
++
+     @Override
+     public AxisAlignedBB getBoundingBox() {
+         return this.boundingBox;
+     }
+-    
++
+     @Override
+     public boolean canBePushed() {
+         return true;
+     }
+-    
++
+     public EntityMinecart(final World world, final double x, final double y, final double z, final int minecartType) {
+         this(world);
+@@ -64,12 +81,25 @@
+         this.minecartType = minecartType;
+     }
+-    
++
+     @Override
+     public double getMountedYOffset() {
+         return this.height * 0.0 - 0.30000001192092896;
+     }
+-    
++
+     @Override
+-    public boolean attackEntityFrom(final Entity entity, final int damage) {
++    public boolean attackEntityFrom(final Entity entity, int damage) {
++        // CraftBukkit start
++        Vehicle vehicle = new LBMinecart(Bukkit.getWorld(this.worldObj.levelName), this);
++        org.bukkit.entity.Entity passenger = (entity == null) ? null : new LBEntity(Bukkit.getWorld(this.worldObj.levelName), entity);
++
++        VehicleDamageEvent event = new VehicleDamageEvent(vehicle, passenger, damage);
++        Bukkit.getServer().getPluginManager().callEvent(event);
++
++        if (event.isCancelled()) {
++            return true;
++        }
++
++        damage = event.getDamage();
++        // CraftBukkit end
+         this.forwardDirection = -this.forwardDirection;
+         this.timeSinceHit = 10;
+@@ -79,18 +109,27 @@
+             if (this.minecartType == 1) {
+                 this.entityDropItem(Block.chest.blockID, 1, 0.0f);
+-            }
+-            else if (this.minecartType == 2) {
++            } else if (this.minecartType == 2) {
+                 this.entityDropItem(Block.stoneOvenIdle.blockID, 1, 0.0f);
+             }
++            // CraftBukkit start
++            VehicleDestroyEvent destroyEvent = new VehicleDestroyEvent(vehicle, passenger);
++            Bukkit.getServer().getPluginManager().callEvent(destroyEvent);
++
++            if (destroyEvent.isCancelled()) {
++                this.damageTaken = 40; // Maximize damage so this doesn't get triggered again right away
++                return true;
++            }
++            // CraftBukkit end
++
+             this.setEntityDead();
+         }
+         return true;
+     }
+-    
++
+     @Override
+     public boolean canBeCollidedWith() {
+         return !this.isDead;
+     }
+-    
++
+     @Override
+     public void setEntityDead() {
+@@ -110,8 +149,8 @@
+                     final EntityItem entityItem7 = new EntityItem(this.worldObj, this.posX + f3, this.posY + f4, this.posZ + f5, new ItemStack(itemStack2.itemID, i2, itemStack2.itemDmg));
+                     final float f6 = 0.05f;
+-                    entityItem7.motionX = (float)this.rand.nextGaussian() * f6;
+-                    entityItem7.motionY = (float)this.rand.nextGaussian() * f6 + 0.2f;
+-                    entityItem7.motionZ = (float)this.rand.nextGaussian() * f6;
 -                    this.worldObj.spawnEntityInWorld(entityItem7);
++                    entityItem7.motionX = (float) this.rand.nextGaussian() * f6;
++                    entityItem7.motionY = (float) this.rand.nextGaussian() * f6 + 0.2f;
++                    entityItem7.motionZ = (float) this.rand.nextGaussian() * f6;
 +                    this.worldObj.spawnEntityInWorld(entityItem7, SpawnReason.NATURAL);
                  }
              }
+@@ -119,7 +158,15 @@
+         super.setEntityDead();
+     }
+-    
++
+     @Override
+     public void onUpdate() {
++        // CraftBukkit start
++        double prevX = this.posX;
++        double prevY = this.posY;
++        double prevZ = this.posZ;
++        float prevYaw = this.rotationYaw;
++        float prevPitch = this.rotationPitch;
++        // CraftBukkit end
++
+         if (this.worldObj.multiplayerWorld) {
+             if (this.turnProgress > 0) {
+@@ -128,20 +175,19 @@
+                 final double d43 = this.posZ + (this.minecartZ - this.posZ) / this.turnProgress;
+                 double d44;
+-                for (d44 = this.minecartYaw - this.rotationYaw; d44 < -180.0; d44 += 360.0) {}
++                for (d44 = this.minecartYaw - this.rotationYaw; d44 < -180.0; d44 += 360.0) {
++                }
+                 while (d44 >= 180.0) {
+                     d44 -= 360.0;
+                 }
+-                this.rotationYaw += (float)(d44 / this.turnProgress);
+-                this.rotationPitch += (float)((this.minecartPitch - this.rotationPitch) / this.turnProgress);
++                this.rotationYaw += (float) (d44 / this.turnProgress);
++                this.rotationPitch += (float) ((this.minecartPitch - this.rotationPitch) / this.turnProgress);
+                 --this.turnProgress;
+                 this.setPosition(d41, d42, d43);
+                 this.setRotation(this.rotationYaw, this.rotationPitch);
+-            }
+-            else {
++            } else {
+                 this.setPosition(this.posX, this.posY, this.posZ);
+                 this.setRotation(this.rotationYaw, this.rotationPitch);
+             }
+-        }
+-        else {
++        } else {
+             if (this.timeSinceHit > 0) {
+                 --this.timeSinceHit;
+@@ -204,10 +250,8 @@
+                     this.posX = i1 + 0.5;
+                     d51 = this.posZ - i3;
+-                }
+-                else if (d47 == 0.0) {
++                } else if (d47 == 0.0) {
+                     this.posZ = i3 + 0.5;
+                     d51 = this.posX - i1;
+-                }
+-                else {
++                } else {
+                     final double d56 = this.posX - d52;
+                     final double d57 = this.posZ - d53;
+@@ -238,6 +282,5 @@
+                 if (i5[0][1] != 0 && MathHelper.floor_double(this.posX) - i1 == i5[0][0] && MathHelper.floor_double(this.posZ) - i3 == i5[0][2]) {
+                     this.setPosition(this.posX, this.posY + i5[0][1], this.posZ);
+-                }
+-                else if (i5[1][1] != 0 && MathHelper.floor_double(this.posX) - i1 == i5[1][0] && MathHelper.floor_double(this.posZ) - i3 == i5[1][2]) {
++                } else if (i5[1][1] != 0 && MathHelper.floor_double(this.posX) - i1 == i5[1][0] && MathHelper.floor_double(this.posZ) - i3 == i5[1][2]) {
+                     this.setPosition(this.posX, this.posY + i5[1][1], this.posZ);
+                 }
+@@ -246,6 +289,5 @@
+                     this.motionY *= 0.0;
+                     this.motionZ *= 0.996999979019165;
+-                }
+-                else {
++                } else {
+                     if (this.minecartType == 2) {
+                         final double d58 = MathHelper.sqrt_double(this.pushX * this.pushX + this.pushZ * this.pushZ);
+@@ -260,6 +302,5 @@
+                             this.motionX += this.pushX * d59;
+                             this.motionZ += this.pushZ * d59;
+-                        }
+-                        else {
++                        } else {
+                             this.motionX *= 0.8999999761581421;
+                             this.motionY *= 0.0;
+@@ -296,6 +337,5 @@
+                             this.pushX = 0.0;
+                             this.pushZ = 0.0;
+-                        }
+-                        else {
++                        } else {
+                             this.pushX = this.motionX;
+                             this.pushZ = this.motionZ;
+@@ -303,6 +343,5 @@
+                     }
+                 }
+-            }
+-            else {
++            } else {
+                 if (this.motionX < -d45) {
+                     this.motionX = -d45;
+@@ -333,5 +372,5 @@
+             final double d63 = this.prevPosZ - this.posZ;
+             if (d62 * d62 + d63 * d63 > 0.001) {
+-                this.rotationYaw = (float)(Math.atan2(d63, d62) * 180.0 / 3.141592653589793);
++                this.rotationYaw = (float) (Math.atan2(d63, d62) * 180.0 / 3.141592653589793);
+                 if (this.isInReverse) {
+                     this.rotationYaw += 180.0f;
+@@ -339,5 +378,6 @@
+             }
+             double d64;
+-            for (d64 = this.rotationYaw - this.prevRotationYaw; d64 >= 180.0; d64 -= 360.0) {}
++            for (d64 = this.rotationYaw - this.prevRotationYaw; d64 >= 180.0; d64 -= 360.0) {
++            }
+             while (d64 < -180.0) {
+                 d64 += 360.0;
+@@ -348,8 +388,21 @@
+             }
+             this.setRotation(this.rotationYaw, this.rotationPitch);
++            // CraftBukkit start
++            org.bukkit.World bworld = Bukkit.getWorld(this.worldObj.levelName);
++
++            Location from = new Location(bworld, prevX, prevY, prevZ, prevYaw, prevPitch);
++            Location to = new Location(bworld, this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
++            Vehicle vehicle = new LBMinecart(bworld, this);
++
++            Bukkit.getPluginManager().callEvent(new VehicleUpdateEvent(vehicle));
++
++            if (!from.equals(to)) {
++                Bukkit.getPluginManager().callEvent(new VehicleMoveEvent(vehicle, from, to));
++            }
++            // CraftBukkit end
+             final List list15 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(0.20000000298023224, 0.0, 0.20000000298023224));
+             if (list15 != null && list15.size() > 0) {
+                 for (int i8 = 0; i8 < list15.size(); ++i8) {
+-                    final Entity entity17 = (Entity)list15.get(i8);
++                    final Entity entity17 = (Entity) list15.get(i8);
+                     if (entity17 != this.riddenByEntity && entity17.canBePushed() && entity17 instanceof EntityMinecart) {
+                         entity17.applyEntityCollision(this);
+@@ -371,5 +424,5 @@
+         }
+     }
+-    
++
+     public Vec3D getPos(double x, double y, double z) {
+         final int i7 = MathHelper.floor_double(x);
+@@ -399,10 +452,8 @@
+                 x = i7 + 0.5;
+                 d12 = z - i9;
+-            }
+-            else if (d21 == 0.0) {
++            } else if (d21 == 0.0) {
+                 z = i9 + 0.5;
+                 d12 = x - i7;
+-            }
+-            else {
++            } else {
+                 final double d22 = x - d13;
+                 final double d23 = z - d15;
+@@ -422,5 +473,5 @@
+         return null;
+     }
+-    
++
+     @Override
+     protected void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+@@ -429,20 +480,19 @@
+             nbttagcompound.setDouble("PushX", this.pushX);
+             nbttagcompound.setDouble("PushZ", this.pushZ);
+-            nbttagcompound.setShort("Fuel", (short)this.fuel);
+-        }
+-        else if (this.minecartType == 1) {
++            nbttagcompound.setShort("Fuel", (short) this.fuel);
++        } else if (this.minecartType == 1) {
+             final NBTTagList nBTTagList2 = new NBTTagList();
+             for (int i3 = 0; i3 < this.cargoItems.length; ++i3) {
+                 if (this.cargoItems[i3] != null) {
+                     final NBTTagCompound nBTTagCompound4 = new NBTTagCompound();
+-                    nBTTagCompound4.setByte("Slot", (byte)i3);
++                    nBTTagCompound4.setByte("Slot", (byte) i3);
+                     this.cargoItems[i3].writeToNBT(nBTTagCompound4);
+                     nBTTagList2.setTag(nBTTagCompound4);
+                 }
+             }
+-            nbttagcompound.setTag("Items", (NBTBase)nBTTagList2);
++            nbttagcompound.setTag("Items", (NBTBase) nBTTagList2);
+         }
+     }
+-    
++
+     @Override
+     protected void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+@@ -452,10 +502,9 @@
+             this.pushZ = nbttagcompound.getDouble("PushZ");
+             this.fuel = nbttagcompound.getShort("Fuel");
+-        }
+-        else if (this.minecartType == 1) {
++        } else if (this.minecartType == 1) {
+             final NBTTagList nBTTagList2 = nbttagcompound.getTagList("Items");
+             this.cargoItems = new ItemStack[this.getSizeInventory()];
+             for (int i3 = 0; i3 < nBTTagList2.tagCount(); ++i3) {
+-                final NBTTagCompound nBTTagCompound4 = (NBTTagCompound)nBTTagList2.tagAt(i3);
++                final NBTTagCompound nBTTagCompound4 = (NBTTagCompound) nBTTagList2.tagAt(i3);
+                 final int i4 = nBTTagCompound4.getByte("Slot") & 0xFF;
+                 if (i4 >= 0 && i4 < this.cargoItems.length) {
+@@ -465,10 +514,28 @@
+         }
+     }
+-    
++
+     @Override
+     public void applyEntityCollision(final Entity entity) {
+         if (entity != this.riddenByEntity) {
++            // CraftBukkit start
++            Vehicle vehicle = new LBMinecart(Bukkit.getWorld(this.worldObj.levelName), this);
++            org.bukkit.entity.Entity hitEntity = new LBEntity(Bukkit.getWorld(this.worldObj.levelName), entity);
++
++            VehicleEntityCollisionEvent collisionEvent = new VehicleEntityCollisionEvent(vehicle, hitEntity);
++            Bukkit.getServer().getPluginManager().callEvent(collisionEvent);
++
++            if (collisionEvent.isCancelled()) {
++                return;
++            }
+             if (entity instanceof EntityLiving && !(entity instanceof EntityPlayer) && this.minecartType == 0 && this.motionX * this.motionX + this.motionZ * this.motionZ > 0.01 && this.riddenByEntity == null && entity.ridingEntity == null) {
+-                entity.mountEntity(this);
++                if (!collisionEvent.isPickupCancelled()) {
++                    VehicleEnterEvent enterEvent = new VehicleEnterEvent(vehicle, hitEntity);
++                    Bukkit.getServer().getPluginManager().callEvent(enterEvent);
++
++                    if (!enterEvent.isCancelled()) {
++                        entity.mountEntity(this);
++                    }
++                }
++                // CraftBukkit end
+             }
+             double d2 = entity.posX - this.posX;
+@@ -494,5 +561,5 @@
+                     double d6 = entity.motionX + this.motionX;
+                     double d7 = entity.motionZ + this.motionZ;
+-                    if (((EntityMinecart)entity).minecartType == 2 && this.minecartType != 2) {
++                    if (((EntityMinecart) entity).minecartType == 2 && this.minecartType != 2) {
+                         this.motionX *= 0.20000000298023224;
+                         this.motionZ *= 0.20000000298023224;
+@@ -500,6 +567,5 @@
+                         entity.motionX *= 0.699999988079071;
+                         entity.motionZ *= 0.699999988079071;
+-                    }
+-                    else if (((EntityMinecart)entity).minecartType != 2 && this.minecartType == 2) {
++                    } else if (((EntityMinecart) entity).minecartType != 2 && this.minecartType == 2) {
+                         entity.motionX *= 0.20000000298023224;
+                         entity.motionZ *= 0.20000000298023224;
+@@ -507,6 +573,5 @@
+                         this.motionX *= 0.699999988079071;
+                         this.motionZ *= 0.699999988079071;
+-                    }
+-                    else {
++                    } else {
+                         d6 /= 2.0;
+                         d7 /= 2.0;
+@@ -518,6 +583,5 @@
+                         entity.addVelocity(d6 + d2, 0.0, d7 + d3);
+                     }
+-                }
+-                else {
++                } else {
+                     this.addVelocity(-d2, 0.0, -d3);
+                     entity.addVelocity(d2 / 4.0, 0.0, d3 / 4.0);
+@@ -526,13 +590,26 @@
+         }
+     }
+-    
++
+     @Override
+     public int getSizeInventory() {
+         return 27;
+     }
+-    
++
+     @Override
+     public ItemStack getStackInSlot(final int slot) {
+         return this.cargoItems[slot];
+     }
++
++    @Override
++    public void mountEntity(Entity entity) {
++        // CraftBukkit start
++        org.bukkit.entity.Entity player = (entity == null) ? null : new LBEntity(Bukkit.getWorld(this.worldObj.levelName), entity);
++
++        VehicleEnterEvent event = new VehicleEnterEvent(new LBMinecart(Bukkit.getWorld(this.worldObj.levelName), this), player);
++        Bukkit.getServer().getPluginManager().callEvent(event);
++
++        if (event.isCancelled()) return;
++        // CraftBukkit end
++        super.mountEntity(entity);
++    }
+ }

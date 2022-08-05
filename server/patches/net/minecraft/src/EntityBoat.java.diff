@@ -1,0 +1,213 @@
+--- EntityBoat.java
++++ EntityBoat.java
+@@ -1,4 +1,17 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.Location;
++import org.bukkit.entity.Vehicle;
++import org.bukkit.event.vehicle.VehicleCreateEvent;
++import org.bukkit.event.vehicle.VehicleDamageEvent;
++import org.bukkit.event.vehicle.VehicleDestroyEvent;
++import org.bukkit.event.vehicle.VehicleEnterEvent;
++import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
++import org.bukkit.event.vehicle.VehicleMoveEvent;
++import org.bukkit.event.vehicle.VehicleUpdateEvent;
++import ru.vladthemountain.lilybukkit.entity.LBBoat;
++import ru.vladthemountain.lilybukkit.entity.LBEntity;
++
+ import java.util.List;
+ 
+@@ -7,5 +20,5 @@
+     public int timeSinceHit;
+     public int forwardDirection;
+-    
++
+     public EntityBoat(final World world) {
+         super(world);
+@@ -17,32 +30,55 @@
+         this.yOffset = this.height / 2.0f;
+         this.canTriggerWalking = false;
++
++        Bukkit.getServer().getPluginManager().callEvent(new VehicleCreateEvent(new LBBoat(Bukkit.getWorld(this.worldObj.levelName), this))); // CraftBukkit
+     }
+-    
++
+     @Override
+     public AxisAlignedBB getCollisionBox(final Entity entity) {
+         return entity.boundingBox;
+     }
+-    
++
+     @Override
+     public AxisAlignedBB getBoundingBox() {
+         return this.boundingBox;
+     }
+-    
++
+     @Override
+     public boolean canBePushed() {
+         return true;
+     }
+-    
++
+     @Override
+     public double getMountedYOffset() {
+         return this.height * 0.0 - 0.30000001192092896;
+     }
+-    
++
+     @Override
+-    public boolean attackEntityFrom(final Entity entity, final int damage) {
++    public boolean attackEntityFrom(final Entity entity, int damage) {
++        // CraftBukkit start
++        Vehicle vehicle = new LBBoat(Bukkit.getWorld(this.worldObj.levelName), this);
++        org.bukkit.entity.Entity attacker = (entity == null) ? null : new LBEntity(Bukkit.getWorld(this.worldObj.levelName), entity);
++
++        VehicleDamageEvent event = new VehicleDamageEvent(vehicle, attacker, damage);
++        Bukkit.getServer().getPluginManager().callEvent(event);
++
++        if (event.isCancelled()) {
++            return true;
++        }
++        damage = event.getDamage();
++        // CraftBukkit end
+         this.forwardDirection = -this.forwardDirection;
+         this.timeSinceHit = 10;
+         this.damageTaken += damage * 10;
+         if (this.damageTaken > 40) {
++            // CraftBukkit start
++            VehicleDestroyEvent destroyEvent = new VehicleDestroyEvent(vehicle, attacker);
++            Bukkit.getServer().getPluginManager().callEvent(destroyEvent);
++
++            if (destroyEvent.isCancelled()) {
++                this.damageTaken = 40; // Maximize damage so this doesn't get triggered again right away
++                return true;
++            }
++            // CraftBukkit end
+             for (int i3 = 0; i3 < 3; ++i3) {
+                 this.entityDropItem(Block.planks.blockID, 1, 0.0f);
+@@ -55,12 +91,20 @@
+         return true;
+     }
+-    
++
+     @Override
+     public boolean canBeCollidedWith() {
+         return !this.isDead;
+     }
+-    
++
+     @Override
+     public void onUpdate() {
++        // CraftBukkit start
++        double prevX = this.posX;
++        double prevY = this.posY;
++        double prevZ = this.posZ;
++        float prevYaw = this.rotationYaw;
++        float prevPitch = this.rotationPitch;
++        // CraftBukkit end
++
+         super.onUpdate();
+         if (this.timeSinceHit > 0) {
+@@ -119,6 +163,5 @@
+                     final double d13 = this.posZ - d9 * d10 * 0.8 - d8 * d11;
+                     this.worldObj.spawnParticle("splash", d12, this.posY - 0.125, d13, this.motionX, this.motionY, this.motionZ);
+-                }
+-                else {
++                } else {
+                     final double d12 = this.posX + d8 + d9 * d10 * 0.7;
+                     final double d13 = this.posZ + d9 - d8 * d10 * 0.7;
+@@ -135,6 +178,5 @@
+                 this.entityDropItem(Item.stick.shiftedIndex, 1, 0.0f);
+             }
+-        }
+-        else {
++        } else {
+             this.motionX *= 0.9900000095367432;
+             this.motionY *= 0.949999988079071;
+@@ -146,8 +188,9 @@
+         final double d14 = this.prevPosZ - this.posZ;
+         if (d9 * d9 + d14 * d14 > 0.001) {
+-            d8 = (float)(Math.atan2(d14, d9) * 180.0 / 3.141592653589793);
++            d8 = (float) (Math.atan2(d14, d9) * 180.0 / 3.141592653589793);
+         }
+         double d15;
+-        for (d15 = d8 - this.rotationYaw; d15 >= 180.0; d15 -= 360.0) {}
++        for (d15 = d8 - this.rotationYaw; d15 >= 180.0; d15 -= 360.0) {
++        }
+         while (d15 < -180.0) {
+             d15 += 360.0;
+@@ -159,9 +202,24 @@
+             d15 = -20.0;
+         }
+-        this.setRotation(this.rotationYaw += (float)d15, this.rotationPitch);
++        this.setRotation(this.rotationYaw += (float) d15, this.rotationPitch);
++        // CraftBukkit start
++        org.bukkit.Server server = Bukkit.getServer();
++        org.bukkit.World bworld = server.getWorld(this.worldObj.levelName);
++
++        Location from = new Location(bworld, prevX, prevY, prevZ, prevYaw, prevPitch);
++        Location to = new Location(bworld, this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
++        Vehicle vehicle = new LBBoat(bworld, this);
++
++        server.getPluginManager().callEvent(new VehicleUpdateEvent(vehicle));
++
++        if (!from.equals(to)) {
++            VehicleMoveEvent event = new VehicleMoveEvent(vehicle, from, to);
++            server.getPluginManager().callEvent(event);
++        }
++        // CraftBukkit end
+         final List list18 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(0.20000000298023224, 0.0, 0.20000000298023224));
+         if (list18 != null && list18.size() > 0) {
+             for (int i7 = 0; i7 < list18.size(); ++i7) {
+-                final Entity entity20 = (Entity)list18.get(i7);
++                final Entity entity20 = (Entity) list18.get(i7);
+                 if (entity20 != this.riddenByEntity && entity20.canBePushed() && entity20 instanceof EntityBoat) {
+                     entity20.applyEntityCollision(this);
+@@ -173,5 +231,5 @@
+         }
+     }
+-    
++
+     @Override
+     protected void updateRiderPosition() {
+@@ -180,11 +238,36 @@
+         this.riddenByEntity.setPosition(this.posX + d1, this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(), this.posZ + d2);
+     }
+-    
++
+     @Override
+     protected void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+     }
+-    
++
+     @Override
+     protected void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+     }
++
++    @Override
++    public void mountEntity(Entity entity) {
++        // CraftBukkit start
++        VehicleEnterEvent event = new VehicleEnterEvent(new LBBoat(Bukkit.getWorld(this.worldObj.levelName), this), new LBEntity(Bukkit.getWorld(this.worldObj.levelName), entity));
++        Bukkit.getServer().getPluginManager().callEvent(event);
++
++        if (event.isCancelled()) return;
++        // CraftBukkit end
++        super.mountEntity(entity);
++    }
++
++    @Override
++    public void applyEntityCollision(Entity entity) {
++        org.bukkit.entity.Entity hitEntity = (entity == null) ? null : new LBEntity(Bukkit.getWorld(this.worldObj.levelName), entity);
++
++        VehicleEntityCollisionEvent event = new VehicleEntityCollisionEvent(new LBBoat(Bukkit.getWorld(this.worldObj.levelName), this), hitEntity);
++        Bukkit.getServer().getPluginManager().callEvent(event);
++
++        if (event.isCancelled()) {
++            return;
++        }
++
++        super.applyEntityCollision(entity);
++    }
+ }
