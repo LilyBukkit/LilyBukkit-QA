@@ -25,6 +25,8 @@ import org.bukkit.command.defaults.IronCommand;
 import org.bukkit.command.defaults.WoodCommand;
 import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
+import org.bukkit.event.world.WorldSaveEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.permissions.Permissible;
@@ -432,11 +434,13 @@ public class LilyBukkit implements Server {
      */
     @Override
     public boolean unloadWorld(World world, boolean save) {
+        if (save) this.pluginMngr.callEvent(new WorldSaveEvent(world));
         for (Chunk chunk : world.getLoadedChunks()) {
             if (!chunk.unload(save)) {
                 return false;
             }
         }
+        this.pluginMngr.callEvent(new WorldUnloadEvent(world));
         return true;
     }
 

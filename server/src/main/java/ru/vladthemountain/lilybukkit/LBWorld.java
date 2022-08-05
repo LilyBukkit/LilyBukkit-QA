@@ -39,6 +39,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.world.SpawnChangeEvent;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
@@ -624,9 +625,11 @@ public class LBWorld implements World {
      */
     @Override
     public boolean setSpawnLocation(int x, int y, int z) {
+        Location previousLocation = this.getSpawnLocation();
         this.world.spawnX = x;
         this.world.spawnY = y;
         this.world.spawnZ = z;
+        Bukkit.getServer().getPluginManager().callEvent(new SpawnChangeEvent(this, previousLocation));
         return true;
     }
 
@@ -882,7 +885,8 @@ public class LBWorld implements World {
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
             entityToReturn = new LBZombie(this, (EntityZombie) entityToSpawn);
         }
-        if (entityToSpawn != null && this.world.spawnEntityInWorld(entityToSpawn, SpawnReason.CUSTOM)) return (T) entityToReturn;
+        if (entityToSpawn != null && this.world.spawnEntityInWorld(entityToSpawn, SpawnReason.CUSTOM))
+            return (T) entityToReturn;
         else throw new IllegalArgumentException("Can't spawn entity");
     }
 
