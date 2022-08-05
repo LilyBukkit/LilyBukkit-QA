@@ -97,6 +97,10 @@ public class NewMain {
                 acceptsAll(asList("nojline"), "Disables jline and emulates the vanilla console");
 
                 acceptsAll(asList("v", "version"), "Show the CraftBukkit Version");
+
+                // LilyBukkit start
+                acceptsAll(asList("nogui"), "Disables standard Minecraft server's GUI");
+                // LilyBukkit end
             }
         };
 

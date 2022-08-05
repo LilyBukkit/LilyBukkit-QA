@@ -1,6 +1,7 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityBoat;
+import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import ru.vladthemountain.lilybukkit.LBWorld;
 
@@ -12,7 +13,7 @@ public class LBBoat extends LBVehicle implements Boat {
     EntityBoat entity;
     double maxSpeed = 0.4;
 
-    public LBBoat(LBWorld w, EntityBoat e) {
+    public LBBoat(World w, EntityBoat e) {
         super(w, e);
         this.entity = e;
     }

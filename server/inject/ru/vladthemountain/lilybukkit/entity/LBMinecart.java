@@ -1,6 +1,7 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityMinecart;
+import org.bukkit.World;
 import org.bukkit.entity.Minecart;
 import org.bukkit.util.Vector;
 import ru.vladthemountain.lilybukkit.LBWorld;
@@ -14,7 +15,7 @@ public class LBMinecart extends LBVehicle implements Minecart {
     double maxSpeed = 0.4;
     boolean isSlow;
 
-    public LBMinecart(LBWorld w, EntityMinecart e) {
+    public LBMinecart(World w, EntityMinecart e) {
         super(w, e);
         this.entity = e;
         this.isSlow = false;
