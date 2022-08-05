@@ -265,4 +265,6 @@ public class LBEntity implements Entity {
     public UUID getUniqueId() {
         return UUID.fromString(String.valueOf(this.entity.entityID));
     }
+
+    public net.minecraft.src.Entity getHandle() {return this.entity;}
 }

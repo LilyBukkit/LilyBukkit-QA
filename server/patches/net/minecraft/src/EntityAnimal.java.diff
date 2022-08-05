@@ -1,0 +1,54 @@
+--- EntityAnimal.java
++++ EntityAnimal.java
+@@ -1,24 +1,32 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.entity.Entity;
++import ru.vladthemountain.lilybukkit.entity.LBAnimals;
++
+ public abstract class EntityAnimal extends EntityCreature implements IAnimals {
++
++    private LBAnimals lbAnimal;//LilyBukkit
++
+     public EntityAnimal(final World world) {
+         super(world);
++        this.lbAnimal = new LBAnimals(Bukkit.getWorld(world.levelName), this);
+     }
+-    
++
+     @Override
+     protected float getBlockPathWeight(final int x, final int y, final int z) {
+         return (this.worldObj.getBlockId(x, y - 1, z) == Block.grass.blockID) ? 10.0f : (this.worldObj.getBrightness(x, y, z) - 0.5f);
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public boolean getCanSpawnHere() {
+@@ -28,8 +36,13 @@
+         return this.worldObj.getBlockId(i1, i2 - 1, i3) == Block.grass.blockID && this.worldObj.getBlockLightValue(i1, i2, i3) > 8 && super.getCanSpawnHere();
+     }
+-    
++
+     @Override
+     public int getTalkInterval() {
+         return 120;
+     }
++
++    @Override
++    public Entity getBukkitEntity() {
++        return this.lbAnimal;
++    }
+ }

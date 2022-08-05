@@ -1,10 +1,8 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.Entity;
 import net.minecraft.src.EntityGiantZombie;
-import net.minecraft.src.EntityMob;
+import org.bukkit.World;
 import org.bukkit.entity.Giant;
-import ru.vladthemountain.lilybukkit.LBWorld;
 
 /**
  * @author VladTheMountain
@@ -12,8 +10,8 @@ import ru.vladthemountain.lilybukkit.LBWorld;
 public class LBGiant extends LBMonster implements Giant {
     EntityGiantZombie entity;
 
-    public LBGiant(LBWorld w, EntityGiantZombie e) {
-        super(w,e);
+    public LBGiant(World w, EntityGiantZombie e) {
+        super(w, e);
         this.entity = e;
     }
 }

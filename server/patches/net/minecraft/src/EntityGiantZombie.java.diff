@@ -1,0 +1,31 @@
+--- EntityGiantZombie.java
++++ EntityGiantZombie.java
+@@ -1,5 +1,12 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.entity.Entity;
++import ru.vladthemountain.lilybukkit.entity.LBGiant;
++
+ public class EntityGiantZombie extends EntityMob {
++
++    private final LBGiant lbGiant; //LilyBukkit
++
+     public EntityGiantZombie(final World world) {
+         super(world);
+@@ -10,9 +17,14 @@
+         this.yOffset *= 6.0f;
+         this.setSize(this.width * 6.0f, this.height * 6.0f);
++
++        this.lbGiant = new LBGiant(Bukkit.getWorld(world.levelName), this); //LilyBukkit
+     }
+-    
++
+     @Override
+     protected float getBlockPathWeight(final int x, final int y, final int z) {
+         return this.worldObj.getBrightness(x, y, z) - 0.5f;
+     }
++
++    @Override
++    public Entity getBukkitEntity() {return this.lbGiant;}
+ }

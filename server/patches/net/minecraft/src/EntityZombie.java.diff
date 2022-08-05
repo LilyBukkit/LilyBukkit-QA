@@ -1,28 +1,35 @@
 --- EntityZombie.java
 +++ EntityZombie.java
-@@ -1,4 +1,9 @@
+@@ -1,5 +1,13 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
++import org.bukkit.entity.Entity;
 +import org.bukkit.event.entity.EntityCombustEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.entity.LBZombie;
 +
  public class EntityZombie extends EntityMob {
++
++    private final LBZombie lbZombie; //LilyBukkit
++
      public EntityZombie(final World world) {
-@@ -8,5 +13,5 @@
+         super(world);
+@@ -7,6 +15,8 @@
+         this.moveSpeed = 0.5f;
          this.attackStrength = 5;
++
++        this.lbZombie = new LBZombie(Bukkit.getWorld(world.levelName), this); //LilyBukkit
      }
 -    
 +
      @Override
      public void onLivingUpdate() {
-@@ -14,25 +19,32 @@
+@@ -14,28 +24,40 @@
              final float f1 = this.getBrightness(1.0f);
              if (f1 > 0.5f && this.worldObj.canBlockSeeTheSky(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) && this.rand.nextFloat() * 30.0f < (f1 - 0.4f) * 2.0f) {
 -                this.fire = 300;
 +                // CraftBukkit start
-+                EntityCombustEvent event = new EntityCombustEvent(new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++                EntityCombustEvent event = new EntityCombustEvent(this.getBukkitEntity());
 +                Bukkit.getServer().getPluginManager().callEvent(event);
 +
 +                if (!event.isCancelled()) {
@@ -55,3 +62,11 @@
 +
      @Override
      protected int getDropItemId() {
+         return Item.feather.shiftedIndex;
+     }
++
++    @Override
++    public Entity getBukkitEntity() {
++        return this.lbZombie;
++    }
+ }

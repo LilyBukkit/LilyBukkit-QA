@@ -1,8 +1,8 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityFallingSand;
+import org.bukkit.World;
 import org.bukkit.entity.FallingSand;
-import ru.vladthemountain.lilybukkit.LBWorld;
 
 /**
  * @author VladTheMountain
@@ -10,7 +10,7 @@ import ru.vladthemountain.lilybukkit.LBWorld;
 public class LBFallingSand extends LBEntity implements FallingSand {
     EntityFallingSand entity;
 
-    public LBFallingSand(LBWorld w, EntityFallingSand e) {
+    public LBFallingSand(World w, EntityFallingSand e) {
         super(w, e);
         this.entity = e;
     }

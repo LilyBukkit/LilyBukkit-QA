@@ -1,6 +1,6 @@
 --- EntitySnowball.java
 +++ EntitySnowball.java
-@@ -1,4 +1,14 @@
+@@ -1,4 +1,12 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
@@ -8,28 +8,31 @@
 +import org.bukkit.event.entity.EntityDamageByEntityEvent;
 +import org.bukkit.event.entity.EntityDamageEvent;
 +import org.bukkit.event.entity.ProjectileHitEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
 +import ru.vladthemountain.lilybukkit.entity.LBLivingEntity;
 +import ru.vladthemountain.lilybukkit.entity.LBSnowball;
 +
  import java.util.List;
  
-@@ -13,5 +23,5 @@
+@@ -13,5 +21,7 @@
      private int ticksInGround;
      private int ticksInAir;
 -    
 +
++    private final LBSnowball lbSnowball; //LilyBukkit
++
      public EntitySnowball(final World world) {
          super(world);
-@@ -25,5 +35,5 @@
+@@ -24,6 +34,8 @@
+         this.ticksInAir = 0;
          this.setSize(0.25f, 0.25f);
++
++        this.lbSnowball = new LBSnowball(Bukkit.getWorld(world.levelName), this); //LilyBukkit
      }
 -    
 +
      @Override
      public void onUpdate() {
-@@ -47,6 +57,5 @@
+@@ -47,6 +59,5 @@
              this.ticksInGround = 0;
              this.ticksInAir = 0;
 -        }
@@ -37,44 +40,31 @@
 +        } else {
              ++this.ticksInAir;
          }
-@@ -63,5 +72,5 @@
+@@ -63,5 +74,5 @@
          double d6 = 0.0;
          for (int i2 = 0; i2 < list5.size(); ++i2) {
 -            final Entity entity5 = (Entity)list5.get(i2);
 +            final Entity entity5 = (Entity) list5.get(i2);
              if (entity5.canBeCollidedWith() && (entity5 != this.thrower || this.ticksInAir >= 5)) {
                  final float f10 = 0.3f;
-@@ -81,5 +90,47 @@
+@@ -81,5 +92,34 @@
          }
          if (movingObjectPosition3 != null) {
 -            if (movingObjectPosition3.entityHit == null || movingObjectPosition3.entityHit.attackEntityFrom(this.thrower, 0)) {}
 +            // CraftBukkit start
-+            ProjectileHitEvent phe = new ProjectileHitEvent(new LBSnowball((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++            ProjectileHitEvent phe = new ProjectileHitEvent((Projectile) this.getBukkitEntity());
 +            Bukkit.getServer().getPluginManager().callEvent(phe);
 +
 +            if (movingObjectPosition3.entityHit != null) {
 +                boolean stick;
 +                if (movingObjectPosition3.entityHit instanceof EntityLiving) {
-+                    org.bukkit.entity.Entity damagee = new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName),movingObjectPosition3.entityHit);
-+                    Projectile projectile = new LBSnowball((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this);
++                    org.bukkit.entity.Entity damagee = movingObjectPosition3.entityHit.getBukkitEntity();
++                    Projectile projectile = (Projectile) this.getBukkitEntity();
 +
 +                    // TODO @see EntityArrow#162
 +                    EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(projectile, damagee, EntityDamageEvent.DamageCause.PROJECTILE, 0);
 +                    Bukkit.getServer().getPluginManager().callEvent(event);
-+                    // LilyBukkit start
-+                    EntityLiving shooter = null;
-+                    if (projectile.getShooter() == null) {
-+                        shooter = new EntityLiving(this.worldObj);
-+                        LBLivingEntity lb_shooter = (LBLivingEntity) projectile.getShooter();
-+                        shooter.posX = lb_shooter.getLocation().getX();
-+                        shooter.posY = lb_shooter.getLocation().getY();
-+                        shooter.posZ = lb_shooter.getLocation().getZ();
-+                        shooter.entityID = lb_shooter.getEntityId();
-+                        shooter.health = lb_shooter.getHealth();
-+                        // TODO: Bruh
-+                    }
-+                    // LilyBukkit end
-+                    this.thrower = shooter;
++                    this.thrower = (EntityLiving) ((LBLivingEntity) projectile.getShooter()).getHandle();
 +
 +                    if (event.isCancelled()) {
 +                        stick = !projectile.doesBounce();
@@ -93,7 +83,7 @@
 +            //if (movingObjectPosition3.entityHit == null || movingObjectPosition3.entityHit.attackEntityFrom(this.thrower, 0)) {}
              for (int i2 = 0; i2 < 8; ++i2) {
                  this.worldObj.spawnParticle("snowballpoof", this.posX, this.posY, this.posZ, 0.0, 0.0, 0.0);
-@@ -91,6 +142,6 @@
+@@ -91,6 +131,6 @@
          this.posZ += this.motionZ;
          final float f11 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
 -        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0 / 3.1415927410125732);
@@ -102,7 +92,7 @@
 +        this.rotationPitch = (float) (Math.atan2(this.motionY, (double) f11) * 180.0 / 3.1415927410125732);
          while (this.rotationPitch - this.prevRotationPitch < -180.0f) {
              this.prevRotationPitch -= 360.0f;
-@@ -122,14 +173,14 @@
+@@ -122,14 +162,14 @@
          this.setPosition(this.posX, this.posY, this.posZ);
      }
 -    
@@ -125,7 +115,7 @@
 +
      public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
          this.xTile = nbttagcompound.getShort("xTile");
-@@ -140,9 +191,9 @@
+@@ -140,12 +180,17 @@
          this.inGround = (nbttagcompound.getByte("inGround") == 1);
      }
 -    
@@ -137,3 +127,11 @@
 +            this.worldObj.playSoundAtEntity((Entity) this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
              entityPlayer.onItemPickup(this, 1);
              this.setEntityDead();
+         }
+     }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {
++        return this.lbSnowball;
++    }
+ }

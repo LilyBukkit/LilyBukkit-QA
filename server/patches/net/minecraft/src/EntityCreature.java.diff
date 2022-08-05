@@ -1,11 +1,10 @@
 --- EntityCreature.java
 +++ EntityCreature.java
-@@ -1,14 +1,20 @@
+@@ -1,14 +1,23 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.EntityTargetEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
 +import ru.vladthemountain.lilybukkit.entity.LBCreature;
 +import ru.vladthemountain.lilybukkit.entity.LBEntity;
 +
@@ -16,38 +15,33 @@
      protected boolean hasAttacked;
 -    
 +
++    private final LBCreature lbCreature; //LilyBukkit
++
      public EntityCreature(final World world) {
          super(world);
          this.hasAttacked = false;
++
++        this.lbCreature = new LBCreature(Bukkit.getWorld(world.levelName), this); //LilyBukkit
      }
 -    
 +
      @Override
      protected void updateEntityActionState() {
-@@ -16,13 +22,55 @@
+@@ -16,13 +25,37 @@
          final float f1 = 16.0f;
          if (this.entityToAttack == null) {
 -            this.entityToAttack = this.findPlayerToAttack();
 +            // CraftBukkit start
 +            Entity target = this.findPlayerToAttack();
 +            if (target != null) {
-+                EntityTargetEvent event = new EntityTargetEvent(new LBCreature((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this), new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), target), EntityTargetEvent.TargetReason.CLOSEST_PLAYER);
++                EntityTargetEvent event = new EntityTargetEvent(this.getBukkitEntity(), target.getBukkitEntity(), EntityTargetEvent.TargetReason.CLOSEST_PLAYER);
 +                Bukkit.getServer().getPluginManager().callEvent(event);
 +
 +                if (!event.isCancelled()) {
 +                    if (event.getTarget() == null) {
 +                        this.entityToAttack = null;
 +                    } else {
-+                        // LilyBukkit start
-+                        LBEntity lb_targetEntity = (LBEntity) event.getTarget();
-+                        EntityLiving targetEntity = new EntityLiving(this.worldObj);
-+                        targetEntity.posX = lb_targetEntity.getLocation().getX();
-+                        targetEntity.posY = lb_targetEntity.getLocation().getY();
-+                        targetEntity.posZ = lb_targetEntity.getLocation().getZ();
-+                        targetEntity.entityID = lb_targetEntity.getEntityId();
-+                        //bruh
-+                        this.entityToAttack = targetEntity;
-+                        // LilyBukkit end
++                        this.entityToAttack = ((LBEntity) event.getTarget()).getHandle();
 +                    }
 +                }
 +            }
@@ -63,30 +57,21 @@
 -        else {
 +        } else if (!this.entityToAttack.isEntityAlive()) {
 +            // CraftBukkit start
-+            EntityTargetEvent event = new EntityTargetEvent(new LBCreature((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this), null, EntityTargetEvent.TargetReason.TARGET_DIED);
++            EntityTargetEvent event = new EntityTargetEvent(this.getBukkitEntity(), null, EntityTargetEvent.TargetReason.TARGET_DIED);
 +            Bukkit.getServer().getPluginManager().callEvent(event);
 +
 +            if (!event.isCancelled()) {
 +                if (event.getTarget() == null) {
 +                    this.entityToAttack = null;
 +                } else {
-+                    // LilyBukkit start
-+                    LBEntity lb_targetEntity = (LBEntity) event.getTarget();
-+                    EntityLiving targetEntity = new EntityLiving(this.worldObj);
-+                    targetEntity.posX = lb_targetEntity.getLocation().getX();
-+                    targetEntity.posY = lb_targetEntity.getLocation().getY();
-+                    targetEntity.posZ = lb_targetEntity.getLocation().getZ();
-+                    targetEntity.entityID = lb_targetEntity.getEntityId();
-+                    //bruh
-+                    this.entityToAttack = targetEntity;
-+                    // LilyBukkit end
++                    this.entityToAttack = ((LBEntity) event.getTarget()).getHandle();
 +                }
 +            }
 +            // CraftBukkit end
 +        } else {
              final float f2 = this.entityToAttack.getDistanceToEntity(this);
              if (this.canEntityBeSeen(this.entityToAttack)) {
-@@ -32,6 +80,5 @@
+@@ -32,6 +65,5 @@
          if (!this.hasAttacked && this.entityToAttack != null && (this.pathToEntity == null || this.rand.nextInt(20) == 0)) {
              this.pathToEntity = this.worldObj.getPathToEntity(this, this.entityToAttack, f1);
 -        }
@@ -94,7 +79,7 @@
 +        } else if ((this.pathToEntity == null && this.rand.nextInt(80) == 0) || this.rand.nextInt(80) == 0) {
              boolean z21 = false;
              int i3 = -1;
-@@ -68,6 +115,5 @@
+@@ -68,6 +100,5 @@
                      vec3D25 = null;
                      this.pathToEntity = null;
 -                }
@@ -102,21 +87,21 @@
 +                } else {
                      vec3D25 = this.pathToEntity.getPosition(this);
                  }
-@@ -78,5 +124,5 @@
+@@ -78,5 +109,5 @@
                  final double d28 = vec3D25.zCoord - this.posZ;
                  final double d29 = vec3D25.yCoord - i10;
 -                final float f5 = (float)(Math.atan2(d28, d27) * 180.0 / 3.1415927410125732) - 90.0f;
 +                final float f5 = (float) (Math.atan2(d28, d27) * 180.0 / 3.1415927410125732) - 90.0f;
                  float f6 = f5 - this.rotationYaw;
                  this.moveForward = this.moveSpeed;
-@@ -98,5 +144,5 @@
+@@ -98,5 +129,5 @@
                      final double d31 = this.entityToAttack.posZ - this.posZ;
                      final float f7 = this.rotationYaw;
 -                    this.rotationYaw = (float)(Math.atan2(d31, d30) * 180.0 / 3.1415927410125732) - 90.0f;
 +                    this.rotationYaw = (float) (Math.atan2(d31, d30) * 180.0 / 3.1415927410125732) - 90.0f;
                      f6 = (f7 - this.rotationYaw + 90.0f) * 3.1415927f / 180.0f;
                      this.moveStrafing = -MathHelper.sin(f6) * this.moveForward * 1.0f;
-@@ -116,22 +162,21 @@
+@@ -116,22 +147,21 @@
                  this.isJumping = true;
              }
 -        }
@@ -144,3 +129,12 @@
 +
      @Override
      public boolean getCanSpawnHere() {
+@@ -141,3 +171,8 @@
+         return super.getCanSpawnHere() && this.getBlockPathWeight(i1, i2, i3) >= 0.0f;
+     }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {
++        return this.lbCreature;
++    }
+ }

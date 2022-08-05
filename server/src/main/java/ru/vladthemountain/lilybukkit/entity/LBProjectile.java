@@ -1,6 +1,7 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.Entity;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import ru.vladthemountain.lilybukkit.LBWorld;
@@ -13,7 +14,7 @@ public class LBProjectile extends LBEntity implements Projectile {
     LBLivingEntity shooter;
     boolean bounces;
 
-    public LBProjectile(LBWorld w, Entity e){
+    public LBProjectile(World w, Entity e){
         super(w,e);
     }
 

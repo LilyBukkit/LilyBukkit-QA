@@ -1,11 +1,10 @@
 --- EntitySheep.java
 +++ EntitySheep.java
-@@ -1,7 +1,14 @@
+@@ -1,7 +1,15 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.EntityDeathEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
 +import ru.vladthemountain.lilybukkit.entity.LBSheep;
 +
 +import java.util.ArrayList;
@@ -14,30 +13,45 @@
      public boolean sheared;
 -    
 +
++    private final LBSheep lbSheep; //LilyBukkit
++
      public EntitySheep(final World world) {
          super(world);
-@@ -10,5 +17,5 @@
+@@ -9,6 +17,8 @@
+         this.texture = "/mob/sheep.png";
          this.setSize(0.9f, 1.3f);
++
++        this.lbSheep = new LBSheep(Bukkit.getWorld(world.levelName), this); //LilyBukkit
      }
 -    
 +
      @Override
      public boolean attackEntityFrom(final Entity entity, final int damage) {
-@@ -27,5 +34,5 @@
+@@ -19,13 +29,11 @@
+                 final EntityItem entityItem5 = entityDropItem = this.entityDropItem(Block.cloth.blockID, 1, 1.0f);
+                 entityDropItem.motionY += this.rand.nextFloat() * 0.05f;
+-                final EntityItem entityItem6 = entityItem5;
+-                entityItem6.motionX += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;
+-                final EntityItem entityItem7 = entityItem5;
+-                entityItem7.motionZ += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;
++                entityItem5.motionX += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;
++                entityItem5.motionZ += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;
+             }
+         }
          return super.attackEntityFrom(entity, damage);
      }
 -    
 +
      @Override
      public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
-@@ -33,5 +40,5 @@
+@@ -33,5 +41,5 @@
          nbttagcompound.setBoolean("Sheared", this.sheared);
      }
 -    
 +
      @Override
      public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
-@@ -39,18 +46,26 @@
+@@ -39,18 +47,31 @@
          this.sheared = nbttagcompound.getBoolean("Sheared");
      }
 -    
@@ -63,7 +77,12 @@
 +    public void onEntityDeath() {
 +        super.onEntityDeath();
 +        // LilyBukkit start
-+        Bukkit.getPluginManager().callEvent(new EntityDeathEvent(new LBSheep((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this), new ArrayList<>()));
++        Bukkit.getPluginManager().callEvent(new EntityDeathEvent(this.getBukkitEntity(), new ArrayList<>()));
 +        // LilyBukkit end
++    }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {
++        return this.lbSheep;
 +    }
  }

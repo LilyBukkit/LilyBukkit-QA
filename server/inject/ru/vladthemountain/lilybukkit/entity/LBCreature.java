@@ -2,6 +2,7 @@ package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityCreature;
 import net.minecraft.src.EntityLiving;
+import org.bukkit.World;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
 import ru.vladthemountain.lilybukkit.LBWorld;
@@ -13,7 +14,7 @@ public class LBCreature extends LBLivingEntity implements Creature {
 
     EntityCreature entity;
 
-    public LBCreature(LBWorld w, EntityCreature e) {
+    public LBCreature(World w, EntityCreature e) {
         super(w, e);
         this.entity = e;
     }

@@ -1,22 +1,27 @@
 --- EntityTNTPrimed.java
 +++ EntityTNTPrimed.java
-@@ -1,7 +1,13 @@
+@@ -1,7 +1,15 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
++import org.bukkit.entity.Explosive;
 +import org.bukkit.event.entity.ExplosionPrimeEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
 +import ru.vladthemountain.lilybukkit.LilyBukkit;
-+import ru.vladthemountain.lilybukkit.entity.LBExplosive;
++import ru.vladthemountain.lilybukkit.entity.LBTNTPrimed;
 +
  public class EntityTNTPrimed extends Entity {
      public int fuse;
 -    
 +
++    private final LBTNTPrimed lbtntPrimed; //LilyBukkit
++
      public EntityTNTPrimed(final World world) {
          super(world);
-@@ -11,9 +17,9 @@
+@@ -10,10 +18,12 @@
+         this.setSize(0.98f, 0.98f);
          this.yOffset = this.height / 2.0f;
++
++        this.lbtntPrimed = new LBTNTPrimed(Bukkit.getWorld(world.levelName), this); //LilyBukkit
      }
 -    
 +
@@ -27,7 +32,7 @@
 +        final float f5 = (float) (Math.random() * 3.1415927410125732 * 2.0);
          this.motionX = -MathHelper.sin(f5 * 3.1415927f / 180.0f) * 0.02f;
          this.motionY = 0.20000000298023224;
-@@ -25,10 +31,10 @@
+@@ -25,10 +35,10 @@
          this.prevPosZ = z;
      }
 -    
@@ -40,7 +45,7 @@
 +
      @Override
      public void onUpdate() {
-@@ -49,20 +55,30 @@
+@@ -49,23 +59,38 @@
              this.setEntityDead();
              this.explode();
 -        }
@@ -59,7 +64,7 @@
 +
 +        LilyBukkit server = (LilyBukkit) Bukkit.getServer();
 +
-+        ExplosionPrimeEvent event = new ExplosionPrimeEvent(new LBExplosive((LBWorld) server.getWorld(this.worldObj.levelName), this));
++        ExplosionPrimeEvent event = new ExplosionPrimeEvent((Explosive) this.getBukkitEntity());
 +        server.getPluginManager().callEvent(event);
 +
 +        if (!event.isCancelled()) {
@@ -79,3 +84,11 @@
 +
      @Override
      protected void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         this.fuse = nbttagcompound.getByte("Fuse");
+     }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {
++        return this.lbtntPrimed;
++    }
+ }

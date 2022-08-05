@@ -1,43 +1,111 @@
 --- EntitySpider.java
 +++ EntitySpider.java
-@@ -1,4 +1,12 @@
+@@ -1,5 +1,14 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.EntityTargetEvent;
 +import org.bukkit.event.entity.EntityTargetEvent.TargetReason;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.entity.LBCreature;
 +import ru.vladthemountain.lilybukkit.entity.LBEntity;
 +import ru.vladthemountain.lilybukkit.entity.LBSpider;
 +
  public class EntitySpider extends EntityMob {
++
++    private final LBSpider lbSpider; //LilyBukkit
++
      public EntitySpider(final World world) {
-@@ -42,5 +50,26 @@
+         super(world);
+@@ -7,10 +16,12 @@
+         this.setSize(1.4f, 0.9f);
+         this.moveSpeed = 0.8f;
++
++        this.lbSpider = new LBSpider(Bukkit.getWorld(world.levelName), this); //LilyBukkit
+     }
+-    
++
+     public double getMountedYOffset() {
+         return this.height * 0.75 - 0.5;
+     }
+-    
++
+     @Override
+     protected Entity findPlayerToAttack() {
+@@ -22,27 +33,38 @@
+         return null;
+     }
+-    
++
+     @Override
+     protected String getLivingSound() {
+         return "mob.spider";
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.spider";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "mob.spiderdeath";
+     }
+-    
++
+     @Override
+     protected void attackEntity(final Entity entity, final float damage) {
          final float f3 = this.getBrightness(1.0f);
          if (f3 > 0.5f && this.rand.nextInt(100) == 0) {
 -            this.entityToAttack = null;
+-        }
+-        else if (damage > 2.0f && damage < 6.0f && this.rand.nextInt(10) == 0) {
 +            // CraftBukkit start
-+            EntityTargetEvent event = new EntityTargetEvent(new LBSpider((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this), null, TargetReason.FORGOT_TARGET);
++            EntityTargetEvent event = new EntityTargetEvent(this.getBukkitEntity(), null, TargetReason.FORGOT_TARGET);
 +            Bukkit.getServer().getPluginManager().callEvent(event);
 +
 +            if (!event.isCancelled()) {
 +                if (event.getTarget() == null) {
 +                    this.entityToAttack = null;
 +                } else {
-+                    // LilyBukkit start
-+                    LBEntity lb_targetEntity = (LBEntity) event.getTarget();
-+                    EntityLiving targetEntity = new EntityLiving(this.worldObj);
-+                    targetEntity.posX = lb_targetEntity.getLocation().getX();
-+                    targetEntity.posY = lb_targetEntity.getLocation().getY();
-+                    targetEntity.posZ = lb_targetEntity.getLocation().getZ();
-+                    targetEntity.entityID = lb_targetEntity.getEntityId();
-+                    //bruh
-+                    this.entityToAttack = targetEntity;
-+                    // LilyBukkit end
++                    this.entityToAttack = ((LBEntity) event.getTarget()).getHandle();
 +                }
 +            }
 +            // CraftBukkit end
 +            //this.entityToAttack = null;
++        } else if (damage > 2.0f && damage < 6.0f && this.rand.nextInt(10) == 0) {
+             if (this.onGround) {
+                 final double d4 = entity.posX - this.posX;
+@@ -53,23 +75,27 @@
+                 this.motionY = 0.4000000059604645;
+             }
+-        }
+-        else {
++        } else {
+             super.attackEntity(entity, damage);
          }
-         else if (damage > 2.0f && damage < 6.0f && this.rand.nextInt(10) == 0) {
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     protected int getDropItemId() {
+         return Item.silk.shiftedIndex;
+     }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {
++        return this.lbSpider;
++    }
+ }

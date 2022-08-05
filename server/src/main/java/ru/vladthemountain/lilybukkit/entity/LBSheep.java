@@ -1,8 +1,9 @@
 package ru.vladthemountain.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import net.minecraft.src.EntitySheep;
+import org.bukkit.World;
 import org.bukkit.entity.Sheep;
-import ru.vladthemountain.lilybukkit.LBWorld;
 
 /**
  * @author VladTheMountain
@@ -11,7 +12,7 @@ public class LBSheep extends LBAnimals implements Sheep {
 
     EntitySheep entity;
 
-    public LBSheep(LBWorld w, EntitySheep e) {
+    public LBSheep(World w, EntitySheep e) {
         super(w, e);
         this.entity = e;
     }
@@ -33,5 +34,10 @@ public class LBSheep extends LBAnimals implements Sheep {
     public void setSheared(boolean flag) {
         this.entity.sheared = flag;
         this.entity.onUpdate();
+    }
+
+    @Override
+    public Entity getHandle() {
+        return this.entity;
     }
 }

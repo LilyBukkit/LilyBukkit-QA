@@ -1,8 +1,9 @@
 package ru.vladthemountain.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import net.minecraft.src.EntitySlime;
+import org.bukkit.World;
 import org.bukkit.entity.Slime;
-import ru.vladthemountain.lilybukkit.LBWorld;
 
 /**
  * @author VladTheMountain
@@ -11,7 +12,7 @@ public class LBSlime extends LBLivingEntity implements Slime {
 
     EntitySlime entity;
 
-    public LBSlime(LBWorld w, EntitySlime e) {
+    public LBSlime(World w, EntitySlime e) {
         super(w, e);
         this.entity = e;
     }
@@ -32,5 +33,10 @@ public class LBSlime extends LBLivingEntity implements Slime {
     @Override
     public void setSize(int sz) {
         this.entity.setSlimeSize(sz);
+    }
+
+    @Override
+    public Entity getHandle() {
+        return this.entity;
     }
 }

@@ -1,8 +1,71 @@
 --- EntityCow.java
 +++ EntityCow.java
-@@ -45,3 +45,5 @@
+@@ -1,7 +1,13 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import org.bukkit.entity.Entity;
++import ru.vladthemountain.lilybukkit.entity.LBCow;
++
+ public class EntityCow extends EntityAnimal {
+     public boolean unusedBool2;
+-    
++
++    private final LBCow lbCow; //LilyBukkit
++
+     public EntityCow(final World world) {
+         super(world);
+@@ -9,39 +15,46 @@
+         this.texture = "/mob/cow.png";
+         this.setSize(0.9f, 1.3f);
++
++        this.lbCow = new LBCow(Bukkit.getWorld(world.levelName), this); //LilyBukkit
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+         super.writeEntityToNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         super.readEntityFromNBT(nbttagcompound);
+     }
+-    
++
+     @Override
+     protected String getLivingSound() {
+         return "mob.cow";
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.cowhurt";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "mob.cowhurt";
+     }
+-    
++
+     @Override
+     protected float getSoundVolume() {
+         return 0.4f;
+     }
+-    
++
+     @Override
+     protected int getDropItemId() {
          return Item.leather.shiftedIndex;
      }
 +
-+
++    @Override
++    public Entity getBukkitEntity() {
++        return this.lbCow;
++    }
  }

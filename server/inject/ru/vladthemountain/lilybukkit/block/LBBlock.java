@@ -32,7 +32,7 @@ public class LBBlock implements Block {
      */
     @Override
     public byte getData() {
-        return (byte) this.world.getWorldServer().getBlockMetadata(this.getX(), this.getY(), this.getZ());
+        return (byte) this.world.getWorldServer().getBlockMetadata(this.posX, this.posY, this.posZ);
     }
 
     /**

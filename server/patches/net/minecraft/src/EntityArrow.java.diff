@@ -1,6 +1,6 @@
 --- EntityArrow.java
 +++ EntityArrow.java
-@@ -1,4 +1,16 @@
+@@ -1,4 +1,17 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
@@ -10,6 +10,7 @@
 +import org.bukkit.event.entity.ProjectileHitEvent;
 +import org.bukkit.event.player.PlayerPickupItemEvent;
 +import ru.vladthemountain.lilybukkit.LBWorld;
++import ru.vladthemountain.lilybukkit.entity.LBArrow;
 +import ru.vladthemountain.lilybukkit.entity.LBEntity;
 +import ru.vladthemountain.lilybukkit.entity.LBItem;
 +import ru.vladthemountain.lilybukkit.entity.LBLivingEntity;
@@ -17,28 +18,36 @@
 +
  import java.util.List;
  
-@@ -13,5 +25,5 @@
+@@ -13,5 +26,7 @@
      private int ticksInGround;
      private int ticksInAir;
 -    
 +
++    private LBArrow lbArrow; // LilyBukkit
++
      public EntityArrow(final World world) {
          super(world);
-@@ -25,5 +37,5 @@
+@@ -24,6 +39,8 @@
+         this.ticksInAir = 0;
          this.setSize(0.5f, 0.5f);
++
++        this.lbArrow = new LBArrow(Bukkit.getWorld(this.worldObj.levelName), this); //LilyBukkit
      }
 -    
 +
      public EntityArrow(final World world, final EntityLiving entityLiving) {
          super(world);
-@@ -48,5 +60,5 @@
+@@ -47,6 +64,8 @@
+         this.motionY = -MathHelper.sin(this.rotationPitch / 180.0f * 3.1415927f);
          this.setArrowHeading(this.motionX, this.motionY, this.motionZ, 1.5f, 1.0f);
++
++        this.lbArrow = new LBArrow(Bukkit.getWorld(this.worldObj.levelName), this); //LilyBukkit
      }
 -    
 +
      public void setArrowHeading(double motionX, double motionY, double motionZ, final float offsetY, final float offsetX) {
          final float f9 = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
-@@ -64,13 +76,13 @@
+@@ -64,13 +83,13 @@
          this.motionZ = motionZ;
          final float f10 = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
 -        final float n = (float)(Math.atan2(motionX, motionZ) * 180.0 / 3.1415927410125732);
@@ -55,7 +64,7 @@
 +
      @Override
      public void onUpdate() {
-@@ -94,6 +106,5 @@
+@@ -94,6 +113,5 @@
              this.ticksInGround = 0;
              this.ticksInAir = 0;
 -        }
@@ -63,7 +72,7 @@
 +        } else {
              ++this.ticksInAir;
          }
-@@ -109,6 +120,6 @@
+@@ -109,6 +127,6 @@
          final List list5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0, 1.0, 1.0));
          double d6 = 0.0;
 -        for (int i2 = 0; i2 < list5.size(); ++i2) {
@@ -72,11 +81,11 @@
 +            final Entity entity5 = (Entity) o;
              if (entity5.canBeCollidedWith() && (entity5 != this.shootingEntity || this.ticksInAir >= 5)) {
                  final float f10 = 0.3f;
-@@ -127,11 +138,53 @@
+@@ -127,11 +145,53 @@
              movingObjectPosition3 = new MovingObjectPosition(entity4);
          }
 +        // CraftBukkit start
-+        ProjectileHitEvent phe = new ProjectileHitEvent(new LBProjectile((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++        ProjectileHitEvent phe = new ProjectileHitEvent((Projectile) this.getBukkitEntity());
 +        Bukkit.getServer().getPluginManager().callEvent(phe);
 +        // CraftBukkit end
          if (movingObjectPosition3 != null) {
@@ -91,8 +100,8 @@
 +
 +                    // TODO decide if we should create DamageCause.ARROW, DamageCause.PROJECTILE
 +                    // or leave as DamageCause.ENTITY_ATTACK
-+                    org.bukkit.entity.Entity damagee = new LBEntity((LBWorld) server.getWorld(this.worldObj.levelName), movingObjectPosition3.entityHit);
-+                    Projectile projectile = new LBProjectile((LBWorld) server.getWorld(this.worldObj.levelName), this);
++                    org.bukkit.entity.Entity damagee = movingObjectPosition3.entityHit.getBukkitEntity();
++                    Projectile projectile = (Projectile) this.getBukkitEntity();
 +                    // TODO deal with arrows being fired from a non-entity
 +
 +                    EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(projectile, damagee, EntityDamageEvent.DamageCause.PROJECTILE, 4);
@@ -130,7 +139,7 @@
 +                } else {
                      this.motionX *= -0.10000000149011612;
                      this.motionY *= -0.10000000149011612;
-@@ -141,18 +194,17 @@
+@@ -141,18 +201,17 @@
                      this.ticksInAir = 0;
                  }
 -            }
@@ -154,7 +163,7 @@
 +                this.worldObj.playSoundAtEntity(this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
                  this.inData = true;
                  this.arrowShake = 7;
-@@ -163,6 +215,6 @@
+@@ -163,6 +222,6 @@
          this.posZ += this.motionZ;
          final float f11 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
 -        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0 / 3.1415927410125732);
@@ -163,7 +172,7 @@
 +        this.rotationPitch = (float) (Math.atan2(this.motionY, f11) * 180.0 / 3.1415927410125732);
          while (this.rotationPitch - this.prevRotationPitch < -180.0f) {
              this.prevRotationPitch -= 360.0f;
-@@ -194,14 +246,14 @@
+@@ -194,14 +253,14 @@
          this.setPosition(this.posX, this.posY, this.posZ);
      }
 -    
@@ -186,7 +195,7 @@
 +
      public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
          this.xTile = nbttagcompound.getShort("xTile");
-@@ -212,9 +264,21 @@
+@@ -212,12 +271,27 @@
          this.inData = (nbttagcompound.getByte("inGround") == 1);
      }
 -    
@@ -198,7 +207,7 @@
 +        if (this.inData && this.shootingEntity instanceof EntityPlayer && this.arrowShake <= 0 && entityPlayer.inventory.canHold(itemstack) > 0) {
 +            EntityItem item = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, itemstack);
 +
-+            PlayerPickupItemEvent event = new PlayerPickupItemEvent(Bukkit.getPlayer(entityPlayer.username), new LBItem(Bukkit.getWorld(this.worldObj.levelName), item), 0);
++            PlayerPickupItemEvent event = new PlayerPickupItemEvent(Bukkit.getPlayer(entityPlayer.username), (org.bukkit.entity.Item) item.getBukkitEntity(), 0);
 +            Bukkit.getServer().getPluginManager().callEvent(event);
 +
 +            if (event.isCancelled()) return;
@@ -210,3 +219,9 @@
 +            this.worldObj.playSoundAtEntity(this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
              entityPlayer.onItemPickup(this, 1);
              this.setEntityDead();
+         }
+     }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {return this.lbArrow;}
+ }

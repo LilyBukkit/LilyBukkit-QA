@@ -1,8 +1,9 @@
 package ru.vladthemountain.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import net.minecraft.src.EntityTNTPrimed;
+import org.bukkit.World;
 import org.bukkit.entity.TNTPrimed;
-import ru.vladthemountain.lilybukkit.LBWorld;
 
 /**
  * @author VladTheMountain
@@ -11,7 +12,7 @@ public class LBTNTPrimed extends LBExplosive implements TNTPrimed {
 
     EntityTNTPrimed entity;
 
-    public LBTNTPrimed(LBWorld w, EntityTNTPrimed e) {
+    public LBTNTPrimed(World w, EntityTNTPrimed e) {
         super(w, e);
         this.entity = e;
     }
@@ -35,5 +36,10 @@ public class LBTNTPrimed extends LBExplosive implements TNTPrimed {
     @Override
     public int getFuseTicks() {
         return this.entity.fuse;
+    }
+
+    @Override
+    public Entity getHandle() {
+        return this.entity;
     }
 }

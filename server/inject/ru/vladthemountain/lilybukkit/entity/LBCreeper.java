@@ -1,6 +1,7 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityCreeper;
+import org.bukkit.World;
 import org.bukkit.entity.Creeper;
 import ru.vladthemountain.lilybukkit.LBWorld;
 
@@ -10,7 +11,7 @@ import ru.vladthemountain.lilybukkit.LBWorld;
 public class LBCreeper extends LBMonster implements Creeper {
     EntityCreeper entity;
 
-    public LBCreeper(LBWorld w, EntityCreeper e) {
+    public LBCreeper(World w, EntityCreeper e) {
         super(w,e);
         this.entity = e;
     }

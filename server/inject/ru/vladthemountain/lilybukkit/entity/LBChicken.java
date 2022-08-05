@@ -1,15 +1,15 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.EntityChicken;
+import org.bukkit.World;
 import org.bukkit.entity.Chicken;
-import ru.vladthemountain.lilybukkit.LBWorld;
 
 /**
  * @author VladTheMountain
  */
 public class LBChicken extends LBAnimals implements Chicken {
 
-    public LBChicken(LBWorld w, EntityChicken e) {
-        super(w,e);
+    public LBChicken(World w, EntityChicken e) {
+        super(w, e);
     }
 }

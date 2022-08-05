@@ -1,8 +1,8 @@
 package ru.vladthemountain.lilybukkit.entity;
 
 import net.minecraft.src.Entity;
+import org.bukkit.World;
 import org.bukkit.entity.Explosive;
-import ru.vladthemountain.lilybukkit.LBWorld;
 
 /**
  * @author VladTheMountain
@@ -11,9 +11,11 @@ public class LBExplosive extends LBEntity implements Explosive {
 
     float affectedRadius;
     boolean spawnsFire;
+    Entity entity;
 
-    public LBExplosive(LBWorld w, Entity e) {
+    public LBExplosive(World w, Entity e) {
         super(w, e);
+        this.entity = e;
     }
 
     /**
@@ -54,5 +56,10 @@ public class LBExplosive extends LBEntity implements Explosive {
     @Override
     public boolean isIncendiary() {
         return this.spawnsFire;
+    }
+
+    @Override
+    public Entity getHandle() {
+        return this.entity;
     }
 }

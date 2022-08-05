@@ -1,6 +1,8 @@
 package ru.vladthemountain.lilybukkit.entity;
 
-import net.minecraft.src.EntityMob;
+import net.minecraft.src.Entity;
+import net.minecraft.src.EntityPlayer;
+import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -8,16 +10,16 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
-import ru.vladthemountain.lilybukkit.LBWorld;
+import ru.vladthemountain.lilybukkit.inventory.LBPlayerInventory;
 
 import java.util.Set;
 
 public class LBHumanEntity extends LBLivingEntity implements HumanEntity {
 
-    final EntityMob entity;
+    final EntityPlayer entity;
     boolean op;
 
-    public LBHumanEntity(LBWorld w, EntityMob e) {
+    public LBHumanEntity(World w, EntityPlayer e) {
         super(w, e);
         this.entity = e;
         this.op = false;
@@ -25,22 +27,23 @@ public class LBHumanEntity extends LBLivingEntity implements HumanEntity {
 
     @Override
     public String getName() {
-        return "EntityMob_" + this.entity.entityID;
+        return this.entity.username;
     }
 
     @Override
     public PlayerInventory getInventory() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new LBPlayerInventory(this.entity.inventory);
     }
 
     @Override
     public ItemStack getItemInHand() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        net.minecraft.src.ItemStack ci = this.entity.inventory.getCurrentItem();
+        return new ItemStack(ci.itemID, ci.stackSize, (short) ci.itemDmg);
     }
 
     @Override
     public void setItemInHand(ItemStack itemStack) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.entity.inventory.setInventorySlotContents(this.entity.inventory.currentItem, new net.minecraft.src.ItemStack(itemStack.getTypeId(), itemStack.getAmount(), itemStack.getDurability()));
     }
 
     @Override
@@ -107,4 +110,7 @@ public class LBHumanEntity extends LBLivingEntity implements HumanEntity {
     public void setOp(boolean b) {
         this.op = b;
     }
+
+    @Override
+    public Entity getHandle() {return this.entity;}
 }

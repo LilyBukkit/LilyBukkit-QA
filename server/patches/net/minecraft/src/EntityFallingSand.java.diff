@@ -1,0 +1,76 @@
+--- EntityFallingSand.java
++++ EntityFallingSand.java
+@@ -1,13 +1,20 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.Bukkit;
++import ru.vladthemountain.lilybukkit.entity.LBFallingSand;
++
+ public class EntityFallingSand extends Entity {
+     public int blockID;
+     public int fallTime;
+-    
++
++    private final LBFallingSand lbFallingSand; //LIlyBukkit
++
+     public EntityFallingSand(final World world) {
+         super(world);
+         this.fallTime = 0;
++
++        this.lbFallingSand = new LBFallingSand(Bukkit.getWorld(world.levelName), this);//LilyBukkit
+     }
+-    
++
+     public EntityFallingSand(final World world, final float x, final float y, final float z, final int blockID) {
+         super(world);
+@@ -25,17 +32,18 @@
+         this.prevPosY = y;
+         this.prevPosZ = z;
++
++        this.lbFallingSand = new LBFallingSand(Bukkit.getWorld(world.levelName), this);//LilyBukkit
+     }
+-    
++
+     @Override
+     public boolean canBeCollidedWith() {
+         return !this.isDead;
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+         if (this.blockID == 0) {
+             this.setEntityDead();
+-        }
+-        else {
++        } else {
+             this.prevPosX = this.posX;
+             this.prevPosY = this.posY;
+@@ -61,6 +69,5 @@
+                     this.dropItem(this.blockID, 1);
+                 }
+-            }
+-            else if (this.fallTime > 100) {
++            } else if (this.fallTime > 100) {
+                 this.dropItem(this.blockID, 1);
+                 this.setEntityDead();
+@@ -68,13 +75,16 @@
+         }
+     }
+-    
++
+     @Override
+     protected void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+-        nbttagcompound.setByte("Tile", (byte)this.blockID);
++        nbttagcompound.setByte("Tile", (byte) this.blockID);
+     }
+-    
++
+     @Override
+     protected void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         this.blockID = (nbttagcompound.getByte("Tile") & 0xFF);
+     }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {return this.lbFallingSand;}
+ }

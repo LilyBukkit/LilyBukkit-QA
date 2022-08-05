@@ -1,16 +1,142 @@
 --- EntitySlime.java
 +++ EntitySlime.java
-@@ -1,4 +1,6 @@
+@@ -1,4 +1,8 @@
  package net.minecraft.src;
  
++import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++import ru.vladthemountain.lilybukkit.entity.LBSlime;
 +
  public class EntitySlime extends EntityLiving implements IMobs {
      public float squishFactor;
-@@ -96,5 +98,5 @@
+@@ -6,5 +10,7 @@
+     private int slimeJumpDelay;
+     public int size;
+-    
++
++    private final LBSlime lbSlime; //LilyBukkit
++
+     public EntitySlime(final World world) {
+         super(world);
+@@ -16,6 +22,8 @@
+         this.slimeJumpDelay = this.rand.nextInt(20) + 10;
+         this.setSlimeSize(this.size);
++
++        this.lbSlime = new LBSlime(Bukkit.getWorld(world.levelName), this); //LilyBukkit
+     }
+-    
++
+     public void setSlimeSize(final int size) {
+         this.size = size;
+@@ -24,5 +32,5 @@
+         this.setPosition(this.posX, this.posY, this.posZ);
+     }
+-    
++
+     @Override
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+@@ -30,5 +38,5 @@
+         nbttagcompound.setInteger("Size", this.size - 1);
+     }
+-    
++
+     @Override
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+@@ -36,5 +44,5 @@
+         this.size = nbttagcompound.getInteger("Size") + 1;
+     }
+-    
++
+     @Override
+     public void onUpdate() {
+@@ -51,5 +59,5 @@
+             }
+             if (this.size > 2) {
+-                this.worldObj.playSoundAtEntity((Entity)this, "mob.slime", this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f) / 0.8f);
++                this.worldObj.playSoundAtEntity((Entity) this, "mob.slime", this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f) / 0.8f);
+             }
+             this.squishFactor = -0.5f;
+@@ -57,5 +65,5 @@
+         this.squishFactor *= 0.6f;
+     }
+-    
++
+     @Override
+     protected void updateEntityActionState() {
+@@ -71,11 +79,10 @@
+             this.isJumping = true;
+             if (this.size > 1) {
+-                this.worldObj.playSoundAtEntity((Entity)this, "mob.slime", this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f) * 0.8f);
++                this.worldObj.playSoundAtEntity((Entity) this, "mob.slime", this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f) * 0.8f);
+             }
+             this.squishFactor = 1.0f;
+             this.moveStrafing = 1.0f - this.rand.nextFloat() * 2.0f;
+-            this.moveForward = (float)(1 * this.size);
+-        }
+-        else {
++            this.moveForward = (float) (1 * this.size);
++        } else {
+             this.isJumping = false;
+             if (this.onGround) {
+@@ -86,5 +93,5 @@
+         }
+     }
+-    
++
+     @Override
+     public void setEntityDead() {
+@@ -96,32 +103,32 @@
                  entitySlime4.setSlimeSize(this.size / 2);
                  entitySlime4.setLocationAndAngles(this.posX + f2, this.posY + 0.5, this.posZ + f3, this.rand.nextFloat() * 360.0f, 0.0f);
 -                this.worldObj.spawnEntityInWorld(entitySlime4);
 +                this.worldObj.spawnEntityInWorld(entitySlime4, SpawnReason.NATURAL);
              }
          }
+         super.setEntityDead();
+     }
+-    
++
+     @Override
+     public void onCollideWithPlayer(final EntityPlayer entityPlayer) {
+         if (this.size > 1 && this.canEntityBeSeen(entityPlayer) && this.getDistanceToEntity(entityPlayer) < 0.6 * this.size && entityPlayer.attackEntityFrom(this, this.size)) {
+-            this.worldObj.playSoundAtEntity((Entity)this, "mob.slimeattack", 1.0f, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
++            this.worldObj.playSoundAtEntity((Entity) this, "mob.slimeattack", 1.0f, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
+         }
+     }
+-    
++
+     @Override
+     protected String getHurtSound() {
+         return "mob.slime";
+     }
+-    
++
+     @Override
+     protected String getDeathSound() {
+         return "mob.slime";
+     }
+-    
++
+     @Override
+     protected int getDropItemId() {
+         return (this.size == 1) ? Item.slimeBall.shiftedIndex : 0;
+     }
+-    
++
+     @Override
+     public boolean getCanSpawnHere() {
+@@ -129,8 +136,13 @@
+         return (this.size == 1 || this.worldObj.difficultySetting > 0) && this.rand.nextInt(10) == 0 && chunk1.getRandomWithSeed(987234911L).nextInt(10) == 0 && this.posY < 16.0;
+     }
+-    
++
+     @Override
+     protected float getSoundVolume() {
+         return 0.6f;
+     }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {
++        return this.lbSlime;
++    }
+ }

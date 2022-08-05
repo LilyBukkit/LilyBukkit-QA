@@ -1,23 +1,84 @@
 --- EntityPainting.java
 +++ EntityPainting.java
-@@ -1,4 +1,12 @@
+@@ -1,6 +1,13 @@
  package net.minecraft.src;
  
+-import java.util.List;
 +import org.bukkit.Bukkit;
++import org.bukkit.entity.Painting;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 +import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 +import org.bukkit.event.painting.PaintingBreakByWorldEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
 +import ru.vladthemountain.lilybukkit.entity.LBPainting;
 +
- import java.util.List;
  import java.util.ArrayList;
-@@ -98,6 +106,12 @@
++import java.util.List;
+ 
+ public class EntityPainting extends Entity {
+@@ -11,5 +18,7 @@
+     private int zPosition;
+     public EnumArt art;
+-    
++
++    private final LBPainting lbPainting; //LilyBukkit
++
+     public EntityPainting(final World world) {
+         super(world);
+@@ -18,6 +27,8 @@
+         this.yOffset = 0.0f;
+         this.setSize(0.5f, 0.5f);
++
++        this.lbPainting = new LBPainting(Bukkit.getWorld(world.levelName), this); //LilyBukkit
+     }
+-    
++
+     public EntityPainting(final World world, final int xPosition, final int yPosition, final int zPosition, final int direction) {
+         this(world);
+@@ -34,21 +45,20 @@
+         }
+         if (arrayList6.size() > 0) {
+-            this.art = (EnumArt)arrayList6.get(this.rand.nextInt(arrayList6.size()));
++            this.art = (EnumArt) arrayList6.get(this.rand.nextInt(arrayList6.size()));
+         }
+         this.setDirection(direction);
+     }
+-    
++
+     public void setDirection(final int direction) {
+         this.direction = direction;
+-        final float n = (float)(direction * 90);
++        final float n = (float) (direction * 90);
+         this.rotationYaw = n;
+         this.prevRotationYaw = n;
+-        float f2 = (float)this.art.sizeX;
+-        float f3 = (float)this.art.sizeY;
+-        float f4 = (float)this.art.sizeX;
++        float f2 = (float) this.art.sizeX;
++        float f3 = (float) this.art.sizeY;
++        float f4 = (float) this.art.sizeX;
+         if (direction != 0 && direction != 2) {
+             f2 = 0.5f;
+-        }
+-        else {
++        } else {
+             f4 = 0.5f;
+         }
+@@ -89,18 +99,24 @@
+         this.boundingBox.setBounds(f5 - f2 - f9, f6 - f3 - f9, f7 - f4 - f9, f5 + f2 + f9, f6 + f3 + f9, f7 + f4 + f9);
+     }
+-    
++
+     private float getArtSize(final int pixelSize) {
+         return (pixelSize == 32) ? 0.5f : ((pixelSize == 64) ? 0.5f : 0.0f);
+     }
+-    
++
+     @Override
+     public void onUpdate() {
          if (this.tickCounter++ == 100 && !this.onValidSurface()) {
              this.tickCounter = 0;
 +            // LilyBukkit start
-+            PaintingBreakByWorldEvent paintingBreakByWorldEvent = new PaintingBreakByWorldEvent(new LBPainting((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++            PaintingBreakByWorldEvent paintingBreakByWorldEvent = new PaintingBreakByWorldEvent((Painting) this.getBukkitEntity());
 +            Bukkit.getServer().getPluginManager().callEvent(paintingBreakByWorldEvent);
 +
 +            if (paintingBreakByWorldEvent.isCancelled()) return;
@@ -27,11 +88,33 @@
 +            this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)), SpawnReason.NATURAL);
          }
      }
-@@ -155,6 +169,12 @@
+-    
++
+     public boolean onValidSurface() {
+         if (this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox).size() > 0) {
+@@ -130,6 +146,5 @@
+                 if (this.direction != 0 && this.direction != 2) {
+                     material8 = this.worldObj.getBlockMaterial(this.xPosition, i4 + i7, i5 + i6);
+-                }
+-                else {
++                } else {
+                     material8 = this.worldObj.getBlockMaterial(i3 + i6, i4 + i7, this.zPosition);
+                 }
+@@ -147,19 +162,25 @@
+         return true;
+     }
+-    
++
+     @Override
+     public boolean canBeCollidedWith() {
+         return true;
+     }
+-    
++
      @Override
      public boolean attackEntityFrom(final Entity entity, final int damage) {
 +        // LilyBukkit start
-+        PaintingBreakByEntityEvent paintingBreakByEntityEvent = new PaintingBreakByEntityEvent(new LBPainting((LBWorld) Bukkit.getWorld(this.worldObj.levelName),this), new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName),entity));
++        PaintingBreakByEntityEvent paintingBreakByEntityEvent = new PaintingBreakByEntityEvent((Painting) this.getBukkitEntity(), entity.getBukkitEntity());
 +        Bukkit.getServer().getPluginManager().callEvent(paintingBreakByEntityEvent);
 +
 +        if (paintingBreakByEntityEvent.isCancelled()) return true;
@@ -41,3 +124,24 @@
 +        this.worldObj.spawnEntityInWorld(new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Item.painting)), SpawnReason.NATURAL);
          return true;
      }
+-    
++
+     public void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
+-        nbttagcompound.setByte("Dir", (byte)this.direction);
++        nbttagcompound.setByte("Dir", (byte) this.direction);
+         nbttagcompound.setString("Motive", this.art.title);
+         nbttagcompound.setInteger("TileX", this.xPosition);
+@@ -167,5 +188,5 @@
+         nbttagcompound.setInteger("TileZ", this.zPosition);
+     }
+-    
++
+     public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
+         this.direction = nbttagcompound.getByte("Dir");
+@@ -184,3 +205,6 @@
+         this.setDirection(this.direction);
+     }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {return this.lbPainting;}
+ }

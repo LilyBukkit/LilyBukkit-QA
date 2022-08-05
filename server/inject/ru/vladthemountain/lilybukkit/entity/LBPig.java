@@ -1,8 +1,9 @@
 package ru.vladthemountain.lilybukkit.entity;
 
+import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPig;
+import org.bukkit.World;
 import org.bukkit.entity.Pig;
-import ru.vladthemountain.lilybukkit.LBWorld;
 
 /**
  * @author VladTheMountain
@@ -11,7 +12,7 @@ public class LBPig extends LBAnimals implements Pig {
 
     EntityPig entity;
 
-    public LBPig(LBWorld w, EntityPig e) {
+    public LBPig(World w, EntityPig e) {
         super(w, e);
         this.entity = e;
     }
@@ -35,4 +36,7 @@ public class LBPig extends LBAnimals implements Pig {
     public void setSaddle(boolean saddled) {
         this.entity.saddled = saddled;
     }
+
+    @Override
+    public Entity getHandle() {return entity;}
 }

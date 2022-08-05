@@ -1,0 +1,13 @@
+--- IInventory.java
++++ IInventory.java
+@@ -1,7 +1,9 @@
+ package net.minecraft.src;
+ 
++import org.bukkit.inventory.Inventory;
++
+ public interface IInventory {
+     int getSizeInventory();
+-    
++
+     ItemStack getStackInSlot(final int slot);
+ }

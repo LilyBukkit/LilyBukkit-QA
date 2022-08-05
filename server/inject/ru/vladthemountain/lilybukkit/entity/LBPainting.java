@@ -3,9 +3,9 @@ package ru.vladthemountain.lilybukkit.entity;
 import net.minecraft.src.EntityPainting;
 import net.minecraft.src.EnumArt;
 import org.bukkit.Art;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Painting;
-import ru.vladthemountain.lilybukkit.LBWorld;
 import ru.vladthemountain.lilybukkit.block.LBBlock;
 
 /**
@@ -15,7 +15,7 @@ public class LBPainting extends LBEntity implements Painting {
 
     final EntityPainting entity;
 
-    public LBPainting(LBWorld w, EntityPainting e) {
+    public LBPainting(World w, EntityPainting e) {
         super(w, e);
         this.entity = e;
     }

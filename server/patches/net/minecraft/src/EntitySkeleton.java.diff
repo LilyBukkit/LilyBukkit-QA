@@ -1,18 +1,22 @@
 --- EntitySkeleton.java
 +++ EntitySkeleton.java
-@@ -1,4 +1,10 @@
+@@ -1,25 +1,35 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 +import org.bukkit.event.entity.EntityCombustEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.entity.LBSkeleton;
 +
  public class EntitySkeleton extends EntityMob {
++
++    private final LBSkeleton lbSkeleton; //LilyBukkit
++
      public EntitySkeleton(final World world) {
-@@ -6,20 +12,20 @@
+         super(world);
          this.texture = "/mob/skeleton.png";
++
++        this.lbSkeleton = new LBSkeleton(Bukkit.getWorld(world.levelName), this); //LilyBukkit
      }
 -    
 +
@@ -36,12 +40,12 @@
 +
      @Override
      public void onLivingUpdate() {
-@@ -27,10 +33,17 @@
+@@ -27,10 +37,17 @@
              final float f1 = this.getBrightness(1.0f);
              if (f1 > 0.5f && this.worldObj.canBlockSeeTheSky(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) && this.rand.nextFloat() * 30.0f < (f1 - 0.4f) * 2.0f) {
 -                this.fire = 300;
 +                // CraftBukkit start
-+                EntityCombustEvent event = new EntityCombustEvent(new LBEntity((LBWorld) Bukkit.getWorld(this.worldObj.levelName), this));
++                EntityCombustEvent event = new EntityCombustEvent(this.getBukkitEntity());
 +                Bukkit.getServer().getPluginManager().callEvent(event);
 +
 +                if (!event.isCancelled()) {
@@ -56,7 +60,7 @@
 +
      @Override
      protected void attackEntity(final Entity entity, final float damage) {
-@@ -44,24 +57,24 @@
+@@ -44,27 +61,32 @@
                  final double d5 = entity.posY - 0.20000000298023224 - entityArrow7.posY;
                  final float f10 = MathHelper.sqrt_double(d3 * d3 + d4 * d4) * 0.2f;
 -                this.worldObj.playSoundAtEntity((Entity)this, "random.bow", 1.0f, 1.0f / (this.rand.nextFloat() * 0.4f + 0.8f));
@@ -87,3 +91,11 @@
 +
      @Override
      protected int getDropItemId() {
+         return Item.arrow.shiftedIndex;
+     }
++
++    @Override
++    public org.bukkit.entity.Entity getBukkitEntity() {
++        return this.lbSkeleton;
++    }
+ }
