@@ -17,7 +17,7 @@
 +        // CraftBukkit start - ENTITY_DAMAGEBY_BLOCK event
 +        if (entity instanceof EntityLiving) {
 +            org.bukkit.block.Block damager = Bukkit.getWorld(world.levelName).getBlockAt(x, y, z);
-+            org.bukkit.entity.Entity damagee = new LBEntity((LBWorld) Bukkit.getWorld(world.levelName), entity);
++            org.bukkit.entity.Entity damagee = entity.getBukkitEntity();
 +
 +            EntityDamageByBlockEvent event = new EntityDamageByBlockEvent(damager, damagee, EntityDamageEvent.DamageCause.CONTACT, 1);
 +            Bukkit.getServer().getPluginManager().callEvent(event);

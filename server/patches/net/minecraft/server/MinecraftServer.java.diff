@@ -208,7 +208,7 @@
          }
          this.clearCurrentTask();
 +        // LilyBukkit start
-+        if (!this.lilyBukkit.addExistingWorld(this.worldMngr)) {
++        if (!this.lilyBukkit.worldList.add(this.worldMngr.getBukkitWorld())) {
 +            MinecraftServer.logger.severe("[LilyBukkit] Couldn't get the current world, terminating to prevent bugs");
 +            this.stop();
 +        }

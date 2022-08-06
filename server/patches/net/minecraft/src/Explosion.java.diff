@@ -32,7 +32,7 @@
 -                entity2.attackEntityFrom(entity, (int)((d26 * d26 + d26) / 2.0 * 8.0 * power + 1.0));
 +                // CraftBukkit start - explosion damage hook
 +                org.bukkit.Server server = Bukkit.getServer();
-+                org.bukkit.entity.Entity damagee = (entity == null) ? null : new LBEntity((LBWorld) server.getWorld(world.levelName), entity2);
++                org.bukkit.entity.Entity damagee = (entity == null) ? null : entity2.getBukkitEntity();
 +                int damageDone = (int) ((d26 * d26 + d26) / 2.0D * 8.0D * (double) power + 1.0D);
 +
 +                if (damagee == null) {
@@ -79,7 +79,7 @@
 +
 +        // CraftBukkit start
 +        org.bukkit.World bworld = Bukkit.getWorld(world.levelName);
-+        org.bukkit.entity.Entity explode = entity == null ? null : new LBEntity((LBWorld) bworld, entity);
++        org.bukkit.entity.Entity explode = entity == null ? null : entity.getBukkitEntity();
 +        Location location = new Location(bworld, x, y, z);
 +
 +        List<org.bukkit.block.Block> blockList = new ArrayList<>();

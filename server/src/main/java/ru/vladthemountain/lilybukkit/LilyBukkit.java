@@ -87,7 +87,7 @@ public class LilyBukkit implements Server {
     private final PluginManager pluginMngr;
     private final BukkitScheduler scheduler;
     private final ServicesManager servicesMngr;
-    public final List<LBWorld> worldList;
+    public final List<World> worldList;
     private final List<Recipe> recipeManager;
     private final SimpleCommandMap commandMap;
     Configuration configuration;
@@ -352,7 +352,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment) {
-        LBWorld newWorld = new LBWorld(new WorldServer(new File(name), name, true));
+        World newWorld = new WorldServer(new File(name), name, true).getBukkitWorld();
         this.worldList.add(newWorld);
         return newWorld;
     }
@@ -371,9 +371,8 @@ public class LilyBukkit implements Server {
     public World createWorld(String name, World.Environment environment, long seed) {
         WorldServer nw = new WorldServer(new File(name), name, true);
         nw.randomSeed = seed;
-        LBWorld newWorld = new LBWorld(nw);
-        this.worldList.add(newWorld);
-        return newWorld;
+        this.worldList.add(nw.getBukkitWorld());
+        return nw.getBukkitWorld();
     }
 
     /**
@@ -388,7 +387,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, ChunkGenerator generator) {
-        LBWorld newWorld = new LBWorld(new WorldServer(new File(name), name, true), generator);
+        World newWorld = new LBWorld(new WorldServer(new File(name), name, true), generator);
         this.worldList.add(newWorld);
         return newWorld;
     }
@@ -408,7 +407,7 @@ public class LilyBukkit implements Server {
     public World createWorld(String name, World.Environment environment, long seed, ChunkGenerator generator) {
         WorldServer nw = new WorldServer(new File(name), name, true);
         nw.randomSeed = seed;
-        LBWorld newWorld = new LBWorld(nw, generator);
+        World newWorld = new LBWorld(nw, generator);
         this.worldList.add(newWorld);
         return newWorld;
     }
@@ -452,7 +451,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World getWorld(String name) {
-        for (LBWorld world : this.worldList) {
+        for (World world : this.worldList) {
             if (world.getName().equals(name)) return world;
         }
         return null;
@@ -466,7 +465,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World getWorld(UUID uid) {
-        for (LBWorld world : this.worldList) {
+        for (World world : this.worldList) {
             if (world.getUID().equals(uid)) return world;
         }
         return null;
@@ -852,10 +851,6 @@ public class LilyBukkit implements Server {
         } else {
             this.mc.configManager.deopPlayer(name);
         }
-    }
-
-    public boolean addExistingWorld(WorldServer w) {
-        return this.worldList.add(new LBWorld(w));
     }
 
     public void CRAFTBUKKIT_loadPlugins() {

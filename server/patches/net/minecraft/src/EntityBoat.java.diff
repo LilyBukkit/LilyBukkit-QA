@@ -66,7 +66,7 @@
 +    public boolean attackEntityFrom(final Entity entity, int damage) {
 +        // CraftBukkit start
 +        Vehicle vehicle = (Vehicle) this.getBukkitEntity();
-+        org.bukkit.entity.Entity attacker = (entity == null) ? null : new LBEntity(Bukkit.getWorld(this.worldObj.levelName), entity);
++        org.bukkit.entity.Entity attacker = (entity == null) ? null : entity.getBukkitEntity();
 +
 +        VehicleDamageEvent event = new VehicleDamageEvent(vehicle, attacker, damage);
 +        Bukkit.getServer().getPluginManager().callEvent(event);
@@ -203,7 +203,7 @@
 +
 +    @Override
 +    public void applyEntityCollision(Entity entity) {
-+        org.bukkit.entity.Entity hitEntity = (entity == null) ? null : new LBEntity(Bukkit.getWorld(this.worldObj.levelName), entity);
++        org.bukkit.entity.Entity hitEntity = (entity == null) ? null : entity.getBukkitEntity();
 +
 +        VehicleEntityCollisionEvent event = new VehicleEntityCollisionEvent((Vehicle) this.getBukkitEntity(), hitEntity);
 +        Bukkit.getServer().getPluginManager().callEvent(event);

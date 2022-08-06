@@ -21,7 +21,7 @@
          this.health = 4;
          this.timeUntilNextEgg = this.rand.nextInt(6000) + 6000;
 +
-+        this.lbChicken = new LBChicken(Bukkit.getWorld(world.levelName), this);
++        this.lbChicken = new LBChicken(Bukkit.getWorld(world.levelName), this); //LilyBukkit
      }
 -    
 +
