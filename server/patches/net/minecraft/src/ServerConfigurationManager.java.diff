@@ -127,7 +127,7 @@
 -        this.mcServer.worldMngr.spawnEntityInWorld(entityPlayerMP1);
 +
 +        // CraftBukkit start
-+        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent((Player) entityPlayerMP1.getBukkitEntity(), "\u00A7e" + entityPlayerMP1.username + " joined the game.");
++        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent((Player) entityPlayerMP1.getBukkitEntity(), "§e" + entityPlayerMP1.username + " joined the game.");
 +        Bukkit.getPluginManager().callEvent(playerJoinEvent);
 +
 +        String joinMessage = playerJoinEvent.getJoinMessage();
