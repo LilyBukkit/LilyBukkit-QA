@@ -145,8 +145,8 @@ public class LilyBukkit implements Server {
     @Override
     public Player[] getOnlinePlayers() {
         List<Player> playerList = new ArrayList<>();
-        for (Entity player : this.mc.worldMngr.playerEntities) {
-            playerList.add(new LBPlayer((LBWorld) this.getWorld(this.mc.worldMngr.levelName), (EntityPlayerMP) player));
+        for (Entity player : this.mc.configManager.playerEntities) {
+            playerList.add((Player) player.getBukkitEntity());
         }
         return playerList.toArray(new Player[]{});
     }
@@ -800,7 +800,14 @@ public class LilyBukkit implements Server {
         }
 
         Map<String, Map<String, Object>> perms;
-        Object yamlContents = new Yaml(new SafeConstructor()).load(stream);
+        Yaml yamlFile = new Yaml(new SafeConstructor());
+        Object yamlContents = null;
+        try {
+            yamlContents = yamlFile.load(stream);
+        } catch (Exception e) {
+            getLogger().log(Level.WARNING, "[LilyBukkit] Couldn't load custom permissions. This error should be gone the next time you launch LilyBukkit. Aborting the loading to prevent even more exceptions.");
+            return;
+        }
 
         try {
             perms = (Map<String, Map<String, Object>>) yamlContents;
