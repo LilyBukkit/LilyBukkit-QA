@@ -129,6 +129,7 @@ jar {
 
 repositories{
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 sourceSets {
@@ -143,7 +144,7 @@ sourceSets {
 }
 
 dependencies{
-    implementation files('lib/lilybukkit-api-1.1.1.jar')
+    implementation 'com.github.Vladg24YT:LilyBukkit-API:1.0.16.05_13-V2'
     //CraftBukkit
     implementation group: "net.sf.jopt-simple", name: "jopt-simple", version: "5.0.4"
     implementation group: "jline", name: "jline", version: "0.9.94"
