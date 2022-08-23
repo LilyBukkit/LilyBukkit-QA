@@ -127,7 +127,7 @@
 -        this.mcServer.worldMngr.spawnEntityInWorld(entityPlayerMP1);
 +
 +        // CraftBukkit start
-+        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent((Player) entityPlayerMP1.getBukkitEntity(), "00A7e" + entityPlayerMP1.username + " joined the game.");
++        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent((Player) entityPlayerMP1.getBukkitEntity(), "§e" + entityPlayerMP1.username + " joined the game.");
 +        Bukkit.getPluginManager().callEvent(playerJoinEvent);
 +
 +        String joinMessage = playerJoinEvent.getJoinMessage();
@@ -151,7 +151,7 @@
 +        // CraftBukkit start
 +        // Quitting must be before we do final save of data, in case plugins need to modify it
          this.playerManagerObj.removePlayer(entityPlayerMP1);
-+        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent((Player) entityPlayerMP1.getBukkitEntity(), "00A7e" + entityPlayerMP1.username + " left the game.");
++        PlayerQuitEvent playerQuitEvent = new PlayerQuitEvent((Player) entityPlayerMP1.getBukkitEntity(), "§e" + entityPlayerMP1.username + " left the game.");
 +        Bukkit.getServer().getPluginManager().callEvent(playerQuitEvent);
 +        // CraftBukkit end
 +

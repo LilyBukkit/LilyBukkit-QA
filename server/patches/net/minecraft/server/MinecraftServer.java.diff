@@ -399,12 +399,12 @@
 -                    final String string4 = string2.substring(string2.indexOf(" ")).trim();
 -                    this.configManager.opPlayer(string4);
 -                    this.print(string3, new StringBuilder("Opping ").append(string4).toString());
--                    this.configManager.sendChatMessageToPlayer(string4, "00A7eYou are now op!");
+-                    this.configManager.sendChatMessageToPlayer(string4, "§eYou are now op!");
 -                }
 -                else if (string2.toLowerCase().startsWith("deop ")) {
 -                    final String string4 = string2.substring(string2.indexOf(" ")).trim();
 -                    this.configManager.deopPlayer(string4);
--                    this.configManager.sendChatMessageToPlayer(string4, "00A7eYou are no longer op!");
+-                    this.configManager.sendChatMessageToPlayer(string4, "§eYou are no longer op!");
 -                    this.print(string3, new StringBuilder("De-opping ").append(string4).toString());
 -                }
 -                else if (string2.toLowerCase().startsWith("ban-ip ")) {
@@ -508,7 +508,7 @@
 -                else if (string2.toLowerCase().startsWith("say ")) {
 -                    string2 = string2.substring(string2.indexOf(" ")).trim();
 -                    MinecraftServer.logger.info(new StringBuilder("[").append(string3).append("] ").append(string2).toString());
--                    this.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("00A7d[Server] ").append(string2).toString()));
+-                    this.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("§d[Server] ").append(string2).toString()));
 -                }
 -                else if (string2.toLowerCase().startsWith("tell ")) {
 -                    final String[] string5 = string2.split(" ");
@@ -518,8 +518,8 @@
 -                    string2 = string2.substring(string2.indexOf(" ")).trim();
 -                    string2 = string2.substring(string2.indexOf(" ")).trim();
 -                    MinecraftServer.logger.info(new StringBuilder("[").append(string3).append("->").append(string5[1]).append("] ").append(string2).toString());
--                    this.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("00A7d[Server] ").append(string2).toString()));
--                    string2 = new StringBuilder("00A77").append(string3).append(" whispers ").append(string2).toString();
+-                    this.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("§d[Server] ").append(string2).toString()));
+-                    string2 = new StringBuilder("§7").append(string3).append(" whispers ").append(string2).toString();
 -                    MinecraftServer.logger.info(string2);
 -                    if (this.configManager.sendPacketToPlayer(string5[1], new Packet3Chat(string2))) {
 -                        continue;
@@ -565,9 +565,9 @@
 +
      private void print(final String string1, final String string2) {
 -        final String string3 = String.valueOf(string1) + ": " + string2;
--        this.configManager.sendChatMessageToAllOps(new StringBuilder("00A77(").append(string3).append(")").toString());
+-        this.configManager.sendChatMessageToAllOps(new StringBuilder("§7(").append(string3).append(")").toString());
 +        final String string3 = string1 + ": " + string2;
-+        this.configManager.sendChatMessageToAllOps("00A77(" + string3 + ")");
++        this.configManager.sendChatMessageToAllOps("§7(" + string3 + ")");
          MinecraftServer.logger.info(string3);
      }
 -    

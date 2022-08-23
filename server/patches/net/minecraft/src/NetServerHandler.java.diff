@@ -51,7 +51,7 @@
 +
 +    public void kickPlayer(String string1) {
 +        // CraftBukkit start
-+        String leaveMessage = "\u00A7e" + this.playerEntity.username + " left the game.";
++        String leaveMessage = "§e" + this.playerEntity.username + " left the game.";
 +
 +        PlayerKickEvent event = new PlayerKickEvent(Bukkit.getServer().getPlayer(this.playerEntity.username), string1, leaveMessage);
 +        Bukkit.getServer().getPluginManager().callEvent(event);
@@ -402,12 +402,12 @@
              if (string2.length >= 3) {
                  string1 = string1.substring(string1.indexOf(" ")).trim();
                  string1 = string1.substring(string1.indexOf(" ")).trim();
--                string1 = new StringBuilder("00A77").append(this.playerEntity.username).append(" whispers ").append(string1).toString();
+-                string1 = new StringBuilder("§7").append(this.playerEntity.username).append(" whispers ").append(string1).toString();
 -                NetServerHandler.logger.info(String.valueOf(string1) + " to " + string2[1]);
-+                string1 = "00A77" + this.playerEntity.username + " whispers " + string1; //LilyBukkit: replace 'this.playerEntity.username' with own code
++                string1 = "§7" + this.playerEntity.username + " whispers " + string1; //LilyBukkit: replace 'this.playerEntity.username' with own code
 +                NetServerHandler.logger.info(string1 + " to " + string2[1]);
                  if (!this.mcServer.configManager.sendPacketToPlayer(string2[1], new Packet3Chat(string1))) {
-                     this.sendPacket(new Packet3Chat("00A7cThere's no player by that name online."));
+                     this.sendPacket(new Packet3Chat("§cThere's no player by that name online."));
 @@ -294,72 +429,74 @@
              }
          }
@@ -419,7 +419,7 @@
 -        else if (string1.toLowerCase().equalsIgnoreCase("/iron")) {
 -            if (MinecraftServer.playerList.containsKey(this.playerEntity.username)) {
 -                NetServerHandler.logger.info(String.valueOf(this.playerEntity.username) + " failed to iron!");
--                this.sendPacket(new Packet3Chat("00A7cYou can't /iron again so soon!"));
+-                this.sendPacket(new Packet3Chat("§cYou can't /iron again so soon!"));
 -            }
 -            else {
 -                MinecraftServer.playerList.put(this.playerEntity.username, 6000);
@@ -432,7 +432,7 @@
 -        else if (string1.toLowerCase().equalsIgnoreCase("/wood")) {
 -            if (MinecraftServer.playerList.containsKey(this.playerEntity.username)) {
 -                NetServerHandler.logger.info(String.valueOf(this.playerEntity.username) + " failed to wood!");
--                this.sendPacket(new Packet3Chat("00A7cYou can't /wood again so soon!"));
+-                this.sendPacket(new Packet3Chat("§cYou can't /wood again so soon!"));
 -            }
 -            else {
 -                MinecraftServer.playerList.put(this.playerEntity.username, 6000);
@@ -513,8 +513,8 @@
 +
      @Override
      public void addHelpCommandMessage(final String helpCommandMessage) {
--        this.sendPacket(new Packet3Chat(new StringBuilder("00A77").append(helpCommandMessage).toString()));
-+        this.sendPacket(new Packet3Chat("00A77" + helpCommandMessage));
+-        this.sendPacket(new Packet3Chat(new StringBuilder("§7").append(helpCommandMessage).toString()));
++        this.sendPacket(new Packet3Chat("§7" + helpCommandMessage));
      }
 -    
 +
