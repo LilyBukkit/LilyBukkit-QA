@@ -251,7 +251,7 @@
              this.authPlayer(username);
          }
 -        return new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
-+        netLoginHandler1.netManager.addToSendQueue(new Packet130RosepadMeta().Default());
++        if (this.mcServer.configManager.enforceRosepad) netLoginHandler1.netManager.addToSendQueue(new Packet130RosepadMeta().Default()); //LilyBukkit - Send the packet only if Rosepad is enforced on the server. This is done to allow vanilla Lilypad QA connections
 +        //return new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
 +        return entity; // LilyBukkit
      }
