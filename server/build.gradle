@@ -146,7 +146,7 @@ dependencies{
     implementation files('lib/lilybukkit-api-1.1.1.jar')
     //CraftBukkit
     implementation group: "net.sf.jopt-simple", name: "jopt-simple", version: "5.0.4"
-    implementation group: "jline", name: "jline", version: "0.9.94"
+    implementation group: "jline", name: "jline", version: "2.14.6"
 }
 
 group 'net.buj'
