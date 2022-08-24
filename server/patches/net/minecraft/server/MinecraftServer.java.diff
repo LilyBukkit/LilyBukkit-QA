@@ -273,6 +273,18 @@
 +
      public void run() {
          try {
+@@ -181,9 +246,9 @@
+                     long j4 = j3 - j1;
+                     if (j4 > 2000L) {
+-                        MinecraftServer.logger.warning("Can't keep up! Did the system time change, or is the server overloaded?");
++                        MinecraftServer.logger.warning("Can't keep up! Did the system time change, or is the server overloaded? Running " + j4 + "ms behind"); //LilyBukkit - add milliseconds counter
+                         j4 = 2000L;
+                     }
+                     if (j4 < 0L) {
+-                        MinecraftServer.logger.warning("Time ran backwards! Did the system time change?");
++                        MinecraftServer.logger.warning("Time ran backwards! Did the system time change? Detecting " + j4 + "ms missing"); //LilyBukkit - add milliseconds counter
+                         j4 = 0L;
+                     }
 @@ -196,32 +261,27 @@
                      Thread.sleep(1L);
                  }

@@ -247,11 +247,12 @@
 -                    return null;
                  }
                  entityPlayerMP6.playerNetServerHandler.kickPlayer("You logged in from another location");
-@@ -131,47 +197,48 @@
+@@ -131,47 +197,49 @@
              this.authPlayer(username);
          }
 -        return new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
-+        if (this.mcServer.configManager.enforceRosepad) netLoginHandler1.netManager.addToSendQueue(new Packet130RosepadMeta().Default()); //LilyBukkit - Send the packet only if Rosepad is enforced on the server. This is done to allow vanilla Lilypad QA connections
++        if (!(netLoginHandler1.ROSEVersion == 0))
++            netLoginHandler1.netManager.addToSendQueue(new Packet130RosepadMeta().Default()); //LilyBukkit - Send the packet only if Rosepad is enforced on the server. This is done to allow vanilla Lilypad QA connections
 +        //return new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
 +        return entity; // LilyBukkit
      }
@@ -311,7 +312,7 @@
 +            BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.bannedPlayersFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -179,37 +246,115 @@
+@@ -179,37 +247,115 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -438,7 +439,7 @@
 +            final BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.ipBanFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -217,46 +362,44 @@
+@@ -217,46 +363,44 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -497,7 +498,7 @@
 +            final BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.opFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -264,27 +407,25 @@
+@@ -264,27 +408,25 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -533,7 +534,7 @@
 +            final BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.authFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -292,30 +433,27 @@
+@@ -292,30 +434,27 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -573,14 +574,14 @@
 +        for (final EntityPlayerMP entityPlayerMP3 : this.playerEntities) {
              if (entityPlayerMP3.username.equals(string1)) {
                  return entityPlayerMP3;
-@@ -324,5 +462,5 @@
+@@ -324,5 +463,5 @@
          return null;
      }
 -    
 +
      public void sendChatMessageToPlayer(final String string1, final String string2) {
          final EntityPlayerMP entityPlayerMP3 = this.getPlayerEntity(string1);
-@@ -331,9 +469,8 @@
+@@ -331,9 +470,8 @@
          }
      }
 -    
@@ -592,14 +593,14 @@
 +        for (final EntityPlayerMP entityPlayerMP4 : this.playerEntities) {
              if (this.isOp(entityPlayerMP4.username)) {
                  entityPlayerMP4.playerNetServerHandler.sendPacket(packet3Chat2);
-@@ -341,5 +478,5 @@
+@@ -341,5 +479,5 @@
          }
      }
 -    
 +
      public boolean sendPacketToPlayer(final String string1, final Packet packet2) {
          final EntityPlayerMP entityPlayerMP3 = this.getPlayerEntity(string1);
-@@ -350,12 +487,12 @@
+@@ -350,12 +488,12 @@
          return false;
      }
 -    
