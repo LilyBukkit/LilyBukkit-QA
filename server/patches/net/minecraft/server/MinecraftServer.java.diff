@@ -1,6 +1,6 @@
 --- MinecraftServer.java
 +++ MinecraftServer.java
-@@ -1,44 +1,50 @@
+@@ -1,44 +1,53 @@
  package net.minecraft.server;
  
 -import net.minecraft.src.ThreadServerApplication;
@@ -14,6 +14,9 @@
 -import java.util.Iterator;
 +import jline.ConsoleReader;
 +import joptsimple.OptionSet;
++import net.buj.rml.Environment;
++import net.buj.rml.MinecraftImpl;
++import net.buj.rml.RosepadModLoader;
 +import net.minecraft.src.AxisAlignedBB;
 +import net.minecraft.src.ConsoleLogManager;
 +import net.minecraft.src.EntityTracker;
@@ -73,13 +76,14 @@
  import java.util.logging.Logger;
 -import net.minecraft.src.ICommandListener;
  
- public class MinecraftServer implements ICommandListener, Runnable {
+-public class MinecraftServer implements ICommandListener, Runnable {
++public class MinecraftServer implements ICommandListener, Runnable, MinecraftImpl {
      public static Logger logger;
 -    public static HashMap playerList;
 +    public static HashMap<String, Integer> playerList;
      public NetworkListenThread networkServer;
      public PropertyManager propertyManagerObj;
-@@ -50,6 +56,6 @@
+@@ -50,6 +59,6 @@
      public String currentTask;
      public int percentDone;
 -    private List playersOnline;
@@ -88,20 +92,23 @@
 +    private List<ServerCommand> commands;
      public EntityTracker entityTracker;
      public boolean onlineMode;
-@@ -57,26 +63,62 @@
+@@ -57,32 +66,81 @@
      public String serverId;
      private static Random rand;
 -    
 +
-+    public static int[] getVersion() {
++    public RosepadModLoader modLoader;
++    public static MinecraftServer INSTANCE;
++
++    public int[] getVersion() {
 +        return new int[]{1, 1, 0, 5};
 +    }
 +
-+    public static String getVersionTag() {
++    public String getVersionTag() {
 +        return "beta";
 +    }
 +
-+    public static String getVersionString() {
++    public String getVersionString() {
 +        int[] version = getVersion();
 +        StringBuilder str = new StringBuilder();
 +        for (int i = 0; i < version.length; i++) {
@@ -130,6 +137,7 @@
 -        this.commands = Collections.synchronizedList((List)new ArrayList());
 +        this.playersOnline = new ArrayList<>();
 +        this.commands = Collections.synchronizedList(new ArrayList<>());
++        this.modLoader = new RosepadModLoader();
 +        // CraftBukkit start
 +        this.options = opts;
 +        // CraftBukkit end
@@ -140,9 +148,11 @@
 +        try {
 +            this.reader = new ConsoleReader();
 +        } catch (IOException ex) {
-+            Logger.getLogger(MinecraftServer.class.getName()).log(Level.SEVERE, null, ex);
++            Logger.getLogger(MinecraftServer.class.getName()).log(Level.SEVERE, "Couldn't init ConsoleReader", ex);
 +        }
 +        Runtime.getRuntime().addShutdownHook(new ServerShutdownThread(this));
++        // LilyBukkit end
++        INSTANCE = this;
      }
 -    
 +
@@ -157,17 +167,24 @@
 +        System.setOut(new PrintStream(new LoggerOutputStream(logger, Level.INFO), true));
 +        System.setErr(new PrintStream(new LoggerOutputStream(logger, Level.SEVERE), true));
 +        // CraftBukkit end
-+        MinecraftServer.logger.info("[Minecraft] Starting Rosepad server version " + getVersionString() + ", running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " API version " + Bukkit.getBukkitVersion());
++        MinecraftServer.logger.info("[Minecraft] Starting LilyBukkit server version " + Bukkit.getServer().getName() + " version " + Bukkit.getServer().getVersion() + ", running Rosepad " + INSTANCE.getVersionString() + " and LilyBukkit API version " + Bukkit.getBukkitVersion());
          if (Runtime.getRuntime().maxMemory() / 1024L / 1024L < 512L) {
              MinecraftServer.logger.warning("**** NOT ENOUGH RAM!");
-@@ -84,5 +126,5 @@
+             MinecraftServer.logger.warning("To start the server with more ram, launch it as \"java -Xmx1024M -Xms1024M -jar minecraft_server.jar\"");
          }
++        MinecraftServer.logger.info("Loading mods");
++        // LilyBukkit start
++        File modsDir = this.getFile("mods");
++        if (!modsDir.exists()) {
++            if (!modsDir.createNewFile()) logger.severe("Couldn't create 'mods' directory");
++        } else this.modLoader.load(Environment.SERVER, new File("mods"));
++        // LIlyBukkit end
          MinecraftServer.logger.info("Loading properties");
 -        this.propertyManagerObj = new PropertyManager(new File("server.properties"));
 +        this.propertyManagerObj = new PropertyManager(this.options); // CraftBukkit
          final String string2 = this.propertyManagerObj.getStringProperty("server-ip", "");
          this.onlineMode = false;
-@@ -93,12 +135,11 @@
+@@ -93,12 +151,11 @@
          }
          final int i4 = this.propertyManagerObj.getIntProperty("server-port", 25565);
 -        MinecraftServer.logger.info(new StringBuilder("Starting Minecraft server on ").append((string2.length() == 0) ? "*" : string2).append(":").append(i4).toString());
@@ -183,7 +200,7 @@
 +            MinecraftServer.logger.log(Level.WARNING, "The exception was: " + iOException6);
              MinecraftServer.logger.warning("Perhaps a server is already running on that port?");
              return false;
-@@ -108,6 +149,5 @@
+@@ -108,6 +165,5 @@
              MinecraftServer.logger.info("The server will authenticate usernames.");
              MinecraftServer.logger.info("Unauthenticated players may still join by default, and their abilities can be configured in the unauth.config file.");
 -        }
@@ -191,7 +208,7 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -118,10 +158,10 @@
+@@ -118,10 +174,10 @@
          this.entityTracker = new EntityTracker(this);
          final String string3 = this.propertyManagerObj.getStringProperty("level-name", "world");
 -        MinecraftServer.logger.info(new StringBuilder("Preparing level \"").append(string3).append("\"").toString());
@@ -204,18 +221,18 @@
 +
      private void initWorld(final String worldName) {
          MinecraftServer.logger.info("Preparing start region");
-@@ -140,26 +180,51 @@
+@@ -140,26 +196,51 @@
          }
          this.clearCurrentTask();
 +        // LilyBukkit start
 +        if (!this.lilyBukkit.worldList.add(this.worldMngr.getBukkitWorld())) {
-+            MinecraftServer.logger.severe("[LilyBukkit] Couldn't get the current world, terminating to prevent bugs");
++            MinecraftServer.logger.severe("[LilyBukkit] Couldn't add the current world, terminating to prevent bugs");
 +            this.stop();
 +        }
 +        // Have to put them next to each other as the target LBWorld is created only in the expression above,
 +        // otherwise events would be either called for a non-existent world or there would be several worlds existing
-+        this.lilyBukkit.getPluginManager().callEvent(new WorldInitEvent(Bukkit.getWorld(worldName)));
-+        this.lilyBukkit.getPluginManager().callEvent(new WorldLoadEvent(Bukkit.getWorld(worldName)));
++        this.lilyBukkit.getPluginManager().callEvent(new WorldInitEvent(this.worldMngr.getBukkitWorld()));
++        this.lilyBukkit.getPluginManager().callEvent(new WorldLoadEvent(this.worldMngr.getBukkitWorld()));
 +        // LilyBukkit stop
      }
 -    
@@ -261,7 +278,7 @@
 +            }
          }
          if (this.worldMngr != null) {
-@@ -167,9 +232,9 @@
+@@ -167,9 +248,9 @@
          }
      }
 -    
@@ -273,7 +290,7 @@
 +
      public void run() {
          try {
-@@ -181,9 +246,9 @@
+@@ -181,9 +262,9 @@
                      long j4 = j3 - j1;
                      if (j4 > 2000L) {
 -                        MinecraftServer.logger.warning("Can't keep up! Did the system time change, or is the server overloaded?");
@@ -285,7 +302,7 @@
 +                        MinecraftServer.logger.warning("Time ran backwards! Did the system time change? Detecting " + j4 + "ms missing"); //LilyBukkit - add milliseconds counter
                          j4 = 0L;
                      }
-@@ -196,32 +261,27 @@
+@@ -196,32 +277,27 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -324,7 +341,7 @@
 +        } finally {
              this.stop();
              this.serverStopped = true;
-@@ -232,18 +292,17 @@
+@@ -232,18 +308,17 @@
          System.exit(0);
      }
 -    
@@ -345,16 +362,15 @@
          }
 -        for (int i5 = 0; i5 < arrayList1.size(); ++i5) {
 -            MinecraftServer.playerList.remove(arrayList1.get(i5));
-+        for (Object o : arrayList1) {
-+            MinecraftServer.playerList.remove(o);
++        for (String username : arrayList1) {
++            MinecraftServer.playerList.remove(username);
          }
          AxisAlignedBB.clearBoundingBoxPool();
-@@ -254,257 +313,85 @@
+@@ -254,257 +329,84 @@
          }
          this.worldMngr.tick();
 -        while (this.worldMngr.updatingLighting()) {}
-+        while (this.worldMngr.updatingLighting()) {
-+        }
++        //while (this.worldMngr.updatingLighting()) {}
          this.worldMngr.updateEntities();
          this.networkServer.handleNetworkListenThread();
          this.configManager.onTick();

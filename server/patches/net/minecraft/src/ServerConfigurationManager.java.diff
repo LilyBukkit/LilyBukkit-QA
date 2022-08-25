@@ -164,7 +164,7 @@
 +
      private static boolean isValidName(final String username) {
 -        return username.matches("[a-zA-Z0-9_ \\u0107 \\u015b]*");
-+        return username.matches("[a-zA-Z0-9_ \\u0107 \\u015b]{2,32}");
++        return username.matches("[a-zA-Z\\d_ \\u0107 \\u015b]{2,32}");
      }
 -    
 +
@@ -205,8 +205,8 @@
 +            event.disallow(Result.KICK_USERNAME, "Your username has invalid characters!"); // LilyBukkit
 +        } else if ((ext == null || ext.getVersion() == 0) && this.enforceRosepad) {
 +            event.disallow(Result.KICK_ROSEPAD, "This server requires client to support scripts"); // LilyBukkit
-+        } else if (ext != null && ext.getVersion() != 1) {
-+            event.disallow(Result.KICK_ROSEPAD, "This server requires Rosepad " + MinecraftServer.getVersionString() + " to join"); // LilyBukkit
++        } else if (ext != null && ext.getVersion() != 1 && this.enforceRosepad) {
++            event.disallow(Result.KICK_ROSEPAD, "This server requires Rosepad " + MinecraftServer.INSTANCE.getVersionString() + " to join"); // LilyBukkit
 +        } else if (!authed && this.isAuthed(username)) {
 +            event.disallow(Result.KICK_ULPP, "This user is authenticated! Log in using Rosepad >=1.1.0.2-beta to authenticate."); // LilyBukkit
 +        } else {
@@ -247,7 +247,7 @@
 -                    return null;
                  }
                  entityPlayerMP6.playerNetServerHandler.kickPlayer("You logged in from another location");
-@@ -131,47 +197,49 @@
+@@ -131,47 +197,50 @@
              this.authPlayer(username);
          }
 -        return new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
@@ -271,8 +271,10 @@
      public void sendPacketToAllPlayers(final Packet packet1) {
 -        for (int i2 = 0; i2 < this.playerEntities.size(); ++i2) {
 -            final EntityPlayerMP entityPlayerMP3 = (EntityPlayerMP)this.playerEntities.get(i2);
+-            entityPlayerMP3.playerNetServerHandler.sendPacket(packet1);
 +        for (final EntityPlayerMP entityPlayerMP3 : this.playerEntities) {
-             entityPlayerMP3.playerNetServerHandler.sendPacket(packet1);
++            //entityPlayerMP3.playerNetServerHandler.sendPacket(packet1);
++            this.sendPacketToPlayer(entityPlayerMP3.username, packet1); // LilyBukkit
          }
      }
 -    
@@ -312,7 +314,7 @@
 +            BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.bannedPlayersFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -179,37 +247,115 @@
+@@ -179,37 +248,115 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -439,7 +441,7 @@
 +            final BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.ipBanFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -217,46 +363,44 @@
+@@ -217,46 +364,44 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -498,7 +500,7 @@
 +            final BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.opFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -264,27 +408,25 @@
+@@ -264,27 +409,25 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -534,7 +536,7 @@
 +            final BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.authFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -292,30 +434,27 @@
+@@ -292,30 +435,27 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -574,14 +576,14 @@
 +        for (final EntityPlayerMP entityPlayerMP3 : this.playerEntities) {
              if (entityPlayerMP3.username.equals(string1)) {
                  return entityPlayerMP3;
-@@ -324,5 +463,5 @@
+@@ -324,5 +464,5 @@
          return null;
      }
 -    
 +
      public void sendChatMessageToPlayer(final String string1, final String string2) {
          final EntityPlayerMP entityPlayerMP3 = this.getPlayerEntity(string1);
-@@ -331,9 +470,8 @@
+@@ -331,9 +471,8 @@
          }
      }
 -    
@@ -593,14 +595,14 @@
 +        for (final EntityPlayerMP entityPlayerMP4 : this.playerEntities) {
              if (this.isOp(entityPlayerMP4.username)) {
                  entityPlayerMP4.playerNetServerHandler.sendPacket(packet3Chat2);
-@@ -341,5 +479,5 @@
+@@ -341,5 +480,5 @@
          }
      }
 -    
 +
      public boolean sendPacketToPlayer(final String string1, final Packet packet2) {
          final EntityPlayerMP entityPlayerMP3 = this.getPlayerEntity(string1);
-@@ -350,12 +488,12 @@
+@@ -350,12 +489,12 @@
          return false;
      }
 -    

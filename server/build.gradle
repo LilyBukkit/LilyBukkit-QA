@@ -147,6 +147,8 @@ dependencies{
     //CraftBukkit
     implementation group: "net.sf.jopt-simple", name: "jopt-simple", version: "5.0.4"
     implementation group: "jline", name: "jline", version: "0.9.94"
+    //Rosepad
+    implementation project(":rml")
 }
 
 group 'net.buj'

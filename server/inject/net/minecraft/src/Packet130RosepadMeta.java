@@ -19,6 +19,7 @@ public class Packet130RosepadMeta extends Packet {
     @Override
     public void readPacketData(DataInputStream dataInputStream) throws IOException {
         serverName = dataInputStream.readUTF();
+        tag = dataInputStream.readUTF();
         short verLen = dataInputStream.readShort();
         version = new int[verLen];
         for (short i = 0; i < verLen; i++)
@@ -38,6 +39,7 @@ public class Packet130RosepadMeta extends Packet {
     @Override
     public void writePacket(DataOutputStream dataOutputStream) throws IOException {
         dataOutputStream.writeUTF(serverName);
+        dataOutputStream.writeUTF(tag);
         dataOutputStream.writeShort(version.length);
         for (int i : version) {
             dataOutputStream.writeShort(i);
@@ -53,7 +55,7 @@ public class Packet130RosepadMeta extends Packet {
     public Packet130RosepadMeta Default() {
         this.extensions.clear();
         this.extensions.add(new ULPPExtension("ULPP", 1));
-        this.extensions.add(new ULPPExtension("ROSE", 1));
+        this.extensions.add(new ULPPExtension("ROSE", 2));
 
         this.version = ((LilyBukkit) Bukkit.getServer()).getRosepadVersion();
         this.tag = ((LilyBukkit) Bukkit.getServer()).getRosepadVersionTag();

@@ -1,6 +1,6 @@
 --- NetServerHandler.java
 +++ NetServerHandler.java
-@@ -1,6 +1,22 @@
+@@ -1,6 +1,24 @@
  package net.minecraft.src;
  
 -import java.io.IOException;
@@ -13,6 +13,8 @@
 +import org.bukkit.entity.Player;
 +import org.bukkit.event.block.Action;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
++import org.bukkit.event.entity.EntityDamageEvent;
++import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 +import org.bukkit.event.player.PlayerAnimationEvent;
 +import org.bukkit.event.player.PlayerChatEvent;
 +import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -24,7 +26,7 @@
 +import java.io.IOException;
  import java.util.logging.Logger;
  
-@@ -17,9 +33,9 @@
+@@ -17,9 +35,9 @@
      protected boolean hasMoved;
      protected ItemStack heldItem;
 -    
@@ -36,14 +38,14 @@
 +
      public NetServerHandler(final MinecraftServer minecraftServer1, final NetworkManager networkManager2, final EntityPlayerMP entityPlayerMP3) {
          this.connectionClosed = false;
-@@ -32,5 +48,5 @@
+@@ -32,5 +50,5 @@
          entityPlayerMP3.playerNetServerHandler = this;
      }
 -    
 +
      public void handlePackets() throws IOException {
          this.netManager.processReadPackets();
-@@ -39,12 +55,34 @@
+@@ -39,12 +57,34 @@
          }
      }
 -    
@@ -81,7 +83,7 @@
 +
      @Override
      public void handleFlying(final Packet10Flying packet) {
-@@ -55,5 +93,69 @@
+@@ -55,5 +95,69 @@
              }
          }
 -        if (this.hasMoved) {
@@ -152,21 +154,21 @@
 +
              this.lastPosX = this.playerEntity.posX;
              this.lastPosY = this.playerEntity.posY;
-@@ -71,5 +173,5 @@
+@@ -71,5 +175,5 @@
                  if (d5 > 1.65 || d5 < 0.1) {
                      this.kickPlayer("Illegal stance");
 -                    NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " had an illegal stance: " + d5);
 +                    NetServerHandler.logger.warning(this.playerEntity.username + " had an illegal stance: " + d5);
                  }
                  this.playerEntity.managedPosY = packet.stance;
-@@ -98,5 +200,5 @@
+@@ -98,5 +202,5 @@
              if (d8 > 0.0625) {
                  z18 = true;
 -                NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " moved wrongly!");
 +                NetServerHandler.logger.warning(this.playerEntity.username + " moved wrongly!");
              }
              this.playerEntity.setPositionAndRotation(d2, d3, d4, f8, f9);
-@@ -110,14 +212,25 @@
+@@ -110,14 +214,25 @@
          }
      }
 -    
@@ -198,7 +200,7 @@
 +
      @Override
      public void handleBlockDig(final Packet14BlockDig packet) {
-@@ -128,11 +241,5 @@
+@@ -128,11 +243,5 @@
          final boolean isOP = op;
          final boolean isAuthed = this.mcServer.configManager.isAuthed(this.playerEntity.username);
 -        boolean z3 = false;
@@ -211,7 +213,7 @@
 +        boolean z3 = (packet.status == 0 || packet.status == 1);
          if (z3) {
              final double d4 = this.playerEntity.posY;
-@@ -151,24 +258,21 @@
+@@ -151,24 +260,21 @@
          final int i20 = packet.zPosition;
          final int i21 = packet.face;
 -        final int maxDistX = (int)MathHelper.abs((float)(i18 - this.mcServer.worldMngr.spawnX));
@@ -245,14 +247,14 @@
 +        } else if (packet.status == 3) {
              final double d5 = this.playerEntity.posX - (i18 + 0.5);
              final double d6 = this.playerEntity.posY - (i19 + 0.5);
-@@ -181,5 +285,5 @@
+@@ -181,5 +287,5 @@
          this.mcServer.worldMngr.disableSpawnProtection = false;
      }
 -    
 +
      @Override
      public void handlePlace(final Packet15Place packet) {
-@@ -193,49 +297,54 @@
+@@ -193,49 +299,54 @@
          final int i5 = packet.zPosition;
          final int i6 = packet.direction;
 -        final int maxDistX = (int)MathHelper.abs((float)(i3 - this.mcServer.worldMngr.spawnX));
@@ -323,7 +325,7 @@
 +
      @Override
      public void handlePickupSpawn(final Packet21PickupSpawn packet) {
-@@ -248,7 +357,7 @@
+@@ -248,7 +359,7 @@
          entityItem8.motionZ = packet.roll / 128.0;
          entityItem8.delayBeforeCanPickup = 10;
 -        this.mcServer.worldMngr.spawnEntityInWorld(entityItem8);
@@ -333,7 +335,7 @@
 +
      @Override
      public void handleChat(final Packet3Chat packet) {
-@@ -256,9 +365,8 @@
+@@ -256,9 +367,8 @@
          if (string2.length() > 100) {
              this.kickPlayer("Chat message too long");
 -        }
@@ -345,7 +347,7 @@
 +                if (" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'abcdefghijklmnopqrstuvwxyz{|}~\u2302\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8£\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1ªº¿®¬½¼¡«»".indexOf((int) string2.charAt(i3)) < 0) {
                      this.kickPlayer("Illegal characters in chat");
                      return;
-@@ -267,7 +375,15 @@
+@@ -267,7 +377,15 @@
              if (string2.startsWith("/")) {
                  this.handleSlashCommand(string2);
 -            }
@@ -364,7 +366,7 @@
 +                //string2 = "<" + /*Bukkit.getPlayer(*/this.playerEntity.username/*).getDisplayName()*/ + "> " + string2; //LilyBukkit: replace 'this.playerEntity.username' with own code
                  NetServerHandler.logger.info(string2);
                  this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(string2));
-@@ -275,18 +391,37 @@
+@@ -275,18 +393,37 @@
          }
      }
 -    
@@ -408,7 +410,7 @@
 +                NetServerHandler.logger.info(string1 + " to " + string2[1]);
                  if (!this.mcServer.configManager.sendPacketToPlayer(string2[1], new Packet3Chat(string1))) {
                      this.sendPacket(new Packet3Chat("§cThere's no player by that name online."));
-@@ -294,72 +429,74 @@
+@@ -294,72 +431,74 @@
              }
          }
 -        else if (string1.toLowerCase().equalsIgnoreCase("/home")) {
@@ -526,25 +528,51 @@
 +
      @Override
      public void handlePlayerInventory(final Packet5PlayerInventory packet) {
-@@ -374,5 +511,5 @@
+@@ -374,5 +513,5 @@
          }
      }
 -    
 +
      public void sendInventoryPackets() {
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-1, this.playerEntity.inventory.mainInventory));
-@@ -380,5 +517,5 @@
+@@ -380,5 +519,5 @@
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-3, this.playerEntity.inventory.armorInventory));
      }
 -    
 +
      @Override
      public void handleComplexEntity(final Packet59ComplexEntity packet) {
-@@ -389,3 +526,7 @@
+@@ -389,3 +528,33 @@
          }
      }
 +
 +    // LilyBukkit start
 +    private boolean justTeleported = false;
 +    // LilyBukkit end
++
++    @Override
++    public void handleEntityDamage(Packet35EntityDamage packet) {
++        System.out.println("Entity " + packet.entityId + " took " + packet.damage + " damage" + (packet.dead ? " (dead)" : ""));
++        Entity entity = this.mcServer.worldMngr.getEntityWithId(packet.entityId);
++        if (entity == null) {
++            System.out.println("No entity found");
++            return;
++        }
++        if (entity instanceof EntityPlayer) {
++            if (entity.entityID != playerEntity.entityID) return;
++            if (packet.dead) {
++                entity.setPosition(
++                        mcServer.worldMngr.spawnX,
++                        mcServer.worldMngr.spawnY,
++                        mcServer.worldMngr.spawnZ
++                );
++            }
++            return;
++        }
++        // LilyBukkit start
++        Bukkit.getServer().getPluginManager().callEvent(new EntityDamageEvent(entity.getBukkitEntity(), DamageCause.CUSTOM, packet.damage)); //Fallback for entity damage
++        // LilyBukkit end
++        System.out.println("Entity took damage");
++        entity.attackEntityFrom(playerEntity, packet.damage);
++    }
  }

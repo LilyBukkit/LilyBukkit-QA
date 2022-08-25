@@ -2,3 +2,4 @@ rootProject.name = 'LilyBukkit'
 
 include ':server'
 //include ':client'
+include ':rml'
