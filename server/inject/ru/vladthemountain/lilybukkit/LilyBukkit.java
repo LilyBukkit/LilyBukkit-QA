@@ -6,7 +6,6 @@ import com.avaje.ebean.config.dbplatform.SQLitePlatform;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.Entity;
-import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.PropertyManager;
 import net.minecraft.src.ServerConfigurationManager;
 import net.minecraft.src.WorldServer;
@@ -47,7 +46,6 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 import ru.vladthemountain.lilybukkit.command.ColouredConsoleSender;
-import ru.vladthemountain.lilybukkit.entity.LBPlayer;
 import ru.vladthemountain.lilybukkit.util.UpdateChecker;
 
 import java.io.File;
@@ -134,7 +132,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getVersion() {
-        return "Alpha 1.2.0.0";
+        return "Alpha 1.2.0.1";
     }
 
     /**
@@ -246,7 +244,9 @@ public class LilyBukkit implements Server {
 
     @Override
     public File getUpdateFolderFile() {
-        return new File(this.getUpdateFolder());
+        File folder = MinecraftServer.INSTANCE.getFile(this.getUpdateFolder());
+        if (!folder.exists()) folder.mkdir();
+        return folder;
     }
 
     /**
@@ -886,7 +886,7 @@ public class LilyBukkit implements Server {
         configuration.getString("settings.permissions-file", "permissions.yml");
 
         if (configuration.getNode("aliases") == null) {
-            List<String> icanhasbukkit = new ArrayList<String>();
+            List<String> icanhasbukkit = new ArrayList<>();
             icanhasbukkit.add("version");
             configuration.setProperty("aliases.icanhasbukkit", icanhasbukkit);
         }

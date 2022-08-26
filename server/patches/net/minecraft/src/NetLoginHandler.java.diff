@@ -79,7 +79,7 @@
 +
      @Override
      public void handleHandshake(final Packet2Handshake packet) {
-@@ -67,47 +68,70 @@
+@@ -67,47 +68,73 @@
              this.serverId = Long.toHexString(NetLoginHandler.rand.nextLong());
              this.netManager.addToSendQueue(new Packet2Handshake(this.serverId));
 -        }
@@ -107,9 +107,12 @@
 +        } else {
 +            NetLoginHandler.logger.info("User doesn't have ULPP enabled"); //LilyBukkit - additional output
          }
-+        if (ULPPManager.supportsExtension(packet.password, "ROSE", 1, 2)) {
-+            NetLoginHandler.logger.info("User connected via Rosepad"); //LilyBukkit - additional output
++        if (ULPPManager.supportsExtension(packet.password, "ROSE", 1, 1)) {
++            NetLoginHandler.logger.info("User connected via 1.1.0.2-1.1.0.5"); //LilyBukkit - additional output
 +            this.ROSEVersion = 1;
++        } else if (ULPPManager.supportsExtension(packet.password, "ROSE", 2, 2)) {
++            NetLoginHandler.logger.info("User connected via 1.1.0.6+"); //LilyBukkit - additional output
++            this.ROSEVersion = 2;
 +        } else {
 +            NetLoginHandler.logger.info("User isn't using Rosepad"); //LilyBukkit - additional output
 +        }
@@ -168,7 +171,7 @@
 +            return;
          }
          final int minVersion = Integer.min(this.ULPPVersion, 1);
-@@ -119,11 +143,12 @@
+@@ -119,11 +146,12 @@
          this.mcServer.networkServer.addPlayer(ULPPLoginServerHandler);
          ULPPLoginServerHandler.sendPacket(new Packet4UpdateTime(this.mcServer.worldMngr.worldTime));
 +        NetLoginHandler.logger.info(this.username + " authenticated using ULPP");
@@ -183,7 +186,7 @@
 +        if (this.ULPPVersion == 1 && this.mcServer.ULPPOnlineMode) {
              this.netManager.addToSendQueue(new Packet1Login("", this.mcServer.serverId, usedULPPVer));
              return;
-@@ -131,10 +156,9 @@
+@@ -131,10 +159,9 @@
          final EntityPlayerMP entityPlayerMP2 = this.mcServer.configManager.login(this, loginPacket.username, loginPacket.password, false);
          if (entityPlayerMP2 != null) {
 -            NetLoginHandler.logger.info(String.valueOf(this.getUserAndIPString()) + " logged in with ULPP" + Integer.toString(this.ULPPVersion));
@@ -196,7 +199,7 @@
 +            } else {
                  netServerHandler3 = ULPPManager.CreateServerHandler(minVersion, this.mcServer, this.netManager, entityPlayerMP2);
              }
-@@ -149,24 +173,24 @@
+@@ -149,24 +176,24 @@
          this.finishedProcessing = true;
      }
 -    

@@ -101,11 +101,11 @@
 +    public static MinecraftServer INSTANCE;
 +
 +    public int[] getVersion() {
-+        return new int[]{1, 1, 0, 5};
++        return new int[]{1, 1, 0, 6};
 +    }
 +
 +    public String getVersionTag() {
-+        return "beta";
++        return "dev";
 +    }
 +
 +    public String getVersionString() {
@@ -176,7 +176,7 @@
 +        // LilyBukkit start
 +        File modsDir = this.getFile("mods");
 +        if (!modsDir.exists()) {
-+            if (!modsDir.createNewFile()) logger.severe("Couldn't create 'mods' directory");
++            if (!modsDir.mkdirs()) logger.severe("Couldn't create 'mods' directory");
 +        } else this.modLoader.load(Environment.SERVER, new File("mods"));
 +        // LIlyBukkit end
          MinecraftServer.logger.info("Loading properties");
