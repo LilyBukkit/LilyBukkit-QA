@@ -5,7 +5,7 @@
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.entity.Entity;
-+import ru.vladthemountain.lilybukkit.entity.LBPig;
++import ru.vladthemountain.lilybukkit.core.entity.LBPig;
 +
  public class EntityPig extends EntityAnimal {
      public boolean saddled;

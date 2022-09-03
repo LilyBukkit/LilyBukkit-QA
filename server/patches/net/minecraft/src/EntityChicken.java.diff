@@ -4,7 +4,7 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
-+import ru.vladthemountain.lilybukkit.entity.LBChicken;
++import ru.vladthemountain.lilybukkit.core.entity.LBChicken;
 +
  public class EntityChicken extends EntityAnimal {
      public boolean unusedBool2;

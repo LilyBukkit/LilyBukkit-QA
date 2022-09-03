@@ -6,8 +6,8 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
 +import org.bukkit.event.block.BlockPlaceEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.block.LBBlockState;
++import ru.vladthemountain.lilybukkit.core.LBWorld;
++import ru.vladthemountain.lilybukkit.core.block.LBBlockState;
 +
  public class ItemSeeds extends Item {
      private int blockType;
@@ -21,9 +21,11 @@
 +
      @Override
      public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, final int y, final int z, final int i7) {
-@@ -16,5 +22,17 @@
+@@ -15,6 +21,18 @@
+         }
          final int i8 = world.getBlockId(x, y, z);
-         if (i8 == Block.tilledField.blockID) {
+-        if (i8 == Block.tilledField.blockID) {
++        if (i8 == Block.TILLED_FIELD.blockID) {
 +            LBBlockState blockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y, z)); //LilyBukkit
 +
              world.setBlockWithNotify(x, y + 1, z, this.blockType);

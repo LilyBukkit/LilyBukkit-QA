@@ -1,14 +1,13 @@
 --- InventoryPlayer.java
 +++ InventoryPlayer.java
-@@ -1,4 +1,7 @@
+@@ -1,4 +1,6 @@
  package net.minecraft.src;
  
-+import org.bukkit.inventory.Inventory;
-+import ru.vladthemountain.lilybukkit.inventory.LBPlayerInventory;
++import ru.vladthemountain.lilybukkit.core.inventory.LBPlayerInventory;
 +
  public class InventoryPlayer implements IInventory {
      public ItemStack[] mainInventory;
-@@ -8,5 +11,7 @@
+@@ -8,5 +10,7 @@
      private EntityPlayer player;
      public boolean inventoryChanged;
 -    
@@ -17,7 +16,7 @@
 +
      public InventoryPlayer(final EntityPlayer entityPlayer) {
          this.mainInventory = new ItemStack[36];
-@@ -16,10 +21,12 @@
+@@ -16,10 +20,12 @@
          this.inventoryChanged = false;
          this.player = entityPlayer;
 +
@@ -32,21 +31,21 @@
 +
      private int storeItemStack(final int itemID) {
          for (int i2 = 0; i2 < this.mainInventory.length; ++i2) {
-@@ -30,5 +37,5 @@
+@@ -30,5 +36,5 @@
          return -1;
      }
 -    
 +
      private int getFirstEmptyStack() {
          for (int i1 = 0; i1 < this.mainInventory.length; ++i1) {
-@@ -39,5 +46,5 @@
+@@ -39,5 +45,5 @@
          return -1;
      }
 -    
 +
      private int storePartialItemStack(final int itemID, int i2) {
          int i3 = this.storeItemStack(itemID);
-@@ -67,5 +74,21 @@
+@@ -67,5 +73,21 @@
          return i2;
      }
 -    
@@ -69,28 +68,28 @@
 +
      public void decrementAnimations() {
          for (int i1 = 0; i1 < this.mainInventory.length; ++i1) {
-@@ -76,5 +99,5 @@
+@@ -76,5 +98,5 @@
          }
      }
 -    
 +
      public boolean addItemStackToInventory(final ItemStack stack) {
          if (stack.itemDmg == 0) {
-@@ -92,5 +115,5 @@
+@@ -92,5 +114,5 @@
          return false;
      }
 -    
 +
      public void setInventorySlotContents(int slots, final ItemStack stack) {
          ItemStack[] itemStack3 = this.mainInventory;
-@@ -105,5 +128,5 @@
+@@ -105,5 +127,5 @@
          itemStack3[slots] = stack;
      }
 -    
 +
      public float getStrVsBlock(final Block block) {
          float f2 = 1.0f;
-@@ -113,10 +136,10 @@
+@@ -113,10 +135,10 @@
          return f2;
      }
 -    
@@ -103,35 +102,35 @@
 +                nBTTagCompound3.setByte("Slot", (byte) i2);
                  this.mainInventory[i2].writeToNBT(nBTTagCompound3);
                  nbttaglist.setTag(nBTTagCompound3);
-@@ -126,5 +149,5 @@
+@@ -126,5 +148,5 @@
              if (this.armorInventory[i2] != null) {
                  final NBTTagCompound nBTTagCompound3 = new NBTTagCompound();
 -                nBTTagCompound3.setByte("Slot", (byte)(i2 + 100));
 +                nBTTagCompound3.setByte("Slot", (byte) (i2 + 100));
                  this.armorInventory[i2].writeToNBT(nBTTagCompound3);
                  nbttaglist.setTag(nBTTagCompound3);
-@@ -134,5 +157,5 @@
+@@ -134,5 +156,5 @@
              if (this.craftingInventory[i2] != null) {
                  final NBTTagCompound nBTTagCompound3 = new NBTTagCompound();
 -                nBTTagCompound3.setByte("Slot", (byte)(i2 + 80));
 +                nBTTagCompound3.setByte("Slot", (byte) (i2 + 80));
                  this.craftingInventory[i2].writeToNBT(nBTTagCompound3);
                  nbttaglist.setTag(nBTTagCompound3);
-@@ -141,5 +164,5 @@
+@@ -141,5 +163,5 @@
          return nbttaglist;
      }
 -    
 +
      public void readFromNBT(final NBTTagList nbttaglist) {
          this.mainInventory = new ItemStack[36];
-@@ -147,5 +170,5 @@
+@@ -147,5 +169,5 @@
          this.craftingInventory = new ItemStack[4];
          for (int i2 = 0; i2 < nbttaglist.tagCount(); ++i2) {
 -            final NBTTagCompound nBTTagCompound3 = (NBTTagCompound)nbttaglist.tagAt(i2);
 +            final NBTTagCompound nBTTagCompound3 = (NBTTagCompound) nbttaglist.tagAt(i2);
              final int i3 = nBTTagCompound3.getByte("Slot") & 0xFF;
              if (i3 >= 0 && i3 < this.mainInventory.length) {
-@@ -160,9 +183,9 @@
+@@ -160,9 +182,9 @@
          }
      }
 -    
@@ -143,7 +142,7 @@
 +
      public ItemStack getStackInSlot(int slot) {
          ItemStack[] itemStack2 = this.mainInventory;
-@@ -177,9 +200,9 @@
+@@ -177,9 +199,9 @@
          return itemStack2[slot];
      }
 -    
@@ -155,28 +154,28 @@
 +
      public boolean canHarvestBlock(final Block block) {
          if (block.material != Material.rock && block.material != Material.iron && block.material != Material.craftedSnow && block.material != Material.snow) {
-@@ -189,5 +212,5 @@
+@@ -189,5 +211,5 @@
          return itemStack2 != null && itemStack2.canHarvestBlock(block);
      }
 -    
 +
      public int getTotalArmorValue() {
          int i1 = 0;
-@@ -201,5 +224,5 @@
+@@ -201,5 +223,5 @@
                  i2 += i7;
                  i3 += i5;
 -                final int i8 = ((ItemArmor)this.armorInventory[i4].getItem()).damageReduceAmount;
 +                final int i8 = ((ItemArmor) this.armorInventory[i4].getItem()).damageReduceAmount;
                  i1 += i8;
              }
-@@ -210,5 +233,5 @@
+@@ -210,5 +232,5 @@
          return (i1 - 1) * i2 / i3 + 1;
      }
 -    
 +
      public void damageArmor(final int damage) {
          for (int i2 = 0; i2 < this.armorInventory.length; ++i2) {
-@@ -222,5 +245,5 @@
+@@ -222,5 +244,5 @@
          }
      }
 -    

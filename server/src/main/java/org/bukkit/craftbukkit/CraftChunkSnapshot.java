@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit;
 
 import org.bukkit.Bukkit;
-import ru.vladthemountain.lilybukkit.LBChunkSnapshot;
+import ru.vladthemountain.lilybukkit.core.LBChunkSnapshot;
 
 @Deprecated
 public class CraftChunkSnapshot extends LBChunkSnapshot {

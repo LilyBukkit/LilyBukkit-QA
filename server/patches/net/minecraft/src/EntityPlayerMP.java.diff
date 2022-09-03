@@ -5,7 +5,7 @@
  
 +import net.minecraft.server.MinecraftServer;
 +import org.bukkit.Bukkit;
-+import ru.vladthemountain.lilybukkit.entity.LBPlayer;
++import ru.vladthemountain.lilybukkit.core.entity.LBPlayer;
 +
  import java.util.HashSet;
  import java.util.LinkedList;

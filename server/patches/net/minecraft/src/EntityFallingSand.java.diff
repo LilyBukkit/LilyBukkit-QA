@@ -4,7 +4,7 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
-+import ru.vladthemountain.lilybukkit.entity.LBFallingSand;
++import ru.vladthemountain.lilybukkit.core.entity.LBFallingSand;
 +
  public class EntityFallingSand extends Entity {
      public int blockID;

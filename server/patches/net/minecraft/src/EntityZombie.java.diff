@@ -6,7 +6,7 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.entity.Entity;
 +import org.bukkit.event.entity.EntityCombustEvent;
-+import ru.vladthemountain.lilybukkit.entity.LBZombie;
++import ru.vladthemountain.lilybukkit.core.entity.LBZombie;
 +
  public class EntityZombie extends EntityMob {
 +

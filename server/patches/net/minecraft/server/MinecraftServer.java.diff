@@ -47,7 +47,7 @@
 +import org.bukkit.event.world.WorldLoadEvent;
 +import org.bukkit.event.world.WorldSaveEvent;
 +import org.bukkit.plugin.PluginLoadOrder;
-+import ru.vladthemountain.lilybukkit.LilyBukkit;
++import ru.vladthemountain.lilybukkit.core.LilyBukkit;
 +
 +import java.awt.GraphicsEnvironment;
 +import java.io.File;
@@ -302,7 +302,7 @@
 +                        MinecraftServer.logger.warning("Time ran backwards! Did the system time change? Detecting " + j4 + "ms missing"); //LilyBukkit - add milliseconds counter
                          j4 = 0L;
                      }
-@@ -196,32 +277,27 @@
+@@ -196,26 +277,22 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -334,14 +334,16 @@
 +                } catch (InterruptedException interruptedException16) {
                      interruptedException16.printStackTrace();
                  }
-             }
+@@ -223,27 +300,21 @@
              return;
--        }
+         }
 -        finally {
-+        } finally {
-             this.stop();
-             this.serverStopped = true;
-@@ -232,18 +308,17 @@
+-            this.stop();
+-            this.serverStopped = true;
+-            System.exit(0);
+-        }
+         this.stop();
+         this.serverStopped = true;
          System.exit(0);
      }
 -    
@@ -366,11 +368,11 @@
 +            MinecraftServer.playerList.remove(username);
          }
          AxisAlignedBB.clearBoundingBoxPool();
-@@ -254,257 +329,84 @@
+@@ -254,257 +325,86 @@
          }
          this.worldMngr.tick();
 -        while (this.worldMngr.updatingLighting()) {}
-+        //while (this.worldMngr.updatingLighting()) {}
++        while (this.worldMngr.updatingLighting()) {doNothing();}
          this.worldMngr.updateEntities();
          this.networkServer.handleNetworkListenThread();
          this.configManager.onTick();
@@ -390,6 +392,8 @@
 -        }
      }
 -    
++
++    private void doNothing() {}
 +
      public void addCommand(final String command, final ICommandListener commandListener) {
          this.commands.add(new ServerCommand(command, commandListener));

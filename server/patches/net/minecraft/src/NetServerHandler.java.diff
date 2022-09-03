@@ -83,7 +83,7 @@
 +
      @Override
      public void handleFlying(final Packet10Flying packet) {
-@@ -55,5 +95,69 @@
+@@ -55,53 +95,163 @@
              }
          }
 -        if (this.hasMoved) {
@@ -154,21 +154,133 @@
 +
              this.lastPosX = this.playerEntity.posX;
              this.lastPosY = this.playerEntity.posY;
-@@ -71,5 +175,5 @@
+             this.lastPosZ = this.playerEntity.posZ;
+-            double d2 = this.playerEntity.posX;
+-            double d3 = this.playerEntity.posY;
+-            double d4 = this.playerEntity.posZ;
+-            float f8 = this.playerEntity.rotationYaw;
+-            float f9 = this.playerEntity.rotationPitch;
++            double posX = this.playerEntity.posX;
++            double posY = this.playerEntity.posY;
++            double posZ = this.playerEntity.posZ;
++            float rotationYaw = this.playerEntity.rotationYaw;
++            float rotationPitch = this.playerEntity.rotationPitch;
+             if (packet.moving) {
+-                d2 = packet.xPosition;
+-                d3 = packet.yPosition;
+-                d4 = packet.zPosition;
++                posX = packet.xPosition;
++                posY = packet.yPosition;
++                posZ = packet.zPosition;
+                 final double d5 = packet.stance - packet.yPosition;
                  if (d5 > 1.65 || d5 < 0.1) {
                      this.kickPlayer("Illegal stance");
 -                    NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " had an illegal stance: " + d5);
 +                    NetServerHandler.logger.warning(this.playerEntity.username + " had an illegal stance: " + d5);
                  }
                  this.playerEntity.managedPosY = packet.stance;
-@@ -98,5 +202,5 @@
-             if (d8 > 0.0625) {
-                 z18 = true;
+             }
+             if (packet.rotating) {
+-                f8 = packet.yaw;
+-                f9 = packet.pitch;
++                rotationYaw = packet.yaw;
++                rotationPitch = packet.pitch;
+             }
+             this.playerEntity.onUpdateEntity();
+             this.playerEntity.ySize = 0.0f;
+-            this.playerEntity.setPositionAndRotation(this.lastPosX, this.lastPosY, this.lastPosZ, f8, f9);
+-            double d5 = d2 - this.playerEntity.posX;
+-            double d6 = d3 - this.playerEntity.posY;
+-            double d7 = d4 - this.playerEntity.posZ;
+-            final float f10 = 0.0625f;
+-            final boolean z17 = this.mcServer.worldMngr.getCollidingBoundingBoxes(this.playerEntity, this.playerEntity.boundingBox.copy().removeCoord(f10, f10, f10)).size() == 0;
+-            this.playerEntity.moveEntity(d5, d6, d7);
+-            d5 = d2 - this.playerEntity.posX;
+-            d6 = d3 - this.playerEntity.posY;
+-            if (d6 > -0.5 || d6 < 0.5) {
+-                d6 = 0.0;
++            this.playerEntity.setPositionAndRotation(
++                    this.lastPosX, this.lastPosY, this.lastPosZ,
++                    rotationYaw, rotationPitch
++            );
++            double diffX = posX - this.playerEntity.posX;
++            double diffY = posY - this.playerEntity.posY;
++            double diffZ = posZ - this.playerEntity.posZ;
++            final float zeroSixTwoFive = 0.0625f;
++            final boolean stuffWereInTheWay = this.mcServer.worldMngr.getCollidingBoundingBoxes(
++                    this.playerEntity,
++                    this.playerEntity.boundingBox.copy().removeCoord(zeroSixTwoFive, zeroSixTwoFive, zeroSixTwoFive)
++            ).size() > 0;
++            this.playerEntity.moveEntity(diffX, diffY, diffZ);
++            diffX = posX - this.playerEntity.posX;
++            diffY = posY - this.playerEntity.posY;
++            if (diffY > -0.5 || diffY < 0.5) {
++                diffY = 0.0;
+             }
+-            d7 = d4 - this.playerEntity.posZ;
+-            final double d8 = d5 * d5 + d6 * d6 + d7 * d7;
+-            boolean z18 = false;
+-            if (d8 > 0.0625) {
+-                z18 = true;
 -                NetServerHandler.logger.warning(String.valueOf(this.playerEntity.username) + " moved wrongly!");
++            diffZ = posZ - this.playerEntity.posZ;
++            final double squaredDistance = diffX * diffX + diffY * diffY + diffZ * diffZ;
++            boolean wrongMove = false;
++            if (squaredDistance > 0.0625) {
++                wrongMove = true;
 +                NetServerHandler.logger.warning(this.playerEntity.username + " moved wrongly!");
              }
-             this.playerEntity.setPositionAndRotation(d2, d3, d4, f8, f9);
-@@ -110,14 +214,25 @@
+-            this.playerEntity.setPositionAndRotation(d2, d3, d4, f8, f9);
+-            final boolean z19 = this.mcServer.worldMngr.getCollidingBoundingBoxes(this.playerEntity, this.playerEntity.boundingBox.copy().removeCoord(f10, f10, f10)).size() == 0;
+-            if (z17 && (z18 || !z19)) {
+-                this.teleportTo(this.lastPosX, this.lastPosY, this.lastPosZ, f8, f9);
++            this.playerEntity.setPositionAndRotation(posX, posY, posZ, rotationYaw, rotationPitch);
++            final boolean stuffInTheWay = this.mcServer.worldMngr.getCollidingBoundingBoxes(
++                    this.playerEntity,
++                    this.playerEntity.boundingBox.copy().removeCoord(zeroSixTwoFive, zeroSixTwoFive, zeroSixTwoFive)
++            ).size() == 0;
++            if (stuffWereInTheWay && (wrongMove || !stuffInTheWay)) {
++                //              double addX = lastPosX > 0 ? lastPosX - Math.floor(lastPosX) : 1 - (-lastPosX - Math.floor(-lastPosX));
++                //              double addY = lastPosY > 0 ? lastPosY - Math.floor(lastPosY) : 1 - (-lastPosY - Math.floor(-lastPosY));
++                //              double addZ = lastPosZ > 0 ? lastPosZ - Math.floor(lastPosZ) : 1 - (-lastPosZ - Math.floor(-lastPosZ));
++
++                //              int blockX = (int) Math.floor(posX);
++                //              int blockY = (int) Math.floor(posY);
++                //              int blockZ = (int) Math.floor(posZ);
++                int lastBlockX = (int) Math.floor(lastPosX);
++                int lastBlockY = (int) Math.floor(lastPosY);
++                int lastBlockZ = (int) Math.floor(lastPosZ);
++
++                //              if (addX < 0.3) addX = -0.5;
++                //              else if (addX > 0.7) addX = 0.5;
++                //              else addX = 0;
++                //              if (addY < 0.3) addY = -0.5;
++                //              else if (addY > 0.7) addY = 0.5;
++                //              else addY = 0;
++                //              if (addZ < 0.3) addZ = -0.5;
++                //              else if (addZ > 0.7) addZ = 0.5;
++                //              else addZ = 0;
++
++                //              if (addX > 0 && this.mcServer.worldMngr.getBlockId(blockX + 1, blockY, blockZ) != 0) addX = 0;
++                //              if (addX < 0 && this.mcServer.worldMngr.getBlockId(blockX - 1, blockY, blockZ) != 0) addX = 0;
++                //              if (addY > 0 && this.mcServer.worldMngr.getBlockId(blockX, blockY + 1, blockZ) != 0) addY = 0;
++                //              if (addY < 0 && this.mcServer.worldMngr.getBlockId(blockX, blockY - 1, blockZ) != 0) addY = 0;
++                //              if (addZ > 0 && this.mcServer.worldMngr.getBlockId(blockX, blockY, blockZ + 1) != 0) addZ = 0;
++                //              if (addZ < 0 && this.mcServer.worldMngr.getBlockId(blockX, blockY, blockZ - 1) != 0) addZ = 0;
++
++                //              if (addY == 0 && addX == 0 && addZ == 0) addY = 0.8; // Fallback if player is stuck
++
++                //              if (this.mcServer.worldMngr.getBlockId(blockX, blockY, blockZ) == 0) {
++                //                  addX *= -0.5;
++                //                  addY *= -0.5;
++                //                  addZ *= -0.5;
++                //              }
++
++                this.sendPacket(new Packet53BlockChange(lastBlockX, lastBlockY, lastBlockZ, this.mcServer.worldMngr));
++                this.teleportTo(lastPosX, lastPosY + 0.5, lastPosZ, rotationYaw, rotationPitch);
+                 return;
+             }
+@@ -110,14 +260,25 @@
          }
      }
 -    
@@ -200,7 +312,7 @@
 +
      @Override
      public void handleBlockDig(final Packet14BlockDig packet) {
-@@ -128,11 +243,5 @@
+@@ -128,11 +289,5 @@
          final boolean isOP = op;
          final boolean isAuthed = this.mcServer.configManager.isAuthed(this.playerEntity.username);
 -        boolean z3 = false;
@@ -213,7 +325,7 @@
 +        boolean z3 = (packet.status == 0 || packet.status == 1);
          if (z3) {
              final double d4 = this.playerEntity.posY;
-@@ -151,24 +260,21 @@
+@@ -151,24 +306,21 @@
          final int i20 = packet.zPosition;
          final int i21 = packet.face;
 -        final int maxDistX = (int)MathHelper.abs((float)(i18 - this.mcServer.worldMngr.spawnX));
@@ -247,14 +359,14 @@
 +        } else if (packet.status == 3) {
              final double d5 = this.playerEntity.posX - (i18 + 0.5);
              final double d6 = this.playerEntity.posY - (i19 + 0.5);
-@@ -181,5 +287,5 @@
+@@ -181,5 +333,5 @@
          this.mcServer.worldMngr.disableSpawnProtection = false;
      }
 -    
 +
      @Override
      public void handlePlace(final Packet15Place packet) {
-@@ -193,49 +299,54 @@
+@@ -193,49 +345,54 @@
          final int i5 = packet.zPosition;
          final int i6 = packet.direction;
 -        final int maxDistX = (int)MathHelper.abs((float)(i3 - this.mcServer.worldMngr.spawnX));
@@ -325,7 +437,7 @@
 +
      @Override
      public void handlePickupSpawn(final Packet21PickupSpawn packet) {
-@@ -248,7 +359,7 @@
+@@ -248,7 +405,7 @@
          entityItem8.motionZ = packet.roll / 128.0;
          entityItem8.delayBeforeCanPickup = 10;
 -        this.mcServer.worldMngr.spawnEntityInWorld(entityItem8);
@@ -335,7 +447,7 @@
 +
      @Override
      public void handleChat(final Packet3Chat packet) {
-@@ -256,9 +367,8 @@
+@@ -256,9 +413,8 @@
          if (string2.length() > 100) {
              this.kickPlayer("Chat message too long");
 -        }
@@ -347,7 +459,7 @@
 +                if (" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'abcdefghijklmnopqrstuvwxyz{|}~\u2302\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8£\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1ªº¿®¬½¼¡«»".indexOf((int) string2.charAt(i3)) < 0) {
                      this.kickPlayer("Illegal characters in chat");
                      return;
-@@ -267,7 +377,15 @@
+@@ -267,7 +423,15 @@
              if (string2.startsWith("/")) {
                  this.handleSlashCommand(string2);
 -            }
@@ -366,7 +478,7 @@
 +                //string2 = "<" + /*Bukkit.getPlayer(*/this.playerEntity.username/*).getDisplayName()*/ + "> " + string2; //LilyBukkit: replace 'this.playerEntity.username' with own code
                  NetServerHandler.logger.info(string2);
                  this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(string2));
-@@ -275,18 +393,37 @@
+@@ -275,18 +439,37 @@
          }
      }
 -    
@@ -410,7 +522,7 @@
 +                NetServerHandler.logger.info(string1 + " to " + string2[1]);
                  if (!this.mcServer.configManager.sendPacketToPlayer(string2[1], new Packet3Chat(string1))) {
                      this.sendPacket(new Packet3Chat("§cThere's no player by that name online."));
-@@ -294,72 +431,74 @@
+@@ -294,72 +477,74 @@
              }
          }
 -        else if (string1.toLowerCase().equalsIgnoreCase("/home")) {
@@ -528,21 +640,21 @@
 +
      @Override
      public void handlePlayerInventory(final Packet5PlayerInventory packet) {
-@@ -374,5 +513,5 @@
+@@ -374,5 +559,5 @@
          }
      }
 -    
 +
      public void sendInventoryPackets() {
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-1, this.playerEntity.inventory.mainInventory));
-@@ -380,5 +519,5 @@
+@@ -380,5 +565,5 @@
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-3, this.playerEntity.inventory.armorInventory));
      }
 -    
 +
      @Override
      public void handleComplexEntity(final Packet59ComplexEntity packet) {
-@@ -389,3 +528,33 @@
+@@ -389,3 +574,39 @@
          }
      }
 +
@@ -574,5 +686,11 @@
 +        // LilyBukkit end
 +        System.out.println("Entity took damage");
 +        entity.attackEntityFrom(playerEntity, packet.damage);
++    }
++
++    @Override
++    public void handleRosepadMeta(Packet130RosepadMeta packet) { // This is important for porting Waterfall/Bungeecord to Lilypad
++        System.out.println("Player " + this.playerEntity.username + " joined server \""
++                + packet.host + "\" using " + packet.serverName);
 +    }
  }

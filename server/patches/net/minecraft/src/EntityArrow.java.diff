@@ -1,6 +1,6 @@
 --- EntityArrow.java
 +++ EntityArrow.java
-@@ -1,4 +1,17 @@
+@@ -1,4 +1,13 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
@@ -9,16 +9,12 @@
 +import org.bukkit.event.entity.EntityDamageEvent;
 +import org.bukkit.event.entity.ProjectileHitEvent;
 +import org.bukkit.event.player.PlayerPickupItemEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.entity.LBArrow;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
-+import ru.vladthemountain.lilybukkit.entity.LBItem;
-+import ru.vladthemountain.lilybukkit.entity.LBLivingEntity;
-+import ru.vladthemountain.lilybukkit.entity.LBProjectile;
++import ru.vladthemountain.lilybukkit.core.entity.LBArrow;
++import ru.vladthemountain.lilybukkit.core.entity.LBLivingEntity;
 +
  import java.util.List;
  
-@@ -13,5 +26,7 @@
+@@ -13,5 +22,7 @@
      private int ticksInGround;
      private int ticksInAir;
 -    
@@ -27,7 +23,7 @@
 +
      public EntityArrow(final World world) {
          super(world);
-@@ -24,6 +39,8 @@
+@@ -24,6 +35,8 @@
          this.ticksInAir = 0;
          this.setSize(0.5f, 0.5f);
 +
@@ -37,7 +33,7 @@
 +
      public EntityArrow(final World world, final EntityLiving entityLiving) {
          super(world);
-@@ -47,6 +64,8 @@
+@@ -47,6 +60,8 @@
          this.motionY = -MathHelper.sin(this.rotationPitch / 180.0f * 3.1415927f);
          this.setArrowHeading(this.motionX, this.motionY, this.motionZ, 1.5f, 1.0f);
 +
@@ -47,7 +43,7 @@
 +
      public void setArrowHeading(double motionX, double motionY, double motionZ, final float offsetY, final float offsetX) {
          final float f9 = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
-@@ -64,13 +83,13 @@
+@@ -64,13 +79,13 @@
          this.motionZ = motionZ;
          final float f10 = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
 -        final float n = (float)(Math.atan2(motionX, motionZ) * 180.0 / 3.1415927410125732);
@@ -64,7 +60,7 @@
 +
      @Override
      public void onUpdate() {
-@@ -94,6 +113,5 @@
+@@ -94,6 +109,5 @@
              this.ticksInGround = 0;
              this.ticksInAir = 0;
 -        }
@@ -72,7 +68,7 @@
 +        } else {
              ++this.ticksInAir;
          }
-@@ -109,6 +127,6 @@
+@@ -109,6 +123,6 @@
          final List list5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0, 1.0, 1.0));
          double d6 = 0.0;
 -        for (int i2 = 0; i2 < list5.size(); ++i2) {
@@ -81,7 +77,7 @@
 +            final Entity entity5 = (Entity) o;
              if (entity5.canBeCollidedWith() && (entity5 != this.shootingEntity || this.ticksInAir >= 5)) {
                  final float f10 = 0.3f;
-@@ -127,11 +145,53 @@
+@@ -127,11 +141,53 @@
              movingObjectPosition3 = new MovingObjectPosition(entity4);
          }
 +        // CraftBukkit start
@@ -139,7 +135,7 @@
 +                } else {
                      this.motionX *= -0.10000000149011612;
                      this.motionY *= -0.10000000149011612;
-@@ -141,18 +201,17 @@
+@@ -141,18 +197,17 @@
                      this.ticksInAir = 0;
                  }
 -            }
@@ -163,7 +159,7 @@
 +                this.worldObj.playSoundAtEntity(this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
                  this.inData = true;
                  this.arrowShake = 7;
-@@ -163,6 +222,6 @@
+@@ -163,6 +218,6 @@
          this.posZ += this.motionZ;
          final float f11 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
 -        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0 / 3.1415927410125732);
@@ -172,7 +168,7 @@
 +        this.rotationPitch = (float) (Math.atan2(this.motionY, f11) * 180.0 / 3.1415927410125732);
          while (this.rotationPitch - this.prevRotationPitch < -180.0f) {
              this.prevRotationPitch -= 360.0f;
-@@ -194,14 +253,14 @@
+@@ -194,14 +249,14 @@
          this.setPosition(this.posX, this.posY, this.posZ);
      }
 -    
@@ -195,7 +191,7 @@
 +
      public void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
          this.xTile = nbttagcompound.getShort("xTile");
-@@ -212,12 +271,27 @@
+@@ -212,12 +267,27 @@
          this.inData = (nbttagcompound.getByte("inGround") == 1);
      }
 -    

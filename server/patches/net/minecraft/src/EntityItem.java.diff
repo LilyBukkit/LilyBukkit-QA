@@ -6,7 +6,7 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.entity.Item;
 +import org.bukkit.event.player.PlayerPickupItemEvent;
-+import ru.vladthemountain.lilybukkit.entity.LBItem;
++import ru.vladthemountain.lilybukkit.core.entity.LBItem;
 +
  public class EntityItem extends Entity {
      public ItemStack item;

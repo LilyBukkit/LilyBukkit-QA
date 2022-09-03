@@ -5,7 +5,7 @@
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.entity.Entity;
-+import ru.vladthemountain.lilybukkit.entity.LBCow;
++import ru.vladthemountain.lilybukkit.core.entity.LBCow;
 +
  public class EntityCow extends EntityAnimal {
      public boolean unusedBool2;

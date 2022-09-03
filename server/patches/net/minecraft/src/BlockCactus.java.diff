@@ -1,17 +1,21 @@
 --- BlockCactus.java
 +++ BlockCactus.java
-@@ -1,4 +1,10 @@
+@@ -1,4 +1,8 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.EntityDamageByBlockEvent;
 +import org.bukkit.event.entity.EntityDamageEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
 +
  import java.util.Random;
  
-@@ -81,4 +87,19 @@
+@@ -76,9 +80,24 @@
+         }
+         final int i5 = world.getBlockId(x, y - 1, z);
+-        return i5 == Block.cactus.blockID || i5 == Block.sand.blockID;
++        return i5 == Block.CACTUS.blockID || i5 == Block.SAND.blockID;
+     }
+     
      @Override
      public void onEntityCollidedWithBlock(final World world, final int x, final int y, final int z, final Entity entity) {
 +        // CraftBukkit start - ENTITY_DAMAGEBY_BLOCK event

@@ -1,7 +1,7 @@
 package net.minecraft.src;
 
 import org.bukkit.Bukkit;
-import ru.vladthemountain.lilybukkit.LilyBukkit;
+import ru.vladthemountain.lilybukkit.core.LilyBukkit;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -12,6 +12,7 @@ import java.util.List;
 public class Packet130RosepadMeta extends Packet {
     public List<ULPPExtension> extensions = new ArrayList<>();
     public String serverName = "§2" + Bukkit.getServer().getName();
+    public String host = "";
     public int[] version = ((LilyBukkit) Bukkit.getServer()).getRosepadVersion();
     public String tag = ((LilyBukkit) Bukkit.getServer()).getRosepadVersionTag();
     public long flags = 0;
@@ -20,6 +21,7 @@ public class Packet130RosepadMeta extends Packet {
     public void readPacketData(DataInputStream dataInputStream) throws IOException {
         serverName = dataInputStream.readUTF();
         tag = dataInputStream.readUTF();
+        host = dataInputStream.readUTF();
         short verLen = dataInputStream.readShort();
         version = new int[verLen];
         for (short i = 0; i < verLen; i++)
@@ -40,6 +42,7 @@ public class Packet130RosepadMeta extends Packet {
     public void writePacket(DataOutputStream dataOutputStream) throws IOException {
         dataOutputStream.writeUTF(serverName);
         dataOutputStream.writeUTF(tag);
+        dataOutputStream.writeUTF(host);
         dataOutputStream.writeShort(version.length);
         for (int i : version) {
             dataOutputStream.writeShort(i);
@@ -68,7 +71,7 @@ public class Packet130RosepadMeta extends Packet {
 
     @Override
     public void processPacket(NetHandler netHandler) {
-
+        netHandler.handleRosepadMeta(this);
     }
 
     @Override

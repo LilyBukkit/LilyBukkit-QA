@@ -19,7 +19,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import org.bukkit.plugin.Plugin;
 
-import ru.vladthemountain.lilybukkit.LilyBukkit;
+import ru.vladthemountain.lilybukkit.core.LilyBukkit;
 
 public class CraftScheduler implements BukkitScheduler, Runnable {
 

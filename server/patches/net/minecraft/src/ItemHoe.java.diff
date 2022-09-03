@@ -7,20 +7,26 @@
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
 +import org.bukkit.event.block.BlockPlaceEvent;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.block.LBBlockState;
++import ru.vladthemountain.lilybukkit.core.LBWorld;
++import ru.vladthemountain.lilybukkit.core.block.LBBlockState;
 +
  public class ItemHoe extends Item {
      public ItemHoe(final int itemID, final int maxDamage) {
-@@ -7,5 +14,5 @@
+@@ -7,17 +14,30 @@
          this.maxDamage = 32 << maxDamage;
      }
 -    
 +
      @Override
      public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, final int y, final int z, final int i7) {
-@@ -17,5 +24,18 @@
-         final Block block10 = Block.tilledField;
+         final int i8 = world.getBlockId(x, y, z);
+         final Material material9 = world.getBlockMaterial(x, y + 1, z);
+-        if ((material9.isSolid() || i8 != Block.grass.blockID) && i8 != Block.dirt.blockID) {
++        if ((material9.isSolid() || i8 != Block.GRASS.blockID) && i8 != Block.DIRT.blockID) {
+             return false;
+         }
+-        final Block block10 = Block.tilledField;
++        final Block block10 = Block.TILLED_FIELD;
          world.playSoundEffect(x + 0.5f, y + 0.5f, z + 0.5f, block10.stepSound.getStepSound(), (block10.stepSound.getVolume() + 1.0f) / 2.0f, block10.stepSound.getPitch() * 0.8f);
 +
 +        LBBlockState blockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y, z)); // LilyBukkit
@@ -37,7 +43,10 @@
 +        // CraftBukkit end
 +
          stack.damageItem(1);
-         if (world.rand.nextInt(8) == 0 && i8 == Block.grass.blockID) {
+-        if (world.rand.nextInt(8) == 0 && i8 == Block.grass.blockID) {
++        if (world.rand.nextInt(8) == 0 && i8 == Block.GRASS.blockID) {
+             final byte b11 = 1;
+             for (int i9 = 0; i9 < b11; ++i9) {
 @@ -28,5 +48,5 @@
                  final EntityItem entityItem17 = new EntityItem(world, x + f14, y + f15, z + f16, new ItemStack(Item.seeds));
                  entityItem17.delayBeforeCanPickup = 10;

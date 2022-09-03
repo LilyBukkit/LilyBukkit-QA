@@ -6,8 +6,8 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.entity.Explosive;
 +import org.bukkit.event.entity.ExplosionPrimeEvent;
-+import ru.vladthemountain.lilybukkit.LilyBukkit;
-+import ru.vladthemountain.lilybukkit.entity.LBTNTPrimed;
++import ru.vladthemountain.lilybukkit.core.LilyBukkit;
++import ru.vladthemountain.lilybukkit.core.entity.LBTNTPrimed;
 +
  public class EntityTNTPrimed extends Entity {
      public int fuse;

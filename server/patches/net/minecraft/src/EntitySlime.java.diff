@@ -5,7 +5,7 @@
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-+import ru.vladthemountain.lilybukkit.entity.LBSlime;
++import ru.vladthemountain.lilybukkit.core.entity.LBSlime;
 +
  public class EntitySlime extends EntityLiving implements IMobs {
      public float squishFactor;

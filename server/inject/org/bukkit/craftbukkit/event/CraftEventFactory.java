@@ -40,12 +40,12 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import ru.vladthemountain.lilybukkit.LBWorld;
-import ru.vladthemountain.lilybukkit.LilyBukkit;
-import ru.vladthemountain.lilybukkit.block.LBBlock;
-import ru.vladthemountain.lilybukkit.entity.LBEntity;
-import ru.vladthemountain.lilybukkit.entity.LBLivingEntity;
-import ru.vladthemountain.lilybukkit.entity.LBPlayer;
+import ru.vladthemountain.lilybukkit.core.LBWorld;
+import ru.vladthemountain.lilybukkit.core.LilyBukkit;
+import ru.vladthemountain.lilybukkit.core.block.LBBlock;
+import ru.vladthemountain.lilybukkit.core.entity.LBEntity;
+import ru.vladthemountain.lilybukkit.core.entity.LBLivingEntity;
+import ru.vladthemountain.lilybukkit.core.entity.LBPlayer;
 
 /**
  * CraftEventFactory used by CraftBukkit.

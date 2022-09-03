@@ -3,7 +3,7 @@ package org.bukkit.craftbukkit;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.ServerConfigurationManager;
 import org.bukkit.plugin.PluginLoadOrder;
-import ru.vladthemountain.lilybukkit.LilyBukkit;
+import ru.vladthemountain.lilybukkit.core.LilyBukkit;
 
 @Deprecated
 public class CraftServer extends LilyBukkit {

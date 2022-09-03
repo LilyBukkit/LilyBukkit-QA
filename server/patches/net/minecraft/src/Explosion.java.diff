@@ -11,8 +11,8 @@
 +import org.bukkit.event.entity.EntityDamageByEntityEvent;
 +import org.bukkit.event.entity.EntityDamageEvent;
 +import org.bukkit.event.entity.EntityExplodeEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.core.LBWorld;
++import ru.vladthemountain.lilybukkit.core.entity.LBEntity;
 +
  import java.util.ArrayList;
  import java.util.HashSet;

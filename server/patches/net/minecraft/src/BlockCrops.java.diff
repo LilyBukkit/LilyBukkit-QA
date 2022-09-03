@@ -7,6 +7,20 @@
 +
  import java.util.Random;
  
+@@ -14,5 +16,5 @@
+     @Override
+     protected boolean canThisPlantGrowOnThisBlockID(final int id) {
+-        return id == Block.tilledField.blockID;
++        return id == Block.TILLED_FIELD.blockID;
+     }
+     
+@@ -49,5 +51,5 @@
+                 final int i16 = world.getBlockId(i14, y - 1, i15);
+                 float f6 = 0.0f;
+-                if (i16 == Block.tilledField.blockID) {
++                if (i16 == Block.TILLED_FIELD.blockID) {
+                     f6 = 1.0f;
+                     if (world.getBlockMetadata(i14, y - 1, i15) > 0) {
 @@ -83,5 +85,5 @@
                  final EntityItem entityItem11 = new EntityItem(world, x + f8, y + f9, z + f10, new ItemStack(Item.seeds));
                  entityItem11.delayBeforeCanPickup = 10;

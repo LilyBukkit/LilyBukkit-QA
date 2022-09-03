@@ -1,9 +1,8 @@
 package org.bukkit.craftbukkit.inventory;
 
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Slot;
-import ru.vladthemountain.lilybukkit.inventory.LBInventory;
-import ru.vladthemountain.lilybukkit.inventory.LBSlot;
+import ru.vladthemountain.lilybukkit.core.inventory.LBInventory;
+import ru.vladthemountain.lilybukkit.core.inventory.LBSlot;
 
 @Deprecated
 public class CraftSlot extends LBSlot {

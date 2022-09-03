@@ -1,6 +1,6 @@
 --- EntityMinecart.java
 +++ EntityMinecart.java
-@@ -1,4 +1,19 @@
+@@ -1,4 +1,17 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
@@ -14,13 +14,11 @@
 +import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 +import org.bukkit.event.vehicle.VehicleMoveEvent;
 +import org.bukkit.event.vehicle.VehicleUpdateEvent;
-+import org.bukkit.inventory.Inventory;
-+import ru.vladthemountain.lilybukkit.entity.LBMinecart;
-+import ru.vladthemountain.lilybukkit.inventory.LBInventory;
++import ru.vladthemountain.lilybukkit.core.entity.LBMinecart;
 +
  import java.util.List;
  
-@@ -20,9 +35,11 @@
+@@ -20,9 +33,11 @@
      private double minecartYaw;
      private double minecartPitch;
 -    
@@ -35,7 +33,7 @@
 +
      public EntityMinecart(final World world) {
          super(world);
-@@ -36,21 +53,24 @@
+@@ -36,21 +51,24 @@
          this.yOffset = this.height / 2.0f;
          this.canTriggerWalking = false;
 +
@@ -64,7 +62,7 @@
 +
      public EntityMinecart(final World world, final double x, final double y, final double z, final int minecartType) {
          this(world);
-@@ -64,12 +84,25 @@
+@@ -64,12 +82,25 @@
          this.minecartType = minecartType;
      }
 -    
@@ -93,14 +91,16 @@
 +        // CraftBukkit end
          this.forwardDirection = -this.forwardDirection;
          this.timeSinceHit = 10;
-@@ -79,18 +112,27 @@
+@@ -78,19 +109,28 @@
+             this.entityDropItem(Item.minecartEmpty.shiftedIndex, 1, 0.0f);
              if (this.minecartType == 1) {
-                 this.entityDropItem(Block.chest.blockID, 1, 0.0f);
--            }
--            else if (this.minecartType == 2) {
+-                this.entityDropItem(Block.chest.blockID, 1, 0.0f);
++                this.entityDropItem(Block.CHEST.blockID, 1, 0.0f);
 +            } else if (this.minecartType == 2) {
-                 this.entityDropItem(Block.stoneOvenIdle.blockID, 1, 0.0f);
++                this.entityDropItem(Block.STONE_OVEN_IDLE.blockID, 1, 0.0f);
              }
+-            else if (this.minecartType == 2) {
+-                this.entityDropItem(Block.stoneOvenIdle.blockID, 1, 0.0f);
 +            // CraftBukkit start
 +            VehicleDestroyEvent destroyEvent = new VehicleDestroyEvent(vehicle, passenger);
 +            Bukkit.getServer().getPluginManager().callEvent(destroyEvent);
@@ -108,7 +108,7 @@
 +            if (destroyEvent.isCancelled()) {
 +                this.damageTaken = 40; // Maximize damage so this doesn't get triggered again right away
 +                return true;
-+            }
+             }
 +            // CraftBukkit end
 +
              this.setEntityDead();
@@ -125,7 +125,7 @@
 +
      @Override
      public void setEntityDead() {
-@@ -110,8 +152,8 @@
+@@ -110,8 +150,8 @@
                      final EntityItem entityItem7 = new EntityItem(this.worldObj, this.posX + f3, this.posY + f4, this.posZ + f5, new ItemStack(itemStack2.itemID, i2, itemStack2.itemDmg));
                      final float f6 = 0.05f;
 -                    entityItem7.motionX = (float)this.rand.nextGaussian() * f6;
@@ -138,7 +138,7 @@
 +                    this.worldObj.spawnEntityInWorld(entityItem7, SpawnReason.NATURAL);
                  }
              }
-@@ -119,7 +161,15 @@
+@@ -119,7 +159,15 @@
          super.setEntityDead();
      }
 -    
@@ -155,7 +155,7 @@
 +
          if (this.worldObj.multiplayerWorld) {
              if (this.turnProgress > 0) {
-@@ -128,20 +178,19 @@
+@@ -128,20 +176,19 @@
                  final double d43 = this.posZ + (this.minecartZ - this.posZ) / this.turnProgress;
                  double d44;
 -                for (d44 = this.minecartYaw - this.rotationYaw; d44 < -180.0; d44 += 360.0) {}
@@ -182,7 +182,21 @@
 +        } else {
              if (this.timeSinceHit > 0) {
                  --this.timeSinceHit;
-@@ -204,10 +253,8 @@
+@@ -157,5 +204,5 @@
+             int i2 = MathHelper.floor_double(this.posY);
+             final int i3 = MathHelper.floor_double(this.posZ);
+-            if (this.worldObj.getBlockId(i1, i2 - 1, i3) == Block.minecartTrack.blockID) {
++            if (this.worldObj.getBlockId(i1, i2 - 1, i3) == Block.MINECART_TRACK.blockID) {
+                 --i2;
+             }
+@@ -163,5 +210,5 @@
+             boolean z6 = false;
+             final double d44 = 0.0078125;
+-            if (this.worldObj.getBlockId(i1, i2, i3) == Block.minecartTrack.blockID) {
++            if (this.worldObj.getBlockId(i1, i2, i3) == Block.MINECART_TRACK.blockID) {
+                 final Vec3D vec3D9 = this.getPos(this.posX, this.posY, this.posZ);
+                 final int i4 = this.worldObj.getBlockMetadata(i1, i2, i3);
+@@ -204,10 +251,8 @@
                      this.posX = i1 + 0.5;
                      d51 = this.posZ - i3;
 -                }
@@ -195,7 +209,7 @@
 +                } else {
                      final double d56 = this.posX - d52;
                      final double d57 = this.posZ - d53;
-@@ -238,6 +285,5 @@
+@@ -238,6 +283,5 @@
                  if (i5[0][1] != 0 && MathHelper.floor_double(this.posX) - i1 == i5[0][0] && MathHelper.floor_double(this.posZ) - i3 == i5[0][2]) {
                      this.setPosition(this.posX, this.posY + i5[0][1], this.posZ);
 -                }
@@ -203,7 +217,7 @@
 +                } else if (i5[1][1] != 0 && MathHelper.floor_double(this.posX) - i1 == i5[1][0] && MathHelper.floor_double(this.posZ) - i3 == i5[1][2]) {
                      this.setPosition(this.posX, this.posY + i5[1][1], this.posZ);
                  }
-@@ -246,6 +292,5 @@
+@@ -246,6 +290,5 @@
                      this.motionY *= 0.0;
                      this.motionZ *= 0.996999979019165;
 -                }
@@ -211,7 +225,7 @@
 +                } else {
                      if (this.minecartType == 2) {
                          final double d58 = MathHelper.sqrt_double(this.pushX * this.pushX + this.pushZ * this.pushZ);
-@@ -260,6 +305,5 @@
+@@ -260,6 +303,5 @@
                              this.motionX += this.pushX * d59;
                              this.motionZ += this.pushZ * d59;
 -                        }
@@ -219,7 +233,7 @@
 +                        } else {
                              this.motionX *= 0.8999999761581421;
                              this.motionY *= 0.0;
-@@ -296,6 +340,5 @@
+@@ -296,6 +338,5 @@
                              this.pushX = 0.0;
                              this.pushZ = 0.0;
 -                        }
@@ -227,7 +241,7 @@
 +                        } else {
                              this.pushX = this.motionX;
                              this.pushZ = this.motionZ;
-@@ -303,6 +346,5 @@
+@@ -303,6 +344,5 @@
                      }
                  }
 -            }
@@ -235,14 +249,14 @@
 +            } else {
                  if (this.motionX < -d45) {
                      this.motionX = -d45;
-@@ -333,5 +375,5 @@
+@@ -333,5 +373,5 @@
              final double d63 = this.prevPosZ - this.posZ;
              if (d62 * d62 + d63 * d63 > 0.001) {
 -                this.rotationYaw = (float)(Math.atan2(d63, d62) * 180.0 / 3.141592653589793);
 +                this.rotationYaw = (float) (Math.atan2(d63, d62) * 180.0 / 3.141592653589793);
                  if (this.isInReverse) {
                      this.rotationYaw += 180.0f;
-@@ -339,5 +381,6 @@
+@@ -339,5 +379,6 @@
              }
              double d64;
 -            for (d64 = this.rotationYaw - this.prevRotationYaw; d64 >= 180.0; d64 -= 360.0) {}
@@ -250,7 +264,7 @@
 +            }
              while (d64 < -180.0) {
                  d64 += 360.0;
-@@ -348,8 +391,21 @@
+@@ -348,8 +389,21 @@
              }
              this.setRotation(this.rotationYaw, this.rotationPitch);
 +            // CraftBukkit start
@@ -273,14 +287,24 @@
 +                    final Entity entity17 = (Entity) list15.get(i8);
                      if (entity17 != this.riddenByEntity && entity17.canBePushed() && entity17 instanceof EntityMinecart) {
                          entity17.applyEntityCollision(this);
-@@ -371,5 +427,5 @@
+@@ -371,13 +425,13 @@
          }
      }
 -    
 +
      public Vec3D getPos(double x, double y, double z) {
          final int i7 = MathHelper.floor_double(x);
-@@ -399,10 +455,8 @@
+         int i8 = MathHelper.floor_double(y);
+         final int i9 = MathHelper.floor_double(z);
+-        if (this.worldObj.getBlockId(i7, i8 - 1, i9) == Block.minecartTrack.blockID) {
++        if (this.worldObj.getBlockId(i7, i8 - 1, i9) == Block.MINECART_TRACK.blockID) {
+             --i8;
+         }
+-        if (this.worldObj.getBlockId(i7, i8, i9) == Block.minecartTrack.blockID) {
++        if (this.worldObj.getBlockId(i7, i8, i9) == Block.MINECART_TRACK.blockID) {
+             final int i10 = this.worldObj.getBlockMetadata(i7, i8, i9);
+             y = i8;
+@@ -399,10 +453,8 @@
                  x = i7 + 0.5;
                  d12 = z - i9;
 -            }
@@ -293,14 +317,14 @@
 +            } else {
                  final double d22 = x - d13;
                  final double d23 = z - d15;
-@@ -422,5 +476,5 @@
+@@ -422,5 +474,5 @@
          return null;
      }
 -    
 +
      @Override
      protected void writeEntityToNBT(final NBTTagCompound nbttagcompound) {
-@@ -429,20 +483,19 @@
+@@ -429,20 +481,19 @@
              nbttagcompound.setDouble("PushX", this.pushX);
              nbttagcompound.setDouble("PushZ", this.pushZ);
 -            nbttagcompound.setShort("Fuel", (short)this.fuel);
@@ -326,7 +350,7 @@
 +
      @Override
      protected void readEntityFromNBT(final NBTTagCompound nbttagcompound) {
-@@ -452,10 +505,9 @@
+@@ -452,10 +503,9 @@
              this.pushZ = nbttagcompound.getDouble("PushZ");
              this.fuel = nbttagcompound.getShort("Fuel");
 -        }
@@ -339,7 +363,7 @@
 +                final NBTTagCompound nBTTagCompound4 = (NBTTagCompound) nBTTagList2.tagAt(i3);
                  final int i4 = nBTTagCompound4.getByte("Slot") & 0xFF;
                  if (i4 >= 0 && i4 < this.cargoItems.length) {
-@@ -465,10 +517,28 @@
+@@ -465,10 +515,28 @@
          }
      }
 -    
@@ -370,14 +394,14 @@
 +                // CraftBukkit end
              }
              double d2 = entity.posX - this.posX;
-@@ -494,5 +564,5 @@
+@@ -494,5 +562,5 @@
                      double d6 = entity.motionX + this.motionX;
                      double d7 = entity.motionZ + this.motionZ;
 -                    if (((EntityMinecart)entity).minecartType == 2 && this.minecartType != 2) {
 +                    if (((EntityMinecart) entity).minecartType == 2 && this.minecartType != 2) {
                          this.motionX *= 0.20000000298023224;
                          this.motionZ *= 0.20000000298023224;
-@@ -500,6 +570,5 @@
+@@ -500,6 +568,5 @@
                          entity.motionX *= 0.699999988079071;
                          entity.motionZ *= 0.699999988079071;
 -                    }
@@ -385,7 +409,7 @@
 +                    } else if (((EntityMinecart) entity).minecartType != 2 && this.minecartType == 2) {
                          entity.motionX *= 0.20000000298023224;
                          entity.motionZ *= 0.20000000298023224;
-@@ -507,6 +576,5 @@
+@@ -507,6 +574,5 @@
                          this.motionX *= 0.699999988079071;
                          this.motionZ *= 0.699999988079071;
 -                    }
@@ -393,7 +417,7 @@
 +                    } else {
                          d6 /= 2.0;
                          d7 /= 2.0;
-@@ -518,6 +586,5 @@
+@@ -518,6 +584,5 @@
                          entity.addVelocity(d6 + d2, 0.0, d7 + d3);
                      }
 -                }
@@ -401,7 +425,7 @@
 +                } else {
                      this.addVelocity(-d2, 0.0, -d3);
                      entity.addVelocity(d2 / 4.0, 0.0, d3 / 4.0);
-@@ -526,13 +593,31 @@
+@@ -526,13 +591,31 @@
          }
      }
 -    

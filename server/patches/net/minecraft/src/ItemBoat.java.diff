@@ -53,7 +53,7 @@
 +                }
 +                // CraftBukkit end
 +
-+                if (world.getBlockId(x, y, z) == Block.snow.blockID) {
++                if (world.getBlockId(x, y, z) == Block.SNOW.blockID) {
 +                    --y;
 +                }
 +                //LilyBukkit start

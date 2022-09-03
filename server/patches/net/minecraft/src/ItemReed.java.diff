@@ -6,19 +6,21 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
 +import org.bukkit.event.block.BlockPlaceEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.block.LBBlockState;
++import ru.vladthemountain.lilybukkit.core.LBWorld;
++import ru.vladthemountain.lilybukkit.core.block.LBBlockState;
 +
  public class ItemReed extends Item {
      private int spawnID;
-@@ -11,4 +17,7 @@
+@@ -11,5 +17,8 @@
      @Override
      public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, int x, int y, int z, int i7) {
+-        if (world.getBlockId(x, y, z) == Block.snow.blockID) {
 +
 +        int clickedX = x, clickedY = y, clickedZ = z; // CraftBukkit
 +
-         if (world.getBlockId(x, y, z) == Block.snow.blockID) {
++        if (world.getBlockId(x, y, z) == Block.SNOW.blockID) {
              i7 = 0;
+         }
 @@ -39,5 +48,29 @@
          if (world.canBlockBePlacedAt(this.spawnID, x, y, z, false)) {
              final Block block8 = Block.blocksList[this.spawnID];

@@ -1,6 +1,6 @@
 package org.bukkit.craftbukkit;
 
-import ru.vladthemountain.lilybukkit.LBOfflinePlayer;
+import ru.vladthemountain.lilybukkit.core.LBOfflinePlayer;
 
 @Deprecated
 public class CraftOfflinePlayer extends LBOfflinePlayer {

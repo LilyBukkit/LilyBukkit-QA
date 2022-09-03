@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit;
 
 import net.minecraft.src.WorldServer;
 import org.bukkit.generator.ChunkGenerator;
-import ru.vladthemountain.lilybukkit.LBWorld;
+import ru.vladthemountain.lilybukkit.core.LBWorld;
 
 @Deprecated
 public class CraftWorld extends LBWorld {

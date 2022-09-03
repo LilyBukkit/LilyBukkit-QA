@@ -93,8 +93,9 @@
      @Override
      public void handleLogin(final Packet1Login packet) {
          this.username = packet.username;
+-        if (packet.protocolVersion != 2) {
 +        this.password = packet.password;
-         if (packet.protocolVersion != 2) {
++        if (packet.protocolVersion /* > */ != 2 /* || packet.protocolVersion < 1 */) {// :skull:
              this.kickUser("Outdated client!");
          }
 -        this.isULPP = ULPPManager.IsVersionString(packet.password);
@@ -108,10 +109,10 @@
 +            NetLoginHandler.logger.info("User doesn't have ULPP enabled"); //LilyBukkit - additional output
          }
 +        if (ULPPManager.supportsExtension(packet.password, "ROSE", 1, 1)) {
-+            NetLoginHandler.logger.info("User connected via 1.1.0.2-1.1.0.5"); //LilyBukkit - additional output
++            NetLoginHandler.logger.info("User connected via Rosepad 1.1.0.2-1.1.0.5"); //LilyBukkit - additional output
 +            this.ROSEVersion = 1;
 +        } else if (ULPPManager.supportsExtension(packet.password, "ROSE", 2, 2)) {
-+            NetLoginHandler.logger.info("User connected via 1.1.0.6+"); //LilyBukkit - additional output
++            NetLoginHandler.logger.info("User connected via Rosepad 1.1.0.6+"); //LilyBukkit - additional output
 +            this.ROSEVersion = 2;
 +        } else {
 +            NetLoginHandler.logger.info("User isn't using Rosepad"); //LilyBukkit - additional output
@@ -150,7 +151,7 @@
 -                NetLoginHandler.logger.info(String.valueOf(this.username) + " failed to authenticate");
 -                this.kickUser("Unable to authenticate using ULPP");
 +                NetLoginHandler.logger.info(this.username + " failed to authenticate");
-+                this.kickUser("Unable to authenticate using ULPP. Error code: " + returnCode + "."); //LilyBukkit - add returnCode to the reason
++                this.kickUser("Unable to authenticate using ULPP. HTTP returned code: " + returnCode + "."); //LilyBukkit - add returnCode to the reason
                  return;
              }
 -        }

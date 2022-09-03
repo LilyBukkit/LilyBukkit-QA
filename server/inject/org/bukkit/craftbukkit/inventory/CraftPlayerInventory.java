@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.inventory;
 
 import net.minecraft.src.InventoryPlayer;
-import ru.vladthemountain.lilybukkit.inventory.LBPlayerInventory;
+import ru.vladthemountain.lilybukkit.core.inventory.LBPlayerInventory;
 
 @Deprecated
 public class CraftPlayerInventory extends LBPlayerInventory {

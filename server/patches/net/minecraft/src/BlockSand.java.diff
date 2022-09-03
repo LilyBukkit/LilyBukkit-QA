@@ -14,3 +14,10 @@
 +                world.spawnEntityInWorld(entityFallingSand8, SpawnReason.NATURAL);
              }
          }
+@@ -53,5 +55,5 @@
+             return true;
+         }
+-        if (i4 == Block.fire.blockID) {
++        if (i4 == Block.FIRE.blockID) {
+             return true;
+         }

@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit.entity;
 
 import org.bukkit.craftbukkit.CraftServer;
-import ru.vladthemountain.lilybukkit.entity.LBProjectile;
+import ru.vladthemountain.lilybukkit.core.entity.LBProjectile;
 
 @Deprecated
 public class AbstractProjectile extends LBProjectile {

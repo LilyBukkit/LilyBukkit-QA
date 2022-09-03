@@ -8,8 +8,8 @@
 +import org.bukkit.event.entity.EntityDamageByEntityEvent;
 +import org.bukkit.event.entity.EntityDamageEvent;
 +import org.bukkit.event.entity.ProjectileHitEvent;
-+import ru.vladthemountain.lilybukkit.entity.LBLivingEntity;
-+import ru.vladthemountain.lilybukkit.entity.LBSnowball;
++import ru.vladthemountain.lilybukkit.core.entity.LBLivingEntity;
++import ru.vladthemountain.lilybukkit.core.entity.LBSnowball;
 +
  import java.util.List;
  

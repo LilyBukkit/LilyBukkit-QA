@@ -5,7 +5,7 @@
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.ExplosionPrimeEvent;
-+import ru.vladthemountain.lilybukkit.entity.LBCreeper;
++import ru.vladthemountain.lilybukkit.core.entity.LBCreeper;
 +
  public class EntityCreeper extends EntityMob {
      int timeSinceIgnited;

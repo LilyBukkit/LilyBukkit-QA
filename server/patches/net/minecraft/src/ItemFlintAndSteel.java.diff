@@ -8,8 +8,8 @@
 +import org.bukkit.entity.Player;
 +import org.bukkit.event.block.BlockIgniteEvent;
 +import org.bukkit.event.block.BlockPlaceEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.block.LBBlockState;
++import ru.vladthemountain.lilybukkit.core.LBWorld;
++import ru.vladthemountain.lilybukkit.core.block.LBBlockState;
 +
  public class ItemFlintAndSteel extends Item {
      public ItemFlintAndSteel(final int itemID) {
@@ -42,10 +42,11 @@
 +            // CraftBukkit end
 +
              world.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, "fire.ignite", 1.0f, ItemFlintAndSteel.rand.nextFloat() * 0.4f + 0.8f);
-             world.setBlockWithNotify(x, y, z, Block.fire.blockID);
+-            world.setBlockWithNotify(x, y, z, Block.fire.blockID);
++            world.setBlockWithNotify(x, y, z, Block.FIRE.blockID);
 +
 +            //LilyBukkit start
-+            BlockPlaceEvent placeEvent = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, Block.fire.blockID);
++            BlockPlaceEvent placeEvent = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, Block.FIRE.blockID);
 +            if (placeEvent.isCancelled() || !placeEvent.canBuild()) {
 +                placeEvent.getBlockPlaced().setTypeIdAndData(0, (byte) 0, false);
 +                return false;

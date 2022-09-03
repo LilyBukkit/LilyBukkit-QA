@@ -1,6 +1,6 @@
 --- BlockFire.java
 +++ BlockFire.java
-@@ -1,4 +1,11 @@
+@@ -1,4 +1,10 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
@@ -8,11 +8,27 @@
 +import org.bukkit.event.block.BlockIgniteEvent;
 +import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 +import org.bukkit.event.block.BlockSpreadEvent;
-+import org.bukkit.material.MaterialData;
 +
  import java.util.Random;
  
-@@ -72,4 +79,13 @@
+@@ -11,10 +17,10 @@
+         this.chanceToEncourageFire = new int[256];
+         this.abilityToCatchFire = new int[256];
+-        this.initializeBlock(Block.planks.blockID, 5, 20);
+-        this.initializeBlock(Block.wood.blockID, 5, 5);
+-        this.initializeBlock(Block.leaves.blockID, 30, 60);
+-        this.initializeBlock(Block.bookshelf.blockID, 30, 20);
+-        this.initializeBlock(Block.tnt.blockID, 15, 100);
+-        this.initializeBlock(Block.cloth.blockID, 30, 60);
++        this.initializeBlock(Block.PLANKS.blockID, 5, 20);
++        this.initializeBlock(Block.WOOD.blockID, 5, 5);
++        this.initializeBlock(Block.LEAVES.blockID, 30, 60);
++        this.initializeBlock(Block.BOOKSHELF.blockID, 30, 20);
++        this.initializeBlock(Block.TNT.blockID, 15, 100);
++        this.initializeBlock(Block.CLOTH.blockID, 30, 60);
+         this.setTickOnLoad(true);
+     }
+@@ -72,4 +78,13 @@
              this.tryToCatchBlockOnFire(world, x, y, z - 1, 300, random);
              this.tryToCatchBlockOnFire(world, x, y, z + 1, 300, random);
 +
@@ -26,7 +42,7 @@
 +
              for (int i7 = x - 1; i7 <= x + 1; ++i7) {
                  for (int i8 = z - 1; i8 <= z + 1; ++i8) {
-@@ -82,5 +98,28 @@
+@@ -82,5 +97,28 @@
                              final int i11 = this.getChanceOfNeighborsEncouragingFire(world, i7, i9, i8);
                              if (i11 > 0 && random.nextInt(i10) <= i11) {
 -                                world.setBlockWithNotify(i7, i9, i8, this.blockID);
@@ -34,7 +50,7 @@
 +                                // CraftBukkit start - Call to stop spread of fire.
 +                                org.bukkit.block.Block block = bworld.getBlockAt(i7, i9, i8);
 +
-+                                if (block.getTypeId() != Block.fire.blockID) {
++                                if (block.getTypeId() != Block.FIRE.blockID) {
 +                                    BlockIgniteEvent event = new BlockIgniteEvent(block, igniteCause, null);
 +                                    server.getPluginManager().callEvent(event);
 +
@@ -56,9 +72,11 @@
 +                                // CraftBukkit end
                              }
                          }
-@@ -95,4 +134,14 @@
+@@ -94,5 +132,15 @@
+         final int i7 = this.abilityToCatchFire[world.getBlockId(x, y, z)];
          if (random.nextInt(chance) < i7) {
-             final boolean z2 = world.getBlockId(x, y, z) == Block.tnt.blockID;
+-            final boolean z2 = world.getBlockId(x, y, z) == Block.tnt.blockID;
++            final boolean z2 = world.getBlockId(x, y, z) == Block.TNT.blockID;
 +            // CraftBukkit start
 +            org.bukkit.block.Block theBlock = Bukkit.getWorld(world.levelName).getBlockAt(x, y, z);
 +
@@ -71,3 +89,10 @@
 +            // CraftBukkit end
              if (random.nextInt(2) == 0) {
                  world.setBlockWithNotify(x, y, z, this.blockID);
+@@ -102,5 +150,5 @@
+             }
+             if (z2) {
+-                Block.tnt.onBlockDestroyedByPlayer(world, x, y, z, 0);
++                Block.TNT.onBlockDestroyedByPlayer(world, x, y, z, 0);
+             }
+         }

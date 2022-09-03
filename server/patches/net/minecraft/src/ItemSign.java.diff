@@ -6,8 +6,8 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
 +import org.bukkit.event.block.BlockPlaceEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.block.LBBlockState;
++import ru.vladthemountain.lilybukkit.core.LBWorld;
++import ru.vladthemountain.lilybukkit.core.block.LBBlockState;
 +
  public class ItemSign extends Item {
      public ItemSign(final int itemID) {
@@ -24,25 +24,30 @@
 +        int clickedX = x, clickedY = y, clickedZ = z; // CraftBukkit
          if (i7 == 1) {
              ++y;
-@@ -34,12 +41,22 @@
+@@ -31,15 +38,25 @@
+             ++x;
+         }
+-        if (!Block.signStanding.canPlaceBlockAt(world, x, y, z)) {
++        if (!Block.SIGN_STANDING.canPlaceBlockAt(world, x, y, z)) {
              return false;
          }
 +        LBBlockState blockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y, z)); //LilyBukkit
          if (i7 == 1) {
-             world.setBlockAndMetadataWithNotify(x, y, z, Block.signStanding.blockID, MathHelper.floor_double((entityPlayer.rotationYaw + 180.0f) * 16.0f / 360.0f + 0.5) & 0xF);
--        }
--        else {
+-            world.setBlockAndMetadataWithNotify(x, y, z, Block.signStanding.blockID, MathHelper.floor_double((entityPlayer.rotationYaw + 180.0f) * 16.0f / 360.0f + 0.5) & 0xF);
++            world.setBlockAndMetadataWithNotify(x, y, z, Block.SIGN_STANDING.blockID, MathHelper.floor_double((entityPlayer.rotationYaw + 180.0f) * 16.0f / 360.0f + 0.5) & 0xF);
 +        } else {
-             world.setBlockAndMetadataWithNotify(x, y, z, Block.signWall.blockID, i7);
++            world.setBlockAndMetadataWithNotify(x, y, z, Block.SIGN_WALL.blockID, i7);
          }
+-        else {
+-            world.setBlockAndMetadataWithNotify(x, y, z, Block.signWall.blockID, i7);
 +
 +        // CraftBukkit start - sign
-+        BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, i7 == 1 ? Block.signStanding : Block.signWall);
++        BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, i7 == 1 ? Block.SIGN_STANDING : Block.SIGN_WALL);
 +
 +        if (event.isCancelled() || !event.canBuild()) {
 +            event.getBlockPlaced().setTypeIdAndData(blockState.getTypeId(), blockState.getRawData(), false);
 +            return false;
-+        }
+         }
 +        // CraftBukkit end
 +
          --stack.stackSize;

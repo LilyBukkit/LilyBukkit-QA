@@ -5,7 +5,7 @@
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.entity.Entity;
-+import ru.vladthemountain.lilybukkit.entity.LBAnimals;
++import ru.vladthemountain.lilybukkit.core.entity.LBAnimals;
 +
  public abstract class EntityAnimal extends EntityCreature implements IAnimals {
 +
@@ -19,7 +19,8 @@
 +
      @Override
      protected float getBlockPathWeight(final int x, final int y, final int z) {
-         return (this.worldObj.getBlockId(x, y - 1, z) == Block.grass.blockID) ? 10.0f : (this.worldObj.getBrightness(x, y, z) - 0.5f);
+-        return (this.worldObj.getBlockId(x, y - 1, z) == Block.grass.blockID) ? 10.0f : (this.worldObj.getBrightness(x, y, z) - 0.5f);
++        return (this.worldObj.getBlockId(x, y - 1, z) == Block.GRASS.blockID) ? 10.0f : (this.worldObj.getBrightness(x, y, z) - 0.5f);
      }
 -    
 +
@@ -37,8 +38,11 @@
 +
      @Override
      public boolean getCanSpawnHere() {
-@@ -28,8 +36,13 @@
-         return this.worldObj.getBlockId(i1, i2 - 1, i3) == Block.grass.blockID && this.worldObj.getBlockLightValue(i1, i2, i3) > 8 && super.getCanSpawnHere();
+@@ -26,10 +34,15 @@
+         final int i2 = MathHelper.floor_double(this.boundingBox.minY);
+         final int i3 = MathHelper.floor_double(this.posZ);
+-        return this.worldObj.getBlockId(i1, i2 - 1, i3) == Block.grass.blockID && this.worldObj.getBlockLightValue(i1, i2, i3) > 8 && super.getCanSpawnHere();
++        return this.worldObj.getBlockId(i1, i2 - 1, i3) == Block.GRASS.blockID && this.worldObj.getBlockLightValue(i1, i2, i3) > 8 && super.getCanSpawnHere();
      }
 -    
 +

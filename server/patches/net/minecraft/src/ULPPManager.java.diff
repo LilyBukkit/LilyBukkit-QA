@@ -1,6 +1,6 @@
 --- ULPPManager.java
 +++ ULPPManager.java
-@@ -3,26 +3,66 @@
+@@ -3,26 +3,65 @@
  import net.minecraft.server.MinecraftServer;
  
 +import java.util.ArrayList;
@@ -46,7 +46,6 @@
 +        List<ULPPExtension> extensions = getProtocolExtensions(ver);
 +        for (ULPPExtension ext : extensions) {
 +            if (ext.getName().equals(extension)) {
-+                NetLoginHandler.logger.info("From" + ver + " " + extension + ":" + ext.getVersion());
 +                return !(ext.getVersion() < versionNumberMin && ext.getVersion() > versionNumberMax);
 +            }
 +        }
@@ -83,7 +82,7 @@
 +
      public static NetServerHandler CreateServerHandler(final int version, final MinecraftServer mc, final NetworkManager netManager, final EntityPlayerMP entityPlayer) {
          switch (version) {
-@@ -31,5 +71,5 @@
+@@ -31,5 +70,5 @@
              }
              default: {
 -                throw new RuntimeException(new StringBuilder("Unknown ULPP version ").append(Integer.toString(version)).toString());

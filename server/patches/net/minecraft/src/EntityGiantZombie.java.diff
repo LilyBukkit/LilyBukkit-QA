@@ -5,7 +5,7 @@
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.entity.Entity;
-+import ru.vladthemountain.lilybukkit.entity.LBGiant;
++import ru.vladthemountain.lilybukkit.core.entity.LBGiant;
 +
  public class EntityGiantZombie extends EntityMob {
 +

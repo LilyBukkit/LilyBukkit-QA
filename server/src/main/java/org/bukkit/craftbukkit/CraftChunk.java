@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit;
 
 import net.minecraft.src.Chunk;
-import ru.vladthemountain.lilybukkit.LBChunk;
+import ru.vladthemountain.lilybukkit.core.LBChunk;
 
 @Deprecated
 public class CraftChunk extends LBChunk {

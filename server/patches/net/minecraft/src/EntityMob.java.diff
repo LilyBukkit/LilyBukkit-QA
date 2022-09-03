@@ -7,8 +7,8 @@
 +import org.bukkit.event.entity.EntityDamageByEntityEvent;
 +import org.bukkit.event.entity.EntityDamageEvent;
 +import org.bukkit.event.entity.EntityTargetEvent;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
-+import ru.vladthemountain.lilybukkit.entity.LBMonster;
++import ru.vladthemountain.lilybukkit.core.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.core.entity.LBMonster;
 +
  public class EntityMob extends EntityCreature implements IMobs {
      protected int attackStrength;

@@ -1,8 +1,8 @@
 package org.bukkit.craftbukkit.block;
 
 import org.bukkit.block.Block;
-import ru.vladthemountain.lilybukkit.LBWorld;
-import ru.vladthemountain.lilybukkit.block.LBChest;
+import ru.vladthemountain.lilybukkit.core.LBWorld;
+import ru.vladthemountain.lilybukkit.core.block.LBChest;
 
 @Deprecated
 public class CraftChest extends LBChest {

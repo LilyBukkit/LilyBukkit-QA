@@ -22,8 +22,9 @@
      @Override
      public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, final int y, final int z, final int i7) {
          final int i8 = world.getBlockId(x, y, z);
-         if (i8 == Block.minecartTrack.blockID) {
+-        if (i8 == Block.minecartTrack.blockID) {
 -            world.spawnEntityInWorld(new EntityMinecart(world, x + 0.5f, y + 0.5f, z + 0.5f, this.minecartType));
++        if (i8 == Block.MINECART_TRACK.blockID) {
 +
 +            // CraftBukkit start - Minecarts
 +            PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent((EntityPlayerMP) entityPlayer, Action.RIGHT_CLICK_BLOCK, x, y, z, i7, stack);

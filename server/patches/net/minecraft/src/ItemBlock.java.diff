@@ -6,18 +6,20 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
 +import org.bukkit.event.block.BlockPlaceEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.block.LBBlockState;
++import ru.vladthemountain.lilybukkit.core.LBWorld;
++import ru.vladthemountain.lilybukkit.core.block.LBBlockState;
 +
  public class ItemBlock extends Item {
      private int blockID;
-@@ -12,4 +18,6 @@
+@@ -12,5 +18,7 @@
      @Override
      public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, int x, int y, int z, int i7) {
+-        if (world.getBlockId(x, y, z) == Block.snow.blockID) {
 +        int clickedX = x, clickedY = y, clickedZ = z; // CraftBukkit
 +
-         if (world.getBlockId(x, y, z) == Block.snow.blockID) {
++        if (world.getBlockId(x, y, z) == Block.SNOW.blockID) {
              i7 = 0;
+         }
 @@ -40,5 +48,55 @@
          if (world.canBlockBePlacedAt(this.blockID, x, y, z, false)) {
              final Block block8 = Block.blocksList[this.blockID];
@@ -32,11 +34,11 @@
 +            LBBlockState blockStateBelow = null;
 +            // Toggles whether the normal or the block below is used for the place event
 +            boolean eventUseBlockBelow = false;
-+            if ((world.getBlockId(x, y - 1, z) == Block.stairDouble.blockID || world.getBlockId(x, y - 1, z) == Block.stairDouble.blockID)
-+                    && (stack.itemID == Block.stairDouble.blockID || stack.itemID == Block.stairSingle.blockID)) {
++            if ((world.getBlockId(x, y - 1, z) == Block.STAIR_DOUBLE.blockID || world.getBlockId(x, y - 1, z) == Block.STAIR_DOUBLE.blockID)
++                    && (stack.itemID == Block.STAIR_DOUBLE.blockID || stack.itemID == Block.STAIR_SINGLE.blockID)) {
 +                blockStateBelow = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y - 1, z));
 +                // Step is placed on step, forms a doublestep replacing the original step, so we need the lower block
-+                eventUseBlockBelow = stack.itemID == Block.stairSingle.blockID && blockStateBelow.getTypeId() == Block.stairSingle.blockID;
++                eventUseBlockBelow = stack.itemID == Block.STAIR_SINGLE.blockID && blockStateBelow.getTypeId() == Block.STAIR_SINGLE.blockID;
 +            }
 +
 +            /**
@@ -59,7 +61,7 @@
 +
 +                    } else {
 +
-+                        if (this.blockID == Block.ice.blockID) {
++                        if (this.blockID == Block.ICE.blockID) {
 +                            // Ice will explode if we set straight to 0
 +                            world.setBlock(x, y, z, 20);
 +                        }

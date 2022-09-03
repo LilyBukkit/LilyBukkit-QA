@@ -6,8 +6,8 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
 +import org.bukkit.event.block.BlockPlaceEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.block.LBBlockState;
++import ru.vladthemountain.lilybukkit.core.LBWorld;
++import ru.vladthemountain.lilybukkit.core.block.LBBlockState;
 +
  public class ItemRedstone extends Item {
      public ItemRedstone(final int itemID) {
@@ -18,21 +18,23 @@
 +
          if (i7 == 0) {
              --y;
-@@ -30,6 +38,20 @@
+@@ -29,7 +37,21 @@
+             return false;
          }
-         if (Block.redstoneWire.canPlaceBlockAt(world, x, y, z)) {
+-        if (Block.redstoneWire.canPlaceBlockAt(world, x, y, z)) {
++        if (Block.REDSTONE_WIRE.canPlaceBlockAt(world, x, y, z)) {
 +
 +            LBBlockState blockState = new LBBlockState((LBWorld) Bukkit.getWorld(world.levelName), Bukkit.getWorld(world.levelName).getBlockAt(x, y, z)); // LilyBukkit
 +
 +            // CraftBukkit start - redstone
-+            BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, Block.redstoneWire);
++            BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, Block.REDSTONE_WIRE);
 +
 +            if (event.isCancelled() || !event.canBuild()) {
 +                event.getBlockPlaced().setTypeIdAndData(blockState.getTypeId(), blockState.getRawData(), false);
 +                return false;
 +            }
 +
-+            world.setBlockWithNotify(x, y, z, Block.redstoneWire.blockID); // Must take place after BlockPlaceEvent, we need to update all other blocks.
++            world.setBlockWithNotify(x, y, z, Block.REDSTONE_WIRE.blockID); // Must take place after BlockPlaceEvent, we need to update all other blocks.
 +            // CraftBukkit end
 +
              --stack.stackSize;

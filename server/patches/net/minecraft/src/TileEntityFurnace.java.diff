@@ -1,24 +1,22 @@
 --- TileEntityFurnace.java
 +++ TileEntityFurnace.java
-@@ -1,4 +1,10 @@
+@@ -1,4 +1,8 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.inventory.FurnaceBurnEvent;
 +import org.bukkit.event.inventory.FurnaceSmeltEvent;
-+import org.bukkit.inventory.Inventory;
-+import ru.vladthemountain.lilybukkit.inventory.LBInventory;
 +
  public class TileEntityFurnace extends TileEntity implements IInventory {
      private ItemStack[] furnaceItemStacks;
-@@ -6,5 +12,5 @@
+@@ -6,5 +10,5 @@
      private int currentItemBurnTime;
      private int furnaceCookTime;
 -    
 +
      public TileEntityFurnace() {
          this.furnaceItemStacks = new ItemStack[3];
-@@ -13,15 +19,15 @@
+@@ -13,15 +17,15 @@
          this.furnaceCookTime = 0;
      }
 -    
@@ -37,14 +35,14 @@
 +
      @Override
      public void readFromNBT(final NBTTagCompound nbttagcompound) {
-@@ -30,5 +36,5 @@
+@@ -30,5 +34,5 @@
          this.furnaceItemStacks = new ItemStack[this.getSizeInventory()];
          for (int i = 0; i < nBTTagList.tagCount(); ++i) {
 -            final NBTTagCompound nBTTagCompound2 = (NBTTagCompound)nBTTagList.tagAt(i);
 +            final NBTTagCompound nBTTagCompound2 = (NBTTagCompound) nBTTagList.tagAt(i);
              final byte by = nBTTagCompound2.getByte("Slot");
              if (by >= 0) {
-@@ -42,26 +48,26 @@
+@@ -42,26 +46,26 @@
          this.currentItemBurnTime = this.getItemBurnTime(this.furnaceItemStacks[1]);
      }
 -    
@@ -78,7 +76,7 @@
 +
      public int getBurnTimeRemainingScaled(final int n) {
          if (this.currentItemBurnTime == 0) {
-@@ -70,9 +76,9 @@
+@@ -70,9 +74,9 @@
          return this.furnaceBurnTime * n / this.currentItemBurnTime;
      }
 -    
@@ -90,7 +88,7 @@
 +
      @Override
      public void updateEntity() {
-@@ -83,11 +89,19 @@
+@@ -83,11 +87,19 @@
          }
          if (this.furnaceBurnTime == 0 && this.canSmelt()) {
 -            final int n = this.furnaceBurnTime = this.getItemBurnTime(this.furnaceItemStacks[1]);
@@ -115,7 +113,7 @@
 +                    final ItemStack itemStack2 = this.furnaceItemStacks[1]; // LilyBukkit - remove extra unused constant `itemStack`
                      --itemStack2.stackSize;
                      if (this.furnaceItemStacks[1].stackSize == 0) {
-@@ -104,6 +118,5 @@
+@@ -104,6 +116,5 @@
                  bl2 = true;
              }
 -        }
@@ -123,14 +121,14 @@
 +        } else {
              this.furnaceCookTime = 0;
          }
-@@ -116,5 +129,5 @@
+@@ -116,5 +127,5 @@
          }
      }
 -    
 +
      private boolean canSmelt() {
          if (this.furnaceItemStacks[0] == null) {
-@@ -124,26 +137,36 @@
+@@ -124,49 +135,59 @@
          return n >= 0 && (this.furnaceItemStacks[2] == null || (this.furnaceItemStacks[2].itemID == n && (this.furnaceItemStacks[2].stackSize < this.furnaceItemStacks[2].getMaxStackSize() || this.furnaceItemStacks[2].stackSize < Item.itemsList[n].getItemStackLimit())));
      }
 -    
@@ -178,8 +176,53 @@
 -    
 +
      private int getCookedItem(final int blockID) {
-         if (blockID == Block.oreIron.blockID) {
-@@ -188,5 +211,5 @@
+-        if (blockID == Block.oreIron.blockID) {
++        if (blockID == Block.ORE_IRON.blockID) {
+             return Item.ingotIron.shiftedIndex;
+         }
+-        if (blockID == Block.oreGold.blockID) {
++        if (blockID == Block.ORE_GOLD.blockID) {
+             return Item.ingotGold.shiftedIndex;
+         }
+-        if (blockID == Block.oreDiamond.blockID) {
++        if (blockID == Block.ORE_DIAMOND.blockID) {
+             return Item.diamond.shiftedIndex;
+         }
+-        if (blockID == Block.sand.blockID) {
+-            return Block.glass.blockID;
++        if (blockID == Block.SAND.blockID) {
++            return Block.GLASS.blockID;
+         }
+         if (blockID == Item.porkRaw.shiftedIndex) {
+             return Item.porkCooked.shiftedIndex;
+         }
+-        if (blockID == Block.cobblestone.blockID) {
+-            return Block.stone.blockID;
++        if (blockID == Block.COBBLESTONE.blockID) {
++            return Block.STONE.blockID;
+         }
+         if (blockID == Item.clay.shiftedIndex) {
+             return Item.brick.shiftedIndex;
+         }
+-        if (blockID == Block.obsidian.blockID) {
++        if (blockID == Block.OBSIDIAN.blockID) {
+             return Item.obsidianIngot.shiftedIndex;
+         }
+@@ -177,16 +198,16 @@
+             return Item.greenDye.shiftedIndex;
+         }
+-        if (blockID == Block.plantYellow.blockID) {
++        if (blockID == Block.PLANT_YELLOW.blockID) {
+             return Item.blueDye.shiftedIndex;
+         }
+-        if (blockID == Block.mushroomBrown.blockID) {
++        if (blockID == Block.MUSHROOM_BROWN.blockID) {
+             return Item.pinkDye.shiftedIndex;
+         }
+-        if (blockID == Block.mushroomRed.blockID) {
++        if (blockID == Block.MUSHROOM_RED.blockID) {
+             return Item.fryshroom.shiftedIndex;
+         }
          return -1;
      }
 -    

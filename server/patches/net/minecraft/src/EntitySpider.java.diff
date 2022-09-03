@@ -6,8 +6,8 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.EntityTargetEvent;
 +import org.bukkit.event.entity.EntityTargetEvent.TargetReason;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
-+import ru.vladthemountain.lilybukkit.entity.LBSpider;
++import ru.vladthemountain.lilybukkit.core.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.core.entity.LBSpider;
 +
  public class EntitySpider extends EntityMob {
 +

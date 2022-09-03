@@ -5,7 +5,7 @@
  
 +import org.bukkit.Bukkit;
 +import org.bukkit.event.entity.EntityDeathEvent;
-+import ru.vladthemountain.lilybukkit.entity.LBSheep;
++import ru.vladthemountain.lilybukkit.core.entity.LBSheep;
 +
 +import java.util.ArrayList;
 +
@@ -27,8 +27,11 @@
 +
      @Override
      public boolean attackEntityFrom(final Entity entity, final int damage) {
-@@ -19,13 +29,11 @@
-                 final EntityItem entityItem5 = entityDropItem = this.entityDropItem(Block.cloth.blockID, 1, 1.0f);
+@@ -17,15 +27,13 @@
+             for (int i3 = 1 + this.rand.nextInt(3), i4 = 0; i4 < i3; ++i4) {
+                 final EntityItem entityDropItem;
+-                final EntityItem entityItem5 = entityDropItem = this.entityDropItem(Block.cloth.blockID, 1, 1.0f);
++                final EntityItem entityItem5 = entityDropItem = this.entityDropItem(Block.CLOTH.blockID, 1, 1.0f);
                  entityDropItem.motionY += this.rand.nextFloat() * 0.05f;
 -                final EntityItem entityItem6 = entityItem5;
 -                entityItem6.motionX += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;

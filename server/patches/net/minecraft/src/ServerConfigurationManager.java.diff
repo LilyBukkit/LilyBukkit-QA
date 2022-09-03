@@ -252,7 +252,7 @@
          }
 -        return new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
 +        if (!(netLoginHandler1.ROSEVersion == 0))
-+            netLoginHandler1.netManager.addToSendQueue(new Packet130RosepadMeta().Default()); //LilyBukkit - Send the packet only if Rosepad is enforced on the server. This is done to allow vanilla Lilypad QA connections
++            netLoginHandler1.netManager.addToSendQueue(new Packet130RosepadMeta().Default()); //LilyBukkit - send the packet if ROSE extension is present
 +        //return new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
 +        return entity; // LilyBukkit
      }

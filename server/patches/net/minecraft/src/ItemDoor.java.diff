@@ -6,18 +6,27 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.craftbukkit.event.CraftEventFactory;
 +import org.bukkit.event.block.BlockPlaceEvent;
-+import ru.vladthemountain.lilybukkit.LBWorld;
-+import ru.vladthemountain.lilybukkit.block.LBBlockState;
++import ru.vladthemountain.lilybukkit.core.LBWorld;
++import ru.vladthemountain.lilybukkit.core.block.LBBlockState;
 +
  public class ItemDoor extends Item {
      private Material material;
-@@ -16,4 +22,6 @@
+@@ -16,11 +22,13 @@
              return false;
          }
 +
 +        int clickedX = x, clickedY = y, clickedZ = z; // CraftBukkit
          ++y;
          Block block8;
+         if (this.material == Material.wood) {
+-            block8 = Block.doorWood;
++            block8 = Block.DOOR_WOOD;
+         }
+         else {
+-            block8 = Block.doorSteel;
++            block8 = Block.DOOR_IRON;
+         }
+         if (!block8.canPlaceBlockAt(world, x, y, z)) {
 @@ -42,6 +50,6 @@
              b10 = 1;
          }
@@ -36,7 +45,7 @@
          world.setBlockWithNotify(x, y, z, block8.blockID);
          world.setBlockMetadataWithNotify(x, y, z, i8);
 +        //CraftBukkit start
-+        BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, this.material==Material.wood?Block.doorWood:Block.doorSteel);
++        BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, blockState, clickedX, clickedY, clickedZ, this.material==Material.wood?Block.DOOR_WOOD :Block.DOOR_IRON);
 +
 +        if (event.isCancelled() || !event.canBuild()) {
 +            event.getBlockPlaced().setTypeIdAndData(blockState.getTypeId(), blockState.getRawData(), false);

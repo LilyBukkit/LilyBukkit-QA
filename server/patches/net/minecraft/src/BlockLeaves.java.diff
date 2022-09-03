@@ -36,13 +36,17 @@
 +
      public void updateCurrentLeaves(final World world, final int x, final int y, final int z) {
          if (this.decayCounter++ < 100) {
-@@ -58,5 +61,5 @@
+@@ -58,8 +61,8 @@
          }
      }
 -    
 +
      private int getConnectionStrength(final World world, final int x, final int y, final int z, final int i5) {
          final int i6 = world.getBlockId(x, y, z);
+-        if (i6 == Block.wood.blockID) {
++        if (i6 == Block.WOOD.blockID) {
+             return 16;
+         }
 @@ -72,5 +75,5 @@
          return i5;
      }
@@ -86,7 +90,8 @@
 +
      @Override
      public int idDropped(final int count, final Random random) {
-         return Block.sapling.blockID;
+-        return Block.sapling.blockID;
++        return Block.SAPLING.blockID;
      }
 -    
 +

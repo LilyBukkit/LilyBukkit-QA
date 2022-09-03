@@ -13,8 +13,8 @@
 +import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 +import org.bukkit.event.vehicle.VehicleMoveEvent;
 +import org.bukkit.event.vehicle.VehicleUpdateEvent;
-+import ru.vladthemountain.lilybukkit.entity.LBBoat;
-+import ru.vladthemountain.lilybukkit.entity.LBEntity;
++import ru.vladthemountain.lilybukkit.core.entity.LBBoat;
++import ru.vladthemountain.lilybukkit.core.entity.LBEntity;
 +
  import java.util.List;
  
@@ -28,7 +28,7 @@
 +
      public EntityBoat(final World world) {
          super(world);
-@@ -17,32 +33,56 @@
+@@ -17,34 +33,58 @@
          this.yOffset = this.height / 2.0f;
          this.canTriggerWalking = false;
 +
@@ -90,7 +90,10 @@
 +            }
 +            // CraftBukkit end
              for (int i3 = 0; i3 < 3; ++i3) {
-                 this.entityDropItem(Block.planks.blockID, 1, 0.0f);
+-                this.entityDropItem(Block.planks.blockID, 1, 0.0f);
++                this.entityDropItem(Block.PLANKS.blockID, 1, 0.0f);
+             }
+             for (int i3 = 0; i3 < 2; ++i3) {
 @@ -55,12 +95,20 @@
          return true;
      }
@@ -122,7 +125,13 @@
 +                } else {
                      final double d12 = this.posX + d8 + d9 * d10 * 0.7;
                      final double d13 = this.posZ + d9 - d8 * d10 * 0.7;
-@@ -135,6 +182,5 @@
+@@ -130,11 +177,10 @@
+             this.setEntityDead();
+             for (int i6 = 0; i6 < 3; ++i6) {
+-                this.entityDropItem(Block.planks.blockID, 1, 0.0f);
++                this.entityDropItem(Block.PLANKS.blockID, 1, 0.0f);
+             }
+             for (int i6 = 0; i6 < 2; ++i6) {
                  this.entityDropItem(Item.stick.shiftedIndex, 1, 0.0f);
              }
 -        }
