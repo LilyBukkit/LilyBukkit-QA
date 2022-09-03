@@ -6,7 +6,7 @@
 is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 
 * [Forum](https://github.com/Vladg24YT/LilyBukkit/discussions)
-* [Latest release](https://github.com/Vladg24YT/LilyBukkit/releases/latest)
+* [Latest release](https://github.com/Vladg24YT/LilyBukkit/releases/latest) | [Latest devbuild](https://nightly.link/LilyBukkit/LilyBukkit-Core/workflows/main/master/RosepadServer.zip)
 
 ## Features
 * **Extended YAML configuration** - If you think `server.properties` offers too few options to customize.
@@ -17,7 +17,7 @@ is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 ## Development plan
 
 - [x] Plugin support (`1.0.0.0`)
-- [x] Persmission support (`1.0.0.0`)
+- [x] Persmissions support (`1.0.0.0`)
 - [x] YAML Config support (`1.1.0.0`)
 - [ ] Multi-world support (`2.0.0.0`)
 
