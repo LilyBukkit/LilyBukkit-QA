@@ -123,7 +123,7 @@ createPatches {
 
 jar {
     manifest {
-        attributes "Main-Class": "ru.vladthemountain.lilybukkit.NewMain"
+        attributes "Main-Class": "ru.vladthemountain.lilybukkit.core.NewMain"
     }
 }
 
