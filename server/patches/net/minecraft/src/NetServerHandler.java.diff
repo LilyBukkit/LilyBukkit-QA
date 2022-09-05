@@ -207,7 +207,7 @@
 +            double diffY = posY - this.playerEntity.posY;
 +            double diffZ = posZ - this.playerEntity.posZ;
 +            final float zeroSixTwoFive = 0.0625f;
-+            final boolean stuffWereInTheWay = this.mcServer.worldMngr.getCollidingBoundingBoxes(
++            final boolean stuffWereInTheWay = this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName).getCollidingBoundingBoxes(
 +                    this.playerEntity,
 +                    this.playerEntity.boundingBox.copy().removeCoord(zeroSixTwoFive, zeroSixTwoFive, zeroSixTwoFive)
 +            ).size() > 0;
@@ -235,7 +235,7 @@
 -            if (z17 && (z18 || !z19)) {
 -                this.teleportTo(this.lastPosX, this.lastPosY, this.lastPosZ, f8, f9);
 +            this.playerEntity.setPositionAndRotation(posX, posY, posZ, rotationYaw, rotationPitch);
-+            final boolean stuffInTheWay = this.mcServer.worldMngr.getCollidingBoundingBoxes(
++            final boolean stuffInTheWay = this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName).getCollidingBoundingBoxes(
 +                    this.playerEntity,
 +                    this.playerEntity.boundingBox.copy().removeCoord(zeroSixTwoFive, zeroSixTwoFive, zeroSixTwoFive)
 +            ).size() == 0;
@@ -276,11 +276,11 @@
 +                //                  addZ *= -0.5;
 +                //              }
 +
-+                this.sendPacket(new Packet53BlockChange(lastBlockX, lastBlockY, lastBlockZ, this.mcServer.worldMngr));
++                this.sendPacket(new Packet53BlockChange(lastBlockX, lastBlockY, lastBlockZ, this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName)));
 +                this.teleportTo(lastPosX, lastPosY + 0.5, lastPosZ, rotationYaw, rotationPitch);
                  return;
              }
-@@ -110,14 +260,25 @@
+@@ -110,29 +260,34 @@
          }
      }
 -    
@@ -312,7 +312,11 @@
 +
      @Override
      public void handleBlockDig(final Packet14BlockDig packet) {
-@@ -128,11 +289,5 @@
+         this.playerEntity.inventory.mainInventory[this.playerEntity.inventory.currentItem] = this.heldItem;
+-        final WorldServer worldMngr = this.mcServer.worldMngr;
++        final WorldServer worldMngr = this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName);
+         final boolean op = this.mcServer.configManager.isOp(this.playerEntity.username);
+         worldMngr.disableSpawnProtection = op;
          final boolean isOP = op;
          final boolean isAuthed = this.mcServer.configManager.isAuthed(this.playerEntity.username);
 -        boolean z3 = false;
@@ -359,13 +363,24 @@
 +        } else if (packet.status == 3) {
              final double d5 = this.playerEntity.posX - (i18 + 0.5);
              final double d6 = this.playerEntity.posY - (i19 + 0.5);
-@@ -181,5 +333,5 @@
-         this.mcServer.worldMngr.disableSpawnProtection = false;
+@@ -176,13 +328,13 @@
+             final double d8 = d5 * d5 + d6 * d6 + d7 * d7;
+             if (d8 < 256.0) {
+-                this.playerEntity.playerNetServerHandler.sendPacket(new Packet53BlockChange(i18, i19, i20, this.mcServer.worldMngr));
++                this.playerEntity.playerNetServerHandler.sendPacket(new Packet53BlockChange(i18, i19, i20, this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName)));
+             }
+         }
+-        this.mcServer.worldMngr.disableSpawnProtection = false;
++        this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName).disableSpawnProtection = false;
      }
 -    
 +
      @Override
      public void handlePlace(final Packet15Place packet) {
+-        final WorldServer worldMngr = this.mcServer.worldMngr;
++        final WorldServer worldMngr = this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName);
+         final boolean op = this.mcServer.configManager.isOp(this.playerEntity.username);
+         worldMngr.disableSpawnProtection = op;
 @@ -193,49 +345,54 @@
          final int i5 = packet.zPosition;
          final int i6 = packet.direction;
@@ -383,11 +398,14 @@
 +        final boolean allowed = (isAuthed || !mcServer.onlineMode) && distance < 7.5 && spawnDistance > 16 || isOP;
          if (allowed) {
              final ItemStack itemStack9 = (packet.id >= 0) ? new ItemStack(packet.id) : null;
-             this.playerEntity.theItemInWorldManager.activeBlockOrUseItem(this.playerEntity, this.mcServer.worldMngr, itemStack9, i3, i4, i5, i6);
+-            this.playerEntity.theItemInWorldManager.activeBlockOrUseItem(this.playerEntity, this.mcServer.worldMngr, itemStack9, i3, i4, i5, i6);
 -        }
+-        this.playerEntity.playerNetServerHandler.sendPacket(new Packet53BlockChange(i3, i4, i5, this.mcServer.worldMngr));
+-        this.mcServer.worldMngr.disableSpawnProtection = false;
++            this.playerEntity.theItemInWorldManager.activeBlockOrUseItem(this.playerEntity, this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName), itemStack9, i3, i4, i5, i6);
 +        } else System.out.println("Denied block placement");
-         this.playerEntity.playerNetServerHandler.sendPacket(new Packet53BlockChange(i3, i4, i5, this.mcServer.worldMngr));
-         this.mcServer.worldMngr.disableSpawnProtection = false;
++        this.playerEntity.playerNetServerHandler.sendPacket(new Packet53BlockChange(i3, i4, i5, this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName)));
++        this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName).disableSpawnProtection = false;
      }
 -    
 +
@@ -431,17 +449,24 @@
 +        Bukkit.getServer().getPluginManager().callEvent(event);
 +        // CraftBukkit end
          this.playerEntity.inventory.mainInventory[this.playerEntity.inventory.currentItem] = this.heldItem;
-         this.mcServer.entityTracker.sendPacketToTrackedPlayers(this.playerEntity, new Packet16BlockItemSwitch(this.playerEntity.entityID, i2));
+-        this.mcServer.entityTracker.sendPacketToTrackedPlayers(this.playerEntity, new Packet16BlockItemSwitch(this.playerEntity.entityID, i2));
++        this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName).entityTracker.sendPacketToTrackedPlayers(this.playerEntity, new Packet16BlockItemSwitch(this.playerEntity.entityID, i2));
      }
 -    
 +
      @Override
      public void handlePickupSpawn(final Packet21PickupSpawn packet) {
-@@ -248,7 +405,7 @@
+@@ -243,12 +400,12 @@
+         final double d3 = packet.yPosition / 32.0;
+         final double d4 = packet.zPosition / 32.0;
+-        final EntityItem entityItem8 = new EntityItem(this.mcServer.worldMngr, d2, d3, d4, new ItemStack(packet.itemID, packet.count));
++        final EntityItem entityItem8 = new EntityItem(this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName), d2, d3, d4, new ItemStack(packet.itemID, packet.count));
+         entityItem8.motionX = packet.rotation / 128.0;
+         entityItem8.motionY = packet.pitch / 128.0;
          entityItem8.motionZ = packet.roll / 128.0;
          entityItem8.delayBeforeCanPickup = 10;
 -        this.mcServer.worldMngr.spawnEntityInWorld(entityItem8);
-+        this.mcServer.worldMngr.spawnEntityInWorld(entityItem8, SpawnReason.NATURAL);
++        this.mcServer.getWorldServer(entityItem8.worldObj.levelName).spawnEntityInWorld(entityItem8, SpawnReason.NATURAL);
      }
 -    
 +
@@ -647,14 +672,27 @@
 +
      public void sendInventoryPackets() {
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-1, this.playerEntity.inventory.mainInventory));
-@@ -380,5 +565,5 @@
+@@ -380,8 +565,17 @@
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-3, this.playerEntity.inventory.armorInventory));
      }
 -    
 +
      @Override
      public void handleComplexEntity(final Packet59ComplexEntity packet) {
-@@ -389,3 +574,39 @@
+-        final TileEntity tileEntity2 = this.mcServer.worldMngr.getBlockTileEntity(packet.xCoord, packet.yCoord, packet.zCoord);
++        TileEntity tileEntity2 = null;
++        // LilyBukkit start
++        for (WorldServer world : this.mcServer.worlds) {
++            TileEntity te = world.getBlockTileEntity(packet.xCoord, packet.yCoord, packet.zCoord);
++            if (te != null && te.equals(this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName).getBlockTileEntity(packet.xCoord, packet.yCoord, packet.zCoord))) {
++                //TODO: replace the TileEntity equality condition with a check that `te` IS in fact the tileEntity that should be handled
++                tileEntity2 = te;
++            }
++        }
++        // LilyBukkit end
+         if (tileEntity2 != null) {
+             tileEntity2.readFromNBT(packet.tileEntityNBT);
+@@ -389,3 +583,39 @@
          }
      }
 +
@@ -665,7 +703,7 @@
 +    @Override
 +    public void handleEntityDamage(Packet35EntityDamage packet) {
 +        System.out.println("Entity " + packet.entityId + " took " + packet.damage + " damage" + (packet.dead ? " (dead)" : ""));
-+        Entity entity = this.mcServer.worldMngr.getEntityWithId(packet.entityId);
++        Entity entity = this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName).getEntityWithId(packet.entityId);
 +        if (entity == null) {
 +            System.out.println("No entity found");
 +            return;
@@ -674,9 +712,9 @@
 +            if (entity.entityID != playerEntity.entityID) return;
 +            if (packet.dead) {
 +                entity.setPosition(
-+                        mcServer.worldMngr.spawnX,
-+                        mcServer.worldMngr.spawnY,
-+                        mcServer.worldMngr.spawnZ
++                        mcServer.getWorldServer(entity.worldObj.levelName).spawnX,
++                        mcServer.getWorldServer(entity.worldObj.levelName).spawnY,
++                        mcServer.getWorldServer(entity.worldObj.levelName).spawnZ
 +                );
 +            }
 +            return;

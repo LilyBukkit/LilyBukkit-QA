@@ -11,12 +11,16 @@
 -import java.io.File;
  
  public class WorldServer extends World {
-@@ -12,13 +14,17 @@
+@@ -12,13 +14,21 @@
      private SpawnerAnimals monsterSpawner;
      private SpawnerAnimals animalSpawner;
 -    
 +
-+    private final LBWorld lbWorld; //LilyBukkit
++    // LilyBukkit start
++    private final LBWorld lbWorld;
++    public EntityTracker entityTracker;
++    public PlayerManager playerManager;
++    // LilyBukkit end
 +
      public WorldServer(final File file1, final String string2, final boolean z3) {
          super(file1, string2);
@@ -33,7 +37,7 @@
 +
      @Override
      public void tick() {
-@@ -29,19 +35,23 @@
+@@ -29,19 +39,22 @@
          this.animalSpawner.onUpdate(this);
      }
 -    
@@ -43,18 +47,22 @@
          return this.chunkProviderServer = new ChunkProviderServer(this, new ChunkLoader(saveDir, true), new ChunkProviderGenerate(this, this.randomSeed));
      }
 -    
-+
-     public List getTileEntityList(final int i1, final int i2, final int i3, final int i4, final int i5, final int i6) {
-         final ArrayList arrayList7 = new ArrayList();
-         for (int i7 = 0; i7 < this.loadedTileEntityList.size(); ++i7) {
+-    public List getTileEntityList(final int i1, final int i2, final int i3, final int i4, final int i5, final int i6) {
+-        final ArrayList arrayList7 = new ArrayList();
+-        for (int i7 = 0; i7 < this.loadedTileEntityList.size(); ++i7) {
 -            final TileEntity tileEntity9 = (TileEntity)this.loadedTileEntityList.get(i7);
-+            final TileEntity tileEntity9 = (TileEntity) this.loadedTileEntityList.get(i7);
-             if (tileEntity9.xCoord >= i1 && tileEntity9.yCoord >= i2 && tileEntity9.zCoord >= i3 && tileEntity9.xCoord < i4 && tileEntity9.yCoord < i5 && tileEntity9.zCoord < i6) {
-                 arrayList7.add(tileEntity9);
+-            if (tileEntity9.xCoord >= i1 && tileEntity9.yCoord >= i2 && tileEntity9.zCoord >= i3 && tileEntity9.xCoord < i4 && tileEntity9.yCoord < i5 && tileEntity9.zCoord < i6) {
+-                arrayList7.add(tileEntity9);
++
++    public List<TileEntity> getTileEntityList(final int i1, final int i2, final int i3, final int i4, final int i5, final int i6) {
++        final ArrayList<TileEntity> arrayList7 = new ArrayList<>();
++        for (TileEntity tileEntity : this.loadedTileEntityList) {
++            if (tileEntity.xCoord >= i1 && tileEntity.yCoord >= i2 && tileEntity.zCoord >= i3 && tileEntity.xCoord < i4 && tileEntity.yCoord < i5 && tileEntity.zCoord < i6) {
++                arrayList7.add(tileEntity);
              }
          }
 -        return (List)arrayList7;
-+        return (List) arrayList7;
++        return arrayList7;
      }
 +
 +    public org.bukkit.World getBukkitWorld() {

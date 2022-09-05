@@ -198,7 +198,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void playEffect(Location loc, Effect effect, int data) {
-        this.entity.mcServer.worldMngr.playSoundAtEntity(this.entity, effect.name(), 100, data); // minus ears
+        this.entity.mcServer.getWorldServer(this.world.getName()).playSoundAtEntity(this.entity, effect.name(), 100, data); // minus ears
     }
 
     /**
@@ -228,7 +228,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean sendChunkChange(Location loc, int sx, int sy, int sz, byte[] data) {
-        Packet51MapChunk packet = new Packet51MapChunk(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), sx, sy, sz, this.entity.mcServer.worldMngr);
+        Packet51MapChunk packet = new Packet51MapChunk(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), sx, sy, sz, this.entity.mcServer.getWorldServer(this.world.getName()));
         packet.chunkData = data;
         this.entity.playerNetServerHandler.handleMapChunk(packet);
         return true;
@@ -240,7 +240,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public void sendBlockChange(Location loc, int material, byte data) {
-        Packet53BlockChange packet = new Packet53BlockChange(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), this.entity.mcServer.worldMngr);
+        Packet53BlockChange packet = new Packet53BlockChange(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), this.entity.mcServer.getWorldServer(this.world.getName()));
         packet.type = material;
         packet.metadata = data;
         this.entity.playerNetServerHandler.handleBlockChange(packet);

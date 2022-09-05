@@ -1,0 +1,51 @@
+--- WorldManager.java
++++ WorldManager.java
+@@ -5,36 +5,36 @@
+ public class WorldManager implements IWorldAccess {
+     private MinecraftServer mcServer;
+-    
++
+     public WorldManager(final MinecraftServer minecraftServer1) {
+         this.mcServer = minecraftServer1;
+     }
+-    
++
+     public void spawnParticle(final String name, final double x, final double y, final double z, final double d8, final double d10, final double d12) {
+     }
+-    
++
+     public void obtainEntitySkin(final Entity entity) {
+-        this.mcServer.entityTracker.trackEntity(entity);
++        this.mcServer.getWorldServer(entity.worldObj.levelName).entityTracker.trackEntity(entity);
+     }
+-    
++
+     public void releaseEntitySkin(final Entity entity) {
+-        this.mcServer.entityTracker.untrackEntity(entity);
++        this.mcServer.getWorldServer(entity.worldObj.levelName).entityTracker.untrackEntity(entity);
+     }
+-    
++
+     public void playSound(final String name, final double x, final double y, final double z, final float volume, final float pitch) {
+     }
+-    
++
+     public void markBlockRangeNeedsUpdate(final int i1, final int i2, final int i3, final int i4, final int i5, final int i6) {
+     }
+-    
++
+     public void updateAllRenderers() {
+     }
+-    
++
+     public void markBlockAndNeighborsNeedsUpdate(final int x, final int y, final int z) {
+         this.mcServer.configManager.markBlockNeedsUpdate(x, y, z);
+     }
+-    
++
+     public void playRecord(final String name, final int x, final int y, final int z) {
+     }
+-    
++
+     public void doNothingWithTileEntity(final int x, final int y, final int z, final TileEntity tileEntity) {
+         this.mcServer.configManager.sentTileEntityToPlayer(x, y, z, tileEntity);

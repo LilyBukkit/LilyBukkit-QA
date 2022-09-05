@@ -69,17 +69,18 @@ import java.util.logging.Logger;
  */
 public class LilyBukkit implements Server {
 
-    final String MAX_PLAYERS = "max-players";
-    final String SERVER_PORT = "server-port";
-    final String VIEW_DISTANCE = "view-distance";
-    final String SERVER_IP = "server-ip";
-    final String WHITELIST_ENABLED = "whitelist";
-    final String SPAWN_PROTECTION = "spawn-protection";
-    final String ONLINE_MODE = "online-mode";
-    final String ALLOW_FLIGHT = "allow-flight";
-    final String SERVER_NAME = "server-name";
-    final String SERVER_ID = "server-id";
-    final String PVP_ENABLED = "pvp-enabled";
+    public final static String LEVEL_NAME = "level-name";
+    public final static String MAX_PLAYERS = "max-players";
+    public final static String SERVER_PORT = "server-port";
+    public final static String VIEW_DISTANCE = "view-distance";
+    public final static String SERVER_IP = "server-ip";
+    public final static String WHITELIST_ENABLED = "whitelist";
+    public final static String SPAWN_PROTECTION = "spawn-protection";
+    public final static String ONLINE_MODE = "online-mode";
+    public final static String ALLOW_FLIGHT = "allow-flight";
+    public final static String SERVER_NAME = "server-name";
+    public final static String SERVER_ID = "server-id";
+    public final static String PVP_ENABLED = "pvp-enabled";
 
     private final MinecraftServer mc;
     private final PluginManager pluginMngr;
@@ -891,6 +892,35 @@ public class LilyBukkit implements Server {
             configuration.setProperty("aliases.icanhasbukkit", icanhasbukkit);
         }
         configuration.save();
+    }
+
+    public ChunkGenerator CRAFTBUKKIT_getGenerator(String world) {
+        ConfigurationNode node = configuration.getNode("worlds");
+        ChunkGenerator result = null;
+
+        if (node != null) {
+            node = node.getNode(world);
+
+            if (node != null) {
+                String name = node.getString("generator");
+
+                if ((name != null) && (!name.equals(""))) {
+                    String[] split = name.split(":", 2);
+                    String id = (split.length > 1) ? split[1] : null;
+                    Plugin plugin = this.pluginMngr.getPlugin(split[0]);
+
+                    if (plugin == null) {
+                        this.getLogger().severe("Could not set generator for default world '" + world + "': Plugin '" + split[0] + "' does not exist");
+                    } else if (!plugin.isEnabled()) {
+                        this.getLogger().severe("Could not set generator for default world '" + world + "': Plugin '" + split[0] + "' is not enabled yet (is it load:STARTUP?)");
+                    } else {
+                        result = plugin.getDefaultWorldGenerator(world, id);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     public ServerConfigurationManager getConfigManager() {

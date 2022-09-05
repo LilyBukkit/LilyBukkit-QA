@@ -535,7 +535,7 @@ public class LBWorld implements World {
         List<net.minecraft.src.Entity> loadedEntities = this.world.loadedEntityList;
         List<Entity> entities = new ArrayList<>();
         for (net.minecraft.src.Entity e : loadedEntities) {
-            entities.add((Entity) e);
+            entities.add(e.getBukkitEntity());
         }
         return entities;
     }

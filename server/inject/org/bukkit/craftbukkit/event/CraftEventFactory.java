@@ -45,7 +45,6 @@ import ru.vladthemountain.lilybukkit.core.LilyBukkit;
 import ru.vladthemountain.lilybukkit.core.block.LBBlock;
 import ru.vladthemountain.lilybukkit.core.entity.LBEntity;
 import ru.vladthemountain.lilybukkit.core.entity.LBLivingEntity;
-import ru.vladthemountain.lilybukkit.core.entity.LBPlayer;
 
 /**
  * CraftEventFactory used by CraftBukkit.
@@ -103,7 +102,7 @@ public class CraftEventFactory {
     }
 
     private static PlayerEvent getPlayerBucketEvent(Type type, EntityPlayerMP who, int clickedX, int clickedY, int clickedZ, int clickedFace, net.minecraft.src.ItemStack itemStack, net.minecraft.src.Item item) {
-        Player player = who == null ? null : new LBPlayer((LBWorld) Bukkit.getServer().getWorld(who.mcServer.worldMngr.levelName), who);
+        Player player = who == null ? null : Bukkit.getPlayerExact(who.username);
         net.minecraft.src.ItemStack vanillaItemInHand = new net.minecraft.src.ItemStack(item);
         ItemStack itemInHand = new ItemStack(vanillaItemInHand.itemID, vanillaItemInHand.stackSize, (short) vanillaItemInHand.itemDmg);
         Material bucket = Material.getMaterial(itemStack.itemID);
@@ -140,7 +139,7 @@ public class CraftEventFactory {
     }
 
     public static PlayerInteractEvent callPlayerInteractEvent(EntityPlayerMP who, Action action, int clickedX, int clickedY, int clickedZ, int clickedFace, net.minecraft.src.ItemStack itemStack) {
-        Player player = who == null ? null : new LBPlayer((LBWorld) Bukkit.getServer().getWorld(who.mcServer.worldMngr.levelName), who);
+        Player player = who == null ? null : Bukkit.getPlayerExact(who.username);
         ItemStack itemInHand = itemStack == null ? new ItemStack(0, 0, (short) 0) : new ItemStack(itemStack.itemID, itemStack.stackSize, (short) itemStack.itemDmg);
 
         LBWorld craftWorld = (LBWorld) player.getWorld();
@@ -175,7 +174,7 @@ public class CraftEventFactory {
      * BlockDamageEvent
      */
     public static BlockDamageEvent callBlockDamageEvent(EntityPlayerMP who, int x, int y, int z, net.minecraft.src.ItemStack itemStack, boolean instaBreak) {
-        Player player = who == null ? null : new LBPlayer((LBWorld) Bukkit.getServer().getWorld(who.mcServer.worldMngr.levelName), who);
+        Player player = who == null ? null : Bukkit.getPlayerExact(who.username);
         ItemStack itemInHand = itemStack == null ? new ItemStack(0, 0, (short) 0) : new ItemStack(itemStack.itemID, itemStack.stackSize, (short) itemStack.itemDmg);
 
         LBWorld world = (LBWorld) player.getWorld();

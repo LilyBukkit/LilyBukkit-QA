@@ -1,6 +1,6 @@
 --- MinecraftServer.java
 +++ MinecraftServer.java
-@@ -1,44 +1,53 @@
+@@ -1,47 +1,61 @@
  package net.minecraft.server;
  
 -import net.minecraft.src.ThreadServerApplication;
@@ -9,9 +9,6 @@
 -import net.minecraft.src.Packet3Chat;
 -import net.minecraft.src.ItemStack;
 -import net.minecraft.src.Item;
--import net.minecraft.src.EntityPlayerMP;
--import net.minecraft.src.ServerCommand;
--import java.util.Iterator;
 +import jline.ConsoleReader;
 +import joptsimple.OptionSet;
 +import net.buj.rml.Environment;
@@ -19,6 +16,9 @@
 +import net.buj.rml.RosepadModLoader;
 +import net.minecraft.src.AxisAlignedBB;
 +import net.minecraft.src.ConsoleLogManager;
+ import net.minecraft.src.EntityPlayerMP;
+-import net.minecraft.src.ServerCommand;
+-import java.util.Iterator;
 +import net.minecraft.src.EntityTracker;
 +import net.minecraft.src.ICommandListener;
  import net.minecraft.src.IUpdatePlayerListBox;
@@ -41,11 +41,13 @@
 +import org.bukkit.Bukkit;
 +import org.bukkit.command.ConsoleCommandSender;
 +import org.bukkit.craftbukkit.LoggerOutputStream;
++import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 +import org.bukkit.craftbukkit.util.ServerShutdownThread;
 +import org.bukkit.event.server.ServerCommandEvent;
 +import org.bukkit.event.world.WorldInitEvent;
 +import org.bukkit.event.world.WorldLoadEvent;
 +import org.bukkit.event.world.WorldSaveEvent;
++import org.bukkit.generator.ChunkGenerator;
 +import org.bukkit.plugin.PluginLoadOrder;
 +import ru.vladthemountain.lilybukkit.core.LilyBukkit;
 +
@@ -71,6 +73,7 @@
 +import java.util.Collections;
  import java.util.HashMap;
 +import java.util.List;
++import java.util.Objects;
 +import java.util.Random;
 +import java.util.logging.Level;
  import java.util.logging.Logger;
@@ -83,16 +86,22 @@
 +    public static HashMap<String, Integer> playerList;
      public NetworkListenThread networkServer;
      public PropertyManager propertyManagerObj;
-@@ -50,6 +59,6 @@
+-    public WorldServer worldMngr;
++    //public WorldServer worldMngr;
++    public List<WorldServer> worlds = new ArrayList<>(); // LilyBukkit
+     public ServerConfigurationManager configManager;
+     private boolean serverRunning;
+@@ -50,39 +64,88 @@
      public String currentTask;
      public int percentDone;
 -    private List playersOnline;
 -    private List commands;
+-    public EntityTracker entityTracker;
 +    private List<IUpdatePlayerListBox> playersOnline;
 +    private List<ServerCommand> commands;
-     public EntityTracker entityTracker;
++    //public EntityTracker entityTracker;
      public boolean onlineMode;
-@@ -57,32 +66,81 @@
+     public boolean ULPPOnlineMode;
      public String serverId;
      private static Random rand;
 -    
@@ -184,7 +193,7 @@
 +        this.propertyManagerObj = new PropertyManager(this.options); // CraftBukkit
          final String string2 = this.propertyManagerObj.getStringProperty("server-ip", "");
          this.onlineMode = false;
-@@ -93,12 +151,11 @@
+@@ -93,12 +156,11 @@
          }
          final int i4 = this.propertyManagerObj.getIntProperty("server-port", 25565);
 -        MinecraftServer.logger.info(new StringBuilder("Starting Minecraft server on ").append((string2.length() == 0) ? "*" : string2).append(":").append(i4).toString());
@@ -200,7 +209,7 @@
 +            MinecraftServer.logger.log(Level.WARNING, "The exception was: " + iOException6);
              MinecraftServer.logger.warning("Perhaps a server is already running on that port?");
              return false;
-@@ -108,6 +165,5 @@
+@@ -108,6 +170,5 @@
              MinecraftServer.logger.info("The server will authenticate usernames.");
              MinecraftServer.logger.info("Unauthenticated players may still join by default, and their abilities can be configured in the unauth.config file.");
 -        }
@@ -208,10 +217,14 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -118,10 +174,10 @@
-         this.entityTracker = new EntityTracker(this);
-         final String string3 = this.propertyManagerObj.getStringProperty("level-name", "world");
+@@ -116,60 +177,108 @@
+         }
+         this.configManager = new ServerConfigurationManager(this);
+-        this.entityTracker = new EntityTracker(this);
+-        final String string3 = this.propertyManagerObj.getStringProperty("level-name", "world");
 -        MinecraftServer.logger.info(new StringBuilder("Preparing level \"").append(string3).append("\"").toString());
++        // LilyBukkit - removed tracker
++        final String string3 = this.propertyManagerObj.getStringProperty(LilyBukkit.LEVEL_NAME, "world");
 +        MinecraftServer.logger.info("Preparing level \"" + string3 + "\"");
          this.initWorld(string3);
          MinecraftServer.logger.info("Done! For help, type \"help\" or \"?\"");
@@ -220,20 +233,57 @@
 -    
 +
      private void initWorld(final String worldName) {
-         MinecraftServer.logger.info("Preparing start region");
-@@ -140,26 +196,51 @@
-         }
-         this.clearCurrentTask();
+-        MinecraftServer.logger.info("Preparing start region");
+-        (this.worldMngr = new WorldServer(new File("."), worldName, this.propertyManagerObj.getBooleanProperty("monsters", false))).addWorldAccess(new WorldManager(this));
+-        this.worldMngr.difficultySetting = 1;
+-        this.configManager.setPlayerManager(this.worldMngr);
+-        final byte b2 = 10;
+-        for (int i3 = -b2; i3 <= b2; ++i3) {
+-            this.outputPercentRemaining("Preparing spawn area", (i3 + b2) * 100 / (b2 + b2 + 1));
+-            for (int i4 = -b2; i4 <= b2; ++i4) {
+-                if (!this.serverRunning) {
+-                    return;
 +        // LilyBukkit start
-+        if (!this.lilyBukkit.worldList.add(this.worldMngr.getBukkitWorld())) {
++        WorldServer world;
++
++        ChunkGenerator gen = this.lilyBukkit.CRAFTBUKKIT_getGenerator(worldName);
++        world = new WorldServer(new File("."), worldName, this.propertyManagerObj.getBooleanProperty("spawn-monsters", true));
++        if (gen != null)
++            world.getBukkitWorld().getPopulators().addAll(gen.getDefaultPopulators(world.getBukkitWorld()));
++        this.lilyBukkit.getPluginManager().callEvent(new WorldInitEvent(world.getBukkitWorld()));
++        world.entityTracker = new EntityTracker(this);
++        world.addWorldAccess(new WorldManager(this));
++        this.worlds.add(world);
++        this.configManager.setPlayerManager(this.worlds.toArray(new WorldServer[0]));
++
++        for (int i = 0; i < this.worlds.size(); i++) {
++            WorldServer worldServer = this.worlds.get(i);
++            logger.info("Preparing start region for level " + worldServer.levelName);
++            // LilyBukkit end
++            final byte b2 = 10;
++            for (int i3 = -b2; i3 <= b2; ++i3) {
++                this.outputPercentRemaining("Preparing spawn area", (i3 + b2) * 100 / (b2 + b2 + 1));
++                for (int i4 = -b2; i4 <= b2; ++i4) {
++                    if (!this.serverRunning) {
++                        return;
++                    }
++                    worldServer.chunkProviderServer.loadChunk((worldServer.spawnX >> 4) + i3, (worldServer.spawnZ >> 4) + i4);
++                    while (worldServer.updatingLighting() && this.serverRunning) {
++                        doNothing();
++                    } // LilyBukkit
+                 }
+-                this.worldMngr.chunkProviderServer.loadChunk((this.worldMngr.spawnX >> 4) + i3, (this.worldMngr.spawnZ >> 4) + i4);
+             }
++            this.lilyBukkit.getPluginManager().callEvent(new WorldLoadEvent(world.getBukkitWorld())); //LilyBukkit
++            // LilyBukkit start
+         }
++
++        if (!this.lilyBukkit.worldList.add(world.getBukkitWorld())) {
 +            MinecraftServer.logger.severe("[LilyBukkit] Couldn't add the current world, terminating to prevent bugs");
 +            this.stop();
 +        }
-+        // Have to put them next to each other as the target LBWorld is created only in the expression above,
-+        // otherwise events would be either called for a non-existent world or there would be several worlds existing
-+        this.lilyBukkit.getPluginManager().callEvent(new WorldInitEvent(this.worldMngr.getBukkitWorld()));
-+        this.lilyBukkit.getPluginManager().callEvent(new WorldLoadEvent(this.worldMngr.getBukkitWorld()));
 +        // LilyBukkit stop
+         this.clearCurrentTask();
      }
 -    
 +
@@ -255,9 +305,14 @@
 +
      private void save() {
          MinecraftServer.logger.info("Saving chunks");
-+        WorldSaveEvent event = new WorldSaveEvent(lilyBukkit.getWorld(worldMngr.levelName));
-+        this.lilyBukkit.getPluginManager().callEvent(event);
-         this.worldMngr.saveWorld(true, null);
+-        this.worldMngr.saveWorld(true, null);
++        // LilyBukkit start
++        for (WorldServer worldServer : this.worlds) {
++            worldServer.saveWorld(true, null);
++            WorldSaveEvent event = new WorldSaveEvent(worldServer.getBukkitWorld());
++            this.lilyBukkit.getPluginManager().callEvent(event);
++        }
++        // LilyBukkit end
      }
 -    
 +
@@ -274,12 +329,17 @@
              this.configManager.savePlayerStates();
 +            // LilyBukkit - added
 +            while (!this.configManager.playerEntities.isEmpty()) {
-+                this.configManager.playerEntities.get(0).playerNetServerHandler.kickPlayer("Server closed");
++                this.configManager.playerEntities.get(0).playerNetServerHandler.kickPlayer("Server stopped");
 +            }
          }
-         if (this.worldMngr != null) {
-@@ -167,9 +248,9 @@
+-        if (this.worldMngr != null) {
++
++        // CraftBukkit start
++        WorldServer worldServer = this.worlds.get(0);
++        if (worldServer != null) {
+             this.save();
          }
++        // CraftBukkit end
      }
 -    
 +
@@ -290,7 +350,7 @@
 +
      public void run() {
          try {
-@@ -181,9 +262,9 @@
+@@ -181,9 +290,9 @@
                      long j4 = j3 - j1;
                      if (j4 > 2000L) {
 -                        MinecraftServer.logger.warning("Can't keep up! Did the system time change, or is the server overloaded?");
@@ -302,7 +362,7 @@
 +                        MinecraftServer.logger.warning("Time ran backwards! Did the system time change? Detecting " + j4 + "ms missing"); //LilyBukkit - add milliseconds counter
                          j4 = 0L;
                      }
-@@ -196,26 +277,22 @@
+@@ -196,26 +305,22 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -334,7 +394,7 @@
 +                } catch (InterruptedException interruptedException16) {
                      interruptedException16.printStackTrace();
                  }
-@@ -223,27 +300,21 @@
+@@ -223,288 +328,145 @@
              return;
          }
 -        finally {
@@ -368,20 +428,44 @@
 +            MinecraftServer.playerList.remove(username);
          }
          AxisAlignedBB.clearBoundingBoxPool();
-@@ -254,257 +325,86 @@
+         Vec3D.initialize();
+         ++this.deathTime;
+-        if (this.deathTime % 20 == 0) {
+-            this.configManager.sendPacketToAllPlayers(new Packet4UpdateTime(this.worldMngr.worldTime));
++
++        // LilyBukkit start
++        ((CraftScheduler) this.lilyBukkit.getScheduler()).mainThreadHeartbeat(this.deathTime);
++
++        for (WorldServer worldServer : this.worlds) {
++            if (this.deathTime % 20 == 0) {
++                for (int j = 0; j < this.configManager.playerEntities.size(); j++) {
++                    EntityPlayerMP entityPlayerMP = this.configManager.playerEntities.get(j);
++                    entityPlayerMP.playerNetServerHandler.sendPacket(new Packet4UpdateTime(worldServer.worldTime));
++                }
++            }
++            worldServer.tick();
++            while (worldServer.updatingLighting()) doNothing();
++            worldServer.updateEntities();
          }
-         this.worldMngr.tick();
+-        this.worldMngr.tick();
 -        while (this.worldMngr.updatingLighting()) {}
-+        while (this.worldMngr.updatingLighting()) {doNothing();}
-         this.worldMngr.updateEntities();
+-        this.worldMngr.updateEntities();
++        // LilyBukkit end
++
          this.networkServer.handleNetworkListenThread();
          this.configManager.onTick();
-         this.entityTracker.updateTrackedEntities();
+-        this.entityTracker.updateTrackedEntities();
 -        for (int i5 = 0; i5 < this.playersOnline.size(); ++i5) {
 -            ((IUpdatePlayerListBox)this.playersOnline.get(i5)).addAllPlayers();
++
++        // LilyBukkit start
++        for (WorldServer w : this.worlds) {
++            w.entityTracker.updateTrackedEntities();
+         }
++        // LilyBukkit end
 +        for (IUpdatePlayerListBox iUpdatePlayerListBox : this.playersOnline) {
 +            iUpdatePlayerListBox.addAllPlayers();
-         }
++        }
          try {
              this.commandLineParser();
 +        } catch (Exception exception5) {
@@ -653,6 +737,24 @@
          return "CONSOLE";
      }
 -    
++
++    // LilyBukkit start
++    public WorldServer getWorldServer(String i) {
++        // CraftBukkit start
++        for (WorldServer world : this.worlds) {
++            if (i.equals(world.levelName)) {
++                return world;
++            }
++        }
++
++        return this.worlds.get(0);
++        // CraftBukkit end
++    }
++
++    public EntityTracker getTracker(String i) {
++        return this.getWorldServer(i).entityTracker; // CraftBukkit
++    }
++    // LilyBukkit end
 +
      public static boolean isServerRunning(final MinecraftServer mcServer) {
          return mcServer.serverRunning;

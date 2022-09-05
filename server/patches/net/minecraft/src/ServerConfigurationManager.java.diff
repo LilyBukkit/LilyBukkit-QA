@@ -1,6 +1,6 @@
 --- ServerConfigurationManager.java
 +++ ServerConfigurationManager.java
-@@ -1,46 +1,60 @@
+@@ -1,46 +1,61 @@
  package net.minecraft.src;
  
 -import java.util.Iterator;
@@ -16,6 +16,7 @@
 +import org.bukkit.event.player.PlayerLoginEvent;
 +import org.bukkit.event.player.PlayerLoginEvent.Result;
 +import org.bukkit.event.player.PlayerQuitEvent;
++import ru.vladthemountain.lilybukkit.core.LilyBukkit;
 +
  import java.io.BufferedReader;
 +import java.io.File;
@@ -82,7 +83,7 @@
 +        this.whitelistEnabled = false;
          this.mcServer = minecraftServer;
          this.bannedPlayersFile = minecraftServer.getFile("banned-players.txt");
-@@ -48,80 +62,132 @@
+@@ -48,80 +63,140 @@
          this.opFile = minecraftServer.getFile("ops.txt");
          this.authFile = minecraftServer.getFile("authed-players.txt");
 +        this.whitelistFile = minecraftServer.getFile("whitelist.txt");
@@ -105,9 +106,15 @@
 +        this.saveWhitelistedIPs();
      }
 -    
+-    public void setPlayerManager(final WorldServer worldServer1) {
+-        this.playerNBTManagerObj = new PlayerNBTManager(new File(worldServer1.saveDirectory, "players"));
 +
-     public void setPlayerManager(final WorldServer worldServer1) {
-         this.playerNBTManagerObj = new PlayerNBTManager(new File(worldServer1.saveDirectory, "players"));
++    public void setPlayerManager(WorldServer[] worldServer1) { //LilyBukkit - change signature
++        //this.playerNBTManagerObj = new PlayerNBTManager(new File(worldServer1.saveDirectory, "players"));
++        // LilyBukkit start
++        if (this.playerNBTManagerObj != null) return;
++        this.playerNBTManagerObj = new PlayerNBTManager(new File(worldServer1[0].saveDirectory, "players"));
++        // LilyBukkit end
      }
 -    
 +
@@ -120,11 +127,16 @@
          this.playerEntities.add(entityPlayerMP1);
          this.playerNBTManagerObj.readPlayerNBT(entityPlayerMP1);
 -        this.mcServer.worldMngr.chunkProviderServer.loadChunk((int)entityPlayerMP1.posX >> 4, (int)entityPlayerMP1.posZ >> 4);
-+        this.mcServer.worldMngr.chunkProviderServer.loadChunk((int) entityPlayerMP1.posX >> 4, (int) entityPlayerMP1.posZ >> 4);
-         while (this.mcServer.worldMngr.getCollidingBoundingBoxes(entityPlayerMP1, entityPlayerMP1.boundingBox).size() != 0) {
+-        while (this.mcServer.worldMngr.getCollidingBoundingBoxes(entityPlayerMP1, entityPlayerMP1.boundingBox).size() != 0) {
++
++        // LilyBukkit start
++        WorldServer worldServer = this.mcServer.getWorldServer(entityPlayerMP1.worldObj.levelName);
++        worldServer.chunkProviderServer.loadChunk((int) entityPlayerMP1.posX >> 4, (int) entityPlayerMP1.posZ >> 4); //LilyBukkit
++        while (worldServer.getCollidingBoundingBoxes(entityPlayerMP1, entityPlayerMP1.boundingBox).size() != 0) {
              entityPlayerMP1.setPosition(entityPlayerMP1.posX, entityPlayerMP1.posY + 1.0, entityPlayerMP1.posZ);
          }
 -        this.mcServer.worldMngr.spawnEntityInWorld(entityPlayerMP1);
++        // LilyBukkit end
 +
 +        // CraftBukkit start
 +        PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent((Player) entityPlayerMP1.getBukkitEntity(), "§e" + entityPlayerMP1.username + " joined the game.");
@@ -137,7 +149,7 @@
 +        }
 +        // CraftBukkit end
 +
-+        this.mcServer.worldMngr.spawnEntityInWorld(entityPlayerMP1, SpawnReason.NATURAL);
++        worldServer.spawnEntityInWorld(entityPlayerMP1, SpawnReason.NATURAL); //LilyBukkit
          this.playerManagerObj.addPlayer(entityPlayerMP1);
      }
 -    
@@ -157,7 +169,8 @@
 +
 +        this.playerManagerObj.removePlayer(entityPlayerMP1);
          this.playerNBTManagerObj.writePlayerNBT(entityPlayerMP1);
-         this.mcServer.worldMngr.setEntityDead(entityPlayerMP1);
+-        this.mcServer.worldMngr.setEntityDead(entityPlayerMP1);
++        this.mcServer.getWorldServer(entityPlayerMP1.worldObj.levelName).setEntityDead(entityPlayerMP1);
          this.playerEntities.remove(entityPlayerMP1);
      }
 -    
@@ -170,7 +183,7 @@
 +
      public EntityPlayerMP login(final NetLoginHandler netLoginHandler1, final String username, final String password, final boolean authed) {
 +        // LilyBukkit start
-+        EntityPlayerMP entity = new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
++        EntityPlayerMP entity = new EntityPlayerMP(this.mcServer, this.mcServer.getWorldServer(this.mcServer.propertyManagerObj.getStringProperty(LilyBukkit.LEVEL_NAME, "world")), username, new ItemInWorldManager(this.mcServer.getWorldServer(this.mcServer.propertyManagerObj.getStringProperty("level-name", "world"))));
 +        Player player = (Player) entity.getBukkitEntity();
 +        PlayerLoginEvent event = new PlayerLoginEvent(player);
 +        // LilyBukkit end
@@ -247,7 +260,7 @@
 -                    return null;
                  }
                  entityPlayerMP6.playerNetServerHandler.kickPlayer("You logged in from another location");
-@@ -131,47 +197,50 @@
+@@ -131,47 +206,50 @@
              this.authPlayer(username);
          }
 -        return new EntityPlayerMP(this.mcServer, this.mcServer.worldMngr, username, new ItemInWorldManager(this.mcServer.worldMngr));
@@ -314,7 +327,7 @@
 +            BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.bannedPlayersFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -179,37 +248,115 @@
+@@ -179,37 +257,115 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -441,7 +454,7 @@
 +            final BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.ipBanFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -217,46 +364,44 @@
+@@ -217,46 +373,44 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -500,7 +513,7 @@
 +            final BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.opFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -264,27 +409,25 @@
+@@ -264,27 +418,25 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -536,7 +549,7 @@
 +            final BufferedReader bufferedReader1 = new BufferedReader(new FileReader(this.authFile));
              String string2 = "";
              while ((string2 = bufferedReader1.readLine()) != null) {
-@@ -292,30 +435,27 @@
+@@ -292,30 +444,27 @@
              }
              bufferedReader1.close();
 +        } catch (Exception exception3) {
@@ -576,14 +589,14 @@
 +        for (final EntityPlayerMP entityPlayerMP3 : this.playerEntities) {
              if (entityPlayerMP3.username.equals(string1)) {
                  return entityPlayerMP3;
-@@ -324,5 +464,5 @@
+@@ -324,5 +473,5 @@
          return null;
      }
 -    
 +
      public void sendChatMessageToPlayer(final String string1, final String string2) {
          final EntityPlayerMP entityPlayerMP3 = this.getPlayerEntity(string1);
-@@ -331,9 +471,8 @@
+@@ -331,9 +480,8 @@
          }
      }
 -    
@@ -595,14 +608,14 @@
 +        for (final EntityPlayerMP entityPlayerMP4 : this.playerEntities) {
              if (this.isOp(entityPlayerMP4.username)) {
                  entityPlayerMP4.playerNetServerHandler.sendPacket(packet3Chat2);
-@@ -341,5 +480,5 @@
+@@ -341,5 +489,5 @@
          }
      }
 -    
 +
      public boolean sendPacketToPlayer(final String string1, final Packet packet2) {
          final EntityPlayerMP entityPlayerMP3 = this.getPlayerEntity(string1);
-@@ -350,12 +489,12 @@
+@@ -350,12 +498,12 @@
          return false;
      }
 -    

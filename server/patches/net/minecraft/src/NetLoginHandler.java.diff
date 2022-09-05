@@ -79,7 +79,7 @@
 +
      @Override
      public void handleHandshake(final Packet2Handshake packet) {
-@@ -67,47 +68,73 @@
+@@ -67,63 +68,90 @@
              this.serverId = Long.toHexString(NetLoginHandler.rand.nextLong());
              this.netManager.addToSendQueue(new Packet2Handshake(this.serverId));
 -        }
@@ -172,9 +172,15 @@
 +            return;
          }
          final int minVersion = Integer.min(this.ULPPVersion, 1);
-@@ -119,11 +146,12 @@
+         final NetServerHandler ULPPLoginServerHandler = ULPPManager.CreateServerHandler(minVersion, this.mcServer, this.netManager, loggedInPlayer);
+-        ULPPLoginServerHandler.sendPacket(new Packet6SpawnPosition(this.mcServer.worldMngr.spawnX, this.mcServer.worldMngr.spawnY, this.mcServer.worldMngr.spawnZ));
++        ULPPLoginServerHandler.sendPacket(new Packet6SpawnPosition(this.mcServer.getWorldServer(loggedInPlayer.worldObj.levelName).spawnX, this.mcServer.getWorldServer(loggedInPlayer.worldObj.levelName).spawnY, this.mcServer.getWorldServer(loggedInPlayer.worldObj.levelName).spawnZ));
+         this.mcServer.configManager.playerLoggedIn(loggedInPlayer);
+         ULPPLoginServerHandler.teleportTo(loggedInPlayer.posX, loggedInPlayer.posY, loggedInPlayer.posZ, loggedInPlayer.rotationYaw, loggedInPlayer.rotationPitch);
+         ULPPLoginServerHandler.sendInventoryPackets();
          this.mcServer.networkServer.addPlayer(ULPPLoginServerHandler);
-         ULPPLoginServerHandler.sendPacket(new Packet4UpdateTime(this.mcServer.worldMngr.worldTime));
+-        ULPPLoginServerHandler.sendPacket(new Packet4UpdateTime(this.mcServer.worldMngr.worldTime));
++        ULPPLoginServerHandler.sendPacket(new Packet4UpdateTime(this.mcServer.getWorldServer(loggedInPlayer.worldObj.levelName).worldTime));
 +        NetLoginHandler.logger.info(this.username + " authenticated using ULPP");
          this.finishedProcessing = true;
      }
@@ -187,7 +193,7 @@
 +        if (this.ULPPVersion == 1 && this.mcServer.ULPPOnlineMode) {
              this.netManager.addToSendQueue(new Packet1Login("", this.mcServer.serverId, usedULPPVer));
              return;
-@@ -131,10 +159,9 @@
+@@ -131,42 +159,41 @@
          final EntityPlayerMP entityPlayerMP2 = this.mcServer.configManager.login(this, loginPacket.username, loginPacket.password, false);
          if (entityPlayerMP2 != null) {
 -            NetLoginHandler.logger.info(String.valueOf(this.getUserAndIPString()) + " logged in with ULPP" + Integer.toString(this.ULPPVersion));
@@ -200,7 +206,16 @@
 +            } else {
                  netServerHandler3 = ULPPManager.CreateServerHandler(minVersion, this.mcServer, this.netManager, entityPlayerMP2);
              }
-@@ -149,24 +176,24 @@
+             netServerHandler3.sendPacket(new Packet1Login("", "", usedULPPVer));
+-            netServerHandler3.sendPacket(new Packet6SpawnPosition(this.mcServer.worldMngr.spawnX, this.mcServer.worldMngr.spawnY, this.mcServer.worldMngr.spawnZ));
++            netServerHandler3.sendPacket(new Packet6SpawnPosition(this.mcServer.getWorldServer(entityPlayerMP2.worldObj.levelName).spawnX, this.mcServer.getWorldServer(entityPlayerMP2.worldObj.levelName).spawnY, this.mcServer.getWorldServer(entityPlayerMP2.worldObj.levelName).spawnZ));
+             this.mcServer.configManager.playerLoggedIn(entityPlayerMP2);
+             netServerHandler3.teleportTo(entityPlayerMP2.posX, entityPlayerMP2.posY, entityPlayerMP2.posZ, entityPlayerMP2.rotationYaw, entityPlayerMP2.rotationPitch);
+             netServerHandler3.sendInventoryPackets();
+             this.mcServer.networkServer.addPlayer(netServerHandler3);
+-            netServerHandler3.sendPacket(new Packet4UpdateTime(this.mcServer.worldMngr.worldTime));
++            netServerHandler3.sendPacket(new Packet4UpdateTime(this.mcServer.getWorldServer(entityPlayerMP2.worldObj.levelName).worldTime));
+         }
          this.finishedProcessing = true;
      }
 -    

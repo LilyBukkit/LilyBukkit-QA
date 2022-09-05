@@ -17,3 +17,6 @@ jars/*
 /.metadata/
 
 craftbukkit/*
+
+spigot/*
+craftbukkit-1.4/*

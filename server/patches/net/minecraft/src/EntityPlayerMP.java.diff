@@ -73,11 +73,16 @@
 +            final ChunkCoordIntPair chunkCoordIntPair2 = this.loadedChunks.get(i4);
              final double d3 = chunkCoordIntPair2.a(this);
              if (i4 == 0 || d3 < d2) {
-@@ -75,5 +82,5 @@
-                 final List list9 = this.mcServer.worldMngr.getTileEntityList(chunkCoordIntPair1.chunkXPos * 16, 0, chunkCoordIntPair1.chunkZPos * 16, chunkCoordIntPair1.chunkXPos * 16 + 16, 128, chunkCoordIntPair1.chunkZPos * 16 + 16);
+@@ -72,8 +79,8 @@
+             if (z8) {
+                 this.loadedChunks.remove(chunkCoordIntPair1);
+-                this.playerNetServerHandler.sendPacket(new Packet51MapChunk(chunkCoordIntPair1.chunkXPos * 16, 0, chunkCoordIntPair1.chunkZPos * 16, 16, 128, 16, this.mcServer.worldMngr));
+-                final List list9 = this.mcServer.worldMngr.getTileEntityList(chunkCoordIntPair1.chunkXPos * 16, 0, chunkCoordIntPair1.chunkZPos * 16, chunkCoordIntPair1.chunkXPos * 16 + 16, 128, chunkCoordIntPair1.chunkZPos * 16 + 16);
++                this.playerNetServerHandler.sendPacket(new Packet51MapChunk(chunkCoordIntPair1.chunkXPos * 16, 0, chunkCoordIntPair1.chunkZPos * 16, 16, 128, 16, this.mcServer.getWorldServer(this.worldObj.levelName)));
++                final List<TileEntity> list9 = this.mcServer.getWorldServer(this.worldObj.levelName).getTileEntityList(chunkCoordIntPair1.chunkXPos * 16, 0, chunkCoordIntPair1.chunkZPos * 16, chunkCoordIntPair1.chunkXPos * 16 + 16, 128, chunkCoordIntPair1.chunkZPos * 16 + 16);
                  for (int i5 = 0; i5 < list9.size(); ++i5) {
 -                    final TileEntity tileEntity7 = (TileEntity)list9.get(i5);
-+                    final TileEntity tileEntity7 = (TileEntity) list9.get(i5);
++                    final TileEntity tileEntity7 = list9.get(i5);
                      this.playerNetServerHandler.sendPacket(new Packet59ComplexEntity(tileEntity7.xCoord, tileEntity7.yCoord, tileEntity7.zCoord, tileEntity7));
                  }
 @@ -81,5 +88,5 @@
@@ -96,8 +101,9 @@
      public void onItemPickup(final Entity entity, final int i2) {
          if (!entity.isDead && entity instanceof EntityItem) {
 -            this.playerNetServerHandler.sendPacket(new Packet17AddToInventory(((EntityItem)entity).item, i2));
+-            this.mcServer.entityTracker.sendPacketToTrackedPlayers(entity, new Packet22Collect(entity.entityID, this.entityID));
 +            this.playerNetServerHandler.sendPacket(new Packet17AddToInventory(((EntityItem) entity).item, i2));
-             this.mcServer.entityTracker.sendPacketToTrackedPlayers(entity, new Packet22Collect(entity.entityID, this.entityID));
++            this.mcServer.getWorldServer(this.worldObj.levelName).entityTracker.sendPacketToTrackedPlayers(entity, new Packet22Collect(entity.entityID, this.entityID));
          }
          super.onItemPickup(entity, i2);
      }
@@ -105,7 +111,11 @@
 +
      @Override
      public void swingItem() {
-@@ -109,8 +116,13 @@
+@@ -106,11 +113,16 @@
+             this.swingProgressInt = -1;
+             this.isSwinging = true;
+-            this.mcServer.entityTracker.sendPacketToTrackedPlayers(this, new Packet18ArmAnimation(this, 1));
++            this.mcServer.getWorldServer(this.worldObj.levelName).entityTracker.sendPacketToTrackedPlayers(this, new Packet18ArmAnimation(this, 1));
          }
      }
 -    
