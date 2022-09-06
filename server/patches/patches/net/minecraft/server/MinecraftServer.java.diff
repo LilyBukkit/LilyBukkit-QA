@@ -1,6 +1,6 @@
 --- MinecraftServer.java
 +++ MinecraftServer.java
-@@ -1,47 +1,61 @@
+@@ -1,47 +1,60 @@
  package net.minecraft.server;
  
 -import net.minecraft.src.ThreadServerApplication;
@@ -73,7 +73,6 @@
 +import java.util.Collections;
  import java.util.HashMap;
 +import java.util.List;
-+import java.util.Objects;
 +import java.util.Random;
 +import java.util.logging.Level;
  import java.util.logging.Logger;
@@ -91,7 +90,7 @@
 +    public List<WorldServer> worlds = new ArrayList<>(); // LilyBukkit
      public ServerConfigurationManager configManager;
      private boolean serverRunning;
-@@ -50,39 +64,88 @@
+@@ -50,39 +63,88 @@
      public String currentTask;
      public int percentDone;
 -    private List playersOnline;
@@ -193,7 +192,7 @@
 +        this.propertyManagerObj = new PropertyManager(this.options); // CraftBukkit
          final String string2 = this.propertyManagerObj.getStringProperty("server-ip", "");
          this.onlineMode = false;
-@@ -93,12 +156,11 @@
+@@ -93,12 +155,11 @@
          }
          final int i4 = this.propertyManagerObj.getIntProperty("server-port", 25565);
 -        MinecraftServer.logger.info(new StringBuilder("Starting Minecraft server on ").append((string2.length() == 0) ? "*" : string2).append(":").append(i4).toString());
@@ -209,7 +208,7 @@
 +            MinecraftServer.logger.log(Level.WARNING, "The exception was: " + iOException6);
              MinecraftServer.logger.warning("Perhaps a server is already running on that port?");
              return false;
-@@ -108,6 +170,5 @@
+@@ -108,6 +169,5 @@
              MinecraftServer.logger.info("The server will authenticate usernames.");
              MinecraftServer.logger.info("Unauthenticated players may still join by default, and their abilities can be configured in the unauth.config file.");
 -        }
@@ -217,7 +216,7 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -116,60 +177,108 @@
+@@ -116,60 +176,108 @@
          }
          this.configManager = new ServerConfigurationManager(this);
 -        this.entityTracker = new EntityTracker(this);
@@ -278,7 +277,7 @@
 +            // LilyBukkit start
          }
 +
-+        if (!this.lilyBukkit.worldList.add(world.getBukkitWorld())) {
++        if (this.lilyBukkit.worldList.put(worldName, world.getBukkitWorld()) != null) {
 +            MinecraftServer.logger.severe("[LilyBukkit] Couldn't add the current world, terminating to prevent bugs");
 +            this.stop();
 +        }
@@ -350,7 +349,7 @@
 +
      public void run() {
          try {
-@@ -181,9 +290,9 @@
+@@ -181,9 +289,9 @@
                      long j4 = j3 - j1;
                      if (j4 > 2000L) {
 -                        MinecraftServer.logger.warning("Can't keep up! Did the system time change, or is the server overloaded?");
@@ -362,7 +361,7 @@
 +                        MinecraftServer.logger.warning("Time ran backwards! Did the system time change? Detecting " + j4 + "ms missing"); //LilyBukkit - add milliseconds counter
                          j4 = 0L;
                      }
-@@ -196,26 +305,22 @@
+@@ -196,26 +304,22 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -394,7 +393,7 @@
 +                } catch (InterruptedException interruptedException16) {
                      interruptedException16.printStackTrace();
                  }
-@@ -223,288 +328,145 @@
+@@ -223,288 +327,145 @@
              return;
          }
 -        finally {

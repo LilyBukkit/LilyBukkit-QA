@@ -205,7 +205,7 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk getChunkAt(int x, int z) {
-        return new LBChunk(this.world.getChunkFromChunkCoords(x, z));
+        return this.world.getChunkFromChunkCoords(x, z).getBukkitChunk();
     }
 
     /**
@@ -254,7 +254,7 @@ public class LBWorld implements World {
         List<net.minecraft.src.Chunk> loaded = this.getChunkProvider().loadedChunks;
         List<Chunk> result = new ArrayList<>();
         for (net.minecraft.src.Chunk chunk : loaded) {
-            result.add(new LBChunk(chunk));
+            result.add(chunk.getBukkitChunk());
         }
         return result.toArray(new Chunk[]{});
     }
@@ -388,11 +388,13 @@ public class LBWorld implements World {
      */
     @Override
     public boolean unloadChunkRequest(int x, int z, boolean safe) {
-        this.chunksToUnload += 1;
-        if (chunksToUnload == 100) {
-            this.chunksToUnload = 0;
-            return this.getChunkProvider().unload100OldestChunks();
-        } else return true;
+        if (safe) {
+            return false;
+        }
+
+        world.chunkProviderServer.queueUnload(x, z);
+
+        return true;
     }
 
     /**
@@ -406,6 +408,27 @@ public class LBWorld implements World {
     public boolean regenerateChunk(int x, int z) {
         return this.getChunkAt(x, z).unload(true, true) && this.getChunkAt(x, z).load(true);
     }
+
+    // CraftBukkit start
+    public boolean isChunkInUse(int x, int z) {
+        Player[] players = Bukkit.getServer().getOnlinePlayers();
+
+        for (Player player : players) {
+            Location loc = player.getLocation();
+            if (loc.getWorld() != world.getBukkitWorld()) {
+                continue;
+            }
+
+            // If the chunk is within 256 blocks of a player, refuse to accept the unload request
+            // This is larger than the distance of loaded chunks that actually surround a player
+            // The player is the center of a 21x21 chunk grid, so the edge is 10 chunks (160 blocks) away from the player
+            if (Math.abs(loc.getBlockX() - (x << 4)) <= 256 && Math.abs(loc.getBlockZ() - (z << 4)) <= 256) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // CraftBukkit end
 
     /**
      * Resends the {@link Chunk} to all clients
@@ -459,7 +482,7 @@ public class LBWorld implements World {
         EntityArrow e = new EntityArrow(this.world);
         e.setPosition(new Integer(location.getBlockX()).doubleValue(), new Integer(location.getBlockY()).doubleValue(), new Integer(location.getBlockZ()).doubleValue());
         e.setArrowHeading(velocity.getX(), velocity.getY(), velocity.getZ(), velocity.angle(new Vector(0, velocity.getY(), 0)), velocity.angle(new Vector(velocity.getX(), 0, 0)));
-        if (this.world.spawnEntityInWorld(e, SpawnReason.CUSTOM)) return new LBArrow(this, e);
+        if (this.world.spawnEntityInWorld(e, SpawnReason.CUSTOM)) return (Arrow) e.getBukkitEntity();
         return null;
     }
 
@@ -568,7 +591,7 @@ public class LBWorld implements World {
         List<Player> playerEntities = new ArrayList<>();
         for (net.minecraft.src.Entity e : loadedEntities) {
             if (e instanceof net.minecraft.src.EntityPlayer) {
-                playerEntities.add(new LBPlayer(this, (EntityPlayerMP) e));
+                playerEntities.add((Player) e.getBukkitEntity());
             }
         }
         return playerEntities;
@@ -815,78 +838,60 @@ public class LBWorld implements World {
     @Override
     public <T extends Entity> T spawn(Location location, Class<T> clazz) throws IllegalArgumentException {
         net.minecraft.src.Entity entityToSpawn = null;
-        Entity entityToReturn = null;
         if (clazz.equals(LBArrow.class)) {
             entityToSpawn = new EntityArrow(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBArrow(this, (EntityArrow) entityToSpawn);
         } else if (clazz.equals(LBBoat.class)) {
             entityToSpawn = new EntityBoat(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBBoat(this, (EntityBoat) entityToSpawn);
         } else if (clazz.equals(LBChicken.class)) {
             entityToSpawn = new EntityChicken(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBChicken(this, (EntityChicken) entityToSpawn);
         } else if (clazz.equals(LBCow.class)) {
             entityToSpawn = new EntityCow(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBCow(this, (EntityCow) entityToSpawn);
         } else if (clazz.equals(LBCreeper.class)) {
             entityToSpawn = new EntityCreeper(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBCreeper(this, (EntityCreeper) entityToSpawn);
         } else if (clazz.equals(LBFallingSand.class)) {
             entityToSpawn = new EntityFallingSand(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBFallingSand(this, (EntityFallingSand) entityToSpawn);
         } else if (clazz.equals(LBGiant.class)) {
             entityToSpawn = new EntityGiantZombie(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBGiant(this, (EntityGiantZombie) entityToSpawn);
         } else if (clazz.equals(LBItem.class)) {
             entityToSpawn = new EntityItem(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBItem(this, (EntityItem) entityToSpawn);
         } else if (clazz.equals(LBMinecart.class)) {
             entityToSpawn = new EntityMinecart(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBMinecart(this, (EntityMinecart) entityToSpawn);
         } else if (clazz.equals(LBPig.class)) {
             entityToSpawn = new EntityPig(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBPig(this, (EntityPig) entityToSpawn);
         } else if (clazz.equals(LBSheep.class)) {
             entityToSpawn = new EntitySheep(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBSheep(this, (EntitySheep) entityToSpawn);
         } else if (clazz.equals(LBSkeleton.class)) {
             entityToSpawn = new EntitySkeleton(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBSkeleton(this, (EntitySkeleton) entityToSpawn);
         } else if (clazz.equals(LBSlime.class)) {
             entityToSpawn = new EntitySlime(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBSlime(this, (EntitySlime) entityToSpawn);
         } else if (clazz.equals(LBSnowball.class)) {
             entityToSpawn = new EntitySnowball(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBSnowball(this, (EntitySnowball) entityToSpawn);
         } else if (clazz.equals(LBSpider.class)) {
             entityToSpawn = new EntitySpider(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBSpider(this, (EntitySpider) entityToSpawn);
         } else if (clazz.equals(LBTNTPrimed.class)) {
             entityToSpawn = new EntityTNTPrimed(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBTNTPrimed(this, (EntityTNTPrimed) entityToSpawn);
         } else if (clazz.equals(LBZombie.class)) {
             entityToSpawn = new EntityZombie(this.world);
             entityToSpawn.setPosition(location.getX(), location.getY(), location.getZ());
-            entityToReturn = new LBZombie(this, (EntityZombie) entityToSpawn);
         }
         if (entityToSpawn != null && this.world.spawnEntityInWorld(entityToSpawn, SpawnReason.CUSTOM))
-            return (T) entityToReturn;
+            return (T) entityToSpawn.getBukkitEntity();
         else throw new IllegalArgumentException("Can't spawn entity");
     }
 
@@ -928,7 +933,7 @@ public class LBWorld implements World {
      */
     @Override
     public ChunkSnapshot getEmptyChunkSnapshot(int x, int z) {
-        return new LBChunkSnapshot(new LBChunk(new net.minecraft.src.Chunk(this.world, x, z)), this.getFullTime(), false);
+        return new LBChunkSnapshot(new net.minecraft.src.Chunk(this.world, x, z).getBukkitChunk(), this.getFullTime(), false);
     }
 
     /**

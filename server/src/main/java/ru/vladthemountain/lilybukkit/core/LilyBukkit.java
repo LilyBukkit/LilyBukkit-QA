@@ -5,9 +5,12 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.SQLitePlatform;
 import com.avaje.ebeaninternal.server.lib.sql.TransactionIsolation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.Entity;
+import net.minecraft.src.EntityTracker;
 import net.minecraft.src.PropertyManager;
 import net.minecraft.src.ServerConfigurationManager;
+import net.minecraft.src.WorldManager;
 import net.minecraft.src.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -24,6 +27,7 @@ import org.bukkit.command.defaults.IronCommand;
 import org.bukkit.command.defaults.WoodCommand;
 import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 import org.bukkit.entity.Player;
+import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.generator.ChunkGenerator;
@@ -57,6 +61,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -86,7 +91,7 @@ public class LilyBukkit implements Server {
     private final PluginManager pluginMngr;
     private final BukkitScheduler scheduler;
     private final ServicesManager servicesMngr;
-    public final List<World> worldList;
+    public final LinkedHashMap<String, World> worldList;
     private final List<Recipe> recipeManager;
     private final SimpleCommandMap commandMap;
     Configuration configuration;
@@ -95,7 +100,7 @@ public class LilyBukkit implements Server {
         this.mc = parent;
         this.scheduler = new CraftScheduler(this);
         this.servicesMngr = new SimpleServicesManager();
-        this.worldList = new ArrayList<>();
+        this.worldList = new LinkedHashMap<>();
         this.recipeManager = new ArrayList<>();
         this.commandMap = new SimpleCommandMap(this);
         this.pluginMngr = new SimplePluginManager(this, this.commandMap);
@@ -133,7 +138,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getVersion() {
-        return "Alpha 1.2.0.1";
+        return "Alpha 2.0.0.0";
     }
 
     /**
@@ -339,7 +344,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public List<World> getWorlds() {
-        return new ArrayList<>(this.worldList);
+        return (List<World>) this.worldList.values();
     }
 
     /**
@@ -353,9 +358,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment) {
-        World newWorld = new WorldServer(new File(name), name, true).getBukkitWorld();
-        this.worldList.add(newWorld);
-        return newWorld;
+        return createWorld(name, environment, (new Random()).nextLong());
     }
 
     /**
@@ -370,10 +373,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, long seed) {
-        WorldServer nw = new WorldServer(new File(name), name, true);
-        nw.randomSeed = seed;
-        this.worldList.add(nw.getBukkitWorld());
-        return nw.getBukkitWorld();
+        return createWorld(name, environment, seed, null);
     }
 
     /**
@@ -388,9 +388,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, ChunkGenerator generator) {
-        World newWorld = new LBWorld(new WorldServer(new File(name), name, true), generator);
-        this.worldList.add(newWorld);
-        return newWorld;
+        return createWorld(name, environment, (new Random()).nextLong(), generator);
     }
 
     /**
@@ -406,11 +404,70 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World createWorld(String name, World.Environment environment, long seed, ChunkGenerator generator) {
-        WorldServer nw = new WorldServer(new File(name), name, true);
-        nw.randomSeed = seed;
-        World newWorld = new LBWorld(nw, generator);
-        this.worldList.add(newWorld);
-        return newWorld;
+        // CraftBukkit start
+        File folder = new File(name);
+        World world = getWorld(name);
+
+        if (world != null) {
+            return world;
+        }
+
+        if ((folder.exists()) && (!folder.isDirectory())) {
+            throw new IllegalArgumentException("File exists with the name '" + name + "' and isn't a folder");
+        }
+
+        if (generator == null) {
+            generator = this.getGenerator(name);
+        }
+
+        WorldServer internal = new WorldServer(new File("."), name, this.mc.propertyManagerObj.getBooleanProperty("monsters", true));
+
+        if (!(this.worldList.containsKey(name.toLowerCase()))) {
+            return null;
+        }
+
+        internal.entityTracker = new EntityTracker(this.mc);
+        internal.addWorldAccess(new WorldManager(this.mc));
+        this.mc.worlds.add(internal);
+
+        if (generator != null) {
+            internal.getBukkitWorld().getPopulators().addAll(generator.getDefaultPopulators(internal.getBukkitWorld()));
+        }
+
+        this.pluginMngr.callEvent(new WorldInitEvent(internal.getBukkitWorld()));
+        System.out.print("Preparing start region for level " + (this.mc.worlds.size() - 1) + " (Seed: " + internal.randomSeed + ")");
+
+        if (internal.getBukkitWorld().getKeepSpawnInMemory()) {
+            short short1 = 196;
+            long i = System.currentTimeMillis();
+            for (int j = -short1; j <= short1; j += 16) {
+                for (int k = -short1; k <= short1; k += 16) {
+                    long l = System.currentTimeMillis();
+
+                    if (l < i) {
+                        i = l;
+                    }
+
+                    if (l > i + 1000L) {
+                        int i1 = (short1 * 2 + 1) * (short1 * 2 + 1);
+                        int j1 = (j + short1) * (short1 * 2 + 1) + k + 1;
+
+                        System.out.println("Preparing spawn area for " + name + ", " + (j1 * 100 / i1) + "%");
+                        i = l;
+                    }
+
+                    ChunkCoordIntPair chunkcoordinates = new ChunkCoordIntPair(internal.spawnX, internal.spawnZ);
+                    internal.chunkProviderServer.loadChunk(chunkcoordinates.chunkXPos + j >> 4, chunkcoordinates.chunkZPos + k >> 4);
+
+                    while (internal.updatingLighting()) {
+                        ;
+                    }
+                }
+            }
+        }
+        this.pluginMngr.callEvent(new WorldLoadEvent(internal.getBukkitWorld()));
+        return internal.getBukkitWorld();
+        // CraftBukkit end
     }
 
     /**
@@ -452,10 +509,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World getWorld(String name) {
-        for (World world : this.worldList) {
-            if (world.getName().equals(name)) return world;
-        }
-        return null;
+        return this.worldList.get(name);
     }
 
     /**
@@ -466,7 +520,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World getWorld(UUID uid) {
-        for (World world : this.worldList) {
+        for (World world : this.worldList.values()) {
             if (world.getUID().equals(uid)) return world;
         }
         return null;
@@ -672,6 +726,35 @@ public class LilyBukkit implements Server {
     @Override
     public boolean getAllowFlight() {
         return this.mc.propertyManagerObj.getBooleanProperty(ALLOW_FLIGHT, false);
+    }
+
+    public ChunkGenerator getGenerator(String world) {
+        ConfigurationNode node = configuration.getNode("worlds");
+        ChunkGenerator result = null;
+
+        if (node != null) {
+            node = node.getNode(world);
+
+            if (node != null) {
+                String name = node.getString("generator");
+
+                if ((name != null) && (!name.equals(""))) {
+                    String[] split = name.split(":", 2);
+                    String id = (split.length > 1) ? split[1] : null;
+                    Plugin plugin = this.pluginMngr.getPlugin(split[0]);
+
+                    if (plugin == null) {
+                        getLogger().severe("Could not set generator for default world '" + world + "': Plugin '" + split[0] + "' does not exist");
+                    } else if (!plugin.isEnabled()) {
+                        getLogger().severe("Could not set generator for default world '" + world + "': Plugin '" + split[0] + "' is not enabled yet (is it load:STARTUP?)");
+                    } else {
+                        result = plugin.getDefaultWorldGenerator(world, id);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override

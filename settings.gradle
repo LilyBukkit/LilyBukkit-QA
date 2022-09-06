@@ -1,4 +1,4 @@
-rootProject.name = 'LilyBukkit'
+rootProject.name = 'LilyBukkit-Core'
 
 include ':server'
 //include ':client'

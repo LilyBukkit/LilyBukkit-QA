@@ -37,6 +37,6 @@ public class LBCreature extends LBLivingEntity implements Creature {
      */
     @Override
     public LivingEntity getTarget() {
-        return new LBLivingEntity(this.world, (EntityLiving) this.entity.entityToAttack);
+        return (LivingEntity) this.entity.entityToAttack.getBukkitEntity();
     }
 }

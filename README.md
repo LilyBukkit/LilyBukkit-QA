@@ -1,12 +1,12 @@
 # LilyBukkit
 
-[![build](https://github.com/Vladg24YT/LilyBukkit/actions/workflows/main.yml/badge.svg?branch=master&event=push)](https://github.com/Vladg24YT/LilyBukkit/actions/workflows/main.yml)
+[![build](https://github.com/LilyBukkit/LilyBukkit-Core/actions/workflows/main.yml/badge.svg?branch=master&event=push)](https://github.com/Vladg24YT/LilyBukkit/actions/workflows/main.yml)
 
 **LilyBukkit** is a CraftBukkit-inspired server core that implements [a modified Bukkit API](https://github.com/Vladg24YT/LilyBukkit-API). The only supported version of Minecraft
 is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 
-* [Forum](https://github.com/Vladg24YT/LilyBukkit/discussions)
-* [Latest release](https://github.com/Vladg24YT/LilyBukkit/releases/latest) | [Latest devbuild](https://nightly.link/LilyBukkit/LilyBukkit-Core/workflows/main/master/RosepadServer.zip)
+* [Forum](https://github.com/LilyBukkit/LilyBukkit-Core/discussions)
+* [Latest release](https://github.com/LilyBukkit/LilyBukkit-Core/releases/latest) | [Latest devbuild](https://nightly.link/LilyBukkit/LilyBukkit-Core/workflows/main/master/RosepadServer.zip)
 
 ## Features
 * **Extended YAML configuration** - If you think `server.properties` offers too few options to customize.
@@ -17,7 +17,7 @@ is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 ## Development plan
 
 - [x] Plugin support (`1.0.0.0`)
-- [x] Persmissions support (`1.0.0.0`)
+- [x] Permissions support (`1.0.0.0`)
 - [x] YAML Config support (`1.1.0.0`)
 - [ ] Multi-world support (`2.0.0.0`)
 

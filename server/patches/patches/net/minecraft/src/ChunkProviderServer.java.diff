@@ -1,9 +1,10 @@
 --- ChunkProviderServer.java
 +++ ChunkProviderServer.java
-@@ -1,4 +1,10 @@
+@@ -1,4 +1,11 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.util.LongHashset;
 +import org.bukkit.event.world.ChunkLoadEvent;
 +import org.bukkit.event.world.ChunkPopulateEvent;
 +import org.bukkit.event.world.ChunkUnloadEvent;
@@ -11,7 +12,7 @@
 +
  import java.io.IOException;
  import java.util.ArrayList;
-@@ -7,19 +13,20 @@
+@@ -7,19 +14,24 @@
  import java.util.List;
  import java.util.Map;
 +import java.util.Random;
@@ -30,16 +31,20 @@
      private WorldServer worldObj;
 -    
 +
++    // CraftBukkit start
++    public LongHashset unloadQueue = new LongHashset();
++    // CraftBukkit end
++
      public ChunkProviderServer(final WorldServer worldServer, final IChunkLoader chunkLoader, final IChunkProvider chunkProvider) {
 -        this.droppedChunksSet = (Set)new HashSet();
 -        this.id2ChunkMap = (Map)new HashMap();
 -        this.loadedChunks = (List)new ArrayList();
-+        this.droppedChunksSet = (Set) new HashSet();
-+        this.id2ChunkMap = (Map) new HashMap();
-+        this.loadedChunks = (List) new ArrayList();
++        this.droppedChunksSet = new HashSet<>();
++        this.id2ChunkMap = new HashMap<>();
++        this.loadedChunks = new ArrayList<>();
          this.chunk = new Chunk(worldServer, new byte[32768], 0, 0);
          this.chunk.isChunkRendered = true;
-@@ -29,10 +36,10 @@
+@@ -29,10 +41,23 @@
          this.serverChunkProvider = chunkProvider;
      }
 -    
@@ -50,9 +55,22 @@
      }
 -    
 +
++    // LilyBukkit start
++    public void queueUnload(int i, int j) {
++        ChunkCoordinates chunkcoordinates = new ChunkCoordinates(this.worldObj.spawnX, this.worldObj.spawnZ);
++        int k = i * 16 + 8 - chunkcoordinates.posX;
++        int l = j * 16 + 8 - chunkcoordinates.posZ;
++        short short1 = 128;
++
++        if (k < -short1 || k > short1 || l < -short1 || l > short1) { // CraftBukkit - added 'this.world.keepSpawnInMemory'
++            this.unloadQueue.add(i, j); // CraftBukkit
++        }
++    }
++    // LilyBukkit end
++
      public void dropChunk(final int i1, final int i2) {
          final int i3 = i1 * 16 + 8 - this.worldObj.spawnX;
-@@ -43,9 +50,10 @@
+@@ -43,9 +68,14 @@
          }
      }
 -    
@@ -62,11 +80,15 @@
 -        this.droppedChunksSet.remove(new ChunkCoordinates(x, z));
 -        Chunk chunk4 = (Chunk)this.id2ChunkMap.get(chunkCoordinates3);
 +        this.droppedChunksSet.remove(chunkCoordinates3);
-+        boolean newChunk = false; //CraftBukkit
++        // CraftBukkit start
++        this.unloadQueue.remove(x, z);
++        Chunk chunk = this.id2ChunkMap.get(new ChunkCoordinates(x, z));
++        boolean newChunk = false;
++        // CraftBukkit end
 +        Chunk chunk4 = this.id2ChunkMap.get(chunkCoordinates3);
          if (chunk4 == null) {
              chunk4 = this.loadAndSaveChunk(x, z);
-@@ -53,8 +61,8 @@
+@@ -53,8 +83,8 @@
                  if (this.serverChunkProvider == null) {
                      chunk4 = this.chunk;
 -                }
@@ -77,7 +99,7 @@
 +                newChunk = true; //CraftBukkit
              }
              this.id2ChunkMap.put(chunkCoordinates3, chunk4);
-@@ -63,4 +71,17 @@
+@@ -63,4 +93,17 @@
                  chunk4.onChunkLoad();
              }
 +
@@ -95,7 +117,7 @@
 +
              if (!chunk4.isTerrainPopulated && this.chunkExists(x + 1, z + 1) && this.chunkExists(x, z + 1) && this.chunkExists(x + 1, z)) {
                  this.populate(this, x, z);
-@@ -78,11 +99,11 @@
+@@ -78,11 +121,11 @@
          return chunk4;
      }
 -    
@@ -110,7 +132,7 @@
 +
      private Chunk loadAndSaveChunk(final int x, final int z) {
          if (this.serverChunkLoader == null) {
-@@ -95,22 +116,20 @@
+@@ -95,22 +138,20 @@
              }
              return chunk3;
 -        }
@@ -137,7 +159,7 @@
 +
      private void saveChunk(final Chunk chunk) {
          if (this.serverChunkLoader != null) {
-@@ -118,11 +137,10 @@
+@@ -118,11 +159,10 @@
                  chunk.lastSaveTime = this.worldObj.worldTime;
                  this.serverChunkLoader.saveChunk(this.worldObj, chunk);
 -            }
@@ -151,7 +173,7 @@
 +
      public void populate(final IChunkProvider chunkProvider, final int x, final int z) {
          final Chunk chunk4 = this.provideChunk(x, z);
-@@ -131,13 +149,32 @@
+@@ -131,13 +171,32 @@
              if (this.serverChunkProvider != null) {
                  this.serverChunkProvider.populate(chunkProvider, x, z);
 +
@@ -186,7 +208,7 @@
 +            final Chunk chunk5 = this.loadedChunks.get(i4);
              if (flag && !chunk5.neverSave) {
                  this.saveExtraChunkData(chunk5);
-@@ -159,17 +196,26 @@
+@@ -159,17 +218,31 @@
          return true;
      }
 -    
@@ -196,32 +218,38 @@
              for (int i1 = 0; i1 < 16; ++i1) {
                  if (!this.droppedChunksSet.isEmpty()) {
 -                    final ChunkCoordinates chunkCoordinates2 = (ChunkCoordinates)this.droppedChunksSet.iterator().next();
-+                    final ChunkCoordinates chunkCoordinates2 = this.droppedChunksSet.iterator().next();
-                     final Chunk chunk3 = this.provideChunk(chunkCoordinates2.posX, chunkCoordinates2.posZ);
+-                    final Chunk chunk3 = this.provideChunk(chunkCoordinates2.posX, chunkCoordinates2.posZ);
 -                    chunk3.onChunkUnload();
 -                    this.saveChunk(chunk3);
 -                    this.saveExtraChunkData(chunk3);
 -                    this.droppedChunksSet.remove(chunkCoordinates2);
 -                    this.id2ChunkMap.remove(chunkCoordinates2);
 -                    this.loadedChunks.remove(chunk3);
-+
 +                    // LilyBukkit start
-+                    if (chunk3 == null) continue;
-+                    ChunkUnloadEvent event = new ChunkUnloadEvent(chunk3.getBukkitChunk());
-+                    Bukkit.getServer().getPluginManager().callEvent(event);
-+                    if (!event.isCancelled()) {
-+                        //LilyBukkit end
++                    for (int i = 0; i < 50 && !this.unloadQueue.isEmpty(); i++) {
++                        long chunkcoordinates = this.unloadQueue.popFirst();
++                        final ChunkCoordinates chunkCoordinates2 = this.droppedChunksSet.iterator().next();
++                        final Chunk chunk3 = this.provideChunk(chunkCoordinates2.posX, chunkCoordinates2.posZ);
 +
-+                        chunk3.onChunkUnload();
-+                        this.saveChunk(chunk3);
-+                        this.saveExtraChunkData(chunk3);
-+                        //this.droppedChunksSet.remove(chunkCoordinates2); // CraftBukkit
-+                        this.id2ChunkMap.remove(chunkCoordinates2);
-+                        this.loadedChunks.remove(chunk3);
-+                    } //LilyBukkit
++
++                        if (chunk3 == null) continue;
++                        ChunkUnloadEvent event = new ChunkUnloadEvent(chunk3.getBukkitChunk());
++                        Bukkit.getServer().getPluginManager().callEvent(event);
++                        if (!event.isCancelled()) {
++                            //LilyBukkit end
++
++                            chunk3.onChunkUnload();
++                            this.saveChunk(chunk3);
++                            this.saveExtraChunkData(chunk3);
++                            //this.droppedChunksSet.remove(chunkCoordinates2); // CraftBukkit
++                            this.id2ChunkMap.remove(chunkCoordinates2);
++                            this.loadedChunks.remove(chunk3);
++                        }
++                    }
++                    // LilyBukkit end
                  }
              }
-@@ -180,5 +226,5 @@
+@@ -180,5 +253,5 @@
          return this.serverChunkProvider.unload100OldestChunks();
      }
 -    

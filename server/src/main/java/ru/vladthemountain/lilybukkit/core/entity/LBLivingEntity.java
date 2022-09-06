@@ -167,11 +167,7 @@ public class LBLivingEntity extends LBEntity implements LivingEntity {
      */
     @Override
     public Vehicle getVehicle() {
-        if (this.entity.ridingEntity instanceof EntityBoat)
-            return new LBBoat(this.world, (EntityBoat) this.entity.ridingEntity);
-        else if (this.entity.ridingEntity instanceof EntityMinecart)
-            return new LBMinecart(this.world, (EntityMinecart) this.entity.ridingEntity);
-        else return null;
+        return (Vehicle) this.entity.ridingEntity.getBukkitEntity();
     }
 
     /**
