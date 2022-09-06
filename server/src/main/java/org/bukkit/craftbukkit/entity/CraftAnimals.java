@@ -1,6 +1,6 @@
 package org.bukkit.craftbukkit.entity;
 
-import net.minecraft.server.EntityAnimal;
+import net.minecraft.src.EntityAnimal;
 import org.bukkit.craftbukkit.CraftServer;
 import ru.vladthemountain.lilybukkit.core.entity.LBAnimals;
 

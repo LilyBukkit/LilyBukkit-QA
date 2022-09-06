@@ -145,7 +145,7 @@
 +                server.getPluginManager().callEvent(event);
 +
 +                if (!event.isCancelled()) {
-+                    this.attackEntityFrom((net.minecraft.server.Entity) null, event.getDamage());
++                    this.attackEntityFrom(null, event.getDamage());
 +                }
 +
 +                if (this.fire <= 0) {

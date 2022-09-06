@@ -1,7 +1,7 @@
 package org.bukkit.craftbukkit;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.Packet;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.Packet;
 
 @Deprecated
 public class ChunkCompressionThread implements Runnable {

@@ -9,7 +9,7 @@ public class CraftChunk extends LBChunk {
         super(chunk);
     }
 
-    public net.minecraft.server.Chunk getHandle() {
-        return (net.minecraft.server.Chunk) this.chunk;
+    public net.minecraft.src.Chunk getHandle() {
+        return this.chunk;
     }
 }
