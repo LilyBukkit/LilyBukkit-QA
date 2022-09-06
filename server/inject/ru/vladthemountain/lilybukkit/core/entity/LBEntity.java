@@ -183,7 +183,7 @@ public class LBEntity implements Entity {
      */
     @Override
     public Entity getPassenger() {
-        return new LBEntity(this.world, this.entity.riddenByEntity);
+        return this.entity.riddenByEntity.getBukkitEntity();
     }
 
     /**
