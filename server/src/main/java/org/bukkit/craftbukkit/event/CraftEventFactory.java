@@ -192,7 +192,7 @@ public class CraftEventFactory {
      * CreatureSpawnEvent
      */
     public static CreatureSpawnEvent callCreatureSpawnEvent(WorldServer world, EntityLiving entityliving, SpawnReason spawnReason) {
-        LivingEntity entity = new LBLivingEntity((LBWorld) Bukkit.getServer().getWorld(world.levelName), entityliving);
+        LivingEntity entity = new LBLivingEntity(world.getBukkitWorld(), entityliving);
         LilyBukkit server = (LilyBukkit) entity.getServer();
 
         CreatureType type = null;
@@ -231,7 +231,7 @@ public class CraftEventFactory {
      * ItemSpawnEvent
      */
     public static ItemSpawnEvent callItemSpawnEvent(WorldServer world, EntityItem entityitem) {
-        Entity entity = new LBEntity((LBWorld) Bukkit.getServer().getWorld(world.levelName), entityitem);
+        Entity entity = new LBEntity(world.getBukkitWorld(), entityitem);
         LilyBukkit server = (LilyBukkit) entity.getServer();
 
         ItemSpawnEvent event = new ItemSpawnEvent(entity, entity.getLocation());
