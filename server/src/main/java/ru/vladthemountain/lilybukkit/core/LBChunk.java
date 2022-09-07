@@ -2,14 +2,12 @@ package ru.vladthemountain.lilybukkit.core;
 
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.EntityPlayerMP;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
-import ru.vladthemountain.lilybukkit.core.block.LBBlock;
 import ru.vladthemountain.lilybukkit.core.block.LBBlockState;
 
 import java.util.ArrayList;
@@ -25,9 +23,9 @@ public class LBChunk implements Chunk {
     protected net.minecraft.src.Chunk chunk;
     protected LBWorld world;
 
-    public LBChunk(net.minecraft.src.Chunk chunk) {
+    public LBChunk(LBWorld world, net.minecraft.src.Chunk chunk) {
         this.chunk = chunk;
-        this.world = (LBWorld) Bukkit.getServer().getWorld(this.chunk.worldObj.levelName);
+        this.world = world;
     }
 
     /**
@@ -70,7 +68,7 @@ public class LBChunk implements Chunk {
      */
     @Override
     public Block getBlock(int x, int y, int z) {
-        return new LBBlock(this.world, this.world.getBlockTypeIdAt(x, y, z), x, y, z);
+        return this.world.getBlockAt(this.getX() + x, y, this.getZ() + z);
     }
 
     /**

@@ -19,7 +19,7 @@ is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 - [x] Plugin support (`1.0.0.0`)
 - [x] Permissions support (`1.0.0.0`)
 - [x] YAML Config support (`1.1.0.0`)
-- [ ] Multi-world support (`2.0.0.0`)
+- [x] Multi-world support (`2.0.0.0`)
 
 ## Installation
 

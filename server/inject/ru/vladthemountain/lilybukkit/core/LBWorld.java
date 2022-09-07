@@ -12,7 +12,6 @@ import net.minecraft.src.EntityItem;
 import net.minecraft.src.EntityMinecart;
 import net.minecraft.src.EntityPig;
 import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.EntitySheep;
 import net.minecraft.src.EntitySkeleton;
 import net.minecraft.src.EntitySlime;
@@ -44,6 +43,7 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import ru.vladthemountain.lilybukkit.core.block.LBBlock;
 import ru.vladthemountain.lilybukkit.core.entity.LBArrow;
 import ru.vladthemountain.lilybukkit.core.entity.LBBoat;
 import ru.vladthemountain.lilybukkit.core.entity.LBChicken;
@@ -54,7 +54,6 @@ import ru.vladthemountain.lilybukkit.core.entity.LBGiant;
 import ru.vladthemountain.lilybukkit.core.entity.LBItem;
 import ru.vladthemountain.lilybukkit.core.entity.LBMinecart;
 import ru.vladthemountain.lilybukkit.core.entity.LBPig;
-import ru.vladthemountain.lilybukkit.core.entity.LBPlayer;
 import ru.vladthemountain.lilybukkit.core.entity.LBSheep;
 import ru.vladthemountain.lilybukkit.core.entity.LBSkeleton;
 import ru.vladthemountain.lilybukkit.core.entity.LBSlime;
@@ -109,7 +108,7 @@ public class LBWorld implements World {
      */
     @Override
     public Block getBlockAt(int x, int y, int z) {
-        return this.getChunkAt(x, z).getBlock(x, y, z);
+        return new LBBlock(this, this.world.getBlockId(x, y, z), x, y, z);
     }
 
     /**
@@ -205,7 +204,8 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk getChunkAt(int x, int z) {
-        return this.world.getChunkFromChunkCoords(x, z).getBukkitChunk();
+        net.minecraft.src.Chunk chunk = this.world.getChunkFromChunkCoords(x, z);
+        return chunk.getBukkitChunk() == null ? new LBChunk(this, chunk) : chunk.getBukkitChunk();
     }
 
     /**
@@ -227,7 +227,8 @@ public class LBWorld implements World {
      */
     @Override
     public Chunk getChunkAt(Block block) {
-        return new LBChunk(this.world.getChunkFromBlockCoords(block.getX(), block.getY()));
+        net.minecraft.src.Chunk chunk = this.world.getChunkFromBlockCoords(block.getX(), block.getZ());
+        return chunk.getBukkitChunk() == null ? new LBChunk(this, chunk) : chunk.getBukkitChunk();
     }
 
     /**
