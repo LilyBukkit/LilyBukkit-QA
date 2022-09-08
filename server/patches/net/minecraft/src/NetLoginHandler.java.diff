@@ -119,17 +119,17 @@
 +        } else {
 +            NetLoginHandler.logger.info("User doesn't have ULPP enabled"); //LilyBukkit - additional output
          }
-+        if (ULPPManager.supportsExtension(packet.password, "ROSE", 1, 1)) {
-+            NetLoginHandler.logger.info("User connected via Rosepad 1.1.0.2-1.1.0.5"); //LilyBukkit - additional output
-+            this.ROSEVersion = 1;
-+        } else if (ULPPManager.supportsExtension(packet.password, "ROSE", 2, 2)) {
++        if (ULPPManager.supportsExtension(packet.password, "ROSE", 2, 2)) {
 +            NetLoginHandler.logger.info("User connected via Rosepad 1.1.0.6+"); //LilyBukkit - additional output
 +            this.ROSEVersion = 2;
++        } else if (ULPPManager.supportsExtension(packet.password, "ROSE", 1, 1)) {
++            NetLoginHandler.logger.info("User connected via Rosepad 1.1.0.2-1.1.0.5"); //LilyBukkit - additional output
++            this.ROSEVersion = 1;
 +        } else {
 +            NetLoginHandler.logger.info("User isn't using Rosepad"); //LilyBukkit - additional output
 +        }
 +        // LilyBukkit start
-+        PlayerPreLoginEvent event = new PlayerPreLoginEvent(this.packet1login.username, this.netManager.networkSocket.getInetAddress());
++        PlayerPreLoginEvent event = new PlayerPreLoginEvent(packet.username, this.netManager.networkSocket.getInetAddress());
 +        Bukkit.getServer().getPluginManager().callEvent(event);
 +
 +        if (event.getResult() != PlayerPreLoginEvent.Result.ALLOWED) {

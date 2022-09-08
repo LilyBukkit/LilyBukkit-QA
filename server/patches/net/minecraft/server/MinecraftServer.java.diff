@@ -113,7 +113,7 @@
 +    }
 +
 +    public String getVersionTag() {
-+        return "dev";
++        return "beta";
 +    }
 +
 +    public String getVersionString() {
