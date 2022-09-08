@@ -1,11 +1,13 @@
 --- NetLoginHandler.java
 +++ NetLoginHandler.java
-@@ -1,9 +1,11 @@
+@@ -1,9 +1,13 @@
  package net.minecraft.src;
  
 -import java.net.HttpURLConnection;
 -import java.net.URL;
 +import net.minecraft.server.MinecraftServer;
++import org.bukkit.Bukkit;
++import org.bukkit.event.player.PlayerPreLoginEvent;
 +
  import java.io.IOException;
 +import java.net.HttpURLConnection;
@@ -15,7 +17,7 @@
 +import java.net.URLEncoder;
  import java.util.Random;
  import java.util.logging.Logger;
-@@ -17,49 +19,48 @@
+@@ -17,49 +21,57 @@
      private long loginStart;
      private String username;
 +    private String password;
@@ -54,6 +56,15 @@
 +
 +    public void tryLogin() {
          if (this.packet1login != null) {
++            // LilyBukkit start
++            PlayerPreLoginEvent event = new PlayerPreLoginEvent(this.packet1login.username, this.netManager.networkSocket.getInetAddress());
++            Bukkit.getServer().getPluginManager().callEvent(event);
++
++            if (event.getResult() != PlayerPreLoginEvent.Result.ALLOWED) {
++                this.kickUser(event.getKickMessage());
++                return;
++            }
++            // LilyBukkit end
              this.doLogin(this.packet1login);
              this.packet1login = null;
          }
@@ -79,7 +90,7 @@
 +
      @Override
      public void handleHandshake(final Packet2Handshake packet) {
-@@ -67,63 +68,90 @@
+@@ -67,63 +79,99 @@
              this.serverId = Long.toHexString(NetLoginHandler.rand.nextLong());
              this.netManager.addToSendQueue(new Packet2Handshake(this.serverId));
 -        }
@@ -117,6 +128,15 @@
 +        } else {
 +            NetLoginHandler.logger.info("User isn't using Rosepad"); //LilyBukkit - additional output
 +        }
++        // LilyBukkit start
++        PlayerPreLoginEvent event = new PlayerPreLoginEvent(this.packet1login.username, this.netManager.networkSocket.getInetAddress());
++        Bukkit.getServer().getPluginManager().callEvent(event);
++
++        if (event.getResult() != PlayerPreLoginEvent.Result.ALLOWED) {
++            this.kickUser(event.getKickMessage());
++            return;
++        }
++        // LilyBukkit end
          this.doLogin(packet);
      }
 -    
@@ -193,7 +213,7 @@
 +        if (this.ULPPVersion == 1 && this.mcServer.ULPPOnlineMode) {
              this.netManager.addToSendQueue(new Packet1Login("", this.mcServer.serverId, usedULPPVer));
              return;
-@@ -131,42 +159,41 @@
+@@ -131,42 +179,41 @@
          final EntityPlayerMP entityPlayerMP2 = this.mcServer.configManager.login(this, loginPacket.username, loginPacket.password, false);
          if (entityPlayerMP2 != null) {
 -            NetLoginHandler.logger.info(String.valueOf(this.getUserAndIPString()) + " logged in with ULPP" + Integer.toString(this.ULPPVersion));
