@@ -1156,7 +1156,7 @@
 +
 +        boolean defaultReturn; // CraftBukkit - store the default action
 +
-+        if (axisAlignedBB9 != null && this.getEntitiesWithinAABB(Entity.class, axisAlignedBB9).isEmpty()) {
++        if (axisAlignedBB9 != null && !this.getEntitiesWithinAABB(Entity.class, axisAlignedBB9).isEmpty()) {
 +            defaultReturn = false; // CraftBukkit
 +        } else {
 +            if (block7 == Block.WATER_MOVING || block7 == Block.WATER_STILL || block7 == Block.LAVA_MOVING || block7 == Block.LAVA_STILL || block7 == Block.FIRE || block7 == Block.SNOW) {

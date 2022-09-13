@@ -1,6 +1,6 @@
 --- ItemBlock.java
 +++ ItemBlock.java
-@@ -1,4 +1,10 @@
+@@ -1,7 +1,13 @@
  package net.minecraft.src;
  
 +import org.bukkit.Bukkit;
@@ -11,7 +11,15 @@
 +
  public class ItemBlock extends Item {
      private int blockID;
-@@ -12,5 +18,7 @@
+-    
++
+     public ItemBlock(final int itemID) {
+         super(itemID);
+@@ -9,11 +15,12 @@
+         this.setIconIndex(Block.blocksList[itemID + 256].getBlockTextureFromSide(2));
+     }
+-    
++
      @Override
      public boolean onItemUse(final ItemStack stack, final EntityPlayer entityPlayer, final World world, int x, int y, int z, int i7) {
 -        if (world.getBlockId(x, y, z) == Block.snow.blockID) {
@@ -19,8 +27,12 @@
 +
 +        if (world.getBlockId(x, y, z) == Block.SNOW.blockID) {
              i7 = 0;
-         }
-@@ -40,5 +48,55 @@
+-        }
+-        else {
++        } else {
+             if (i7 == 0) {
+                 --y;
+@@ -40,5 +47,55 @@
          if (world.canBlockBePlacedAt(this.blockID, x, y, z, false)) {
              final Block block8 = Block.blocksList[this.blockID];
 -            if (world.setBlockWithNotify(x, y, z, this.blockID)) {
@@ -52,7 +64,7 @@
 +             * replace this with.
 +             */
 +            if (world.setBlockAndMetadata(x, y, z, this.blockID, stack.itemDmg)) { // <-- world.setTypeIdAndData does this to place the block
-+                BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, eventUseBlockBelow ? blockStateBelow : replacedBlockState, clickedX, clickedY, clickedZ, i7);
++                BlockPlaceEvent event = CraftEventFactory.callBlockPlaceEvent(world, (EntityPlayerMP) entityPlayer, eventUseBlockBelow ? blockStateBelow : replacedBlockState, clickedX, clickedY, clickedZ, this.blockID);
 +
 +                if (event.isCancelled() || !event.canBuild()) {
 +                    if (blockStateBelow != null) { // Used for steps
@@ -71,9 +83,9 @@
 +                    return true;
 +
 +                }
-+                world.notifyBlocksOfNeighborChange(x, y, z, event.getBlock().getTypeId()); // <-- world.setTypeIdAndData does this on success (tell the world)
++                world.notifyBlockChange(x, y, z, event.getBlock().getTypeId()); // <-- world.setTypeIdAndData does this on success (tell the world)
 +
 +                // CraftBukkit end
-+            //if (world.setBlockWithNotify(x, y, z, this.blockID)) {
++                //if (world.setBlockWithNotify(x, y, z, this.blockID)) {
                  Block.blocksList[this.blockID].onBlockPlaced(world, x, y, z, i7);
                  world.playSoundEffect(x + 0.5f, y + 0.5f, z + 0.5f, block8.stepSound.getStepSound(), (block8.stepSound.getVolume() + 1.0f) / 2.0f, block8.stepSound.getPitch() * 0.8f);

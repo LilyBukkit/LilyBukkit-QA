@@ -6,6 +6,7 @@ import net.minecraft.src.Packet4UpdateTime;
 import net.minecraft.src.Packet51MapChunk;
 import net.minecraft.src.Packet53BlockChange;
 import net.minecraft.src.Packet5PlayerInventory;
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -429,6 +430,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean hasPermission(String name) {
+        Bukkit.getServer().getLogger().info("Checking if " + this.getName() + " has permission " + name);
         return this.permissibleBase.hasPermission(name);
     }
 
@@ -442,6 +444,7 @@ public class LBPlayer extends LBLivingEntity implements Player {
      */
     @Override
     public boolean hasPermission(Permission perm) {
+        Bukkit.getServer().getLogger().info("Checking if " + this.getName() + " has permission " + perm.getName());
         return this.permissibleBase.hasPermission(perm);
     }
 
