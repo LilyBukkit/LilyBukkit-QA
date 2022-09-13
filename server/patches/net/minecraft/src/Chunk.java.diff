@@ -211,6 +211,13 @@
 +
      public void addEntity(final Entity entity) {
          if (!this.isChunkRendered) {
+@@ -280,5 +283,5 @@
+             final int i3 = MathHelper.floor_double(entity.posZ / 16.0);
+             if (i2 != this.xPosition || i3 != this.zPosition) {
+-                System.out.println(new StringBuilder("Wrong location! ").append(entity).toString());
++                System.out.print("Wrong location! " + entity);
+             }
+             int i4 = MathHelper.floor_double(entity.posY / 16.0);
 @@ -296,9 +299,9 @@
          }
      }
@@ -264,31 +271,40 @@
 @@ -351,10 +354,9 @@
              }
              this.chunkTileEntityMap.put(chunkPosition5, tileEntity);
--        }
--        else {
 +        } else {
-             System.out.println("Attempted to place a tile entity where there was no entity tile!");
++            System.out.print("Attempted to place a tile entity where there was no entity tile!");
          }
+-        else {
+-            System.out.println("Attempted to place a tile entity where there was no entity tile!");
+-        }
      }
 -    
 +
      public void removeChunkBlockTileEntity(final int x, final int y, final int z) {
          final ChunkPosition chunkPosition4 = new ChunkPosition(x, y, z);
-@@ -363,5 +365,5 @@
+@@ -363,25 +365,25 @@
          }
      }
 -    
 +
      public void onChunkLoad() {
          this.isChunkLoaded = true;
-@@ -371,5 +373,5 @@
+         this.worldObj.loadedTileEntityList.addAll(this.chunkTileEntityMap.values());
+-        for (int i1 = 0; i1 < this.entities.length; ++i1) {
+-            this.worldObj.addLoadedEntities(this.entities[i1]);
++        for (List<Entity> entity : this.entities) {
++            this.worldObj.addLoadedEntities(entity);
          }
      }
 -    
 +
      public void onChunkUnload() {
          this.isChunkLoaded = false;
-@@ -379,9 +381,9 @@
+         this.worldObj.loadedTileEntityList.removeAll(this.chunkTileEntityMap.values());
+-        for (int i1 = 0; i1 < this.entities.length; ++i1) {
+-            this.worldObj.unloadEntities(this.entities[i1]);
++        for (List<Entity> entity : this.entities) {
++            this.worldObj.unloadEntities(entity);
          }
      }
 -    
@@ -300,11 +316,13 @@
 +
      public void getEntitiesWithinAABBForEntity(final Entity entity, final AxisAlignedBB aabb, final List list) {
          int i4 = MathHelper.floor_double((aabb.minY - 2.0) / 16.0);
-@@ -396,5 +398,5 @@
+@@ -395,6 +397,6 @@
+         for (int i6 = i4; i6 <= i5; ++i6) {
              final List list2 = this.entities[i6];
-             for (int i7 = 0; i7 < list2.size(); ++i7) {
+-            for (int i7 = 0; i7 < list2.size(); ++i7) {
 -                final Entity entity2 = (Entity)list2.get(i7);
-+                final Entity entity2 = (Entity) list2.get(i7);
++            for (Object o : list2) {
++                final Entity entity2 = (Entity) o;
                  if (entity2 != entity && entity2.boundingBox.intersectsWith(aabb)) {
                      list.add(entity2);
 @@ -403,5 +405,5 @@
@@ -314,11 +332,15 @@
 +
      public void getEntitiesOfTypeWithinAAAB(final Class clazz, final AxisAlignedBB aabb, final List list) {
          int i4 = MathHelper.floor_double((aabb.minY - 2.0) / 16.0);
-@@ -416,5 +418,5 @@
-             final List list2 = this.entities[i6];
-             for (int i7 = 0; i7 < list2.size(); ++i7) {
+@@ -414,7 +416,7 @@
+         }
+         for (int i6 = i4; i6 <= i5; ++i6) {
+-            final List list2 = this.entities[i6];
+-            for (int i7 = 0; i7 < list2.size(); ++i7) {
 -                final Entity entity9 = (Entity)list2.get(i7);
-+                final Entity entity9 = (Entity) list2.get(i7);
++            final List<Entity> list2 = this.entities[i6];
++            for (Object o : list2) {
++                final Entity entity9 = (Entity) o;
                  if (clazz.isAssignableFrom(entity9.getClass()) && entity9.boundingBox.intersectsWith(aabb)) {
                      list.add(entity9);
 @@ -423,9 +425,9 @@

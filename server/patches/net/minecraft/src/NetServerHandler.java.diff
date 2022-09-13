@@ -144,8 +144,8 @@
 +
 +        if (Double.isNaN(packet.xPosition) || Double.isNaN(packet.yPosition) || Double.isNaN(packet.zPosition) || Double.isNaN(packet.stance)) {
 +            player.teleport(player.getWorld().getSpawnLocation());
-+            System.err.println(player.getName() + " was caught trying to crash the server with an invalid position.");
-+            player.kickPlayer("Nope!");
++            System.err.print(player.getName() + " was caught trying to crash the server with an invalid position.");
++            player.kickPlayer("Your position is invalid, goodbye.");
 +            return;
 +        }
 +
@@ -381,7 +381,7 @@
 +        final WorldServer worldMngr = this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName);
          final boolean op = this.mcServer.configManager.isOp(this.playerEntity.username);
          worldMngr.disableSpawnProtection = op;
-@@ -193,49 +345,54 @@
+@@ -193,49 +345,55 @@
          final int i5 = packet.zPosition;
          final int i6 = packet.direction;
 -        final int maxDistX = (int)MathHelper.abs((float)(i3 - this.mcServer.worldMngr.spawnX));
@@ -403,7 +403,8 @@
 -        this.playerEntity.playerNetServerHandler.sendPacket(new Packet53BlockChange(i3, i4, i5, this.mcServer.worldMngr));
 -        this.mcServer.worldMngr.disableSpawnProtection = false;
 +            this.playerEntity.theItemInWorldManager.activeBlockOrUseItem(this.playerEntity, this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName), itemStack9, i3, i4, i5, i6);
-+        } else System.out.println("Denied block placement");
++        } else
++            System.out.print("Denied block placement at " + packet.xPosition + ", " + packet.yPosition + ", " + packet.zPosition);
 +        this.playerEntity.playerNetServerHandler.sendPacket(new Packet53BlockChange(i3, i4, i5, this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName)));
 +        this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName).disableSpawnProtection = false;
      }
@@ -456,7 +457,7 @@
 +
      @Override
      public void handlePickupSpawn(final Packet21PickupSpawn packet) {
-@@ -243,12 +400,12 @@
+@@ -243,12 +401,12 @@
          final double d3 = packet.yPosition / 32.0;
          final double d4 = packet.zPosition / 32.0;
 -        final EntityItem entityItem8 = new EntityItem(this.mcServer.worldMngr, d2, d3, d4, new ItemStack(packet.itemID, packet.count));
@@ -472,7 +473,7 @@
 +
      @Override
      public void handleChat(final Packet3Chat packet) {
-@@ -256,9 +413,8 @@
+@@ -256,9 +414,8 @@
          if (string2.length() > 100) {
              this.kickPlayer("Chat message too long");
 -        }
@@ -484,7 +485,7 @@
 +                if (" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'abcdefghijklmnopqrstuvwxyz{|}~\u2302\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8£\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1ªº¿®¬½¼¡«»".indexOf((int) string2.charAt(i3)) < 0) {
                      this.kickPlayer("Illegal characters in chat");
                      return;
-@@ -267,7 +423,15 @@
+@@ -267,7 +424,15 @@
              if (string2.startsWith("/")) {
                  this.handleSlashCommand(string2);
 -            }
@@ -503,7 +504,7 @@
 +                //string2 = "<" + /*Bukkit.getPlayer(*/this.playerEntity.username/*).getDisplayName()*/ + "> " + string2; //LilyBukkit: replace 'this.playerEntity.username' with own code
                  NetServerHandler.logger.info(string2);
                  this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(string2));
-@@ -275,18 +439,37 @@
+@@ -275,18 +440,37 @@
          }
      }
 -    
@@ -547,7 +548,7 @@
 +                NetServerHandler.logger.info(string1 + " to " + string2[1]);
                  if (!this.mcServer.configManager.sendPacketToPlayer(string2[1], new Packet3Chat(string1))) {
                      this.sendPacket(new Packet3Chat("§cThere's no player by that name online."));
-@@ -294,72 +477,74 @@
+@@ -294,72 +478,74 @@
              }
          }
 -        else if (string1.toLowerCase().equalsIgnoreCase("/home")) {
@@ -665,14 +666,14 @@
 +
      @Override
      public void handlePlayerInventory(final Packet5PlayerInventory packet) {
-@@ -374,5 +559,5 @@
+@@ -374,5 +560,5 @@
          }
      }
 -    
 +
      public void sendInventoryPackets() {
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-1, this.playerEntity.inventory.mainInventory));
-@@ -380,8 +565,17 @@
+@@ -380,8 +566,17 @@
          this.netManager.addToSendQueue(new Packet5PlayerInventory(-3, this.playerEntity.inventory.armorInventory));
      }
 -    
@@ -692,7 +693,7 @@
 +        // LilyBukkit end
          if (tileEntity2 != null) {
              tileEntity2.readFromNBT(packet.tileEntityNBT);
-@@ -389,3 +583,39 @@
+@@ -389,3 +584,39 @@
          }
      }
 +
@@ -702,10 +703,10 @@
 +
 +    @Override
 +    public void handleEntityDamage(Packet35EntityDamage packet) {
-+        System.out.println("Entity " + packet.entityId + " took " + packet.damage + " damage" + (packet.dead ? " (dead)" : ""));
++        System.out.print("Entity " + packet.entityId + " took " + packet.damage + " damage" + (packet.dead ? " (dead)" : ""));
 +        Entity entity = this.mcServer.getWorldServer(this.playerEntity.worldObj.levelName).getEntityWithId(packet.entityId);
 +        if (entity == null) {
-+            System.out.println("No entity found");
++            System.out.print("No entity found with id " + packet.entityId);
 +            return;
 +        }
 +        if (entity instanceof EntityPlayer) {
@@ -722,13 +723,13 @@
 +        // LilyBukkit start
 +        Bukkit.getServer().getPluginManager().callEvent(new EntityDamageEvent(entity.getBukkitEntity(), DamageCause.CUSTOM, packet.damage)); //Fallback for entity damage
 +        // LilyBukkit end
-+        System.out.println("Entity took damage");
++        System.out.print("Entity " + packet.entityId + " took damage");
 +        entity.attackEntityFrom(playerEntity, packet.damage);
 +    }
 +
 +    @Override
 +    public void handleRosepadMeta(Packet130RosepadMeta packet) { // This is important for porting Waterfall/Bungeecord to Lilypad
-+        System.out.println("Player " + this.playerEntity.username + " joined server \""
++        System.out.print("Player " + this.playerEntity.username + " joined server \""
 +                + packet.host + "\" using " + packet.serverName);
 +    }
  }

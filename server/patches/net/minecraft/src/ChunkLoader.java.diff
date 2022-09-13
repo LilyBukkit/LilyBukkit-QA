@@ -1,0 +1,54 @@
+--- ChunkLoader.java
++++ ChunkLoader.java
+@@ -18,5 +18,5 @@
+     
+     private File chunkFileForXZ(final int x, final int z) {
+-        final String string3 = new StringBuilder("c.").append(Integer.toString(x, 36)).append(".").append(Integer.toString(z, 36)).append(".dat").toString();
++        final String string3 = "c." + Integer.toString(x, 36) + "." + Integer.toString(z, 36) + ".dat";
+         final String string4 = Integer.toString(x & 0x3F, 36);
+         final String string5 = Integer.toString(z & 0x3F, 36);
+@@ -44,16 +44,16 @@
+             try {
+                 final FileInputStream fileInputStream5 = new FileInputStream(file4);
+-                final NBTTagCompound nBTTagCompound6 = CompressedStreamTools.readCompressed((InputStream)fileInputStream5);
++                final NBTTagCompound nBTTagCompound6 = CompressedStreamTools.readCompressed(fileInputStream5);
+                 if (!nBTTagCompound6.hasKey("Level")) {
+-                    System.out.println(new StringBuilder("Chunk file at ").append(x).append(",").append(z).append(" is missing level data, skipping").toString());
++                    System.out.print("Chunk file at " + x + "," + z + " is missing level data, skipping");
+                     return null;
+                 }
+                 if (!nBTTagCompound6.getCompoundTag("Level").hasKey("Blocks")) {
+-                    System.out.println(new StringBuilder("Chunk file at ").append(x).append(",").append(z).append(" is missing block data, skipping").toString());
++                    System.out.print("Chunk file at " + x + "," + z + " is missing block data, skipping");
+                     return null;
+                 }
+                 Chunk chunk7 = loadChunkIntoWorldFromCompound(world, nBTTagCompound6.getCompoundTag("Level"));
+                 if (!chunk7.isAtLocation(x, z)) {
+-                    System.out.println(new StringBuilder("Chunk file at ").append(x).append(",").append(z).append(" is in the wrong location; relocating. (Expected ").append(x).append(", ").append(z).append(", got ").append(chunk7.xPosition).append(", ").append(chunk7.zPosition).append(")").toString());
++                    System.out.print("Chunk file at " + x + "," + z + " is in the wrong location; relocating. (Expected " + x + ", " + z + ", got " + chunk7.xPosition + ", " + chunk7.zPosition + ")");
+                     nBTTagCompound6.setInteger("xPos", x);
+                     nBTTagCompound6.setInteger("zPos", z);
+@@ -80,7 +80,7 @@
+             final NBTTagCompound nBTTagCompound6 = new NBTTagCompound();
+             final NBTTagCompound nBTTagCompound7 = new NBTTagCompound();
+-            nBTTagCompound6.setTag("Level", (NBTBase)nBTTagCompound7);
++            nBTTagCompound6.setTag("Level", nBTTagCompound7);
+             this.storeChunkInCompound(chunk, world, nBTTagCompound7);
+-            CompressedStreamTools.writeCompressed(nBTTagCompound6, (OutputStream)fileOutputStream5);
++            CompressedStreamTools.writeCompressed(nBTTagCompound6, fileOutputStream5);
+             fileOutputStream5.close();
+             if (file3.exists()) {
+@@ -117,5 +117,5 @@
+             }
+         }
+-        nbttagcompound.setTag("Entities", (NBTBase)nBTTagList4);
++        nbttagcompound.setTag("Entities", nBTTagList4);
+         final NBTTagList nBTTagList5 = new NBTTagList();
+         for (final TileEntity tileEntity10 : chunk.chunkTileEntityMap.values()) {
+@@ -124,5 +124,5 @@
+             nBTTagList5.setTag(nBTTagCompound8);
+         }
+-        nbttagcompound.setTag("TileEntities", (NBTBase)nBTTagList5);
++        nbttagcompound.setTag("TileEntities", nBTTagList5);
+     }
+     

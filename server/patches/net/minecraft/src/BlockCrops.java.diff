@@ -28,3 +28,10 @@
 +                world.spawnEntityInWorld(entityItem11, SpawnReason.NATURAL);
              }
          }
+@@ -90,5 +92,5 @@
+     @Override
+     public int idDropped(final int count, final Random random) {
+-        System.out.println(new StringBuilder("Get resource: ").append(count).toString());
++        System.out.print("Get resource: " + count);
+         return (count == 7) ? Item.wheat.shiftedIndex : -1;
+     }

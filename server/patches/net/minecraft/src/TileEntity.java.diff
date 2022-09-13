@@ -1,0 +1,23 @@
+--- TileEntity.java
++++ TileEntity.java
+@@ -23,5 +23,5 @@
+     private static void addMapping(final Class clazz, final String tileEntityName) {
+         if (TileEntity.classToNameMap.containsKey(tileEntityName)) {
+-            throw new IllegalArgumentException(new StringBuilder("Duplicate id: ").append(tileEntityName).toString());
++            throw new IllegalArgumentException("Duplicate id: " + tileEntityName);
+         }
+         TileEntity.nameToClassMap.put(tileEntityName, clazz);
+@@ -38,5 +38,5 @@
+         final String string2 = (String)TileEntity.classToNameMap.get(this.getClass());
+         if (string2 == null) {
+-            throw new RuntimeException(new StringBuilder().append(this.getClass()).append(" is missing a mapping! This is a bug!").toString());
++            throw new RuntimeException(this.getClass() + " is missing a mapping! This is a bug!");
+         }
+         nbttagcompound.setString("id", string2);
+@@ -64,5 +64,5 @@
+         }
+         else {
+-            System.out.println(new StringBuilder("Skipping TileEntity with id ").append(nbttagcompound.getString("id")).toString());
++            System.out.print("Skipping TileEntity with id " + nbttagcompound.getString("id"));
+         }
+         return tileEntity1;

@@ -1,0 +1,19 @@
+--- ConsoleLogFormatter.java
++++ ConsoleLogFormatter.java
+@@ -39,13 +39,12 @@
+         }
+         else if (level3 == Level.SEVERE) {
+-            stringBuilder2.append(new StringBuilder(" [").append(level3.getLocalizedName()).append("] ").toString());
++            stringBuilder2.append(" [" + level3.getLocalizedName() + "] ");
+         }
+         stringBuilder2.append(logRecord.getMessage());
+-        stringBuilder2.append('\n');
+         final Throwable throwable4 = logRecord.getThrown();
+         if (throwable4 != null) {
+             final StringWriter stringWriter5 = new StringWriter();
+-            throwable4.printStackTrace(new PrintWriter((Writer)stringWriter5));
+-            stringBuilder2.append(stringWriter5.toString());
++            throwable4.printStackTrace(new PrintWriter(stringWriter5));
++            stringBuilder2.append(stringWriter5);
+         }
+         return stringBuilder2.toString();

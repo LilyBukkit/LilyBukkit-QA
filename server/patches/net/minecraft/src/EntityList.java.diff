@@ -1,0 +1,9 @@
+--- EntityList.java
++++ EntityList.java
+@@ -73,5 +73,5 @@
+         }
+         else {
+-            System.out.println(new StringBuilder("Skipping Entity with id ").append(nbttagcompound.getString("id")).toString());
++            System.out.print("Skipping Entity with id " + nbttagcompound.getString("id"));
+         }
+         return entity2;

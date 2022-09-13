@@ -101,19 +101,22 @@
 +        } else {
              this.removeProgress = 0.0f;
              this.removeProgressUnused = 0.0f;
-@@ -63,5 +108,5 @@
+@@ -63,6 +108,7 @@
          }
      }
 -    
 +
      public boolean removeBlock(final int i1, final int i2, final int i3) {
++        System.out.print("Removing at " + i1 + "," + i2 + "," + i3);
          final Block block4 = Block.blocksList[this.worldObj.getBlockId(i1, i2, i3)];
-@@ -73,6 +118,19 @@
+         final int i4 = this.worldObj.getBlockMetadata(i1, i2, i3);
+@@ -73,6 +119,20 @@
          return z6;
      }
 -    
 +
      public boolean tryHarvestBlock(final int i1, final int i2, final int i3) {
++        System.out.print("Harvesting at " + i1 + "," + i2 + "," + i3);
 +        // CraftBukkit start
 +        if (this.thisPlayer != null) {
 +            org.bukkit.block.Block block = Bukkit.getWorld(this.worldObj.levelName).getBlockAt(i1, i2, i3);
@@ -129,7 +132,7 @@
 +
          final int i4 = this.worldObj.getBlockId(i1, i2, i3);
          final int i5 = this.worldObj.getBlockMetadata(i1, i2, i3);
-@@ -91,8 +149,35 @@
+@@ -91,8 +151,35 @@
          return z6;
      }
 -    

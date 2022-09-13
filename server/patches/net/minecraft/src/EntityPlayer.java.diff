@@ -80,7 +80,11 @@
 +                } else {
                      if (n3 != 0) {
                          ++n2;
-@@ -108,9 +118,9 @@
+@@ -105,12 +115,12 @@
+             this.posY = n2;
+             this.setPosition(this.posX, this.posY, this.posZ);
+-            System.out.println(new StringBuilder("Sending player to Brazil at: ").append(this.posX).append(" ").append(this.posY).append(" ").append(this.posZ).toString());
++            System.out.print("Sending player to Brazil at: " + this.posX + " " + this.posY + " " + this.posZ);
          }
      }
 -    

@@ -64,9 +64,11 @@
 +
      public void run() {
          while (this.networkListenThread.isListening) {
-@@ -23,7 +64,18 @@
+@@ -22,8 +63,19 @@
+                     continue;
                  }
-                 final NetLoginHandler netLoginHandler2 = new NetLoginHandler(this.minecraftServer, socket1, new StringBuilder("Connection #").append(NetworkListenThread.incrementConnections(this.networkListenThread)).toString());
+-                final NetLoginHandler netLoginHandler2 = new NetLoginHandler(this.minecraftServer, socket1, new StringBuilder("Connection #").append(NetworkListenThread.incrementConnections(this.networkListenThread)).toString());
++                final NetLoginHandler netLoginHandler2 = new NetLoginHandler(this.minecraftServer, socket1, "Connection #" + NetworkListenThread.incrementConnections(this.networkListenThread));
 +                ByteArrayWrapper address = new ByteArrayWrapper(socket1.getInetAddress().getAddress());
 +                if (!lastConnectionAt.containsKey(address)) {
 +                    lastConnectionAt.put(address, 0L);
@@ -75,7 +77,7 @@
 +                if (System.currentTimeMillis() - lastConnectedAt < 5000) {
 +                    lastConnectionAt.put(address, System.currentTimeMillis());
 +                    socket1.close();
-+                    System.out.println("Connection throttled [" + address + "]");
++                    System.out.print("Connection throttled [" + address + "]");
 +                    continue;
 +                }
 +                lastConnectionAt.put(address, System.currentTimeMillis());

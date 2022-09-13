@@ -73,7 +73,7 @@
 +        } catch (Exception exception2) {
              exception2.printStackTrace();
 -            System.out.println(new StringBuilder("Skipping packet with id ").append(id).toString());
-+            System.out.println("Skipping packet with id " + id);
++            System.out.print("Skipping packet with id " + id);
              return null;
          }
      }

@@ -578,7 +578,7 @@
 +
      public void setBlockBounds(final float minX, final float minY, final float minZ, final float maxX, final float maxY, final float maxZ) {
          this.minX = minX;
-@@ -362,71 +377,72 @@
+@@ -362,71 +377,73 @@
          this.maxZ = maxZ;
      }
 -    
@@ -641,6 +641,7 @@
 -    
 +
      public void onBlockDestroyedByPlayer(final World world, final int x, final int y, final int z, final int flag) {
++        System.out.print("Destroyed at " + x + "," + y + "," + z);
      }
 -    
 +
@@ -673,7 +674,7 @@
 +
      public float blockStrength(final EntityPlayer entityPlayer) {
          if (this.hardness < 0.0f) {
-@@ -435,6 +451,5 @@
+@@ -435,6 +452,5 @@
              }
              return 0.0f;
 -        }
@@ -681,7 +682,7 @@
 +        } else {
              if (!entityPlayer.canHarvestBlock(this)) {
                  return 1.0f / this.hardness / 100.0f;
-@@ -443,9 +458,9 @@
+@@ -443,9 +459,9 @@
          }
      }
 -    
@@ -693,14 +694,14 @@
 +
      public void dropBlockAsItemWithChance(final World world, final int x, final int y, final int z, final int i5, final float f6) {
          if (!world.multiplayerWorld) {
-@@ -460,5 +475,5 @@
+@@ -460,5 +476,5 @@
                          final EntityItem entityItem17 = new EntityItem(world, x + d11, y + d12, z + d13, new ItemStack(i8));
                          entityItem17.delayBeforeCanPickup = 10;
 -                        world.spawnEntityInWorld(entityItem17);
 +                        world.spawnEntityInWorld(entityItem17, SpawnReason.NATURAL);
                      }
                  }
-@@ -466,9 +481,9 @@
+@@ -466,9 +482,9 @@
          }
      }
 -    
@@ -712,7 +713,7 @@
 +
      public MovingObjectPosition collisionRayTrace(final World world, final int x, final int y, final int z, Vec3D vector1, Vec3D vector2) {
          this.setBlockBoundsBasedOnState(world, x, y, z);
-@@ -542,59 +557,62 @@
+@@ -542,59 +558,62 @@
          return new MovingObjectPosition(x, y, z, b14, vec3D13.addVector(x, y, z));
      }
 -    

@@ -42,9 +42,9 @@ public class UpdateChecker {
         String versionName = (String) responseBody.get("name");
 
         if (!(Bukkit.getServer().getName() + " " + Bukkit.getServer().getVersion()).equals(versionName)) {
-            System.out.println("### An update for LilyBukkit is available: " + versionName + " ###");
+            Bukkit.getServer().getLogger().warning("### An update for LilyBukkit is available: " + versionName + " ###");
         } else {
-            System.out.println("### You're using the latest LilyBukkit build ###");
+            Bukkit.getServer().getLogger().info("### You're using the latest LilyBukkit build ###");
         }
     }
 }

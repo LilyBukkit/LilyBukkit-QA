@@ -51,7 +51,12 @@
 +
      protected Item(final int itemID) {
          this.maxStackSize = 64;
-@@ -245,37 +249,37 @@
+@@ -241,41 +245,41 @@
+         this.shiftedIndex = 256 + itemID;
+         if (Item.itemsList[256 + itemID] != null) {
+-            System.out.println(new StringBuilder("CONFLICT @ ").append(itemID).toString());
++            System.out.println("CONFLICT @ " + itemID);
+         }
          Item.itemsList[256 + itemID] = this;
      }
 -    
