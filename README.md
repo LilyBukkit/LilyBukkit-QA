@@ -23,8 +23,8 @@ is `Alpha 1.0.16.05_13 Lilypad QA` from the AlphaVer ARG.
 
 ## Installation
 
-Just follow [the guide](https://alphaver.fandom.com/wiki/Hosting_a_server#Hosting_a_Lilypad_server) (replace `RosepadServer.jar` with the name of the latest jar file).
+See [our website](https://https://lilybukkit.github.io/downloads.html).
 
 -----
-*This server core is developed on top of [RosepadMC/Rosepad](https://github.com/RosepadMC/Rosepad) `v1.1.0.5-beta`.*  
+*This server core is developed on top of [RosepadMC/Rosepad](https://github.com/RosepadMC/Rosepad).*  
 *More info on the ARG can be found at the [AlphaVer Wiki](https://alphaver.fandom.com/wiki).*
