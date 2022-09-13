@@ -41,7 +41,7 @@
      
      public void removePlayer(final EntityPlayerMP entityPlayerMP) {
 -        this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat(new StringBuilder("§e").append(entityPlayerMP.username).append(" left the game.").toString()));
-+        //this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat("§e" +entityPlayerMP.username + " left the game.")); //LilyBukkit: replace 'this.playerEntity.username' with own code
++        this.mcServer.configManager.sendPacketToAllPlayers(new Packet3Chat("§e" +entityPlayerMP.username + " left the game.")); //LilyBukkit: replace 'this.playerEntity.username' with own code
          final int i2 = (int)entityPlayerMP.posX >> 4;
          final int i3 = (int)entityPlayerMP.posZ >> 4;
 @@ -132,5 +133,5 @@
