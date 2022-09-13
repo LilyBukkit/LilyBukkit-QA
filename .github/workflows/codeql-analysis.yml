@@ -84,11 +84,8 @@ jobs:
         java-version: ${{ matrix.java2 }}
     - name: make gradle wrapper executable
       run: chmod +x ./gradlew
-    - name: build
-      run: TOOLKIT_JAVA17=$(echo /opt/hostedtoolcache/Java_Zulu_jdk/17.*/x64) USERNAME=Vladg24YT TOKEN=${{ secrets.GITHUB_TOKEN }} ./gradlew -Dorg.gradle.java.home=$(echo /opt/hostedtoolcache/Java_Zulu_jdk/8.*/x64) prepare injectClasses processPatches shadowJar pack
     - run: |
         echo "Run, Build Application using script"
-        TOOLKIT_JAVA17=$(echo /opt/hostedtoolcache/Java_Zulu_jdk/17.*/x64) USERNAME=Vladg24YT TOKEN=${{ secrets.GITHUB_TOKEN }} ./gradlew -Dorg.gradle.java.home=$(echo /opt/hostedtoolcache/Java_Zulu_jdk/8.*/x64) prepare injectClasses processPatches shadowJar pack
-
+        TOOLKIT_JAVA17=$(echo /opt/hostedtoolcache/Java_Zulu_jdk/17.*/x64) ./gradlew -Dorg.gradle.java.home=$(echo /opt/hostedtoolcache/Java_Zulu_jdk/8.*/x64) prepare injectClasses processPatches shadowJar pack
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
