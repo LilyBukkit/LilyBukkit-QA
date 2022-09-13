@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Packet130RosepadMeta extends Packet {
     public List<ULPPExtension> extensions = new ArrayList<>();
-    public String serverName = "§2" + Bukkit.getServer().getName();
+    public String serverName = Bukkit.getServer().getName();
     public String host = "";
     public int[] version = ((LilyBukkit) Bukkit.getServer()).getRosepadVersion();
     public String tag = ((LilyBukkit) Bukkit.getServer()).getRosepadVersionTag();

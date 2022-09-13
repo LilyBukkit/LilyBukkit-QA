@@ -139,7 +139,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public String getVersion() {
-        return "Alpha 2.0.0.1";
+        return "Alpha 2.0.0.2";
     }
 
     /**
