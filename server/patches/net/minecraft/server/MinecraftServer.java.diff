@@ -216,7 +216,7 @@
 +        } else {
              MinecraftServer.logger.warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
              MinecraftServer.logger.warning("The server will make no attempt to authenticate usernames. Beware.");
-@@ -116,60 +176,108 @@
+@@ -116,60 +176,102 @@
          }
          this.configManager = new ServerConfigurationManager(this);
 -        this.entityTracker = new EntityTracker(this);
@@ -274,14 +274,8 @@
 -                this.worldMngr.chunkProviderServer.loadChunk((this.worldMngr.spawnX >> 4) + i3, (this.worldMngr.spawnZ >> 4) + i4);
              }
 +            this.lilyBukkit.getPluginManager().callEvent(new WorldLoadEvent(world.getBukkitWorld())); //LilyBukkit
-+            // LilyBukkit start
          }
 +
-+        if (this.lilyBukkit.worldList.put(worldName, world.getBukkitWorld()) != null) {
-+            MinecraftServer.logger.severe("[LilyBukkit] Couldn't add the current world, terminating to prevent bugs");
-+            this.stop();
-+        }
-+        // LilyBukkit stop
          this.clearCurrentTask();
      }
 -    
@@ -349,7 +343,7 @@
 +
      public void run() {
          try {
-@@ -181,9 +289,9 @@
+@@ -181,9 +283,9 @@
                      long j4 = j3 - j1;
                      if (j4 > 2000L) {
 -                        MinecraftServer.logger.warning("Can't keep up! Did the system time change, or is the server overloaded?");
@@ -361,7 +355,7 @@
 +                        MinecraftServer.logger.warning("Time ran backwards! Did the system time change? Detecting " + j4 + "ms missing"); //LilyBukkit - add milliseconds counter
                          j4 = 0L;
                      }
-@@ -196,26 +304,22 @@
+@@ -196,26 +298,22 @@
                      Thread.sleep(1L);
                  }
 -            }
@@ -393,7 +387,7 @@
 +                } catch (InterruptedException interruptedException16) {
                      interruptedException16.printStackTrace();
                  }
-@@ -223,288 +327,145 @@
+@@ -223,288 +321,149 @@
              return;
          }
 -        finally {
@@ -746,8 +740,12 @@
 +            }
 +        }
 +
-+        return this.worlds.get(0);
++        return this.getWorldServer(0);
 +        // CraftBukkit end
++    }
++
++    public WorldServer getWorldServer(int index){
++        return this.worlds.get(index);
 +    }
 +
 +    public EntityTracker getTracker(String i) {

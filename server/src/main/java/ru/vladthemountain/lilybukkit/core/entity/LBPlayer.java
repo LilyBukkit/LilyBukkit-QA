@@ -44,9 +44,9 @@ public class LBPlayer extends LBLivingEntity implements Player {
         this.entity = p;
         this.world = w;
         this.displayName = p.username;
-        this.spawnPoint = new Location(this.world, p.worldObj.spawnX, p.worldObj.spawnY, p.worldObj.spawnZ);
-        this.inventory = new LBPlayerInventory(this.entity.inventory);
-        this.playerTime = this.world.getTime();
+        this.spawnPoint = new Location(w, p.worldObj.spawnX, p.worldObj.spawnY, p.worldObj.spawnZ);
+        this.inventory = new LBPlayerInventory(p.inventory);
+        this.playerTime = w.getTime();
         this.permissibleBase = new PermissibleBase(this);
     }
 

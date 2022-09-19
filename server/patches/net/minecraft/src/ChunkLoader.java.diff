@@ -28,6 +28,13 @@
 +                    System.out.print("Chunk file at " + x + "," + z + " is in the wrong location; relocating. (Expected " + x + ", " + z + ", got " + chunk7.xPosition + ", " + chunk7.zPosition + ")");
                      nBTTagCompound6.setInteger("xPos", x);
                      nBTTagCompound6.setInteger("zPos", z);
+@@ -70,5 +70,5 @@
+     
+     public void saveChunk(final World world, final Chunk chunk) {
+-        world.checkSessionLock();
++        //world.checkSessionLock();
+         final File file3 = this.chunkFileForXZ(chunk.xPosition, chunk.zPosition);
+         if (file3.exists()) {
 @@ -80,7 +80,7 @@
              final NBTTagCompound nBTTagCompound6 = new NBTTagCompound();
              final NBTTagCompound nBTTagCompound7 = new NBTTagCompound();
@@ -38,6 +45,13 @@
 +            CompressedStreamTools.writeCompressed(nBTTagCompound6, fileOutputStream5);
              fileOutputStream5.close();
              if (file3.exists()) {
+@@ -96,5 +96,5 @@
+     
+     public void storeChunkInCompound(final Chunk chunk, final World world, final NBTTagCompound nbttagcompound) {
+-        world.checkSessionLock();
++        //world.checkSessionLock();
+         nbttagcompound.setInteger("xPos", chunk.xPosition);
+         nbttagcompound.setInteger("zPos", chunk.zPosition);
 @@ -117,5 +117,5 @@
              }
          }

@@ -183,7 +183,7 @@
 +
      public EntityPlayerMP login(final NetLoginHandler netLoginHandler1, final String username, final String password, final boolean authed) {
 +        // LilyBukkit start
-+        EntityPlayerMP entity = new EntityPlayerMP(this.mcServer, this.mcServer.getWorldServer(this.mcServer.propertyManagerObj.getStringProperty(LilyBukkit.LEVEL_NAME, "world")), username, new ItemInWorldManager(this.mcServer.getWorldServer(this.mcServer.propertyManagerObj.getStringProperty("level-name", "world"))));
++        EntityPlayerMP entity = new EntityPlayerMP(this.mcServer, this.mcServer.getWorldServer(0), username, new ItemInWorldManager(this.mcServer.getWorldServer(this.mcServer.propertyManagerObj.getStringProperty("level-name", "world"))));
 +        Player player = (Player) entity.getBukkitEntity();
 +        PlayerLoginEvent event = new PlayerLoginEvent(player);
 +        // LilyBukkit end

@@ -92,7 +92,7 @@ public class LilyBukkit implements Server {
     private final PluginManager pluginMngr;
     private final BukkitScheduler scheduler;
     private final ServicesManager servicesMngr;
-    public final Map<String, World> worldList = new LinkedHashMap<>();
+    private final Map<String, World> worldList = new LinkedHashMap<>();
     private final List<Recipe> recipeManager;
     private final SimpleCommandMap commandMap;
     Configuration configuration;
@@ -509,7 +509,7 @@ public class LilyBukkit implements Server {
      */
     @Override
     public World getWorld(String name) {
-        return this.worldList.get(name);
+        return this.worldList.get(name) != null ? this.worldList.get(name) : this.worldList.put(name, this.mc.getWorldServer(name).getBukkitWorld());
     }
 
     /**

@@ -23,9 +23,9 @@ public class LBChunk implements Chunk {
     protected net.minecraft.src.Chunk chunk;
     protected LBWorld world;
 
-    public LBChunk(LBWorld world, net.minecraft.src.Chunk chunk) {
+    public LBChunk(World world, net.minecraft.src.Chunk chunk) {
         this.chunk = chunk;
-        this.world = world;
+        this.world = (LBWorld) world;
     }
 
     /**

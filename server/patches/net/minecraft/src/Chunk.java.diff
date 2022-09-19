@@ -43,7 +43,7 @@
 +            this.entities[i4] = new ArrayList<>();
          }
 +
-+        this.lbChunk = new LBChunk((LBWorld) Bukkit.getServer().getWorld(world.levelName), this); //LilyBukkit
++        this.lbChunk = new LBChunk(Bukkit.getServer().getWorld(world.levelName), this); //LilyBukkit
      }
 -    
 -    public Chunk(final World world, final byte[] blocks, final int xPosition, final int zPositin) {

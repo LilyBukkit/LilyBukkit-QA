@@ -7,6 +7,6 @@ import ru.vladthemountain.lilybukkit.core.entity.LBAnimals;
 @Deprecated
 public class CraftAnimals extends LBAnimals {
     public CraftAnimals(CraftServer server, EntityAnimal e) {
-        super(server.worldList.get(0), e);
+        super(server.getWorld(e.worldObj.levelName), e);
     }
 }

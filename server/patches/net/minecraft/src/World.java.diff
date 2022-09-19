@@ -258,13 +258,16 @@
 +
      public void saveWorld(final boolean flag, final IProgressUpdate progressUpdate) {
          if (this.chunkProvider.canSave()) {
-@@ -262,5 +261,5 @@
+@@ -262,7 +261,7 @@
          }
      }
 -    
 +
      private void saveLevel() {
-         this.checkSessionLock();
+-        this.checkSessionLock();
++        //this.checkSessionLock();
+         final NBTTagCompound nBTTagCompound1 = new NBTTagCompound();
+         nBTTagCompound1.setLong("RandomSeed", this.randomSeed);
 @@ -278,5 +277,5 @@
          EntityPlayer entityPlayer2 = null;
          if (this.playerEntities.size() > 0) {
@@ -1286,12 +1289,13 @@
 +
      public byte[] getChunkData(final int i1, final int i2, final int i3, final int x, final int y, final int z) {
          final byte[] b7 = new byte[x * y * z * 5 / 2];
-@@ -1560,20 +1616,18 @@
+@@ -1560,22 +1616,20 @@
          return b7;
      }
 -    
+-    public void checkSessionLock() {
 +
-     public void checkSessionLock() {
++    /*public void checkSessionLock() {
          try {
              final File file1 = new File(this.saveDirectory, "session.lock");
 -            final DataInputStream dataInputStream2 = new DataInputStream((InputStream)new FileInputStream(file1));
@@ -1311,3 +1315,6 @@
 +        } catch (IOException iOException7) {
              throw new MinecraftException("Failed to check session lock, aborting");
          }
+-    }
++    }*/
+ }
