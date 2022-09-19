@@ -92,7 +92,7 @@ public class LilyBukkit implements Server {
     private final PluginManager pluginMngr;
     private final BukkitScheduler scheduler;
     private final ServicesManager servicesMngr;
-    public final LinkedHashMap<String, World> worldList;
+    public final Map<String, World> worldList = new LinkedHashMap<>();
     private final List<Recipe> recipeManager;
     private final SimpleCommandMap commandMap;
     Configuration configuration;
@@ -101,7 +101,6 @@ public class LilyBukkit implements Server {
         this.mc = parent;
         this.scheduler = new CraftScheduler(this);
         this.servicesMngr = new SimpleServicesManager();
-        this.worldList = new LinkedHashMap<>();
         this.recipeManager = new ArrayList<>();
         this.commandMap = new SimpleCommandMap(this);
         this.pluginMngr = new SimplePluginManager(this, this.commandMap);
