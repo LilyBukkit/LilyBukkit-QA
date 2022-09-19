@@ -15,7 +15,7 @@ import java.util.Scanner;
 public class UpdateChecker {
     public static void checkForUpdates() {
 
-        String url = "https://api.github.com/repos/Vladg24YT/LilyBukkit/releases/latest";
+        String url = "https://api.github.com/repos/LilyBukkit/LilyBukkit-QA/releases/latest";
         String charset = StandardCharsets.UTF_8.name();
 
         JSONObject responseBody;
